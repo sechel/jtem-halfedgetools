@@ -9,13 +9,13 @@
 	<classpathentry kind="lib" path="lib/xstream-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/vecmath.jar"/>
 	<classpathentry kind="lib" path="lib/mjtOptimization.jar"/>
-	<classpathentry kind="lib" path="lib/jReality.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/java2d"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/java2dx"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/modelling"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/mfc"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/numericalMethods"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/jReality.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jrworkspace"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
