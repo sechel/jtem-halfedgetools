@@ -1,0 +1,224 @@
+package de.jtem.halfedgetools.functional.edgelength;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.functional.Energy;
+import de.jtem.halfedgetools.functional.Functional;
+import de.jtem.halfedgetools.functional.Gradient;
+import de.jtem.halfedgetools.functional.Hessian;
+import de.jtem.halfedgetools.functional.edgelength.EdgeLengthAdapters.Length;
+import de.jtem.halfedgetools.functional.edgelength.EdgeLengthAdapters.PositionDomainValue;
+import de.jtem.halfedgetools.functional.edgelength.EdgeLengthAdapters.WeightFunction;
+
+public class EdgeLengthFunctional <
+	V extends Vertex<V, E, F>,
+	E extends Edge<V, E, F>,
+	F extends Face<V, E, F>,
+	X extends PositionDomainValue<V>
+> implements Functional<V, E, F, X> {
+
+	private Length 
+		l0 = null;
+	private WeightFunction 
+		w = null;
+	
+	public EdgeLengthFunctional(Length l0, WeightFunction w) {
+		this.l0 = l0;
+		this.w = w;
+		this.w.evalWeight(0.0); // warning
+	}
+	
+	
+	@Override
+	public <HDS extends HalfEdgeDataStructure<V, E, F>> void evaluate(HDS hds,
+			X x, Energy E, Gradient G, Hessian H) {
+		if (E != null) {
+			E.set(evaluate(hds, x));
+		}
+		if (G != null) {
+			evaluateGradient(hds, x, G);
+		}
+		if (H != null) {
+			evaluateHessian(hds, x, H);
+		}
+	}
+
+	@Override
+	public <HDS extends HalfEdgeDataStructure<V, E, F>> int getDimension(HDS hds) {
+		return hds.numVertices() * 3;
+	}
+
+	
+	public double evaluate(
+		HalfEdgeDataStructure<V, E, F> G,
+		X x
+	) {
+		double[] s = new double[3];
+		double[] t = new double[3];
+		double[] smt = new double[3];
+		double l0sq = l0.getL0() * l0.getL0();
+		double result = 0.0;
+		for (E e : G.getPositiveEdges()) {
+			x.getPosition(e.getStartVertex(), s);
+			x.getPosition(e.getTargetVertex(), t);
+			subtract(smt, s, t);
+			double dot = innerProduct(smt, smt);
+			double dif = dot - l0sq;
+			result += dif * dif;
+		}
+		return result;
+	}
+	
+	
+	public void evaluateGradient(
+		// input	
+			HalfEdgeDataStructure<V, E, F> G,
+			X x,
+		// output
+			Gradient grad
+	) {
+		grad.setZero();
+		double[] vk = new double[3];
+		double[] vj = new double[3];
+		double[] smt = new double[3];
+		for (V v : G.getVertices()) {
+			double l0sq = l0.getL0() * l0.getL0();
+			for (E e : HalfEdgeUtils.incomingEdges(v)) {
+				x.getPosition(v, vk);
+				x.getPosition(e.getStartVertex(), vj);
+				subtract(smt, vk, vj);
+				double factor = innerProduct(smt, smt) - l0sq;
+				int off = v.getIndex() * 3;
+				for (int d = 0; d < 3; d++) {
+					grad.add(off + d, 4 * (vk[d] - vj[d]) * factor);
+				}
+			}
+		}
+	}
+	
+	
+	
+	
+	public void evaluateHessian(
+		// input
+			HalfEdgeDataStructure<V, E, F> G,
+			X x,
+		// output	
+			Hessian H
+	) {
+		H.setZero();
+		double[] vkPos = new double[3];
+		double[] vjPos = new double[3];
+		double[] smt = new double[3];
+		for (V vk : G.getVertices()) {
+			int koff = vk.getIndex() * 3;
+			double l0sq = l0.getL0() * l0.getL0();
+			List<E> star = HalfEdgeUtils.incomingEdges(vk);
+			for (E e : star) {
+				V vj = e.getStartVertex();
+				int joff = vj.getIndex() * 3;
+				x.getPosition(vk, vkPos);
+				x.getPosition(vj, vjPos);
+				subtract(smt, vkPos, vjPos);
+				double edgeContrib = innerProduct(smt, smt) - l0sq;
+				for (int d = 0; d < 3; d++) {
+					double vContrib = vkPos[d] - vjPos[d];
+					double vContribSq = 2 * vContrib * vContrib;
+					double diag = 4 * (vContribSq + edgeContrib);
+					H.add(koff + d, koff + d, diag);
+					H.add(koff + d, joff + d, -diag);
+					for (int d2 = 0; d2 < 3; d2++) {
+						if (d2 == d) {
+							continue;
+						}
+						double d2Contrib = vkPos[d2] - vjPos[d2];
+						H.add(koff + d, koff + d2, 8 * d2Contrib * vContrib);
+						H.add(koff + d, joff + d2, -8 * d2Contrib * vContrib);
+					}
+				}
+			}
+		}
+	}
+	
+	
+	private double innerProduct(double[] u, double[] v) {
+		if (u.length != v.length) {
+			if (Math.abs(u.length - v.length) != 1) {
+				throw new IllegalArgumentException(
+						"Vectors must have same length");
+			}
+		}
+		double norm = 0.0;
+		int n = u.length < v.length ? u.length : v.length;
+		for (int i = 0; i < n; ++i) {
+			norm += u[i] * v[i];
+		}
+		return norm;
+	}
+
+	private double[] subtract(double[] dst, double[] src1, double[] src2) {
+		int n = Math.min(src1.length, src2.length);
+		if (dst == null)
+			dst = new double[n];
+		if (dst.length > n) {
+			throw new IllegalArgumentException("Invalid dimension for target");
+		}
+		for (int i = 0; i < dst.length; ++i) {
+			dst[i] = src1[i] - src2[i];
+		}
+		return dst;
+	}
+	
+	
+	
+	public <
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> int[][] getNonZeroPattern(HDS hds){
+		int dim = hds.numVertices() * 3;
+		Map<Integer, List<Integer>> nzMap = new HashMap<Integer, List<Integer>>();
+		for (V v : hds.getVertices()) {
+			for (E e : HalfEdgeUtils.incomingEdges(v)) {
+				int off = v.getIndex() * 3;
+				int off2 = e.getStartVertex().getIndex() * 3;
+				for (int d = 0; d < 3; d++) {
+					if (!nzMap.containsKey(off + d)) {
+						nzMap.put(off + d, new LinkedList<Integer>());
+					}
+					List<Integer> nzList = nzMap.get(off + d);
+					nzList.add(off + d);
+					nzList.add(off2 + d);
+					for (int d2 = 0; d2 < 3; d2++) {
+						if (d2 == d) {
+							continue;
+						}
+						nzList.add(off + d2);
+						nzList.add(off2 + d2);
+					}
+				}
+			}
+		}
+		int[][] nzPattern = new int[dim][];
+		for (int i = 0; i < nzPattern.length; i++) {
+			List<Integer> nzList = nzMap.get(i); 
+			if (nzList == null) {
+				nzPattern[i] = new int[0];
+				continue;
+			}
+			nzPattern[i] = new int[nzList.size()];
+			int j = 0;
+			for (Integer nz : nzList) {
+				nzPattern[i][j++] = nz;
+			}
+		}
+		return nzPattern;
+	}
+
+}
