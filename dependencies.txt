@@ -1,8 +1,9 @@
 #jTEM dependencies of the project, put jars of other packages this project depends on in the 
 #folder specified by LIBDIR - default is "lib"
+halfedge
 java2d
 java2dx
-modelling
 mfc
+modelling
 numericalMethods
 jrworkspace
