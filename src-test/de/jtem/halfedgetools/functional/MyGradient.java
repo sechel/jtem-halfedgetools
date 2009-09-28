@@ -1,7 +1,6 @@
 package de.jtem.halfedgetools.functional;
 
 import no.uib.cipr.matrix.Vector;
-import de.jtem.halfedgetools.functional.Gradient;
 
 public class MyGradient implements Gradient {
 

@@ -11,8 +11,6 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jreality.ui.viewerapp.ViewerApp;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.jreality.ConverterHeds2JR;
-import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
 import de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType;
 import de.jtem.halfedgetools.jreality.adapter.standard.StandardColorAdapter;
 import de.jtem.halfedgetools.jreality.adapter.standard.StandardCoordinateAdapter;

@@ -21,8 +21,6 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
-import de.jtem.halfedgetools.functional.DomainValue;
-import de.jtem.halfedgetools.functional.Functional;
 
 
 public abstract class FunctionalTest <

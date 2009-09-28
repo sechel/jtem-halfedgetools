@@ -1,6 +1,5 @@
 package de.jtem.halfedgetools.functional;
 
-import de.jtem.halfedgetools.functional.Energy;
 
 public class MyEnergy implements Energy {
 
