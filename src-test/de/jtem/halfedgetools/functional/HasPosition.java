@@ -1,4 +1,4 @@
-package de.jtem.halfedge.functional;
+package de.jtem.halfedgetools.functional;
 
 import javax.vecmath.Point3d;
 

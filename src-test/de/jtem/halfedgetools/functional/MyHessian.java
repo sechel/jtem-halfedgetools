@@ -1,4 +1,4 @@
-package de.jtem.halfedge.functional;
+package de.jtem.halfedgetools.functional;
 
 import no.uib.cipr.matrix.Matrix;
 import de.jtem.halfedgetools.functional.Hessian;

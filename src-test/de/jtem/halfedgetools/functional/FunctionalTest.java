@@ -1,4 +1,4 @@
-package de.jtem.halfedge.functional;
+package de.jtem.halfedgetools.functional;
 
 import static de.jtem.halfedge.util.HalfEdgeUtils.constructFaceByVertices;
 import static java.lang.Math.sqrt;
