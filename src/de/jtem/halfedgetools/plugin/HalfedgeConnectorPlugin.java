@@ -93,7 +93,9 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		geometriesScroller = new JScrollPane(geometryList, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
 	private JLabel
 		selectedNodesLabel = new JLabel("Sel. V: E: F: "),
-		hedsClassLabel = new JLabel("Class: ");
+		vClassLabel = new JLabel("vClass: "),
+		eClassLabel = new JLabel("eClass: "),
+		fClassLabel = new JLabel("fClass: ");
 	private GeomObject	
 		activeGeometry = null;
 	private StatusChangedListener
@@ -138,7 +140,9 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		c.weightx = 1.0;
 		c.insets = new Insets(2, 2, 2, 2);
 		c.gridwidth = GridBagConstraints.REMAINDER;
-		shrinkPanel.add(hedsClassLabel, c);
+		shrinkPanel.add(vClassLabel, c);
+		shrinkPanel.add(eClassLabel, c);
+		shrinkPanel.add(fClassLabel, c);
 		shrinkPanel.add(selectedNodesLabel, c);
 		
 		geometryList.getSelectionModel().addListSelectionListener(this);
@@ -453,7 +457,9 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 	
 	void updateCache(HDS hds) {
 		cachedHEDS = hds;
-		hedsClassLabel.setText("V: " + hds.getVertexClass().getSimpleName() + " E: " + hds.getEdgeClass().getSimpleName() + " F: " +hds.getFaceClass().getSimpleName());
+		vClassLabel.setText("vClass: " + hds.getVertexClass().getSimpleName());
+		eClassLabel.setText("eClass: " + hds.getEdgeClass().getSimpleName());
+		fClassLabel.setText("fClass: " +hds.getFaceClass().getSimpleName());
 		
 	}
 	
