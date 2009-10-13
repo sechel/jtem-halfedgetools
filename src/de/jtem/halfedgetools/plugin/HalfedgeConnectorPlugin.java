@@ -106,8 +106,6 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		rescanButton = new JButton("Rescan"),
 		loadButton = new JButton("Load"),
 		saveButton = new JButton("Save");
-		
-	private Adapter[] lastAdapters = null;
 	
 	private JFileChooser 
 		chooser = FileLoaderDialog.createFileChooser("heml", "HalfEdge Markup Language");
@@ -154,12 +152,12 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		
 		
 		
-		c.gridwidth = 1;
-		c.weightx = 1.0;
-		shrinkPanel.add(loadButton, c);
-		c.gridwidth = REMAINDER;
-		c.weightx = 1.0;
-		shrinkPanel.add(saveButton, c);
+//		c.gridwidth = 1;
+//		c.weightx = 1.0;
+//		shrinkPanel.add(loadButton, c);
+//		c.gridwidth = REMAINDER;
+//		c.weightx = 1.0;
+//		shrinkPanel.add(saveButton, c);
 		
 		c.weighty = 0.0;
 
@@ -184,8 +182,8 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 				file = chooser.getSelectedFile();
 			}
 			if (file != null) {
-				HDS newHeds = HalfEdgeIO.readHDS(file.getAbsolutePath());
-				ConverterHeds2JR c = new ConverterHeds2JR();
+				HDS newHeds = HalfedgeIO.readHDS(file.getAbsolutePath());
+				ConverterHeds2JR<V,E,F> c = new ConverterHeds2JR<V,E,F>();
 				if(adapters == null)
 					adapters = new Adapter[] {new StandardCoordinateAdapter(AdapterType.VERTEX_ADAPTER)};
 				IndexedFaceSet ifs = c.heds2ifs(newHeds, adapters);
@@ -202,7 +200,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 				file = chooser.getSelectedFile();
 			}
 			if (file != null) {
-				HalfEdgeIO.writeHDS(cachedHEDS, file.getAbsolutePath());
+				HalfedgeIO.writeHDS(cachedHEDS, file.getAbsolutePath());
 			}
 		}
 	}
@@ -238,12 +236,14 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 
 	
 	public HDS getHalfedgeContent(HDS hds, Adapter... a) {
+		IndexedFaceSet ifs = null;
 		if (activeGeometry == null) {
 			// is there a better way to get this?
-			IndexedFaceSet ifs = (IndexedFaceSet)((GeomObject)geometryModel.get(0)).cgc.getGeometry();
+			// TODO check if remove
+			ifs = (IndexedFaceSet)((GeomObject)geometryModel.get(0)).cgc.getGeometry();
 		}
 		ConverterJR2Heds<V, E, F> c = new ConverterJR2Heds<V, E, F>(hds.getVertexClass(), hds.getEdgeClass(), hds.getFaceClass());
-		IndexedFaceSet ifs = (IndexedFaceSet)activeGeometry.cgc.getGeometry();
+		ifs = (IndexedFaceSet)activeGeometry.cgc.getGeometry();
 		boolean oriented = IndexedFaceSetUtility.makeConsistentOrientation(ifs);
 		if (!oriented) {
 			statusChangedListener.statusChanged("Surface is not orientable!");
@@ -294,7 +294,6 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		if (normals) {
 			IndexedFaceSetUtility.calculateAndSetNormals(ifs);
 		}
-		lastAdapters = a;
 		updateCache(hds);
 		activeGeometry.cgc.setGeometry(ifs);
 		contentChangedListener.skipNextUpdate(true);
@@ -459,7 +458,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		cachedHEDS = hds;
 		vClassLabel.setText("vClass: " + hds.getVertexClass().getSimpleName());
 		eClassLabel.setText("eClass: " + hds.getEdgeClass().getSimpleName());
-		fClassLabel.setText("fClass: " +hds.getFaceClass().getSimpleName());
+		fClassLabel.setText("fClass: " + hds.getFaceClass().getSimpleName());
 		
 	}
 	
@@ -504,10 +503,10 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 
 				
 				if(!ownUpdate ) {
-					System.err.println("Heds connector updating");
+//					System.err.println("Heds connector updating");
 					updateCache(hds);
 				} else {
-					System.err.println("Heds not updating because self-caused update");
+//					System.err.println("Heds not updating because self-caused update");
 					ownUpdate = false;
 				}
 			}

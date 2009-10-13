@@ -3,6 +3,7 @@ package de.jtem.halfedgetools.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -318,7 +319,11 @@ public class HalfEdgeUtilsExtra {
 	 * @param n the number of vertices 
 	 * @return the new face
 	 */
-	static public <V extends Vertex<V,E,F>,E extends Edge<V,E,F>, F extends Face<V,E,F>> List<E>  addTriangulatedNGonToBoundary(HalfEdgeDataStructure<V,E,F> heds, List<E> boundary) {
+	static public <
+		V extends Vertex<V,E,F>,
+		E extends Edge<V,E,F>, 
+		F extends Face<V,E,F>
+	> List<E>  addTriangulatedNGonToBoundary(HalfEdgeDataStructure<V,E,F> heds, List<E> boundary) {
 	
 		int n = boundary.size();
 		
@@ -618,6 +623,48 @@ public class HalfEdgeUtilsExtra {
 		graph.removeFace(f);
 		return midFace;
 		
+	}
+
+	// TODO: check with Boris
+	public static 	
+	<	V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+    > boolean isRegular(HalfEdgeDataStructure<V,E,F> heds) {
+		
+		for(E e : heds.getEdges()) {
+			if(e.getTargetVertex() == e.getStartVertex())
+				return false;
+		}
+		
+		for(F f : heds.getFaces()) {
+			List<E> b = getBoundary(f);
+			
+			int originalSize = b.size();
+			HashSet<E> hashSet = new HashSet<E>(b);
+			int withoutDuplicates = hashSet.size();
+			int numOfDuplicates = originalSize - withoutDuplicates;
+			
+			if(numOfDuplicates > 0) {
+				return false;
+			} else {
+				List<V> v = new ArrayList<V>();
+				for(E e : b) {
+					v.add(e.getTargetVertex());
+				}
+				
+				int originalSize2 = v.size();
+				HashSet<V> hashSet2 = new HashSet<V>(v);
+				int withoutDuplicates2 = hashSet2.size();
+				int numOfDuplicates2 = originalSize2 - withoutDuplicates2;
+				
+				if(numOfDuplicates2 > 0)
+					return false;
+			}
+		} 
+		
+		
+		return true;
 	}
 
 //	public static <

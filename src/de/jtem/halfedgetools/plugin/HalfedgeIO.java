@@ -10,7 +10,7 @@ import com.thoughtworks.xstream.XStream;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 
 
-public class HalfEdgeIO {
+public class HalfedgeIO {
 	
 	static XStream xstream = new XStream();
 

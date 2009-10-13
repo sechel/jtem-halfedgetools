@@ -317,7 +317,7 @@ public class Alexandrov {
 		}
 	}
 	
-	protected static <
+	public static <
 	V extends Vertex<V, E, F> & HasXYZW & HasRadius,
 	E extends Edge<V, E, F> & IsFlippable,
 	F extends Face<V, E, F>

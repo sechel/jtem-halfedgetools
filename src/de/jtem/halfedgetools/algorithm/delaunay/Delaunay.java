@@ -26,11 +26,14 @@ import de.jtem.halfedgetools.util.triangulationutilities.TriangulationException;
  * 
  * @author Stefan Sechelmann
  */
-public class Delaunay <V extends Vertex<V, E, F>, E extends Edge<V, E, F>  & IsFlippable, F extends Face<V, E, F>> {
+public class Delaunay  {
 	
 
-	public static <V extends Vertex<V, E, F>, E extends Edge<V, E, F>  & HasLength, F extends Face<V, E, F>> boolean isObtuse(
-			F f) throws TriangulationException {
+	public static <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>  & HasLength, 
+		F extends Face<V, E, F>
+	> boolean isObtuse(F f) throws TriangulationException {
 		for (E e : HalfEdgeUtils.boundaryEdges(f)) {
 			if (isObtuse(e))
 				return true;
@@ -38,21 +41,30 @@ public class Delaunay <V extends Vertex<V, E, F>, E extends Edge<V, E, F>  & IsF
 		return false;
 	}
 
-	public static <V extends Vertex<V, E, F>, E extends Edge<V, E, F> & HasLength, F extends Face<V, E, F>> boolean isObtuse(
-			E e) throws TriangulationException {
+	public static <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>  & HasLength, 
+		F extends Face<V, E, F>
+	> boolean isObtuse(E e) throws TriangulationException {
 		return getAngle(e) > Math.PI;
 	}
 
-	public static <V extends Vertex<V, E, F>, E extends Edge<V, E, F> & IsFlippable, F extends Face<V, E, F>> Integer getNumFlips(
-			HalfEdgeDataStructure<V, E, F> graph) {
+	public static <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F> & IsFlippable, 
+		F extends Face<V, E, F>
+	> Integer getNumFlips(HalfEdgeDataStructure<V, E, F> graph) {
 		Integer result = 0;
 		for (E e : graph.getEdges())
 			result += e.getFlipCount();
 		return result;
 	}
 
-	public static <V extends Vertex<V, E, F>, E extends Edge<V, E, F> & IsFlippable, F extends Face<V, E, F>> Integer getNumEffectiveFlips(
-			HalfEdgeDataStructure<V, E, F> graph) {
+	public static <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F> & IsFlippable, 
+		F extends Face<V, E, F>
+	> Integer getNumEffectiveFlips(HalfEdgeDataStructure<V, E, F> graph) {
 		Integer result = 0;
 		for (E e : graph.getEdges())
 			if (e.getFlipCount() > 0 && (e.getFlipCount() % 2) != 0)
@@ -68,15 +80,17 @@ public class Delaunay <V extends Vertex<V, E, F>, E extends Edge<V, E, F>  & IsF
 	 * @return the angle at edge
 	 * @throws TriangulationException
 	 */
-	public static <V extends Vertex<V, E, F>, E extends Edge<V, E, F> & HasLength, F extends Face<V, E, F>> Double getAngle(
-			E edge) throws TriangulationException {
+	public static <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F> & HasLength, 
+		F extends Face<V, E, F>
+	> Double getAngle(E edge) throws TriangulationException {
 		Double a = edge.getLength();
 		Double b = edge.getNextEdge().getLength();
 		Double c = edge.getPreviousEdge().getLength();
 		if ((a*a + b*b - c*c) / (2*a*b) > 1)
 			throw new TriangulationException("Triangle inequation doesn't hold for " + edge);
 		Double result = Math.abs(StrictMath.acos((a*a + b*b - c*c) / (2*a*b)));
-//		System.err.println("angle between " + edge + " and " + edge.getNextEdge() + " is " + result);
 		return result;
 		
 	}
@@ -89,16 +103,15 @@ public class Delaunay <V extends Vertex<V, E, F>, E extends Edge<V, E, F>  & IsF
 	 * @return the check result
 	 * @throws TriangulationException
 	 */
-	public static <V extends Vertex<V, E, F>, E extends Edge<V, E, F> & HasLength, F extends Face<V, E, F>> boolean isDelaunay(
-			E edge) throws TriangulationException {
-		// added boundary check...
-		// if(HalfEdgeUtils.isInteriorEdge(edge)) {
+	public static <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F> & HasLength, 
+		F extends Face<V, E, F>
+	> boolean isDelaunay(E edge) throws TriangulationException {
+
 		Double gamma = getAngle(edge.getNextEdge());
 		Double delta = getAngle(edge.getOppositeEdge().getNextEdge());
 		return gamma + delta <= Math.PI;
-		// } else {
-		// return true;
-		// }
 	}
 
 	/**
@@ -109,7 +122,8 @@ public class Delaunay <V extends Vertex<V, E, F>, E extends Edge<V, E, F>  & IsF
 	 * @return the check result
 	 * @throws TriangulationException
 	 */
-	public static <V extends Vertex<V, E, F>, E extends Edge<V, E, F> & HasLength, F extends Face<V, E, F>> boolean isDelaunay(
+	public static <
+		V extends Vertex<V, E, F>, E extends Edge<V, E, F> & HasLength, F extends Face<V, E, F>> boolean isDelaunay(
 			E edge, List<E> interior) throws TriangulationException {
 		// added boundary check...
 		if (interior.contains(edge)) {
@@ -121,7 +135,11 @@ public class Delaunay <V extends Vertex<V, E, F>, E extends Edge<V, E, F>  & IsF
 		}
 	}
 
-	public static <V extends Vertex<V, E, F>, E extends Edge<V, E, F> & HasLength, F extends Face<V, E, F>> boolean isDelaunay(
+	public static <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F> & HasLength, 
+		F extends Face<V, E, F>
+	> boolean isDelaunay(
 			HalfEdgeDataStructure<V, E, F> graph) {
 		for (E edge : graph.getEdges()) {
 			try {
