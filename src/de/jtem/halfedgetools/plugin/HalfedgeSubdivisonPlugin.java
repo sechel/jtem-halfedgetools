@@ -30,6 +30,7 @@ import de.jtem.halfedgetools.algorithm.subdivision.Subdivider.InterpolFunk;
 import de.jtem.halfedgetools.algorithm.subdivision.Subdivider.SubdivType;
 import de.jtem.halfedgetools.algorithm.subdivision.node.SubDivEdge;
 import de.jtem.halfedgetools.algorithm.subdivision.node.SubDivFace;
+import de.jtem.halfedgetools.algorithm.subdivision.node.SubDivHDS;
 import de.jtem.halfedgetools.algorithm.subdivision.node.SubDivVertex;
 import de.jtem.halfedgetools.jreality.adapter.standard.StandardCoordinateAdapter;
 import de.jtem.jrworkspace.plugin.Controller;
@@ -39,7 +40,7 @@ import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
 public class HalfedgeSubdivisonPlugin extends ShrinkPanelPlugin implements ActionListener {
 
-	private HalfedgeConnectorPlugin
+	private HalfedgeConnectorPlugin<SubDivVertex,SubDivEdge,SubDivFace,SubDivHDS>
 		hcp = null;
 		
 	// ----------------------------- Gui -----------------------------
@@ -54,7 +55,7 @@ public class HalfedgeSubdivisonPlugin extends ShrinkPanelPlugin implements Actio
 	private JCheckBox linearCB=new JCheckBox("linear",false);
 
 	private ButtonGroup typeBG= new ButtonGroup();
-	private JRadioButton sqrtRB=new JRadioButton("Sqareroot");
+	private JRadioButton sqrtRB=new JRadioButton("Squareroot");
 	private JRadioButton butterflyRB=new JRadioButton("Butterfly");
 	private JRadioButton stockRB=new JRadioButton("Stock");
 	private JRadioButton gonskaRB=new JRadioButton("Gonska");
@@ -118,17 +119,16 @@ public class HalfedgeSubdivisonPlugin extends ShrinkPanelPlugin implements Actio
 	}
 	private void unrefine(){
 		// convert:
-		HalfEdgeDataStructure<SubDivVertex, SubDivEdge,SubDivFace> heds= new HalfEdgeDataStructure<SubDivVertex, SubDivEdge, SubDivFace>(
-				SubDivVertex.class,SubDivEdge.class,SubDivFace.class);
-		hcp.getHalfedgeContent(heds,new StandardCoordinateAdapter(VERTEX_ADAPTER));
+		SubDivHDS heds = new SubDivHDS();
+		hcp.convertActiveGeometryToHDS(heds,new StandardCoordinateAdapter(VERTEX_ADAPTER));
 		// perform:
-		Subdivider s= new Subdivider(SubDivVertex.class, SubDivEdge.class, SubDivFace.class);
+		Subdivider<SubDivVertex,SubDivEdge,SubDivFace> s = new Subdivider(SubDivVertex.class, SubDivEdge.class, SubDivFace.class);
 		s.setHeds(heds);
 		s.setToleranceShort(minSpM.getNumber().doubleValue());
 		s.removeShortEdges();
 		// reconvert:
 		heds=s.getHeds();
-		hcp.updateHalfedgeContent(heds, true, 
+		hcp.updateHalfedgeContentAndActiveGeometry(heds, true, 
 				new StandardCoordinateAdapter(VERTEX_ADAPTER)
 //				,new SubDivTypeColorAdapter(VERTEX_ADAPTER)
 //				,new SubDivTypeColorAdapter(FACE_ADAPTER)
@@ -138,7 +138,7 @@ public class HalfedgeSubdivisonPlugin extends ShrinkPanelPlugin implements Actio
 		// convert:
 		HalfEdgeDataStructure<SubDivVertex, SubDivEdge,SubDivFace> heds= new HalfEdgeDataStructure<SubDivVertex, SubDivEdge, SubDivFace>(
 				SubDivVertex.class,SubDivEdge.class,SubDivFace.class);
-		hcp.getHalfedgeContent(heds,new StandardCoordinateAdapter(VERTEX_ADAPTER));
+		hcp.convertActiveGeometryToHDS(heds,new StandardCoordinateAdapter(VERTEX_ADAPTER));
 
 		// settings and perform:
 		Subdivider s= new Subdivider(SubDivVertex.class, SubDivEdge.class, SubDivFace.class);
@@ -192,7 +192,7 @@ public class HalfedgeSubdivisonPlugin extends ShrinkPanelPlugin implements Actio
 		
 		// reconvert:
 		heds=s.getHeds();
-		hcp.updateHalfedgeContent(heds, true, 
+		hcp.updateHalfedgeContentAndActiveGeometry(heds, true, 
 				new StandardCoordinateAdapter(VERTEX_ADAPTER)
 //				,new SubDivTypeColorAdapter(VERTEX_ADAPTER)
 //				,new SubDivTypeColorAdapter(EDGE_ADAPTER)
@@ -213,6 +213,7 @@ public class HalfedgeSubdivisonPlugin extends ShrinkPanelPlugin implements Actio
 		return new PluginInfo("gonskas subdivider and others");
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);

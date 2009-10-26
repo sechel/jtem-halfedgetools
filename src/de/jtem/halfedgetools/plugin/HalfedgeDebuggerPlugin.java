@@ -1,6 +1,5 @@
 package de.jtem.halfedgetools.plugin;
 
-import static de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType.VERTEX_ADAPTER;
 import static javax.swing.SwingUtilities.isEventDispatchThread;
 
 import java.awt.Dimension;
@@ -26,10 +25,6 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.jreality.adapter.standard.StandardCoordinateAdapter;
-import de.jtem.halfedgetools.jreality.node.standard.StandardEdge;
-import de.jtem.halfedgetools.jreality.node.standard.StandardFace;
-import de.jtem.halfedgetools.jreality.node.standard.StandardVertex;
 import de.jtem.halfedgetools.plugin.AnnotationAdapter.EdgeIndexAnnotation;
 import de.jtem.halfedgetools.plugin.AnnotationAdapter.FaceIndexAnnotation;
 import de.jtem.halfedgetools.plugin.AnnotationAdapter.VertexIndexAnnotation;
@@ -42,12 +37,13 @@ import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
 public class HalfedgeDebuggerPlugin <
-	V extends Vertex<V, E, F>,
-	E extends Edge<V, E, F>,
-	F extends Face<V, E, F>
+V extends Vertex<V,E,F>,
+E extends Edge<V,E,F> ,
+F extends Face<V,E,F>,
+HDS extends HalfEdgeDataStructure<V,E,F>
 > extends ShrinkPanelPlugin implements ActionListener, ChangeListener {
 
-	private HalfedgeConnectorPlugin
+	private HalfedgeConnectorPlugin<V,E,F,HDS>
 		hcp = null;
 	private SimpleModeller2D
 		moddeller = new GraphicsModeller2D();
@@ -78,7 +74,7 @@ public class HalfedgeDebuggerPlugin <
 		navigationPanel = new JPanel(),
 		debugPanel = new JPanel();
 	
-	private HalfEdgeDataStructure<V, E, F>
+	private HDS
 		hds = null;
 	private AnnotationAdapter<?>[]
 	    defaultAnnotators = {
@@ -161,12 +157,13 @@ public class HalfedgeDebuggerPlugin <
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	public void actionPerformed(ActionEvent e) {
 		Object s = e.getSource();
 		if (getGeometryButton == s) {
-			hds = (HalfEdgeDataStructure<V, E, F>) new HalfEdgeDataStructure<StandardVertex, StandardEdge, StandardFace>(StandardVertex.class, StandardEdge.class, StandardFace.class);
-			hcp.getHalfedgeContent(hds, new StandardCoordinateAdapter(VERTEX_ADAPTER));
+			hds = hcp.getBlankHDS();
+//			hds = (HalfEdgeDataStructure<V, E, F>) new HalfEdgeDataStructure<StandardVertex, StandardEdge, StandardFace>(StandardVertex.class, StandardEdge.class, StandardFace.class);
+//			hcp.convertActiveGeometryToHDS(hds, new StandardCoordinateAdapter(VERTEX_ADAPTER));
+			hds = hcp.getCachedHalfEdgeDataStructure();
 			setData(hds);
 		}
 		if (continueButton == s) {
@@ -321,7 +318,7 @@ public class HalfedgeDebuggerPlugin <
 	}
 	
 	
-	public void setData(HalfEdgeDataStructure<V, E, F> hds) {
+	public void setData(HDS hds) {
 		this.hds = hds;
 		vertexSpinner.removeChangeListener(this);
 		edgeSpinner.removeChangeListener(this);
@@ -364,6 +361,7 @@ public class HalfedgeDebuggerPlugin <
 		return View.class;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);

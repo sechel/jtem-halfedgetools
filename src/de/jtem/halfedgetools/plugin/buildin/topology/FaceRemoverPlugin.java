@@ -1,29 +1,29 @@
 package de.jtem.halfedgetools.plugin.buildin.topology;
 
-import de.jreality.plugin.JRViewerUtility;
-import de.jreality.plugin.basic.Content;
-import de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType;
-import de.jtem.halfedgetools.jreality.adapter.standard.StandardCoordinateAdapter;
-import de.jtem.halfedgetools.jreality.node.standard.StandardHDS;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin;
 import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
-import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class FaceRemoverPlugin extends HalfedgeAlgorithmPlugin{
+public class FaceRemoverPlugin<
+V extends Vertex<V,E,F>,
+E extends Edge<V,E,F> ,
+F extends Face<V,E,F>,
+HDS extends HalfEdgeDataStructure<V,E,F>
+> extends HalfedgeAlgorithmPlugin<V,E,F,HDS>{
 
-	private Content content = null;
-	private HalfedgeConnectorPlugin hedsConnector = null;
 	
 	
-	public void execute(HalfedgeConnectorPlugin hcp) { 
-		StandardHDS hds = hedsConnector.getHalfedgeContent(new StandardCoordinateAdapter(AdapterType.VERTEX_ADAPTER));
+	public void execute(HalfedgeConnectorPlugin<V,E,F,HDS> hcp) { 
+		HDS hds = hcp.getCachedHalfEdgeDataStructure();
 		
-		HalfEdgeTopologyOperations.removeFace(hds.getFace(hedsConnector.getSelectedFaceIndex()));
-		hedsConnector.updateHalfedgeContent(hds, true, new StandardCoordinateAdapter(AdapterType.VERTEX_ADAPTER));
+		HalfEdgeTopologyOperations.removeFace(hds.getFace(hcp.getSelectedFaceIndex()));
+		hcp.updateHalfedgeContentAndActiveGeometry(hds, true);
 		
-		content.fireContentChanged();
 	}
 
 	
@@ -46,20 +46,6 @@ public class FaceRemoverPlugin extends HalfedgeAlgorithmPlugin{
 		return new PluginInfo("Face remover");
 	}
 	
-	
-	public void install(Controller c) throws Exception {
-		super.install(c);
-		
-		content = JRViewerUtility.getContentPlugin(c);
-		hedsConnector = c.getPlugin(HalfedgeConnectorPlugin.class);
-
-	}
-	
-	
-	public void uninstall(Controller c) throws Exception {
-		super.uninstall(c);
-	}
-
 	
 
 }

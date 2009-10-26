@@ -5,16 +5,25 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import de.jreality.plugin.basic.ViewMenuBar;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 
-public abstract class HalfedgeAlgorithmPlugin extends Plugin {
+public abstract class HalfedgeAlgorithmPlugin <
+V extends Vertex<V,E,F>,
+E extends Edge<V,E,F> ,
+F extends Face<V,E,F>,
+HDS extends HalfEdgeDataStructure<V,E,F>
+>  extends Plugin {
 
 	protected ViewMenuBar
 		viewMenuBar = null;
 	protected HalfedgeToolBar
 		halfedgeToolBar = null;
-	protected HalfedgeConnectorPlugin<?,?,?,?>
+	protected HalfedgeConnectorPlugin<V,E,F,HDS>
 		hcp = null;
 	protected double
 		actionPriority = 1.0;
@@ -50,6 +59,7 @@ public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 		Diagnosis
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
@@ -74,6 +84,6 @@ public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 	
 	public abstract String getAlgorithmName();
 
-	public abstract void execute(HalfedgeConnectorPlugin<?,?,?,?> hcp);
+	public abstract void execute(HalfedgeConnectorPlugin<V,E,F,HDS> hcp);
 	
 }

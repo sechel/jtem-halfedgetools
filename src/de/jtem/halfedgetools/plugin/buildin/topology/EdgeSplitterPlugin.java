@@ -1,41 +1,44 @@
 package de.jtem.halfedgetools.plugin.buildin.topology;
 
 import de.jreality.math.Rn;
-import de.jreality.plugin.JRViewerUtility;
-import de.jreality.plugin.basic.Content;
-import de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType;
-import de.jtem.halfedgetools.jreality.adapter.standard.StandardCoordinateAdapter;
-import de.jtem.halfedgetools.jreality.node.standard.StandardEdge;
-import de.jtem.halfedgetools.jreality.node.standard.StandardHDS;
-import de.jtem.halfedgetools.jreality.node.standard.StandardVertex;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin;
 import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
-import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class EdgeSplitterPlugin extends HalfedgeAlgorithmPlugin {
+public class EdgeSplitterPlugin<
+V extends Vertex<V,E,F>,
+E extends Edge<V,E,F> ,
+F extends Face<V,E,F>,
+HDS extends HalfEdgeDataStructure<V,E,F>
+> extends HalfedgeAlgorithmPlugin<V,E,F,HDS>{
 
-	private Content content = null;
-	private HalfedgeConnectorPlugin hedsConnector = null;
-
+	private Coord3DAdapter<V> adapter;
 	
-	public void execute(HalfedgeConnectorPlugin hcp) { 
-		StandardHDS hds = hedsConnector.getHalfedgeContent(new StandardCoordinateAdapter(AdapterType.VERTEX_ADAPTER));
+	public EdgeSplitterPlugin(Coord3DAdapter<V> ad) {
+		this.adapter = ad;
+	}
+	
+	public void execute(HalfedgeConnectorPlugin<V,E,F,HDS> hcp) { 
+		HDS hds = hcp.getCachedHalfEdgeDataStructure();
 		
-		StandardEdge e= hds.getEdge(hedsConnector.getSelectedEdgeIndex());
+		E e= hds.getEdge(hcp.getSelectedEdgeIndex());
 		
 	
-		double[] p1 = e.getTargetVertex().position;
-		double[] p2 = e.getStartVertex().position;
-		StandardVertex v = HalfEdgeTopologyOperations.splitEdge(e);
-		v.position = Rn.linearCombination(null, 0.5, p1, 0.5, p2);
+		double[] p1 = adapter.getCoord(e.getTargetVertex());
+		double[] p2 = adapter.getCoord(e.getStartVertex());
+		V v = HalfEdgeTopologyOperations.splitEdge(e);
+		adapter.setCoord(v, Rn.linearCombination(null, 0.5, p1, 0.5, p2));
 		
-		hedsConnector.updateHalfedgeContent(hds, true, new StandardCoordinateAdapter(AdapterType.VERTEX_ADAPTER));
+		hcp.updateHalfedgeContentAndActiveGeometry(hds, true);
 		
-		hedsConnector.setSelectedVertexIndex(v.getIndex());
+		hcp.setSelectedVertexIndex(v.getIndex());
 		
-		content.fireContentChanged();
 	}
 
 	
@@ -58,20 +61,6 @@ public class EdgeSplitterPlugin extends HalfedgeAlgorithmPlugin {
 		return new PluginInfo("Edge splitter");
 	}
 	
-	
-	public void install(Controller c) throws Exception {
-		super.install(c);
-		
-		content = JRViewerUtility.getContentPlugin(c);
-		hedsConnector = c.getPlugin(HalfedgeConnectorPlugin.class);
 
-	}
-	
-	
-	public void uninstall(Controller c) throws Exception {
-		super.uninstall(c);
-	}
-
-	
 
 }

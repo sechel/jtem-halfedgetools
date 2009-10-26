@@ -666,22 +666,22 @@ public class FaceCycleSubdivider {
 	 * Entscheidet gleich anhand der Laenge was zuerst gesplited wird. 
 	 * @param face Facette die gedrittelt werden soll.
 	 */
-	private void splitFaceTwiceOpti(int face){
-		double[] len=faceSideLenSq.get(face);
-		short longest=0;
-		if(len[longest]<len[1])	longest=1;
-		if(len[longest]<len[2])	longest=2;
-		int newFace=edgeSplit(face,longest,FaceType.HANDLED_WAY);
-		short vice=next(longest);
-		if(len[vice]<len[next(vice)]){
-			vice=next(vice);
-			edgeSplit(face,vice,FaceType.HANDLED_WAY);	
-		}
-		else{
-			edgeSplit(newFace,vice,FaceType.HANDLED_WAY);
-		}
-		return;
-	}
+//	private void splitFaceTwiceOpti(int face){
+//		double[] len=faceSideLenSq.get(face);
+//		short longest=0;
+//		if(len[longest]<len[1])	longest=1;
+//		if(len[longest]<len[2])	longest=2;
+//		int newFace=edgeSplit(face,longest,FaceType.HANDLED_WAY);
+//		short vice=next(longest);
+//		if(len[vice]<len[next(vice)]){
+//			vice=next(vice);
+//			edgeSplit(face,vice,FaceType.HANDLED_WAY);	
+//		}
+//		else{
+//			edgeSplit(newFace,vice,FaceType.HANDLED_WAY);
+//		}
+//		return;
+//	}
 	/**Findet den Nachfolger dieser Facette im Weg des Subdivisionsgraphen.
 	 * Prueft dabei gleichzeitig ob der Weg enden muss.
 	 * @param faceSide Facette und Startseite des Restweges.

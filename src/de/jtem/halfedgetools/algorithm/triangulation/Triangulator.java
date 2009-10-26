@@ -10,11 +10,13 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 
-public class Triangulator <
-	V extends Vertex<V, E, F>,
-	E extends Edge<V, E, F>,
-	F extends Face<V, E, F>
-> {
+public class Triangulator 
+<
+	V extends Vertex<V, E,F>,
+	E extends Edge<V, E,F>,
+	F extends Face<V, E,F>
+> 
+{
 
 //	public <
 //	HDS extends HalfEdgeDataStructure<V, E, F>
@@ -24,10 +26,12 @@ public class Triangulator <
 //		triangulate(hds);
 //	}
 	
-	public <
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> List<E> triangulate(
-		HDS hds
+	public
+//	<
+//		HDS extends HalfEdgeDataStructure<V, E, F>
+//	> 
+	List<E> triangulate(
+		HalfEdgeDataStructure<V,E,F> hds
 	) {
 		List<E> newEdges = new ArrayList<E>();
 		List<F> fList = new LinkedList<F>(hds.getFaces());

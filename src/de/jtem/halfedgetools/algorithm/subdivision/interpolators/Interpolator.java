@@ -19,6 +19,7 @@ public abstract class Interpolator {
 	E extends JREdge<V,E,F> & HasLengthSquared,
 	F extends JRFace<V,E,F>
 	>void interpolate(E e,V v){
+		
 		double[] t=e.getTargetVertex().position;
 		double[] s=e.getStartVertex().position;
 		double[] coords=new double[t.length];

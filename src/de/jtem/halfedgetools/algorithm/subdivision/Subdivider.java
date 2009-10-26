@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.algorithm.subdivision;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -7,8 +8,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+
 import sun.misc.Compare;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.HasLengthSquared;
 import de.jtem.halfedgetools.algorithm.subdivision.decorations.HasType.Type;
 import de.jtem.halfedgetools.algorithm.subdivision.interpolators.Interpolator;
@@ -101,11 +107,13 @@ public class Subdivider<
 	private Class<V> vClass = null;
 	private Class<E> eClass = null;
 	private Class<F> fClass = null;
+	private Coord3DAdapter<V> ad;
 	
-	public Subdivider(Class<V> vClass, Class<E> eClass, Class<F> fClass) {
+	public Subdivider(Class<V> vClass, Class<E> eClass, Class<F> fClass, Coord3DAdapter<V> ad) {
 		this.vClass = vClass;
 		this.eClass = eClass;
 		this.fClass = fClass;
+		this.ad = ad;
 	}
 	
 	
@@ -720,7 +728,7 @@ public class Subdivider<
 				E eNew=(E)forwardEdg[e.getIndex()];
 				if(e.getLeftFace()!=null)
 					eNew.setLeftFace((F)forwardFac[e.getLeftFace().getIndex()]);
-//				if(e.getTargetVertex()!=null)
+				if(e.getTargetVertex()!=null)
 					eNew.setTargetVertex((V)forwardVert[e.getTargetVertex().getIndex()]);
 				//else System.out.println("Subdivider.removeMarkedNodes(NoVertex)");
 				eNew.linkNextEdge((E)forwardEdg[e.getNextEdge().getIndex()]);
@@ -730,6 +738,37 @@ public class Subdivider<
 		}
 		heds=hedsNew;
 	}
+	
+//	private void removeMarkedNodes() {
+//		
+//		List<V> vToRem = new ArrayList<V>();
+//		List<E> eToRem = new ArrayList<E>();
+//		List<F> fToRem = new ArrayList<F>();
+//		
+//		for(V v : heds.getVertices()) {
+//			if(vTypes.get(v) == Type.illegal)
+//				vToRem.add(v);
+//		}
+//		
+//		for(E e: heds.getEdges()) {
+//			if(eTypes.get(e) == Type.illegal)
+//				eToRem.add(e);
+//		}
+//		
+//		for(F f : heds.getFaces()) {
+//			if(fTypes.get(f) == Type.illegal)
+//				fToRem.add(f);
+//		}
+//		
+//		for(V v : vToRem)
+//			heds.removeVertex(v);
+//		
+//		for(E e : eToRem)
+//			heds.removeEdge(e);
+//		
+//		for(F f : fToRem)
+//			heds.removeFace(f);
+//	}
 	//----------------- publics ----------------------
 	/** Entsorgt ueberfluesige Daten.
 	 * Setzt alle Vertex-, Facetten- und Kanten-Typen zurueck auf "optimal". */ 
@@ -1652,5 +1691,6 @@ public class Subdivider<
 		return interp;
 	}
 }
+
 
 

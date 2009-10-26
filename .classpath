@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="de/jtem/halfedgetools/plugin/HalfedgeSubdivisonPlugin.java" kind="src" path="src"/>
 	<classpathentry kind="src" path="src-test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/halfedge"/>
@@ -15,7 +15,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/mfc"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/numericalMethods"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="lib/jReality.jar"/>
+	<classpathentry kind="lib" path="lib/jReality.jar" sourcepath="/jreality"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jrworkspace"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -115,17 +115,7 @@ public class HalfEdgeUtilsExtra {
 //			v.setPosition(pos);
 //		}
 //	}
-	
-	public static <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>
-	>
-	HalfEdgeDataStructure<V,E,F> createCombinatoriallyEquivalentCopy(HalfEdgeDataStructure<V,E,F> graph) {
-	
-		return graph.createCombinatoriallyEquivalentCopy(graph.getVertexClass(), graph.getEdgeClass(), graph.getFaceClass());
-		
-	}
+
 	
 	public static <
 		V extends Vertex<V, E, F>,
@@ -391,10 +381,35 @@ public class HalfEdgeUtilsExtra {
 		return edges;
 	}
 
-	public static void clear(HalfEdgeDataStructure<?,?,?> graph){
-		graph.getVertices().clear();
-		graph.getEdges().clear();
-		graph.getFaces().clear();
+	public static <
+	V extends Vertex<V, E, F>,
+	E extends Edge<V, E, F>,
+	F extends Face<V, E, F>
+>void clear(HalfEdgeDataStructure<V,E,F> heds){
+		List<V> vToRem = new ArrayList<V>();
+		List<E> eToRem = new ArrayList<E>();
+		List<F> fToRem = new ArrayList<F>();
+		
+		for(V v : heds.getVertices()) {
+				vToRem.add(v);
+		}
+		
+		for(E e: heds.getEdges()) {
+				eToRem.add(e);
+		}
+		
+		for(F f : heds.getFaces()) {
+				fToRem.add(f);
+		}
+		
+		for(V v : vToRem)
+			heds.removeVertex(v);
+		
+		for(E e : eToRem)
+			heds.removeEdge(e);
+		
+		for(F f : fToRem)
+			heds.removeFace(f);
 	}
 
 	public static <

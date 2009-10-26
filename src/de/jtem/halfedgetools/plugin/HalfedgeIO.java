@@ -54,7 +54,7 @@ public class HalfedgeIO {
 	
 	public static void writeHDS(HalfEdgeDataStructure<?,?,?> heds, String filename) {
 
-		xstream.setMode(XStream.ID_REFERENCES);
+//		xstream.setMode(XStream.ID_REFERENCES);
 		
 		String xml = xstream.toXML(heds);
 		try {

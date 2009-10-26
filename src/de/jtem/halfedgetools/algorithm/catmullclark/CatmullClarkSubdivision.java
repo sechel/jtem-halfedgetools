@@ -16,6 +16,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
+import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 
 /**
  * Catmull-Clark Subdivision
@@ -46,7 +47,7 @@ public class CatmullClarkSubdivision  <
 		HDS r,
 		Coord3DAdapter<V> coord
 	) {
-		
+		HalfEdgeUtilsExtra.clear(r);
 		// face vertices
 		Map<F, V> fvMap = new HashMap<F, V>();
 		for (F f : hds.getFaces()) {

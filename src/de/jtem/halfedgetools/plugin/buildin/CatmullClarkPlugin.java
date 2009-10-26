@@ -1,34 +1,30 @@
 package de.jtem.halfedgetools.plugin.buildin;
 
-import static de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType.VERTEX_ADAPTER;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
 import de.jtem.halfedgetools.algorithm.catmullclark.CatmullClarkSubdivision;
-import de.jtem.halfedgetools.jreality.adapter.standard.StandardCoordinateAdapter;
-import de.jtem.halfedgetools.jreality.node.standard.StandardEdge;
-import de.jtem.halfedgetools.jreality.node.standard.StandardFace;
-import de.jtem.halfedgetools.jreality.node.standard.StandardHDS;
-import de.jtem.halfedgetools.jreality.node.standard.StandardVertex;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class CatmullClarkPlugin extends HalfedgeAlgorithmPlugin {
-
-	private CatmullClarkSubdivision<StandardVertex, StandardEdge, StandardFace> 
-		subdivider = new CatmullClarkSubdivision<StandardVertex, StandardEdge, StandardFace>();
+public class CatmullClarkPlugin
+	<
+		V extends Vertex<V,E,F>,
+		E extends Edge<V,E,F> ,
+		F extends Face<V,E,F>,
+		HDS extends HalfEdgeDataStructure<V,E,F>
+	> extends HalfedgeAlgorithmPlugin<V,E,F,HDS> {
 	
+	private Coord3DAdapter<V> adapter = null;
 	
-	private static class MyCoorAdapter implements Coord3DAdapter<StandardVertex> {
-
-		public double[] getCoord(StandardVertex v) {
-			return v.position;
-		}
-
-		public void setCoord(StandardVertex v, double[] c) {
-			v.position = c;
-		}
-		
+	public CatmullClarkPlugin(Coord3DAdapter<V> ad) {
+		adapter = ad;
 	}
+
+	private CatmullClarkSubdivision<V,E,F> subdivider = new CatmullClarkSubdivision<V,E,F>();
 	
 	
 	@Override
@@ -48,14 +44,15 @@ public class CatmullClarkPlugin extends HalfedgeAlgorithmPlugin {
 	
 	
 	@Override
-	public void execute(HalfedgeConnectorPlugin hcp) {
-		StandardHDS hds = hcp.getHalfedgeContent(new StandardCoordinateAdapter(VERTEX_ADAPTER));
+	public void execute(HalfedgeConnectorPlugin<V,E,F,HDS> hcp) {
+		HDS hds = hcp.getCachedHalfEdgeDataStructure();
+		HDS tHDS = hcp.getBlankHDS();
+		hds.createCombinatoriallyEquivalentCopy(tHDS);
 		if (hds == null) {
 			return;
 		}
-		StandardHDS newHds = new StandardHDS();
-		subdivider.subdivide(hds, newHds, new MyCoorAdapter());
-		hcp.updateHalfedgeContent(newHds, true, new StandardCoordinateAdapter(VERTEX_ADAPTER));		
+		subdivider.subdivide(hds, tHDS, adapter);
+		hcp.updateHalfedgeContentAndActiveGeometry(tHDS, true);	
 	}
 	
 

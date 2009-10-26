@@ -1,20 +1,23 @@
 package de.jtem.halfedgetools.plugin.buildin;
 
-import static de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType.VERTEX_ADAPTER;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
-import de.jtem.halfedgetools.jreality.adapter.standard.StandardCoordinateAdapter;
-import de.jtem.halfedgetools.jreality.node.standard.StandardEdge;
-import de.jtem.halfedgetools.jreality.node.standard.StandardFace;
-import de.jtem.halfedgetools.jreality.node.standard.StandardHDS;
-import de.jtem.halfedgetools.jreality.node.standard.StandardVertex;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class TriangulatePlugin extends HalfedgeAlgorithmPlugin {
+public class TriangulatePlugin <
+V extends Vertex<V,E,F>,
+E extends Edge<V,E,F> ,
+F extends Face<V,E,F>,
+HDS extends HalfEdgeDataStructure<V,E,F>
+>   extends HalfedgeAlgorithmPlugin<V,E,F,HDS> {
 
-	private Triangulator<StandardVertex, StandardEdge, StandardFace> 
-		triangulator = new Triangulator<StandardVertex, StandardEdge, StandardFace>();
+	private Triangulator<V, E, F> 
+		triangulator = new Triangulator<V, E, F>();
 	
 	@Override
 	public AlgorithmType getAlgorithmType() {
@@ -33,13 +36,15 @@ public class TriangulatePlugin extends HalfedgeAlgorithmPlugin {
 	
 	
 	@Override
-	public void execute(HalfedgeConnectorPlugin hcp) {
-		StandardHDS hds = hcp.getHalfedgeContent(new StandardCoordinateAdapter(VERTEX_ADAPTER));
+	public void execute(HalfedgeConnectorPlugin<V,E,F,HDS> hcp) {
+		HDS hds = hcp.getCachedHalfEdgeDataStructure();
 		if (hds == null) {
+			System.err.println("hds was null");
 			return;
 		}
 		triangulator.triangulate(hds);
-		hcp.updateHalfedgeContent(hds, true, new StandardCoordinateAdapter(VERTEX_ADAPTER));		
+		hcp.updateHalfedgeContentAndActiveGeometry(hds, true);
+
 	}
 	
 

@@ -301,7 +301,7 @@ public class SurfaceUtility {
 			} while (e != actEdge && counter < graph.numEdges());
 		}
 
-		if(!HalfEdgeUtils.isValidSurface(graph))
+		if(!HalfEdgeUtils.isValidSurface(graph, true))
 			throw new SurfaceException("No valid surface could be constructed!");
 	
 		return faces;
