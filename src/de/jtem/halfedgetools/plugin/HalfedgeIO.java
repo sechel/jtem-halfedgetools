@@ -35,20 +35,15 @@ public class HalfedgeIO {
 		writer.close();	
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static
-	< 
-	HDS extends HalfEdgeDataStructure<?,?,?>
-	> 
-	HDS readHDS(String filename){
+	HalfEdgeDataStructure<?,?,?> readHDS(String filename){
 		String xml = null;
 		try {
 			xml = readTextFile(filename);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		HDS heds = (HDS)xstream.fromXML(xml);
-		return heds;
+		return (HalfEdgeDataStructure<?,?,?>)xstream.fromXML(xml);
 	}
 	
 	

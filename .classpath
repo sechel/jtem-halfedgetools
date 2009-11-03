@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry excluding="de/jtem/halfedgetools/plugin/HalfedgeSubdivisonPlugin.java" kind="src" path="src"/>
 	<classpathentry kind="src" path="src-test"/>
+	<classpathentry excluding="HalfedgeSubdivisonPlugin.java" kind="src" path="src-defect"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/halfedge"/>
 	<classpathentry kind="lib" path="lib/mtj.jar"/>

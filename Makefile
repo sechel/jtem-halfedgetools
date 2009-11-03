@@ -39,7 +39,7 @@ EXCLTESTS=
 JUNIT=junit.jar#$(shell locate junit.jar |  grep '/junit.jar' | tail --lines=1)
 
 #compile options
-JAVACOPTS=-target 1.5 -source 1.5
+JAVACOPTS=-target 1.5 -source 1.5 -Xlint:unchecked
 
 #javadoc options
 JAVADOCOPTS= -author -protected -nodeprecated -nodeprecatedlist \

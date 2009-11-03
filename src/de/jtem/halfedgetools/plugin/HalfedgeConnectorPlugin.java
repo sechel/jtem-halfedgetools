@@ -182,6 +182,7 @@ public  class HalfedgeConnectorPlugin
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	public 	void actionPerformed(ActionEvent e) {
 		if (rescanButton == e.getSource()) {
 			ContentChangedEvent cce = new ContentChangedEvent(ChangeEventType.ContentChanged);
@@ -193,7 +194,7 @@ public  class HalfedgeConnectorPlugin
 				file = chooser.getSelectedFile();
 			}
 			if (file != null) {
-				HDS newHeds = HalfedgeIO.readHDS(file.getAbsolutePath());
+				HDS newHeds = (HDS)HalfedgeIO.readHDS(file.getAbsolutePath());
 				ConverterHeds2JR<V,E,F> c = new ConverterHeds2JR<V,E,F>();
 				if(adapters == null)
 					adapters = new Adapter[] {new StandardCoordinateAdapter(AdapterType.VERTEX_ADAPTER)};
