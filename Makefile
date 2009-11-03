@@ -13,7 +13,7 @@ DOCDIR=doc
 #the snippets for the webpage are put here
 WEBDIR=web
 #the package summary file (source)
-PACKAGEHTML=$(word 1,$(SRCDIRS))/de/jtem/$(NAME)/package.html
+PACKAGEHTML=$(word 1,$(SRCDIRS))/de/jtem/$(NAME)/package-info.java
 #the html page to read the websnippets of 
 #(usually the processed PACKAGEHTML: package-summary.html) 
 PACKAGESUMHTML=$(DOCDIR)/de/jtem/$(NAME)/package-summary.html
@@ -21,7 +21,7 @@ PACKAGESUMHTML=$(DOCDIR)/de/jtem/$(NAME)/package-summary.html
 #location of the web site, may be empty
 SERVER=
 #directory of the website on the server, or local if SERVER is empty
-SRVDIR=/net/www/pub/jtem/test
+SRVDIR=/net/www/pub/jtem
 
 #directory for the dependencies
 LIBDIR=lib
@@ -31,12 +31,12 @@ LIBDIR=lib
 RELDIR=rel
 
 #directories of the JUnit tests, all files that match Test*.java or *Test.java will be executed 
-TESTDIR=test
+TESTDIR=src-test
 TESTBINDIR=$(TESTDIR)
 #exclude the following tests  
 EXCLTESTS=
 #where to find junit.jar
-JUNIT=$(shell locate junit.jar |  grep '/junit.jar' | tail --lines=1)
+JUNIT=junit.jar#$(shell locate junit.jar |  grep '/junit.jar' | tail --lines=1)
 
 #compile options
 JAVACOPTS=-target 1.5 -source 1.5
@@ -44,7 +44,6 @@ JAVACOPTS=-target 1.5 -source 1.5
 #javadoc options
 JAVADOCOPTS= -author -protected -nodeprecated -nodeprecatedlist \
   -windowtitle 'de.jtem.$(NAME) package API documentation' \
-  -overview $(PACKAGEHTML) \
   -header '<a href="http://www.jtem.de/$(NAME)" target="_top">$(NAME)</a> by<br><a href="http://www.jtem.de" target="_top">jTEM</a>' \
   -footer '<a href="http://www.jtem.de/$(NAME)" target="_top">$(NAME)</a> by<br><a href="http://www.jtem.de" target="_top">jTEM</a>' \
   -bottom '<font size=-1><b><a href="mailto:jtem@math.tu-berlin.de?subject=$(NAME):">jTEM</a></b></font>' \
@@ -92,9 +91,9 @@ DOWNLOADDEPS=$(JTEMURL)/downloads
 
 #function to copy to SRVDIR
 ifeq ($(strip $(SERVER)),)
-  copy_to_website=cp -a $(1) $(SRVDIR)/$(strip $(2)); echo " - copy \"$(1)\" to \" $(SRVDIR)/$(strip $(2))\" "
+  copy_to_website=cp $(1) $(SRVDIR)/$(strip $(2)); echo " - copy \"$(1)\" to \" $(SRVDIR)/$(strip $(2))\" "
 else  
-  copy_to_website=scp -r $(1) $(SERVER):$(SRVDIR)/$(2)
+  copy_to_website=scp -r $(1) $(SERVER):$(SRVDIR)/$(strip $(2)); echo " - copy \"$(1)\" to \" $(SRVDIR)/$(strip $(2))\" "
 endif
 #function to execute on SERVER 
 ifeq ($(strip $(SERVER)),)
@@ -102,10 +101,6 @@ ifeq ($(strip $(SERVER)),)
 else  
   exec_on_server=ssh $(SERVER) "$(1)"
 endif
-#function to get last change date from svn
-svndate=`( svn --xml info $(1) 2> /dev/null  | grep "<text-updated>"  \
-	|| svn --xml info $(1) 2> /dev/null  | grep "<date>" )  \
-	|  sed -e 's/.*>\(....-..-..\).*/\1/'`
 
 
 # ---Targets --
@@ -115,10 +110,10 @@ help:
 	@cat README.txt
 	@echo "CURRENT VALUES OF SOME VARIABLES"; echo "================================"; echo
 	@echo "project name (NAME): $(NAME)"
-	@echo "sources (SRCDIRS): $(SRCDIRS)"
-	@echo "compiled classes (BINDIR): $(BINDIR)"
-	@echo "generated api documentation (DOCDIR): $(DOCDIR)"
-	@echo "generated snippets for the web site (WEBDIR): $(WEBDIR)"
+	@echo "find sources in (SRCDIRS): $(SRCDIRS)"
+	@echo "compiled classes in (BINDIR): $(BINDIR)"
+	@echo "generat api documentation in (DOCDIR): $(DOCDIR)"
+	@echo "generat snippets for the web site in (WEBDIR): $(WEBDIR)"
 	@echo "package-summary.html to produce the web snipptes (PACKAGESUMHTML): $(PACKAGESUMHTML)"
 	@echo "server of the website - may be empty(SERVER): $(SERVER)"
 	@echo "directory of the web site on the server (SRVDIR): $(SRVDIR)"
@@ -213,13 +208,8 @@ $(DOCDIR): $(shell find $(SRCDIRS)  -path "*.svn" -prune -o -print ) | $(DEPS)
 web: $(WEBDIR)/teaser.html $(WEBDIR)/content.html 
 	@for f in $?; do $(call copy_to_website,$$f,$(NAME)/$${f#$(WEBDIR)}); done
 	@if [ -d $(dir $(PACKAGEHTML))/doc-files ]; then $(call copy_to_website,$(dir $(PACKAGEHTML))/doc-files,$(NAME)/doc-files); fi
-	@date=$(call svndate, $(PACKAGESUMHTML)); \
-	if [ "" = "$$date" ]; then date=$(call svndate, $(PACKAGEHTML)); fi; \
-	if [ "" = "$$date" ]; then date=$(call svndate, $(DOCDIR)/de/jtem/$(NAME)/package-info.java); fi;\
-	if [ "" = "$$date" ]; then date=`date -r $< +%F`; fi; \
-	$(call exec_on_server,touch -d $$date $(SRVDIR)/$(NAME)/content.html $(SRVDIR)/projects.html)
 	@if [ -f  releasenotes.txt ]; then $(call copy_to_website, releasenotes.txt,downloads/$(NAME)); fi
-	@$(call exec_on_server, find $(SRVDIR) -user `whoami` | xargs chmod g+rw)
+	@-$(call exec_on_server, find $(SRVDIR) -user `whoami` | xargs chmod g+rw)
 	
 $(WEBDIR)/teaser.html: $(DOCDIR)
 	@if [ ! -d $(WEBDIR) ]; then mkdir $(WEBDIR); fi
@@ -252,7 +242,7 @@ release: web test $(DOCDIR) $(RELDIR)/$(NAME).jar $(RELDIR)/$(NAME).tgz $(RELDIR
 	@$(call copy_to_website, $(DOCDIR),$(NAME)/api)
 	@$(call copy_to_website, $(RELDIR)/current.txt,downloads/$(NAME))
 	@$(call copy_to_website, releasenotes.txt,downloads/$(NAME))
-	@$(call exec_on_server, find $(SRVDIR) -user `whoami` | xargs chmod g+rw)
+	@-$(call exec_on_server, find $(SRVDIR) -user `whoami` | xargs chmod g+rw)
 	@echo " - release `cat rel/current.txt` succesfully deployed."
 
 #jar of compiled classes
