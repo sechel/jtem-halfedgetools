@@ -91,7 +91,7 @@ DOWNLOADDEPS=$(JTEMURL)/downloads
 
 #function to copy to SRVDIR
 ifeq ($(strip $(SERVER)),)
-  copy_to_website=cp $(1) $(SRVDIR)/$(strip $(2)); echo " - copy \"$(1)\" to \" $(SRVDIR)/$(strip $(2))\" "
+  copy_to_website=cp -R $(1) $(SRVDIR)/$(strip $(2)); echo " - copy \"$(1)\" to \" $(SRVDIR)/$(strip $(2))\" "
 else  
   copy_to_website=scp -r $(1) $(SERVER):$(SRVDIR)/$(strip $(2)); echo " - copy \"$(1)\" to \" $(SRVDIR)/$(strip $(2))\" "
 endif
