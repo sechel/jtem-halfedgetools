@@ -31,7 +31,7 @@ LIBDIR=lib
 RELDIR=rel
 
 #directories of the JUnit tests, all files that match Test*.java or *Test.java will be executed 
-TESTDIR=src-test
+TESTDIR=
 TESTBINDIR=$(TESTDIR)
 #exclude the following tests  
 EXCLTESTS=
