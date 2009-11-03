@@ -249,15 +249,9 @@ public  class HalfedgeConnectorPlugin
 
 	
 	public void convertActiveGeometryToHDS(HDS hds, Adapter... a) {
-		try {
-			hds = hdsClass.newInstance();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		hds.clear();
+
 		IndexedFaceSet ifs = null;
 		if (activeGeometry == null) {
 			// is there a better way to get this?
@@ -271,6 +265,7 @@ public  class HalfedgeConnectorPlugin
 			statusChangedListener.statusChanged("Surface is not orientable!");
 			return;
 		}
+		
 		c.ifs2heds(ifs, hds, a);
 	}
 	
@@ -396,8 +391,8 @@ public  class HalfedgeConnectorPlugin
 		content = JRViewerUtility.getContentPlugin(c);
 		content.addContentChangedListener(contentChangedListener);
 		scene = c.getPlugin(Scene.class);
-		setContentParseRoot(scene.getContentComponent());
-		contentChangedListener.contentChanged(null);
+		SceneGraphComponent sc = scene.getContentComponent();
+		setContentParseRoot(sc); // also calls contentChanged()
 		
 		det.setDescription("Select node");
 	    det.addFaceDragListener(new FaceDragListener() {
