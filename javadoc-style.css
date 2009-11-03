@@ -1,0 +1,2694 @@
+/* Javadoc style sheet */
+
+/* Define colors, fonts and other style attributes here to override the defaults */
+
+/* Page background color */
+body { background-color: #FFFFFF; color:#000000 }
+
+/* Headings */
+h1 { font-size: 145% }
+
+/* Table colors */
+.TableHeadingColor     { background: #F9F7F7; color:#000000 } /* Dark mauve */
+.TableSubHeadingColor  { background: #EAEAEA; color:#000000 } /* Light mauve */
+.TableRowColor         { background: #FFFFFF; color:#000000 } /* White */
+
+/* Font used in left-hand frame lists */
+.FrameTitleFont   { font-size: 100%; font-family: Helvetica, Arial, sans-serif; color:#000000 }
+.FrameHeadingFont { font-size:  90%; font-family: Helvetica, Arial, sans-serif; color:#000000 }
+.FrameItemFont    { font-size:  90%; font-family: Helvetica, Arial, sans-serif; color:#000000 }
+
+/* Navigation bar fonts and colors */
+.NavBarCell1    { background-color:#EAEAEA; color:#000000} /* Light mauve */
+.NavBarCell1Rev { background-color:#7d6666; color:#FFFFFF} /* Dark Blue */
+.NavBarFont1    { font-family: Arial, Helvetica, sans-serif; color:#000000;color:#000000;}
+.NavBarFont1Rev { font-family: Arial, Helvetica, sans-serif; color:#FFFFFF;color:#FFFFFF;}
+
+.NavBarCell2    { font-family: Arial, Helvetica, sans-serif; background-color:#FFFFFF; color:#000000}
+.NavBarCell3    { font-family: Arial, Helvetica, sans-serif; background-color:#FFFFFF; color:#000000}
+
+
+/* 
+Website: TUB 
+Theme Name: Sky
+Structure: 3-columns 2-fixed 1-fluid + maxwidth
+Version: 1.0
+Author: Timo Wirth, Wibke Jaeger - Aperto AG
+--
+
+rubrikenseite   = rs
+textseite       = ts
+
+*/
+
+body { /* font: default 16px to 10px */
+    font: 75% verdana, tahoma, arial, helvetica, sans-serif; 
+    background: #fff; 
+    min-width: 710px;
+}
+code,
+pre {
+    font-size: 180%;
+}
+
+/* LINKS
+----------------------------------- */
+
+a {
+    color: #900;
+    text-decoration: none;
+}
+#main p a { /* links im Text */
+    text-decoration: underline;
+}
+
+
+
+/* ab: Links innerhalb von Listen sollen auch unterstrichen werden: */
+#main ul li a { /* links im Listentext */
+    text-decoration: underline;
+}
+/* ab: Und fuer den Fuss alles wieder rueckgaengig: */
+#footer ul li a,
+#main .listing li a 
+{ /* links im Listentext */
+    text-decoration: none;
+}
+#footer ul li a:focus,
+#footer ul li a:hover,
+#footer ul li a:active,
+#main .listing li a:focus,
+#main .listing li a:hover,
+#main .listing li a:active
+{  
+    text-decoration: underline;
+}
+
+
+
+a:visited {
+    color: #900;
+}
+a:hover {  
+    text-decoration: underline;
+}
+a:active, 
+a:focus {
+    text-decoration: underline;
+}
+a.extern {
+    padding: 1px 0 0 22px;
+    background: url(pics/icon-extern.gif) 0 0 no-repeat;
+}
+a.anchor {
+    padding: 0 0 2px 22px;
+    background: url(pics/icon_anchornav.gif) 0 0 no-repeat;
+}
+a.download {
+    padding: 3px 0 3px 22px;
+    background: url(pics/icon-link-download.gif) 0 2px no-repeat;
+}
+a.feedback {
+    padding: 3px 0 0 22px;
+    background: url(pics/icon-link-email.gif) 0 2px no-repeat;
+}
+
+a.delete {
+    padding: 3px 0 0 22px;
+       background: url(pics/icon-delete.gif) 0 2px no-repeat;
+}
+a.send {
+    padding: 3px 0 0 22px;
+    background: url(pics/icon-link-empfehlen.gif) 0 2px no-repeat;
+}
+a.print {
+    padding: 3px 0 0 22px;
+    background: url(pics/icon-link-drucken.gif) 0 2px no-repeat;
+}
+
+
+a.intern {
+    padding: 1px 0 0 22px;
+    background: url(pics/icon-link-intern.gif) 0 0 no-repeat;
+
+}
+
+a.backlink {
+    padding-left: 22px;
+    background: url(pics/icon-link-seitenschalter-zurueck.gif) 0 50% no-repeat;
+    display: block;
+}
+/* hidden */
+.skip a,
+.aural,
+#head h2,
+#breadcrumb,
+#nav h2,
+#nav em,
+#extras h3,
+#nav-groups h2,
+#search-box label,
+#login label,
+#footer h2,
+p.copyright {
+    position: absolute;
+    display: none;
+    left: -2000px;
+    width: 1px;
+    height: 1px;
+}
+/*
+.skip a, .aural, #head h3, #nav h3, #extras h3, #nav-groups h3, #search-box label, #login label, #footer h3, p.copyright {
+    position: absolute;
+    overflow: hidden;
+    left: -2000px;
+    width: 1px;
+    height: 1px;
+}
+*/
+
+.skip a:active,
+.skip a:focus {
+    position: absolute;
+    z-index: 1000;
+    overflow: visible;
+    width: auto;
+    height: auto;
+    font-weight: bold;
+    top: 2px;
+    left: 0px;
+    padding: 3px;
+    color: #000;
+    font-size: 110%;
+}
+#extras p.aural {
+    padding:0;
+    margin: 0;
+}
+
+
+/* clear */
+#extras .box .images:after,
+.listing ul.termine li:after,
+.listing ul.downloads li:after {
+    content: " ";
+    display: block;
+    clear: both;
+}
+
+
+/* SCHRIFTEN 
+------------------------------------------ */
+
+#branding, #main, #nav, #extras {
+    font-size: 110%;
+}
+
+/* durchschuss */
+p {
+    line-height: 1.4em;
+}
+
+/* breadcrumb 
+------------------------------------------- */
+#breadcrumb {
+    display:none;
+}
+
+/* BRANDING 
+------------------------------------------- */
+
+#branding {
+    position: relative;
+    background: #ADC4D2 url(pics/headerfoto-02.jpg) no-repeat top left;
+    height: 15em;
+}
+
+#welcome #branding {
+    height: 19em;
+    background: #ADC4D2 url(pics/finales-headermotiv.jpg) no-repeat top left;
+}
+
+
+#lichthof h1 { /* h1 auf der Startseite */
+    background: #fff;
+    padding: 0;
+}
+
+
+#branding .en,
+#main #footer .en {
+    padding: 0 0 0 16px;
+    background: url(pics/flagge-en.gif) no-repeat 0 50%;
+}
+#branding .de,
+#main #footer .de {
+    padding: 0 0 0 16px;
+    background: url(pics/icon-deutschflagge.gif) no-repeat 0 50%;
+}
+/* logo */
+div#home {
+    position: absolute;
+    top: 25px;
+    left: 0;
+    display: block;
+}
+
+/* breadcrumb auf unterseiten */
+ul#nav-pfad {
+    background: #fff;
+    width: 219px;
+    margin: -1px 0 0 0;
+    padding: 0;
+}
+
+#nav-pfad li {
+    margin: 0;
+    border-bottom: 1px solid #9FB6C4;
+}
+#nav-pfad .last { /*letzes Listenelemnt ohne Linie */
+    border-bottom: 0px solid #9FB6C4;
+}
+#nav-pfad li a {
+    display: block;
+    height: 1%;
+    padding: 2px 0 2px 22px;
+    background: #eaeaea;
+}
+#nav-pfad li a:hover,
+#nav-pfad li a.standort,
+#nav-pfad li a:active, 
+#nav-pfad li a:focus {
+    background: #900;
+    color: #fff;
+}
+
+
+/* weisse box */
+#head {
+    position: relative;
+    margin: 0 0 0 260px;
+    padding: 0;
+    background: #fff;
+    height: 9.1em;
+    max-width: 730px;
+}
+
+/* graue Leiste im head */
+#nav-meta {
+    border-bottom: 1px solid #9FB6C4;
+    padding: 0;
+    background: #eaeaea;
+    width: 100%;
+    overflow: auto;
+}
+
+/* meta-navigation */
+
+#nav-meta ul {
+    float: right;
+    background: #eaeaea;
+    padding: 5px;
+    width: auto;
+    text-align: right;
+}
+#nav-meta li {
+    display: inline;
+    margin: 0 10px 0 0;
+}
+#nav-meta li a {
+    color: #990000;
+}
+
+/* suche */
+#search-box {   
+    float: right;
+    margin: 0;
+    padding: 3px 0 3px 0;
+    width: 200px; /* wie randpspalte */
+    background: #ccc;
+}
+
+#search-box a {   
+    color: #990000;
+}
+
+#search-box input {
+    width: 75px;
+    font-size: 100%;
+    margin: 0 0 0 10px;
+    padding: 1px 2px 0 2px;
+    color: #333;
+}
+#search-box input.button {
+    width: 21px;
+    height: 17px;
+    vertical-align: bottom;
+    margin: 0 0 1px 0;
+    border: none;
+}
+
+/* login - anmeldung */
+
+#login {
+    float: right;
+    width: 199px; /* wie randpspalte + 1px border */
+    height: 6.6em;
+    /*padding: 5px 0 10px 0;*/
+    border-left: 1px solid #9fb6c4;
+    background: #fff;
+}
+#login h4 {
+    /*margin: 0 0 0 10px;*/
+    margin: 3px 0 0 10px;
+    font-size: 100%;
+}
+
+#login ul {
+    clear: left;
+    list-style: none;
+    margin: 10px 0 0 10px;
+}
+#login li {
+    margin: 5px 0 0 0;
+    line-height: 1.4em;
+}
+#login li a {
+    margin: 5px 0;
+    padding: 0 0 4px 22px;
+    background: url(pics/icon-link-intern.gif) 0 0 no-repeat;
+}
+
+#login p {
+    margin: 0 0 0 10px;
+}
+
+#login p.logout {
+    margin: 10px 0 0 10px;
+}
+#login p.logout a {
+    padding: 0 0 4px 22px;
+    background: url(pics/icon-link-intern.gif) 0 0 no-repeat;
+}
+
+
+/* rubriken kopf */
+div.section-box {
+    width: 100%;
+
+}
+div.section {
+    margin: 0 200px 0 0;
+    position: relative;
+    min-height: 6.6em;
+    height: 6.6em; /* for safari*/
+    background: #fff;
+}
+div.section .logoprowi {
+    float: right;
+    margin: .5em .3em 0 0;
+}
+
+div.section p {
+   position: absolute;
+   display: block;
+   font: bold 200% arial, geneva, helvetica, verdana, sans-serif;
+   bottom: 5px;
+   left: 10px;
+   margin-right: 70px;
+}
+
+div.section p.long {
+    font-size: 160%;
+}
+
+div.section p.longer {
+    font-size: 160%;
+   line-height: 110%;
+}
+
+div.section em {
+   display: block;
+   font-style: normal;
+   font-weight: bold;
+   font-size: 75%;
+   color: #ccc;
+}
+
+/* persona navigation */
+div#nav-groups-outer { /* ab: neu angelegt, damit H-Menue korrekte Breite hat */
+    position: relative;
+    margin: 0 0 0 260px;
+    padding: 0;
+    max-width: 730px;
+    bottom: 0;
+    height: 5.9em;
+}
+
+#welcome div#nav-groups-outer { /* ab: neu angelegt, damit H-Menue korrekte Breite hat */
+    height: 9.9em;
+}
+
+div#nav-groups {
+    position: absolute;
+    bottom: 0;
+    /* ab: vgl. nav-groups-outer background: url(pics/persona.gif) 260px 0 no-repeat; */
+    background: url(pics/persona.gif) 0px 0 no-repeat; 
+     width: 100%;
+    /* ab: nicht noetig: margin: 0 0 0 0; */
+ }
+
+#nav-groups ul {
+    /* ab: vgl. nav-groups-outer margin: 2px 0 0 262px; /* links wie main +2 wegen bg div  */
+    margin: 2px 0 0 2px; /* links wie main +2 wegen bg div  */
+    float: left;
+    background: #900;
+    display: inline; /* ANTI-IE-BUG: double-margin-float */
+    padding: 4px 0 4px 0;
+   /* border-bottom: 4px solid #900;
+    border-top: 4px solid #900;*/
+
+}
+
+#nav-groups li {
+    margin: 4px 0px 0 0px;
+    padding: 10px 0 4px 0;
+    display: inline; /* ANTI-IE&-BUG: double-margin-float */
+    /* Firefox hat damit Probleme!!! white-space: nowrap; /* ab: innerhalb von Links keinen Zeilenumbruch! */
+}
+
+#nav-groups li a {
+    color: #fff;
+    padding: 4px 10px 4px 32px;
+    background: url(pics/icon-link-zielgruppe.gif) 10px 50% no-repeat;
+    margin: 0;
+    font-weight: bold;
+}
+
+#nav-groups li.current a {
+    color: #900;
+    background: #EAEAEA url(pics/icon-link-zielgruppe_active.gif) 10px 50% no-repeat;
+}
+#nav-groups li a.current:hover {
+    text-decoration: none;
+}
+
+/* ########### alternative version ##### zur auswahl ### kann spaeter raus ##### */
+
+.zielgruppe div#nav-groups {
+    position: absolute;
+    bottom: -23px;
+    background: url(pics/persona.gif) 260px 0 no-repeat;
+    width: 100%;
+}
+
+
+
+/* WRAPPER - umschliesst main und nav und randspalte 
+-------------------------------------------------------- */
+
+#wrapper {
+    border-top: 1px solid #fff; /* ANTI-IE-FLOAT-BUG */
+    position: relative;
+    margin: 40px 0 0 0;
+    max-width: 990px;
+} 
+
+
+#content { /* container */
+  padding-left: 260px;   /* nav width */
+  padding-right: 240px;  /* extras width */
+}
+
+
+
+/* HAUPT-NAVIGATION    
+-------------------------------------------------------- */
+
+#nav {
+	position: absolute; /* fuer ie max width */
+	float: none;
+	top: 0;
+	left: 0;
+	width: 220px; 
+}
+#nav ul {
+    margin: 0 0 40px 20px; 
+    border-top: 1px solid #ccc;
+}
+#nav li {
+    margin: 0;
+    padding: 1px 0;
+    width: 100%;
+    border-bottom: 1px solid #ccc;
+}
+#nav li a {
+    padding: 6px 3px;
+    display: block; 
+    height: 1%; /* ANTI-IE-BUG: 2px abstand top der lis */ 
+    font-size: 110%;
+    font-weight: bold;
+}
+
+/* visited */ 
+#nav li a:visited {
+    color: #990000;
+}
+
+/* standort */
+#nav li a.standort { /* aufgeklappt */
+   background: #ccc;
+   color: #990000;
+}
+#content #nav li a.current { /* markiert */
+   background: #990000;
+   color: #fff;
+}
+
+/* hover */
+#nav li a:hover,
+#nav li a:active, 
+#nav li a:focus, 
+#nav li a:hover em,
+#nav li a:active em, 
+#nav li a:focus em,
+#nav li a:hover strong,
+#nav li a:active strong, 
+#content #nav li a.current:hover,
+#content #nav li a.current:active,
+#content #nav li a.current:focus {
+   background: #990000;
+   color: #fff;
+}
+#nav li em {
+    display: block;
+    color: #7d6666;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 90%;
+}
+#nav li strong {
+    display: block;
+    font-size: 100%;
+}
+
+/* ebene 2 */
+
+#nav li ul {
+    background: #EAEAEA;
+    width: 100%;
+    font-size: 100%;
+    margin: 0 0 -1px 0;
+    border: none;
+    padding: 0;
+}
+#nav li li {
+    position: relative;
+    border-top: 1px solid #fff;
+    border-bottom: 0;
+    font-size: 90%;
+    margin: 0 0 0 10px;
+    padding: 0;
+    width: auto;
+}
+#nav li li a {
+    border: none;
+}
+
+/* ebene 3 */
+
+#nav li li ul {
+    background: #F9F7F7;
+    width: auto;
+    font-size: 100%;
+    margin: 0 0 -1px 0;
+    border: none;
+    padding: 0;
+}
+#nav li li li {
+    border-top: none;
+    border-bottom: 1px solid #ccc;
+    font-size: 100%;
+    margin: 0 0 0 15px;
+    padding: 0;
+    width: auto;
+}
+#nav li li li a {
+    border: none;
+}
+
+/* INHALTSBEREICH     
+-------------------------------------------------------- */
+
+#main {
+    width: 100%; /* Hauptspalte ist 100% breit autom. ohne padding von container */
+    float: left; /* alle Spalten links, main und rechts floaten */
+    position: relative; 
+}
+
+#opener {
+    margin: 0 0 20px 0;
+    overflow: hidden;
+    width: 100%;
+}
+#opener h1 {
+    background:none;
+    margin: 0 0 10px;
+    padding:0;
+}
+h1 {
+    clear: both;
+    font: bold 230% arial, geneva, helvetica, verdana, tahoma, sans-serif;
+    margin: 0 0 10px 0;
+    padding: 0 0 5px 0;
+    background: url(pics/dotted.gif) 0 100% repeat-x;
+    position: relative; /* ANTI-IE-BUG background */
+}
+
+#welcome h1 { /* h1 auf der Startseite */
+    background: #fff;
+    padding: 0;
+}
+
+#main p {
+    margin: 10px 0;
+    color: #000;
+}
+
+/* ab: Listen sollen auch grau dargestellt werden */
+#main li {
+    margin: 10px 0;
+    color: #000;
+}
+#main #footer li { /* links im Text */
+    color: #000;
+}
+
+
+#main #opener p {
+    display: inline;
+    margin: 10px 0;
+    font-size: 110%;
+}
+#main #opener p.date {
+    display: block;
+}
+
+
+/* TEASER 
+-------------*/
+
+/* rubrik in teaser */
+.kicker {
+    padding: 1px 0 2px 3px;
+    background: #eaeaea;
+}
+
+.teaser h3 {
+    font: bold 150% arial, geneva, helvetica, verdana, tahoma, sans-serif;
+    margin: 10px 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ccc;
+}
+
+#main p.date {
+    margin: 0 0 15px 0;
+    border-top: 1px solid #ccc;
+    padding: 5px 0 0 0;
+    color: #7d6666;
+}
+#main .teaser p.date {
+    border-top: none;
+    padding: 0;
+    margin: -5px 0 0 0; /* - margin h3 */
+}
+
+.banner {
+    clear: left;
+    margin: 0 0 30px 0;
+    padding: 14px 0px;
+    overflow: hidden;
+    width: 100%;
+    text-align:center;
+    background: #eaeaea url(pics/text-anzeige.gif) 10px 1px no-repeat;
+}
+.banner img {
+    display: block;
+    margin: 0 auto;
+}
+
+.mehr {
+    display: block;
+    margin: 10px 0;
+    font-weight: bold;
+    padding: 1px 0 0 22px;
+    text-decoration: none;
+    background: url(pics/icon-link-intern.gif) 0 2px no-repeat;
+}
+#main .mehr a,
+#main a.mehr {
+    text-decoration: none;
+}
+
+#main .mehr a:active, 
+#main a.mehr:active,
+#main .mehr a:focus, 
+#main a.mehr:focus,
+#main .mehr a:hover,
+#main a.mehr:hover {
+    text-decoration: underline;
+}
+
+.teaser { /* 1-spaltige box */
+    float: left;
+    margin: 0 0 20px 0;
+    width: 99%; 
+}
+
+.small { /* 2-spaltige boxen */
+    float: left;
+    margin: 0 0 30px 0;
+    width: 235px;
+    
+}
+
+.first { /* erster teaser */
+    clear: both;
+    margin-right: 20px;
+}
+
+
+
+/* BILDER 
+---------------------------------------- */
+
+/* Bild mit Bildunterzeile */
+dl.bild { 
+    clear: left;
+    float: right;
+/*11.10.07 Wenig: hier habe ich aus 20px 2px gemacht*/
+/*01.07.08 Tepper: 8px 4px geaendert, Rand zum Text */
+    margin: 0 0 8px 4px;
+    padding: 0;
+    display: inline;
+    width: 241px;
+}
+
+/* kleines Bild */
+dl.thumb {
+    width: 100px;
+}
+
+/* groï¿½es Bild */
+dl.big {
+    width: 490px;
+}
+
+/*
+dl.bild dt {
+    background: #F9F7f7;
+}*/
+
+.is dl.bild img {
+    margin: 0;
+    float: none;
+    display: block;
+}
+
+dl.bild dd {
+    position: relative;
+   /*clear: both;*/
+    margin: 0;
+    padding: 2px 2px 0px 2px;
+    font-size: 90%;
+    color: #7d6666;
+}
+dl.bild dd a {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+}
+ #main dl.bild dd.zoom {
+    float: right;
+    width: 14px;
+    padding: 2px 0 5px 0;
+    height: 1.4em;
+    margin: 0;
+}
+#main dl.bild dd.zoom a { /* image zoom */
+    display: block;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    width: 14px;
+    height: 14px;
+    background: url(pics/icon-lupe.gif) 0 0 no-repeat;
+    text-indent: -4000px;
+    z-index: 100;
+}
+
+
+
+/* LISTING TICKER TOC INSTITUTSGLIEDERUNG 
+---------------------------------------------------- */
+
+.listing {
+    clear: left;
+    margin: 0 0 20px 0;
+    padding: 0;
+}
+
+#main h2 /*, 22.07.2008 Lobach: gilt nicht fuer h3!
+#main .listing h3 */ { /* listing */
+    clear: both; /*Wenig: fï¿½r TU-Ticker*/
+    margin: 20px 0 0 0;
+    padding: 0 0 10px 0;
+    text-transform: uppercase;
+    font: bold 150% arial, geneva, helvetica, verdana, tahoma, sans-serif;
+    background: url(pics/dotted.gif) 0 100% repeat-x;
+    position: relative; /* ANTI-IE-BUG background */
+}
+
+#main h2 {
+    text-transform: none;
+}
+
+#main h3.nobackground { /* listing */
+    background: none;
+}
+#main .listing ul li p {
+    display: block;
+    padding: 0 0 0 25px;
+    margin: -5px 0 5px 0;
+}
+#main .listing ul {
+    margin: 0;
+    clear: left;
+    list-style: none;
+}
+
+#main .listing li {
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    padding: 0;
+    width: 100%;   
+    line-height: 1.4em;
+}
+
+#main .listing li a {
+    margin: 0;
+    padding: 5px 0 6px 24px;
+    background: url(pics/icon-link-intern.gif) 0 5px no-repeat;
+    display: block;
+    height: 1%;
+}
+#main .listing ul.downloads li a {
+    margin: 0;
+    padding: 5px 0 6px 24px;
+    background: url(pics/icon-link-download.gif) 0 5px no-repeat;
+    display: block;
+    height: 1%;
+}
+#main .listing li.all { /* link alle meldungen */
+    margin-top: 10px;
+    font-weight: bold;
+    border: none;
+}
+#main .listing li.last { /* wenn nur ein link in der Liste */
+    border: none;
+}
+/* termin-liste datum rechts */
+
+.listing ul.termine li,
+.listing ul.downloads li {
+    position: relative;
+}
+
+#main .listing ul.termine li a,
+#main .listing ul.downloads li a {
+    margin-right: 8em;
+}
+
+.listing ul.termine em,
+.listing ul.downloads em {
+    position: absolute;
+    top: 5px;
+    right: 0;
+    font-style: normal;
+}
+
+.listing li a em {
+    font-style: normal;
+    color: #000;
+    width: 7em;
+    display: block;
+    float: left;
+}
+
+#main .listing .toc li {
+    font-weight: bold;
+    background-image: none;
+    font: bold 130% arial, geneva, helvetica, verdana, sans-serif;
+}
+
+#main .listing .toc li a {
+    padding: 5px 0pt 6px 24px;
+    background: url(pics/icon_anchornav.gif) 0 6px no-repeat;
+}
+
+
+
+/* FUSS - FOOTER 
+------------------------------------------------------ */
+
+#footer {
+    clear: both;
+    margin: 40px 0; 
+    background: #fff;
+}
+
+#footer p a {
+    text-decoration: none;
+}
+#footer p a:hover {
+    text-decoration: underline;
+}
+
+#footer p a:focus,
+#footer p a:active{
+    text-decoration: underline;
+}
+
+#print a {
+    margin-left: 4px;
+}
+#print img {
+    vertical-align: middle;
+    margin-bottom: 3px;
+}
+li.send a {
+   padding: 3px 0 0 19px;
+    background: url(pics/icon-link-empfehlen.gif) 0 2px no-repeat;
+}
+li.print a {
+    padding: 3px 0 0 19px;
+    background: url(pics/icon-link-drucken.gif) 0 2px no-repeat;
+}
+a.search {
+    padding: 2px 0 2px 26px;
+    background: url(pics/lupe.gif) 0 50% no-repeat;
+}
+a.detail {
+    padding: 2px 0 2px 22px;
+    background: url(pics/icon-lupe.gif) 0 50% no-repeat;
+}
+a.plus {
+    padding: 2px 0 2px 26px;
+    background: url(pics/icon-plus.gif) 0 50% no-repeat;
+}
+a.gleich {
+    padding: 2px 0 2px 26px;
+    background: url(pics/icon-gleich.gif) 0 50% no-repeat;
+}
+a.minus {
+    padding: 2px 0 2px 26px;
+    background: url(pics/icon-minus.gif) 0 50% no-repeat;
+}
+#main #footer ul {
+    margin: 0;
+    padding: 5px;
+    list-style: none;
+    text-align: right;
+    background: #F9F7F7;
+}
+#main #footer li {
+    display: inline;
+    margin: 0 0 0 10px;
+    padding: 0;
+    background: transparent;
+}
+#footer p {
+    margin: 0;
+    border-top: 1px solid #fff;
+    padding: 5px;
+    background: #fff;
+    text-align: right;
+}
+
+
+/* kontakt, impressum */
+#main #footer ul#features { 
+    background: #eaeaea;
+    padding-bottom: 6px;
+}
+
+
+
+/* RANDSPALTE     
+-------------------------------------------------------- */
+
+#extras {
+    float: left; /* ie specific - kein position absolute moeglich */
+    width: 240px; 
+    margin-right: -240px;
+}
+.box {
+    margin: 0 0 20px 40px;
+    border-bottom: 1px solid #ccc;
+    padding: 0 0 20px 0;
+}
+
+.box h2 {
+    font: bold 150% arial, geneva, helvetica, verdana, tahoma, sans-serif;
+    margin: 0 0 10px 0;
+}
+
+/* listen und links */
+
+.box ul {
+    clear: left;
+    list-style: none;
+}
+.box li {
+    margin: 6px 0;
+    line-height: 1.4em;
+}
+.box li a {
+    margin: 5px 0;
+    padding: 0 0 4px 22px;
+    background: url(pics/icon-link-intern.gif) 0 0 no-repeat;
+}
+.box li a.extern {
+    background: url(pics/icon-extern.gif) 0 0 no-repeat;
+}
+.box li a.download {
+    background: url(pics/icon-link-download.gif) 0 0 no-repeat;
+}
+/* linkliste extern */
+.box ul.extern li a {
+    padding:0px 0pt 4px 22px;
+    background: url(pics/icon-extern.gif) 0 0 no-repeat;
+}
+/* linkliste downloads */
+.box ul.download a {
+    padding-left: 22px;
+    background: url(pics/icon-link-download.gif) 0 0 no-repeat;
+}
+
+.box dl.bild { 
+    float: none;
+    margin: 0;
+    padding: 0;
+    display: inline;
+}
+
+.box dl.bild img {
+    float: none;
+    display: block;
+    width: 200px;
+}
+
+.box dl.bild dd {
+    clear: both;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* help-box */
+
+.help {
+    background: #E7EEF2;
+    padding: 0;
+}
+
+.help h2 { /* help-box */
+    float: left; /* FIX IE bg-bug */
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    padding: 0 0 10px 0;
+    width: 100%;
+    background: #fff;
+}
+
+.help dl#fontsize {
+    float: left;
+    border-top: 1px solid #fff;
+    margin: 0 0 10px 0;
+    padding: 10px 0;
+    width: 100%;
+    background: url(pics/dotted-bg.gif) 50% 100% no-repeat; 
+}
+
+#extras .kompakt dl#fontsize { /* box ohne links */
+    background: #e7eef2;
+    margin: 0;
+}
+
+.help dt {
+    margin: 0 0 0 10px;
+    float: left;
+    display: inline; /* ANTI-IE-BUG: double-margin-float */
+}
+
+.help dd {
+    float: left;
+    margin: -2px 0 0 5px;   
+    padding: 2px 2px; 
+}
+
+.help dd a {
+    margin: 0;
+    width: 20px;
+    height: 16px;
+    display: block;
+    /*text-indent: -2000px;*/
+}
+
+.help dd a.bigger {
+    background: url(pics/icon-plus.gif) 0 0 no-repeat;
+}
+.help dd a.smaller {
+    background: url(pics/icon-minus.gif) 0 0 no-repeat;
+}
+.help dd a.default {
+    background: url(pics/icon-gleich.gif) 0 0 no-repeat;
+}
+
+.help ul {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.help p { /* standort-nummer */
+    position: relative;
+    float: left;
+    border-top: 1px solid #fff;
+    margin: 0 0 10px 0;
+    padding: 10px 0 10px 0;
+    width: 100%;
+    background: url(pics/dotted-bg.gif) 50% 100% no-repeat; 
+}
+
+/*Link in Ansprechpartner*/
+.box a.intern {
+    display:inline;
+    padding: 1px 0 0 22px;
+    margin-top:0px;
+    background: url(pics/icon-link-intern.gif) 0 0px no-repeat;
+}
+
+.box input { /* standort-nummer */
+   margin: 0;
+   padding: 1px 2px 0 2px;
+   width: 45%;
+   font-size: 100%; 
+}
+.box label { /* standort-nummer */
+    width: 34%;
+    float: left;
+    font-weight: normal;
+    font-size: 100%;
+    margin: 0;
+    padding: 1px 2px 0 2px;
+}
+.box input.button {
+    width: 15px;
+    height: 14px;
+    vertical-align: bottom;
+    margin: 0 0 1px 0;
+    border: none;
+}
+.box div.standortnr { /* standort-nummer */
+    clear: left;
+    border-bottom: 1px solid #fff;
+    margin: 0 0 0 0px;
+    padding: 0px 0;
+    height: 1.7em;
+}
+.box li.helpfunction {
+    padding-top: 7px;
+    padding-bottom: 3px;
+}
+.box li.helpfunction a {
+    padding: 0 0 0 20px;
+    background: url(pics/clap.gif) no-repeat 0 0;
+}
+
+/* newsletter-box */
+.newsletter {
+    background: #E7EEF2;
+    padding: 0 0 10px 0;
+}
+.newsletter h2 {
+    background: #fff;
+    margin: 0;
+    padding: 0 0 10px 0;
+    border-bottom: 1px solid #ccc;
+}
+#extras .newsletter label {
+    margin: .5em 0 .3em .8em;
+    float: none;
+    font-weight: normal;
+    width: 90%;
+}
+#extras .newsletter input {
+    margin: 0 0 0 10px;
+    padding: 1px 2px 0 2px;
+    width: 65%;
+    font-size: 100%;
+}
+#extras .newsletter input.button {
+    margin: 0 0 1px 0;
+    border: none;
+    width: 15px;
+    height: 14px;
+    vertical-align: bottom;
+}
+
+/* calendar-box */
+.calendar h2 {
+    background: #fff;
+    margin: 0;
+    padding: 0 0 10px 0;
+    border-bottom: 1px solid #ccc;
+}
+.calendar table em {
+    font-style: normal;
+    color: #000;
+
+}
+.calendar table a {
+    font-weight: bold; 
+    text-decoration:underline;
+}
+.calendar table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    caption-side: top;
+    empty-cells: show;
+    clear: left;
+    padding: 0;
+    width: 200px; 
+    table-layout: auto;
+}
+
+.calendar caption {
+    background: #EAEAEA;
+    padding: 4px;
+}
+.calendar td,
+.calendar th {
+    padding: 4px 4px;
+    border-right: 1px solid #9fb6c4;
+}
+.calendar th.last,
+.calendar td.last {
+    border-right: 0px solid #9fb6c4;
+}
+.calendar td {
+    border-top: 1px solid #9fb6c4;
+}
+
+/* banner-box */
+#extras .banner {
+    padding: 14px 0;
+    overflow: hidden;
+    width: 200px;
+    background: #eaeaea url(pics/text-anzeige.gif) 10px 1px no-repeat;
+    border-bottom: none;
+}
+#extras .banner img {
+    display: block;
+    margin: 0 auto;
+    width: 180px;
+}
+
+/* fotogallerie box */
+#extras .box p { 
+    padding: 0 0 .5em 0;
+}
+#extras .box .images {
+    height: 1%;
+    clear: both;
+}
+#extras .box .images img { 
+    width: 60px;
+}
+#extras .box .images a { 
+    float: left;
+    margin-right: 10px;
+}
+#extras .box .images a.last { 
+    margin-right: 0;
+}
+#extras .fotogallery span a {
+    padding: 0 0 4px 22px;
+    background: url(pics/icon-link-intern.gif) 0 0 no-repeat;
+}
+#extras .fotogallery span {
+    display: block;
+    margin-top: 10px;
+}
+
+
+
+/* FAKULTï¿½TEN - UEBERSICHT 
+-----------------------------------------------------------  */
+
+.fakultaeten { /* extra div for IE */
+    clear: left;
+    border: 1px solid blue;
+    float: left;
+    
+}
+
+.fak { /* eine fakultaet */
+    float: left;
+    margin: 20px 0 5px 0;
+    border-bottom: 1px solid #ccc;
+    padding: 0 0 10px 0;  
+    width: 235px;
+}
+
+.fakfirst {
+    clear: left;
+    margin: 20px 20px 0 0; /* rand rechts */
+}
+
+/* We Links im Schaufenster sollen nicht unterstrichen sein*/
+
+#main .fak ul li a{
+    text-decoration: none;
+}
+
+#main .fakfirst ul li a{
+    text-decoration: none;
+}
+
+/* We Links im Schaufenster sollen nicht unterstrichen sein ENDE*/
+
+.fak h3 {
+    font: bold 130% arial, geneva, helvetica, verdana, sans-serif;
+    padding: 5px 0 0 5px;
+    background: #eaeaea;
+    font-weight: bold;
+    height: 4em;
+}
+
+.fak h3 em {
+    font-weight: normal;
+    font-style: normal;
+    display: block;
+}
+
+.fak h3 a em {
+    color: #000;
+}
+
+
+.fak ul {
+    margin: 5px 0 0 0;
+}
+
+#main .fak li {
+    margin: 0;
+    padding: 3px 0 4px 0;
+    width: 100%;   
+    line-height: 1.4em;
+    background: #fff;
+}
+
+.fak li a {
+    margin: 0;
+    padding: 1px 0 3px 24px;
+    background: url(pics/icon-link-intern.gif) 0 0 no-repeat;
+}
+
+
+
+/* INSTITUTSGLIEDERUNG - UEBERSICHT 
+-----------------------------------------------------------  */
+
+.faklist {
+    margin: 40px 0 0 0;
+}
+
+.faklist h3 {
+    font: bold 130% arial, geneva, helvetica, verdana, sans-serif;
+    padding: 0;
+    font-weight: bold;
+}
+
+.faklist h3 em {
+    font-style: normal;
+}
+
+.faklist h3 a em {
+    color: #000;
+}
+
+.faklist ul {
+    margin: 10px 0 0 0;
+    position: relative; /* ANTI-IE-BUG backgrounds */
+}
+
+#main .faklist li {
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    padding: 0;
+    width: 100%;   
+    line-height: 1.4em;
+}
+
+#main .faklist li a {
+    margin: 0;
+    padding: 5px 0 6px 24px;
+    background: url(pics/icon-link-intern.gif) 0 5px no-repeat;
+    display: block;
+    height: 1%;
+}
+
+
+/* nach oben link */
+
+p.csc-linkToTop {
+    clear:both;
+    text-align: right;
+}
+
+p.csc-linkToTop a {
+    background: url(pics/icon-link-nachoben.gif) 0 2px no-repeat;
+    padding: 3px 0 0px 22px;
+}
+
+p.top {
+    text-align: right;
+}
+
+p.top a {
+    background: url(pics/icon-link-nachoben.gif) 0 5px no-repeat;
+    padding: 5px 0 6px 24px;
+}
+
+
+
+/* ALLGEMEINE ATTRIBUTE
+------------------------------------------- */
+
+/* clear */
+hr {
+    clear: left; 
+    display: block;
+    border: none;
+    height: 0px;
+    color: #fff;
+    width: 1px;
+}
+
+.abbr, acronym, span.abbr { /* for IE */
+    border-bottom: 1px dotted; /* border-color is inherited from color */
+    font-style: normal;
+    cursor: help;
+} 
+
+
+
+/*  TEXTSEITE / ARTIKELEBENE
+-----------------------------------------------------------  */
+
+#ts #main p.date {
+    display: inline;
+    margin: 0 0 15px 0;
+    border-top: none;
+    padding: 0;
+    color: #7d6666;
+}
+
+#ts #main p {
+    font-size: 100%;
+}
+
+#ts #main p.vorspann {
+    font-size: 110%;
+}
+
+#ts #main h3 {
+    clear: both;
+    font: bold 120% arial, geneva, helvetica, verdana, tahoma, sans-serif;
+    margin: 20px 0 10px 0;
+}
+#ts #main h2 {
+    clear: both;
+    margin-bottom: 20px;
+}
+/* Liste im Text */
+#main ol {
+    clear: both;
+    position: relative;
+    margin: 10px 0;
+    padding-left: 3.3em;
+}
+#main ol ol {
+    margin: 0 0;
+    padding-left: 2em;
+}
+#main ul {
+    /*clear: both; MT 4.8.2008*/
+    position: relative;
+    padding-left: 3px;
+    margin: 10px 0;
+    line-height: 1.4em;
+}
+#main ul ul {
+    margin: 5px 0;
+}
+#main ul ol {
+    margin: 0 0 0 10px;
+}
+#main ul ol ol {
+    margin-top: 0px;
+}
+#main ul li {
+    list-style-position: outside;
+    list-style: none;
+    margin: 0 0 4px 0;
+    padding: 0 0 0 10px;
+    background: url(pics/dot.gif) 0 6px no-repeat;
+}
+#main ol li {
+    list-style-position: outside;
+    list-style: decimal;
+    background: #fff;
+    padding: 0;
+    margin-bottom: 0;
+    line-height: 1.8em;
+}
+#main blockquote {
+    font-style: normal;
+}
+
+address {
+    border-left: 5px solid #990000;
+    padding-left: 8px;
+    line-height: 1.4em;
+}
+
+/* Tabellen im Text */
+ #main table {
+     margin-bottom: 20px;
+    clear: both;
+    border-collapse: collapse;
+    border-spacing: 0;
+    caption-side: top;
+    empty-cells: show;
+    padding: 0;
+    width: 100%; 
+    table-layout: auto;
+}
+#main td, 
+#main th {
+    vertical-align: top;
+    text-align: left;
+    padding: 5px 10px;
+    border-bottom: 1px solid #cccccc;
+}
+#main caption {
+    padding: 5px 10px;
+    background: #5B4B4B;
+    color: #fff;
+    font-weight: bold;
+    text-align: left;
+}
+#main thead th { 
+    padding: 10px 10px 2px 10px;
+    color: #000;
+    background: #EAEAEA;
+}
+ #main tr {
+    background: #EAEAEA;
+    border-bottom: 1px solid #cccccc;
+}
+#main tr.odd {
+    background: #F9F7F7;
+}
+
+/* Sprungmarkennavigation */
+#ts #main ul.toc {
+    margin-left: 0;
+}
+#ts #main ul.toc li {
+    list-style: none;
+}
+#ts #main ul.toc li a {
+    margin-left: 0;
+}
+#ts #main ul.toc {
+    list-style: none;
+}
+
+/* FORMULARE 
+----------------------------------------------------------- */
+
+form {
+    margin: 0;
+    padding: 0;
+}
+
+form h3 {
+    font: bold 150% arial, geneva, helvetica, verdana, tahoma, sans-serif;
+    margin: 10px 0;
+}
+
+    
+fieldset {
+    clear: left;
+    position: relative;
+    display: block; /* for ie */
+    margin: 0 0 20px 0;
+    padding: 0;
+}
+
+fieldset.small {
+    width: 450px;
+}
+
+legend { /* ausgeblendet */
+    font-weight: bold;
+    padding: 0 10px; 
+    display: block;
+    position: absolute;
+    overflow: hidden;
+    left: -2000px;
+    width: 1px;
+    height: 1px;   
+    text-indent: -2000px;
+}
+
+#main fieldset p {
+    height: 1%;
+}
+p.pflichtfeld {
+    position: absolute;
+    top: 0;
+    right: 0px;
+    margin: 0;
+    padding: 0;
+    width: 120px;
+}
+form span.timespace {
+    float: left;
+    display: block;
+    margin-left: 12em;
+    height: 1%;
+    width:60%;
+}
+form .timespace label {
+    float: none;
+    width:15em;
+}
+form .timespace input {
+    float: none;
+    margin-bottom: .5em;
+}
+/* zeilen alle formfelder ausser radio und checkboxen */
+#main fieldset p {
+    margin: 0;
+    padding: 20px 0 20px 10px;
+    overflow: hidden; /* spannt p auf */
+    border-bottom: 1px solid #fff;
+    background: #EAEAEA;
+}
+#main fieldset fieldset p {
+    clear: none; /* aufheben bei p von radios und checkboxen */
+   /* ab: float: none; /* aufheben bei p von radios und checkboxen */
+}
+#main fieldset span {
+    display: block;
+}
+label {
+    display: block; 
+    float: left;
+    width: 11em;
+    font-weight: bold;
+    margin-right: .8em;
+}
+
+
+
+label.zweiteslabel {
+    display: inline;
+    width: auto;
+    margin-left: 5px;
+    margin-right: 2px;
+    float: none;
+}
+
+
+/* doppel label */
+
+span.doppel {
+    display: block; 
+    float: left;
+    width: 12em;
+}
+
+span.doppel label {
+    display: inline;
+    width: auto;
+    margin-right: 5px;
+}
+
+
+/* input text-felder */
+
+/* old
+input,
+textarea {
+    width: 300px;
+    margin: 0 5px 0 0;
+    border: 1px solid #333;
+    padding: 2px 2px;
+}
+*/
+input,
+textarea {
+    margin: 0 5px 0 0;
+    border: 1px solid #333;
+    padding: 2px 2px;
+    width: 69.5%;
+}
+
+#main textarea {
+    font-size: 120%;
+    font-family: arial, geneva, helvetica, verdana, tahoma, sans-serif;
+}
+
+#main input.small {
+    width: 100px;
+}
+
+#main input.xsmall {
+    width: 50px;
+}
+
+#main input.xxsmall {
+    width: 30px; /* vier zeichen */
+}
+
+/* nicht editierbare input-felder */
+input.readonly {
+    border: 1px solid #ccc;
+    background: #F2F0F0;
+    color: #333;
+}
+
+/* extra-text in Formularen mit trennern */
+#main fieldset p span {
+    margin: 0 5px 0 0;
+    padding: 0 5px 0 0;
+}
+
+
+/* buttons */
+
+
+ /* container fuer button - breite wie fieldset */
+#main .button-wrapper {
+    width: auto; 
+    overflow: auto;
+    height: 1%; 
+}
+#main .button-wrapper-small {
+    width: 450px;
+}
+
+#main input.button {
+    width: auto;
+    float: right;
+    margin: 0;
+    border-bottom: 2px solid #999;
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    border-right: 2px solid #999;
+    padding: 2px 5px;
+    font-weight: bold;
+    font-size: 90%;
+    background: #fff;
+    color: #990000;
+}
+
+#main form .intern a {
+   padding: 0 0 4px 22px;
+   background: url(pics/icon-link-intern.gif) 0 0 no-repeat;
+}
+
+
+/* highlighting text-eingabe-feld */
+
+#main input:focus,
+#main textarea:focus,
+#main select:focus {
+   border: 2px solid #9fb6c4;
+}
+
+/* pulldowns */
+
+/* old
+select {
+     width: 306px;
+     margin: 0 5px 0 0;
+}
+*/
+select {
+     margin: 0 5px 0 0;
+     width: 70.75%;
+}
+
+option {
+    padding: 0 4px 0 2px;
+    border-bottom: 1px solid #ccc;
+}
+
+
+/* check und radio 2-spaltig */
+
+
+fieldset.group { /* ganz zeilen bei radio und checkboxen */ 
+    clear: left;
+    margin: 0; 
+    padding: 10px 0 20px 0;
+    display: inline; /* BUG for IE 6 */
+    border: none;
+    width: auto;
+    border-bottom: 1px solid #fff;
+    background: #EAEAEA;
+    width: 100%; /* for IE */
+    overflow: hidden;
+}
+html>body fieldset.group {
+    display: block; /* mose */
+}
+
+input.checkbox, 
+input.radio {
+    width: auto;
+    border: none;
+}
+html>body input.checkbox,
+html>body input.radio {
+    margin-right: 0.5em; /* mose */
+}
+
+fieldset fieldset { /* 2. fieldset umschliesst radios und checkboxen */
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+#main fieldset fieldset p.aslabel {
+    display: block; 
+    float: left;
+    width: 11em;
+    font-size: 1em;
+    margin: 0 0 0 10px;
+    font-weight: bold;
+}
+
+#main fieldset fieldset div { /* spalten bei radios und checkboxen */
+    width: 31.5em;
+    float: left;
+}
+
+#main fieldset fieldset div p { /* label plus input radios checkboxes 2zeilig */
+    float: left;
+    margin: 0 0 10px 0;
+    width: 10em;
+}
+#main fieldset fieldset div.timeoption {
+    margin-left: .5em;
+}
+#main fieldset fieldset div.timeoption .choice {
+    width: 30em;
+}
+#main fieldset fieldset div.timeoption .choice input.text {
+    width: 6em;
+    color: #000 !important;
+}
+#main fieldset fieldset div p.timeoption input.radio {
+    width: auto;
+}
+fieldset fieldset label { /* labels stehen nicht links block, sondern direkt neben radios */
+    width: 100px;
+    margin-right: 0 !important;
+    display: inline;
+    float: none;
+    font-weight: normal;
+}
+
+
+/* radios in einer zeile */
+
+#main fieldset fieldset p { /* label plus input radios checkboxes 1zeilig  */
+    margin: 0;
+    padding: 0;
+    float: left;
+    border: none;
+    background: transparent;
+}
+#main form fieldset fieldset p label { /* label der 1zeilig radios */
+    margin-right: 15px;
+}
+
+
+
+/* Fehlermeldung */
+
+#main h2.error {
+    text-transform: none;
+    border: none;
+    background: #fff;
+}
+#main .error {
+    border: 2px solid #900;
+}
+
+.error * {
+    color: #900;
+}
+#main span.errormessage {
+    display: block;
+    font-weight: bold;
+    margin-left: 11.8em;
+    margin-bottom: 10px;
+}
+
+
+
+
+
+/* ab: Neues Element fuer Fehlermeldung bei Gruppenelementen */
+fieldset.grouperror {
+    background: #eaeaea; /* ab: Hintergrundfarbe grau, damit Gruppen-Input-Felder bei Error auch grau */
+    border: 2px solid #900;
+}
+#main fieldset.grouperror span.errormessage {
+    display: block;
+    font-weight: bold;
+    color: #900;
+    margin-left: 12.3em;
+    margin-bottom: 10px;
+}   
+#main fieldset.grouperror  .error {
+    border: 0px;
+}   
+/* ab: nochmal ausfuehrlich fuer ie: */
+fieldset.grouperror {
+    clear: left;
+    margin: 0;
+    padding: 10px 0 20px 0;
+    display: inline;
+    width: auto;
+    background: #EAEAEA;
+    width: 100%;
+    overflow: hidden;
+}
+html>body fieldset.grouperror {
+    display: block;
+}
+
+
+
+
+
+
+/* KALENDER 
+------------------------------------- */
+
+#kalender { 
+    display: inline; /* ANTI-IE-BUG hover */
+    float: left; /* ANTI-IE-BUG hover */
+    margin: 0 0 40px 0;
+    width:100%;
+}
+
+#kalender .teaser {
+    margin-top: 20px;
+    height: 1%;
+}
+#kalender .teaser dl.bild {
+    margin-top: 15px;
+}
+#kalender .teaser h3 {
+    font: bold 150% arial, geneva, helvetica, verdana, tahoma, sans-serif;
+    margin: 10px 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ccc;
+}
+#kalender h2 {
+    position: static;
+    margin: 20px 0 0 0;
+    padding: 0 0 10px 0;
+    text-transform: uppercase;
+    font: bold 150% arial, geneva, helvetica, verdana, tahoma, sans-serif;
+    background: url(pics/dotted.gif) 0 100% repeat-x;
+}
+#kalender form {
+    margin-top: 0;
+    background: none;
+}
+#kalender form fieldset {
+    margin-top: 0;
+    padding: 0;
+    background: #EAEAEA;
+}
+#main #kalender h2.events {
+    margin-bottom: 10px;
+}
+#main #kalender p.subline {
+    border-top: none;
+    padding: 0 0 3px 0;
+    margin: -5px 0 0 0; /* - margin h3 */
+    background: url(pics/dotted.gif) 0 100% repeat-x;
+}
+#main #kalender p.subline em {
+    font-style: normal;
+    text-transform: uppercase;
+}
+#kalender #kalenderliste .subline {
+    padding: 0 0 18px 0;
+    border-bottom: 1px solid #ccc;
+    font-weight: bold;
+    color: #333;
+}
+#kalender #kalenderliste .subline a {
+    font-weight: bold;
+    color: #990000; 
+}
+#main #kalender #kalenderliste .subline a:hover {
+text-decoration: underline;
+}
+#kalender #kalenderliste .subline span em.date {
+    width: 2.2em;
+    margin: 0 5px 0 5px;
+    font-weight: bold;
+    color: #333;
+    font-style: normal;
+}
+#kalender #kalenderliste .subline span em.day {
+    width: 2em;
+    float: left;
+    font-weight: bold;
+    color: #333;
+    text-transform: uppercase;
+    font-style: normal;
+}
+#kalender #kalenderliste span.date {
+    width: 13em;
+    float: left;
+}
+#main #kalender #kalenderliste h2 {
+    font: 100% verdana, tahoma, arial, helvetica, sans-serif; 
+    font-weight: bold;
+    text-transform: none;
+    background-image: none;
+    margin: 0;
+    padding: 0;
+}
+#kalender #kalenderliste p {
+    margin-left: 8.1em;
+    padding-bottom: 1em;
+}
+dl#kalenderliste a:link, dl#kalenderliste a:visited, dl#kalenderliste a:hover {
+    display: block;
+    text-decoration: none;
+    color: #900;
+}
+
+dl#kalenderliste a:hover {
+background: #F9F7F7;
+}
+
+
+/* Suchergebnis 
+------------------------------------- */
+
+#suchergebnis { 
+    display: inline; /* ANTI-IE-BUG hover */
+    float: left; /* ANTI-IE-BUG hover */
+    margin: 0 0 40px 0;
+}
+
+#main #suchergebnis .teaser {
+    border-bottom: none;
+    padding: 5px 0;
+}
+
+#main #suchergebnis .teaser span {
+    display: block;
+    margin: .5em 0 .3em 0;
+}
+
+#suchergebnis h2 {
+    margin: 20px 0 0 0;
+    padding: 0 0 10px 0;
+    text-transform: uppercase;
+    font: bold 150% arial, geneva, helvetica, verdana, tahoma, sans-serif;
+    background: none;
+    position: relative; /* ANTI-IE-BUG background */
+}
+
+#suchergebnis h3 {
+    font: bold 150% arial, geneva, helvetica, verdana, tahoma, sans-serif;
+    margin: 10px 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ccc;
+    background: none;
+    text-transform: none;
+}
+
+#suchergebnis a.download,
+#suchergebnis a.extern { 
+    font-weight: bold;
+    padding-top: 1px;
+ }
+
+#suchergebnis form {
+    clear: both;
+}
+
+/* paging vor und zurueck*/
+.paging {
+    clear: left;
+    position: relative;
+    margin: 0 0 10px 0;
+    padding: 0;
+    background: #EAEAEA;
+    width: 100%;
+    height: auto;
+}
+
+/* 1-10 , 11-20 etc */
+#main  .paging p.nav-index { 
+    width: auto;
+    margin: 0 auto;
+    padding: .2em 12em;
+    text-align: center;
+}
+#main  .paging a { /* die Links */
+    padding: 0 3px;
+    text-decoration: none;
+} 
+#main  .paging a:hover { /* die Links */
+    text-decoration: underline;
+} 
+
+.back,
+.forward {
+    position: absolute;
+    top: .2em; 
+    width: 100px;
+}
+.back {
+    left: 0;
+    text-align: left;
+}
+.forward {
+    right: 0; 
+    text-align: right;
+}
+.back a {
+    margin-left: 4px;
+}
+.forward a  {
+    margin-right: 4px;
+}
+#suchergebnis .teaser {
+    margin: 0;
+    padding: 20px 0 20px 0;
+    border-bottom: 1px solid #ccc;
+}
+#suchergebnis .teaser em {
+    font-style: normal;
+    background: #eaeaea;
+    padding: 0 3px;
+}
+
+/* Erweiterte Suche */
+#suchergebnis .displayresult { 
+    float: right;
+    margin: 0 0 20px 0;
+}
+
+
+
+
+/* KALENDER 
+------------------------------------- */
+#termindetail { 
+    display: inline; /* ANTI-IE-BUG hover */
+    float: left; /* ANTI-IE-BUG hover */
+    width:100%;
+    margin: 0 0 40px 0;
+}
+#termindetail p.backlink a {
+    margin: 40px 0 0 0;
+    padding-left: 22px;
+    background: url(pics/icon-link-seitenschalter-zurueck.gif) 0 50% no-repeat;
+    text-decoration: none;
+    display: block;
+    height: 1%;
+}
+#termindetail p.date {
+    margin: 0 0 15px 0;
+    border-top: none;
+    padding: 0;
+    color: #7d6666;
+}
+dl#termin {
+    clear: both;
+    margin: 0; 
+    padding: 0;
+    line-height: 1.5em;
+}
+dl#termin dt { 
+   width: 14em;
+   font-weight: bold;
+}
+dl#termin dd {
+    margin: -1.4em 0 1.2em 15em;
+}
+#termindetail dl#termin dd ul {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+
+
+/* FOTOGALERIE 
+------------------------------------- */
+#gallery dl { 
+    clear: left;
+    margin: 0;
+    padding: 10px 0 0 0;
+    background: #F9F7F7;
+}
+
+#gallery dt {
+    clear: left;
+    padding: 0;
+    text-align: center;
+    margin: 10px 0 10px 0;
+}
+
+#gallery dt img.breit {
+    float: none;
+    display: inline;
+    width: 390px;
+}
+#gallery dt img.hochkant {
+    float: none;
+    display: inline;
+    width: 290px;
+}
+#gallery dd {
+    clear: both;
+    margin: 0;
+    padding: 5px 10px;
+    background: #EAEAEA;
+    text-align: center;
+}
+#gallery dl dt {
+    margin-top: 0;
+}
+#gallery dl dt img {
+    width: 390px;
+}
+#main #gallery .paging {
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding: 2px 0 2px 0;
+    margin-bottom: 0;
+    background: #F9F7F7;
+}
+#main #gallery .paging p.nav-index { 
+    width: auto;
+    margin: 0 auto;
+    padding: .2em 12em;
+    text-align: center;
+}
+#main #gallery .paging p.nav-index a { /* die Links */
+    padding: 0 3px;
+} 
+
+/* HELPFUNKTIONS 
+------------------------------------- */
+.helpfunctions caption {
+    margin-top: 10px;
+}
+
+/* UEBERSICHT PUBLIKATIONEN 
+------------------------------------- */
+#brochure h3 {
+    margin: 10px 0 0 0;
+    padding: 0 0 5px 0;
+    background: none;
+    position: relative; /* ANTI-IE-BUG background */
+    border-bottom: 1px solid #ccc;
+    color: #000;
+    font: bold 150% arial, geneva, helvetica, verdana, tahoma, sans-serif;
+}
+a.warenkorb {
+    padding-left: 19px;
+    background: url(pics/icon-warenkorb.gif) 0 50% no-repeat;
+}
+
+/* 1-10 , 11-20 etc */
+#main #brochure .paging p.nav-index { 
+    width: auto;
+    margin: 0 auto;
+    padding: .2em 12em;
+    text-align: center;
+}
+#brochure .paging p.nav-index a { /* die Links */
+    padding: 0 3px;
+}
+#brochure .paging {
+    border-top: 1px solid #ccc;
+}
+#content #main .teaser-brochure {
+    margin: 2px 0 0 0;
+    padding: 15px 0 0 0;
+    border-top: 1px solid #ccc;
+}
+#content #main .teaser-brochure-pub {
+    margin: 2px 0 0 0;
+    padding: 15px 0 0 0;
+    border-top: 1px solid #ccc;
+}
+
+#main .teaser-brochure div {
+   float: left;
+   width: 30em;
+}
+#main .teaser-brochure-pub div {
+   float: left;
+}
+
+#main #brochure .teaser-brochure p {
+    padding-bottom: 10px;
+}
+#main #brochure .teaser-brochure-pub p {
+    padding-bottom: 10px;
+}
+
+#content #main .teaser-brochure h2 {
+    margin: 0;
+    padding: 0;
+    background: none;
+    text-transform: none;
+    color: #990000;
+    font: bold 150% arial, geneva, helvetica, verdana, tahoma, sans-serif;
+}
+#content #main .teaser-brochure-pub h2 {
+    margin: 0;
+    padding: 0;
+    background: none;
+    text-transform: none;
+    color: #990000;
+    font: bold 150% arial, geneva, helvetica, verdana, tahoma, sans-serif;
+}
+
+#content #main .teaser-brochure dl.bild {
+    clear:none;
+    /*float: left;*/
+    width: 132px;
+    margin-left: 0;
+    margin-right: 20px;
+}
+
+#content #main .teaser-brochure-pub dl.bild {
+    clear:none;
+    /*float: left;*/
+    width: 132px;
+    margin-left: 0;
+    margin-right: 20px;
+}
+
+#content #main .teaser-brochure dl.bild dt {
+    background:#FFF none repeat scroll 0%;
+    height: 133px;
+}
+#content #main .teaser-brochure-pub dl.bild dt {
+    background:#FFF none repeat scroll 0%;
+    height: 133px;
+}
+
+#content #main .teaser-brochure .subline {
+    margin: 0;
+    padding: 5px 0 0 0;
+    color: #7d6666;
+}
+#content #main .teaser-brochure-pub .subline {
+    margin: 0;
+    padding: 5px 0 0 0;
+    color: #7d6666;
+}
+
+.teaser-brochure span {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.teaser-brochure-pub span.download_url {
+	display: block;
+	margin-bottom: 10px;
+}
+
+#brochure .openwarenkorb {
+    margin-top: 10px;
+    padding-top: 20px;
+    border-top: 1px solid #ccc;
+}
+#brochure .openwarenkorb a {
+    padding: 0 0 4px 22px;
+    font-weight: bold;   
+    background: url(pics/icon-link-intern.gif) 0 0 no-repeat;
+}
+
+
+/* WARENKORB 
+------------------------------------- */
+#main #warenkorb h3 {
+    margin: 20px 0 0 0;
+    padding: 0 0 10px 0;
+    text-transform: uppercase;
+    font: bold 150% arial, geneva, helvetica, verdana, tahoma, sans-serif;
+    background: url(pics/dotted.gif) 0 100% repeat-x;
+    position: relative; /* ANTI-IE-BUG background */
+}
+#content #main #warenkorb .teaser-brochure {
+    border-top: none;
+    margin: 20px 0 0 0;
+    padding: 0 0 20px 0;
+    border-bottom: 1px solid #ccc;
+}
+#content #main #warenkorb .teaser-brochure dl.basketitemoptions dt {
+    float: left;
+    margin-bottom: 3px;
+    width: 6em;
+    font-weight: bold;  
+}
+#content #main #warenkorb .teaser-brochure dl.basketitemoptions dd {
+    margin-bottom: 3px;
+}
+#content #main #warenkorb .teaser-brochure dl.basketitemoptions dt label {
+    margin: 0;
+    float: none;
+    width: auto; 
+}
+#content #main #warenkorb .teaser-brochure dl.basketitemoptions input {
+   float: none;
+   width: 5em;
+}
+#warenkorb a.delete {
+   display: block;
+   margin: 20px 0 0 0;
+   padding: 0 0 4px 22px;
+   background: url(pics/icon-delete.gif) 0 0 no-repeat;
+}
+#main #warenkorb table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    caption-side: top;
+    empty-cells: show;
+    clear: left;
+    padding: 0;
+    width: 100%; 
+    table-layout: auto;
+}
+#main #warenkorb td, #main #warenkorb th {
+    vertical-align: top;
+    text-align: left;
+    border-bottom: 1px solid #cccccc;
+}
+#main #warenkorb caption {
+    padding: 5px 10px;
+    background: #5B4B4B;
+    color: #fff;
+    font-weight: bold;
+    text-align: left;
+}
+#main #warenkorb tr {
+    background: #EAEAEA;
+    border-bottom: 1px solid #cccccc;
+}
+#main #warenkorb td {
+    border-bottom: 1px solid #cccccc;
+}
+#main #warenkorb tr .right {
+    text-align: right;   
+}
+#main #warenkorb tr.odd {
+    background: #F9F7F7;
+}
+#main #warenkorb thead th { 
+    padding: 10px 10px 2px 10px;
+    color: #000;
+    background: #EAEAEA;
+}
+#main #warenkorb td, #main #warenkorb th { 
+    padding: 5px 10px;
+}
+#main #warenkorb td em { 
+    font-style: normal;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+#main #warenkorb .button-wrapper {
+    margin: 10px 0 30px 0;
+}
+#main #warenkorb .button-wrapper input {
+    margin: 0 0 0 5px;
+}
+
+
+/* LOGIN-FEHLERSEITE 
+------------------------------------- */
+.teaser-address {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+.firstaddress {
+    border-top: 1px solid #ccc;
+    margin-top: 20px;
+    padding-top: 20px;
+}
+.teaser-address p {
+    color: #000;
+}
+.teaser-address .borderaddress {
+    border-left: 5px solid #990000;
+    padding-left: 8px;
+    line-height: 1.4em;
+    position: relative;
+}
+.teaser-address .links:after { /*FLOATING BUG MOZ */
+    content: " ";
+    display: block;
+    clear: both;
+}
+.teaser-address .links { /*FLOATING BUG IE */
+    height: 1%;
+}
+.teaser-address .borderaddress address {
+    border-left: none;
+    padding-left: 0;
+    line-height: normal;
+}
+.teaser-address span.intern {
+    float: left;
+    text-align: left;
+    width: 49%;
+}
+.teaser-address span.email {
+    float: right;
+    text-align: right;
+    width: 49%;
+}
+.teaser-address span.intern a {
+   padding: 0 0 4px 22px;
+   background: url(pics/icon-link-intern.gif) 0 0 no-repeat;
+}
+.teaser-address span.email a {
+   padding: 0 0 4px 22px;
+   background: url(pics/icon-email.gif) 0 0 no-repeat;
+}
+
+
+/* ERROR-SEITE
+----------------------------------- */
+#errorpage p.error label,
+#errorpage p.error {
+    color: #990000;
+    font-weight: bold;
+}
+#errorpage p.error input {
+    border: 1px solid #990000;
+}
+
+/* LEBENSLAUF
+----------------------------------- */
+#ts #main table.vita {
+    margin-bottom: 2em;
+}
+#ts #main table.vita td.first {
+    width: 12%;
+    padding-right: .3em;
+}
+#ts #main table.vita td.second {
+    width: 12%;
+    padding-right: .3em;
+}
+/* POPUP
+----------------------------------- */
+
+body.popup {
+    min-width: 100px;
+}
+#popupbranding {
+    font-size: 110%; 
+    position: relative; 
+    background: #92ADBE url(pics/headerfoto-02.jpg) no-repeat top left;
+    height: 80px;
+    /* width: 490px; */
+    padding-top: 25px;
+}
+#popuphome {
+    position: absolute; 
+    top: 10px; 
+    left: 0; 
+    display: block;
+}
+#popuphead {
+    position: relative; 
+    margin: 0 0 0 260px; 
+    padding: 0; 
+    background: #fff; 
+    height: 6.8em;
+}
+#popupcontent {
+    margin: 2em 1em 1em 1em;
+    /* width: 470px; */
+}
+#popupcontent p {
+    padding: 1em 0 1em 0; 
+}
+span.annotation {
+    display: block;
+}
+
+
+

@@ -51,6 +51,7 @@ JAVADOCOPTS= -author -protected -nodeprecated -nodeprecatedlist \
   $(foreach d, $(DEPNAMES), -link $(JTEMURL)/$(d)/api) \
   -d $(DOCDIR) -classpath "$(BINDIR):`find $(LIBDIR) -name '*.jar' -printf %p: 2> /dev/null `" \
   -sourcepath `echo $(SRCDIRS) | tr \  :` \
+  -stylesheetfile javadoc-style.css \
   $(DOCPACKAGES)
 	   
 
@@ -239,7 +240,7 @@ release: web test $(DOCDIR) $(RELDIR)/$(NAME).jar $(RELDIR)/$(NAME).tgz $(RELDIR
 	@$(call copy_to_website, $(RELDIR)/$(NAME).zip,downloads/$(NAME)/$(NAME)_`cat $(RELDIR)/current.txt`.zip)
 	@$(call copy_to_website, $(RELDIR)/$(NAME)-api.tgz,downloads/$(NAME)/$(NAME)-api_`cat $(RELDIR)/current.txt`.tgz)
 	@$(call exec_on_server, if [ -d  $(SRVDIR)/$(NAME)/api ]; then rm -rf $(SRVDIR)/$(NAME)/api; fi)
-	$(call copy_to_website, $(DOCDIR),$(NAME)/api)
+	@$(call copy_to_website, $(DOCDIR),$(NAME)/api)
 	@$(call copy_to_website, $(RELDIR)/current.txt,downloads/$(NAME))
 	@$(call copy_to_website, releasenotes.txt,downloads/$(NAME))
 	@-$(call exec_on_server, find $(SRVDIR) -user `whoami` | xargs chmod g+rw)
