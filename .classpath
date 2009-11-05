@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="de/jtem/halfedgetools/plugin/HalfedgeSubdivisonPlugin.java" kind="src" path="src"/>
+	<classpathentry excluding="de/jtem/halfedgetools/plugin/HalfedgeSubdivisonPlugin.java" kind="src" path="src">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="jreality/jni/linux64"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="src" path="src-test"/>
 	<classpathentry excluding="HalfedgeSubdivisonPlugin.java" kind="src" path="src-defect"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>

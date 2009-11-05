@@ -18,10 +18,14 @@ public class CatmullClarkPlugin
 		HDS extends HalfEdgeDataStructure<V,E,F>
 	> extends HalfedgeAlgorithmPlugin<V,E,F,HDS> {
 	
-	private Coord3DAdapter<V> adapter = null;
+	private Coord3DAdapter<V> vA = null;
+	private Coord3DAdapter<E> eA;
+	private Coord3DAdapter<F> fA;
 	
-	public CatmullClarkPlugin(Coord3DAdapter<V> ad) {
-		adapter = ad;
+	public CatmullClarkPlugin(Coord3DAdapter<V> ad, Coord3DAdapter<E> ead, Coord3DAdapter<F> fac) {
+		this.vA = ad;
+		this.eA = ead;
+		this.fA  = fac;
 	}
 
 	private CatmullClarkSubdivision<V,E,F> subdivider = new CatmullClarkSubdivision<V,E,F>();
@@ -51,7 +55,7 @@ public class CatmullClarkPlugin
 		if (hds == null) {
 			return;
 		}
-		subdivider.subdivide(hds, tHDS, adapter);
+		subdivider.subdivide(hds, tHDS, vA, eA, fA);
 		hcp.updateHalfedgeContentAndActiveGeometry(tHDS, true);	
 	}
 	

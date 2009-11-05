@@ -200,12 +200,9 @@ public  class HalfedgeConnectorPlugin
 					adapters = new Adapter[] {new StandardCoordinateAdapter(AdapterType.VERTEX_ADAPTER)};
 				IndexedFaceSet ifs = c.heds2ifs(newHeds, adapters);
 				IndexedFaceSetUtility.calculateAndSetNormals(ifs);
-				updateCache(newHeds);
-				if (activeGeometry == null) {
-					SceneGraphComponent root = new SceneGraphComponent();
-					activeGeometry = new GeomObject(root);
-				}
-				activeGeometry.cgc.setGeometry(ifs);
+
+				updateHalfedgeContentAndActiveGeometry(newHeds, true);
+
 			}
 			
 		} else if(saveButton == e.getSource()) {
@@ -287,7 +284,7 @@ public  class HalfedgeConnectorPlugin
 		return result;
 	}
 	
-	public void getCachedHalfEdgeDataStructureElseConvert(HDS hds, Adapter... a) {
+	public HDS getCachedHalfEdgeDataStructureElseConvert(HDS hds, Adapter... a) {
 
 		if(cachedHEDS.getVertexClass() == hds.getVertexClass() &&
 				cachedHEDS.getEdgeClass() == hds.getEdgeClass() &&
@@ -298,6 +295,8 @@ public  class HalfedgeConnectorPlugin
 			System.err.println("cache didnt match class so returning as default hds");
 			convertActiveGeometryToHDS(hds, a);
 		}
+		
+		return hds;
 	}
 	
 	public HDS getCachedHalfEdgeDataStructure() {

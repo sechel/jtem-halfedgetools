@@ -3,9 +3,9 @@
  */
 package de.jtem.halfedgetools.algorithm;
 
-import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.Node;
 
-public interface Coord3DAdapter<V extends Vertex<V, ?, ?>> {
-	public double[] getCoord(V v);
-	public void setCoord(V v, double[] c);
+public interface Coord3DAdapter<N extends Node<?, ?, ?>> {
+	public double[] getCoord(N n);
+	public void setCoord(N n, double[] c);
 }

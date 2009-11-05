@@ -7,8 +7,10 @@ import static de.jtem.halfedge.util.HalfEdgeUtils.isBoundaryVertex;
 import static de.jtem.halfedge.util.HalfEdgeUtils.isInteriorEdge;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -38,15 +40,19 @@ public class CatmullClarkSubdivision  <
 	 * @param <HDS> 
 	 * @param hds the input surface
 	 * @param r the output surface will be overwritten
-	 * @param coord a coordinates adapter
+	 * @param vc a coordinates adapter
 	 */
 	public <
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void subdivide(
+	> Map<E, Set<E>> subdivide(
 		HDS hds,
 		HDS r,
-		Coord3DAdapter<V> coord
+		Coord3DAdapter<V> vc,
+		Coord3DAdapter<E> ec,
+		Coord3DAdapter<F> fc
 	) {
+		
+		
 		HalfEdgeUtilsExtra.clear(r);
 		// face vertices
 		Map<F, V> fvMap = new HashMap<F, V>();
@@ -55,15 +61,17 @@ public class CatmullClarkSubdivision  <
 			fvMap.put(f, v);
 			
 			double[] sum = {0, 0, 0};
-			List<E> b = boundaryEdges(f);
-			int size = 0;
-			for (E e : b) {
-				V bv = e.getTargetVertex();
-				add(sum, sum, coord.getCoord(bv));
-				size++;
-			}
-			times(sum, 1.0 / size, sum);
-			coord.setCoord(v, sum);
+//			List<E> b = boundaryEdges(f);
+//			int size = 0;
+//			for (E e : b) {
+//				V bv = e.getTargetVertex();
+////				add(sum, sum, coord.getCoord(bv));
+//				add(sum, sum, ec.getCoord(e));
+//				size++;
+//			}
+//			times(sum, 1.0 / size, sum);
+			sum = fc.getCoord(f);
+			vc.setCoord(v, sum);
 		}
 		
 		// edge vertices
@@ -79,11 +87,15 @@ public class CatmullClarkSubdivision  <
 			V leftV = fvMap.get(e.getLeftFace());
 			V rightV = fvMap.get(e.getRightFace());
 			double[][] coords = new double[4][];
-			coords[0] = coord.getCoord(leftV);
-			coords[1] = coord.getCoord(rightV);
-			coords[2] = coord.getCoord(e.getStartVertex());
-			coords[3] = coord.getCoord(e.getTargetVertex());
-			coord.setCoord(v, average(null, coords));
+//			coords[0] = vc.getCoord(leftV);
+//			coords[1] = vc.getCoord(rightV);
+//			coords[2] = coord.getCoord(e.getStartVertex());
+//			coords[3] = coord.getCoord(e.getTargetVertex());
+			coords[0] = fc.getCoord(e.getLeftFace());
+			coords[1] = fc.getCoord(e.getRightFace());
+			coords[2] = ec.getCoord(e);
+			coords[3] = ec.getCoord(e.getOppositeEdge());
+			vc.setCoord(v, average(null, coords));
 		}
 	
 		// vertex vertices
@@ -100,21 +112,23 @@ public class CatmullClarkSubdivision  <
 			double[] faceSum = {0, 0, 0};
 			for (F f : fStar) {
 				V fv = fvMap.get(f);
-				add(faceSum, faceSum, coord.getCoord(fv));
+				add(faceSum, faceSum, vc.getCoord(fv));
 			}
 			times(faceSum, 1.0 / fStar.size(), faceSum);
 			double[] edgeSum = {0, 0, 0};
 			for (E e : star) {
-				add(edgeSum, coord.getCoord(e.getTargetVertex()), edgeSum);
-				add(edgeSum, coord.getCoord(e.getStartVertex()), edgeSum);
+//				add(edgeSum, coord.getCoord(e.getTargetVertex()), edgeSum);
+//				add(edgeSum, coord.getCoord(e.getStartVertex()), edgeSum);
+				add(edgeSum, ec.getCoord(e), edgeSum);
+				add(edgeSum, ec.getCoord(e.getOppositeEdge()), edgeSum);
 			}
 			times(edgeSum, 1.0 / star.size(), edgeSum);
 			
 			int n = star.size();
-			double[] vertexSum = times(null, n - 3, coord.getCoord(v));
+			double[] vertexSum = times(null, n - 3, vc.getCoord(v));
 			
 			double[] sum = add(null, add(null, faceSum, edgeSum), vertexSum);
-			coord.setCoord(nv, times(sum, 1.0 / n, sum));
+			vc.setCoord(nv, times(sum, 1.0 / n, sum));
 			
 		}
 
@@ -162,6 +176,10 @@ public class CatmullClarkSubdivision  <
 			}
 		}
 		
+
+		Map<E, Set<E>> oldEtoSubDivEs = new HashMap<E, Set<E>>();
+		
+		Map<E, E> tempEmap = new HashMap<E, E>();
 		// vertex vertex connections and linkage
 		for (V v : hds.getVertices()) {
 			if (isBoundaryVertex(v)) {
@@ -196,13 +214,26 @@ public class CatmullClarkSubdivision  <
 				if (linkIn.getOppositeEdge().getLeftFace() == null) {
 					linkOut.getOppositeEdge().linkNextEdge(linkIn.getOppositeEdge());
 				}
+				
+				tempEmap.put(e, in);
+				
 			}
 			if (firstOut != null) {
 				firstOut.linkPreviousEdge(lastIn);
 			}
 		}
 		
+		for(E e : hds.getEdges()) {
+			Set<E> newEs = new HashSet<E>();
+			newEs.add(tempEmap.get(e));
+			newEs.add(tempEmap.get(e.getOppositeEdge()).getOppositeEdge());
+			
+			oldEtoSubDivEs.put(e, newEs);
+		}
+		
 		HalfEdgeUtils.isValidSurface(r, true);
+		
+		return oldEtoSubDivEs;
 	}
 	
 	
