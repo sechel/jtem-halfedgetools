@@ -4,10 +4,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.jreality.geometry.Primitives;
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.Inspector;
+import de.jreality.plugin.basic.Scene;
+import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewMenuBar;
 import de.jreality.plugin.basic.ViewToolBar;
 import de.jreality.plugin.content.ContentAppearance;
@@ -31,8 +34,12 @@ import de.jtem.halfedgetools.jreality.node.standard.StandardHDS;
 import de.jtem.halfedgetools.jreality.node.standard.StandardVertex;
 import de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin;
 import de.jtem.halfedgetools.plugin.buildin.CatmullClarkPlugin;
+import de.jtem.halfedgetools.plugin.buildin.EdgeQuadPlugin;
 import de.jtem.halfedgetools.plugin.buildin.LoopPlugin;
+import de.jtem.halfedgetools.plugin.buildin.MedialGraphPlugin;
+import de.jtem.halfedgetools.plugin.buildin.QuadStripPlugin;
 import de.jtem.halfedgetools.plugin.buildin.TriangulatePlugin;
+import de.jtem.halfedgetools.plugin.buildin.VertexQuadPlugin;
 import de.jtem.jrworkspace.plugin.Plugin;
 
 public class TopologyOperations {
@@ -41,7 +48,7 @@ public class TopologyOperations {
 		
 		final class StandardVAdapter implements Coord3DAdapter<StandardVertex> {
 			public double[] getCoord(StandardVertex v) {
-				return v.position;
+				return v.position.clone();
 			}
 			public void setCoord(StandardVertex v, double[] c) {
 				v.position = c;
@@ -50,7 +57,16 @@ public class TopologyOperations {
 		
 		final class StandardEAdapter implements Coord3DAdapter<StandardEdge> {
 			public double[] getCoord(StandardEdge e) {
-				return e.getTargetVertex().position;
+				return e.getTargetVertex().position.clone();
+			}
+			public void setCoord(StandardEdge e, double[] c) {
+				e.getTargetVertex().position = c;
+			}
+		}
+		
+		final class StandardMedEAdapter implements Coord3DAdapter<StandardEdge> {
+			public double[] getCoord(StandardEdge e) {
+				return Rn.linearCombination(null, 0.5, e.getTargetVertex().position, 0.5, e.getStartVertex().position);
 			}
 			public void setCoord(StandardEdge e, double[] c) {
 				e.getTargetVertex().position = c;
@@ -90,6 +106,10 @@ public class TopologyOperations {
 		hs.add(new TriangulatePlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>());
 		hs.add(new FillHolesPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>());
 		hs.add(new LoopPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardEAdapter()));
+		hs.add(new EdgeQuadPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
+		hs.add(new VertexQuadPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
+		hs.add(new MedialGraphPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
+		hs.add(new QuadStripPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
 		return hs;
 	}
 	
@@ -115,6 +135,10 @@ public class TopologyOperations {
 		hs.add(new TriangulatePlugin<V,E,F,HDS>());
 		hs.add(new FillHolesPlugin<V,E,F,HDS>());
 		hs.add(new LoopPlugin<V,E,F,HDS>(vA,eA));
+		hs.add(new EdgeQuadPlugin<V,E,F,HDS>(vA,eA,fA));
+		hs.add(new VertexQuadPlugin<V,E,F,HDS>(vA,eA,fA));
+		hs.add(new MedialGraphPlugin<V,E,F,HDS>(vA,eA,fA));
+		hs.add(new QuadStripPlugin<V,E,F,HDS>(vA,eA,fA));
 		return hs;
 	}
 	
@@ -138,8 +162,11 @@ public class TopologyOperations {
 		
 		viewer.registerPlugins(TopologyOperations.topologicalEditingStandardHDS());
 	
-		viewer.registerPlugin(new HalfedgeConnectorPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(
-				StandardHDS.class, new StandardCoordinateAdapter(AdapterType.VERTEX_ADAPTER)));
+		HalfedgeConnectorPlugin<StandardVertex, StandardEdge, StandardFace, StandardHDS> hcp = new HalfedgeConnectorPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(
+				StandardHDS.class, new StandardCoordinateAdapter(AdapterType.VERTEX_ADAPTER));
+		
+		viewer.registerPlugin(hcp);
+		
 		
 		viewer.startup();
 	}

@@ -31,6 +31,24 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 	//return new HEDS approximated using dyadic scheme
 	public Map<E, Set<E>> subdivide(HEDS oldHeds, HEDS newHeds, Coord3DAdapter<V> vA, Coord3DAdapter<E> eA){
 		
+		int maxDeg = 0;
+		for(V v : oldHeds.getVertices()) {
+			maxDeg = Math.max(maxDeg, HalfEdgeUtils.incomingEdges(v).size());
+		}
+		
+		
+		//	Für reguläre alte Punkte p_alt -> α= 3/8
+		//	Sonst α= 5/8 -(3/8 + 1/4* cos(2*π/d)
+		// TODO check with a paper
+		HashMap<Integer, Double> alphaMap = new HashMap<Integer, Double>();
+		for(int i = 1; i <= maxDeg; i++) {
+			double alpha = 0.0;
+			if(i == 6)
+				alpha = 3.0/8.0;
+			else
+				alpha = 5.0/8.0 - StrictMath.pow(3.0/8.0 + 1.0/4.0 * StrictMath.cos(2*Math.PI/i),2);
+			alphaMap.put(i, alpha);
+		}
 		
 		// Verschiebung der neuen Punkte p_neu = 1/8*(3*a+1*b+3*c+1*d)
 		for(E e : oldHeds.getPositiveEdges()) {
@@ -69,7 +87,7 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 			Rn.times(mid, 1.0 / deg, mid);	
 			
 			double[] newpos = new double[] {0,0,0};
-			double alpha = alphaLoop(deg);
+			double alpha = alphaMap.get(deg);
 			
 			Rn.linearCombination(newpos, 1.0 - alpha, vA.getCoord(v), alpha, mid);
 			
@@ -174,17 +192,5 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 		}
 		
 	};
-
-	//	Für reguläre alte Punkte p_alt -> α= 3/8
-	//	Sonst α= 5/8 -(3/8 + 1/4* cos(2*π/d)
-	private double alphaLoop(int degv){
-		double alpha = 3.0/8.0;
-		if (degv == 6){}
-		else{
-		alpha = 5.0/8.0 - Math.pow(3.0/8.0 + 1.0/4.0 * Math.cos(2*Math.PI/degv),2);
-		};
-		return alpha;
-	}
-	
 	
 }
