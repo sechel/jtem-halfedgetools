@@ -22,27 +22,28 @@ F extends Face<V, E, F>,
 HEDS extends HalfEdgeDataStructure<V, E, F>>
  {
 
-	private Map<E, double[]> oldEtoPos;
-	private HashMap<V, double[]> oldVtoPos;
-	private Map<V,E> newVtoOldE;
+	private Map<E, double[]> oldEtoPos = new HashMap<E, double[]>();;
+	private HashMap<V, double[]> oldVtoPos = new HashMap<V, double[]>();;
+	private Map<V,E> newVtoOldE = new HashMap<V,E>();;
+	private Map<E, Set<E>> oldEtoNewEs = new HashMap<E,Set<E>>();
 	
-	private Map<E, Set<E>> oldEtoNewEs;
 	
 	//return new HEDS approximated using dyadic scheme
-	public Map<E, Set<E>> subdivide(HEDS oldHeds, HEDS newHeds, Coord3DAdapter<V> vc, Coord3DAdapter<E> ec){
-				
+	public Map<E, Set<E>> subdivide(HEDS oldHeds, HEDS newHeds, Coord3DAdapter<V> vA, Coord3DAdapter<E> eA){
 		
-		oldEtoPos = new HashMap<E, double[]>();
+		
+		// Verschiebung der neuen Punkte p_neu = 1/8*(3*a+1*b+3*c+1*d)
 		for(E e : oldHeds.getPositiveEdges()) {
 
-			double[] pos = new double[3];
-			double[] a = ec.getCoord(e.getPreviousEdge());
-			double[] b = ec.getCoord(e.getOppositeEdge().getPreviousEdge());
-			double[] c = ec.getCoord(e.getOppositeEdge().getNextEdge());
-			double[] d = ec.getCoord(e.getNextEdge());
+			double[] pos = new double[] {0,0,0};
+			double[] a = eA.getCoord(e.getPreviousEdge());
+			double[] b = eA.getCoord(e.getOppositeEdge().getPreviousEdge());
+			double[] c = eA.getCoord(e.getOppositeEdge().getNextEdge());
+			double[] d = eA.getCoord(e.getNextEdge());
 			
-			Rn.times(a,3,a);
-			Rn.times(b,3,b);
+			
+			Rn.times(a,3.0,a);
+			Rn.times(b,3.0,b);
 			Rn.add(pos, b, a);
 			Rn.add(pos, c, pos);
 			Rn.add(pos, d, pos);
@@ -52,7 +53,10 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 			
 		}
 		
-		oldVtoPos = new HashMap<V, double[]>();
+		//	Verschiebung der alten Punkte p_alt = (1-α)p_alt+ α*m
+		//	m= Mittelwert Nachbarn
+		//	Falls der Grad d := #Nachbarn =6,
+		//	ist der Punkt regulär.
 		for(V v : oldHeds.getVertices()) {
 			List<E> star = HalfEdgeUtils.incomingEdges(v);
 			int deg = star.size();
@@ -60,30 +64,32 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 			double[] mid = new double[]{0,0,0};
 			for(E e : star) {
 				E eo = e.getOppositeEdge();
-				Rn.add(mid, ec.getCoord(eo), mid);
+				Rn.add(mid, eA.getCoord(eo), mid);
 			}
 			Rn.times(mid, 1.0 / deg, mid);	
 			
 			double[] newpos = new double[] {0,0,0};
 			double alpha = alphaLoop(deg);
 			
-			Rn.linearCombination(newpos, 1.0 - alpha, vc.getCoord(v), alpha, mid);
+			Rn.linearCombination(newpos, 1.0 - alpha, vA.getCoord(v), alpha, mid);
 			
 			oldVtoPos.put(v, newpos);			
 		}
 		
 		dyadicSubdiv(oldHeds, newHeds);
 		
-		for(V v : newVtoOldE.keySet()) {
-			double[] pos = oldEtoPos.get(newVtoOldE.get(v));
-			vc.setCoord(v, pos);
+		for(V ov : oldVtoPos.keySet()) {
+			double[] pos = oldVtoPos.get(ov);
+			V newV = newHeds.getVertex(ov.getIndex());
+			vA.setCoord(newV, pos);
 		}
 		
-		for(V v : oldVtoPos.keySet()) {
-			double[] pos = oldVtoPos.get(v);
-			V newV = newHeds.getVertex(v.getIndex());
-			vc.setCoord(newV, pos);
+		for(V nv : newVtoOldE.keySet()) {
+			E oe = newVtoOldE.get(nv);
+			double[] pos = oldEtoPos.get(oe);
+			vA.setCoord(nv, pos);
 		}
+		
 		
 		return oldEtoNewEs;
 
@@ -94,8 +100,6 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 		//struktur kopieren
 		alt.createCombinatoriallyEquivalentCopy(neu);
 
-		newVtoOldE = new HashMap<V,E>();
-		oldEtoNewEs = new HashMap<E,Set<E>>();
 		
 		for(E oe : alt.getPositiveEdges()){
 			E e = neu.getEdge(oe.getIndex());	
@@ -124,7 +128,7 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 			eo2.linkNextEdge(eon);
 			eo2.setTargetVertex(es);
 			
-			HashSet<E> newEs = new HashSet<E>();
+			Set<E> newEs = new HashSet<E>();
 			newEs.add(e); newEs.add(e2);
 			
 			oldEtoNewEs.put(oe, newEs);
@@ -140,8 +144,6 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 			List<E> e = new ArrayList<E>(0);
 			List<E> eb = new ArrayList<E>(0);
 			List<F> fn = neu.addNewFaces(3);
-			
-//			List<E> boundary = HalfEdgeUtils.boundaryEdges(f);
 			
 			e.add(f.getBoundaryEdge());
 
@@ -173,7 +175,8 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 		
 	};
 
-	
+	//	Für reguläre alte Punkte p_alt -> α= 3/8
+	//	Sonst α= 5/8 -(3/8 + 1/4* cos(2*π/d)
 	private double alphaLoop(int degv){
 		double alpha = 3.0/8.0;
 		if (degv == 6){}
