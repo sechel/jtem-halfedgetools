@@ -5,15 +5,15 @@
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentLoader:currentDirectory</string>
-    <string>/homes/geometer/josefsso/store/workspace/GeometricFlows/data/models</string>
-  </entry>
-  <entry>
-    <string>de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin:showPanel</string>
-    <boolean>true</boolean>
+    <string>/homes/geometer/josefsso/store/temp2</string>
   </entry>
   <entry>
     <string>de.jreality.plugin.menu.DisplayOptions:showPick</string>
     <boolean>false</boolean>
+  </entry>
+  <entry>
+    <string>de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin:showPanel</string>
+    <boolean>true</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.basic.ViewPreferences:showToolBar</string>
@@ -21,7 +21,7 @@
   </entry>
   <entry>
     <string>de.jreality.plugin.basic.MainPanel:shrinked</string>
-    <boolean>true</boolean>
+    <boolean>false</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentTools:pickVertices</string>
@@ -29,10 +29,14 @@
   </entry>
   <entry>
     <string>de.jreality.plugin.menu.BackgroundColor:color</string>
-    <string>Default</string>
+    <string>Gray</string>
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentTools:rotationEnabled</string>
+    <boolean>true</boolean>
+  </entry>
+  <entry>
+    <string>de.jreality.plugin.basic.View:showLeft</string>
     <boolean>true</boolean>
   </entry>
   <entry>
@@ -40,16 +44,12 @@
     <boolean>false</boolean>
   </entry>
   <entry>
-    <string>de.jreality.plugin.basic.View:showLeft</string>
+    <string>de.jreality.plugin.content.ContentTools:encompassEnabled</string>
     <boolean>true</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.basic.View:hidePanels</string>
     <boolean>false</boolean>
-  </entry>
-  <entry>
-    <string>de.jreality.plugin.content.ContentTools:encompassEnabled</string>
-    <boolean>true</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentTools:dragEnabled</string>
@@ -77,7 +77,7 @@
   </entry>
   <entry>
     <string>de.jreality.plugin.basic.Inspector:shrinked</string>
-    <boolean>false</boolean>
+    <boolean>true</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.basic.MainPanel:showPanel</string>
@@ -100,16 +100,16 @@
     <boolean>false</boolean>
   </entry>
   <entry>
-    <string>de.jreality.plugin.basic.View:showTop</string>
-    <boolean>false</boolean>
+    <string>de.jreality.plugin.basic.Inspector:propagateSelections</string>
+    <boolean>true</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.basic.Inspector:receiveSelections</string>
     <boolean>true</boolean>
   </entry>
   <entry>
-    <string>de.jreality.plugin.basic.Inspector:propagateSelections</string>
-    <boolean>true</boolean>
+    <string>de.jreality.plugin.basic.View:showTop</string>
+    <boolean>false</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.basic.ViewPreferences:colorChooserMode</string>

@@ -333,7 +333,7 @@ public  class HalfedgeConnectorPlugin
 		updateCache(hds);
 		activeGeometry.cgc.setGeometry(ifs);
 //		contentChangedListener.skipNextUpdate(true);
-//		contentChangedListener.contentChanged(new ContentChangedEvent(ContentChanged));
+//		contentChangedListener.contentChanged(new ContentChangedEvent(ChangeEventTypeContentChanged));
 	}
 	
 	public void updateHalfedgeContentAndActiveGeometry(HDS hds, boolean normals) {
@@ -350,7 +350,7 @@ public  class HalfedgeConnectorPlugin
 		activeGeometry.cgc.setGeometry(ifs);
 		
 //		contentChangedListener.skipNextUpdate(true);
-//		contentChangedListener.contentChanged(new ContentChangedEvent(ContentChanged));
+//		contentChangedListener.contentChanged(new ContentChangedEvent(ChangeEventType.ContentChanged));
 	}
 	
 	@Deprecated

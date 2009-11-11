@@ -22,5 +22,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/jReality.jar" sourcepath="/jreality"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jrworkspace"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/discretegroup"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
