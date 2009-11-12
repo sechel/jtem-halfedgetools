@@ -10,94 +10,16 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
+import de.jtem.halfedgetools.algorithm.delaunay.decorations.IsFlippable;
 import de.jtem.halfedgetools.functional.alexandrov.SurfaceUtility;
 import de.jtem.halfedgetools.plugin.buildin.topology.TopologyOperations;
 import de.jtem.halfedgetools.util.surfaceutilities.SurfaceException;
+import de.jtem.halfedgetools.util.triangulationutilities.TriangulationException;
 
 public class Subdivision {
 
-	@SuppressWarnings("unchecked")
-	public static 
-	<
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V,E,F>
-	> HDS createStripSubdivision(
-			HDS graph,
-			HDS quad,
-			HashMap<V, V> vertexVertexMap,
-			HashMap<E, V> edgeVertexMap,
-			HashMap<F, V> faceVertexMap,
-			Coord3DAdapter<V> vA,
-			Coord3DAdapter<E> eA,
-			Coord3DAdapter<F> fA) 
-			throws SurfaceException{
-		
-		for (V v : graph.getVertices()){
-			V newV = quad.addNewVertex();
-			vA.setCoord(newV, vA.getCoord(v));
-			vertexVertexMap.put(v, newV);
-		}
-		for (E e : graph.getPositiveEdges()){
-			V newV = quad.addNewVertex();
-			vA.setCoord(newV, eA.getCoord(e));
-			edgeVertexMap.put(e, newV);
-			edgeVertexMap.put(e.getOppositeEdge(), newV);
-		}
-		for (F f : graph.getFaces()){
-			if (HalfEdgeUtils.boundaryEdges(f).size() < 4) 
-				continue;
-			V newVertex = quad.addNewVertex();
-			vA.setCoord(newVertex, fA.getCoord(f));
-			faceVertexMap.put(f, newVertex);
-		}
-		
-		FaceByFaceGenerator<V, E, F> g = new FaceByFaceGenerator<V, E, F>(quad);
-		for (F f : graph.getFaces()){
-			if (HalfEdgeUtils.boundaryEdges(f).size() >= 4){
-				for (E b : HalfEdgeUtils.boundaryEdges(f)){
-					V v1 = edgeVertexMap.get(b);
-					V v2 = vertexVertexMap.get(b.getTargetVertex());
-					V v3 = edgeVertexMap.get(b.getNextEdge());
-					V v4 = faceVertexMap.get(f);
-					g.addFace(v1, v2, v3, v4);
-				}
-			} else if (HalfEdgeUtils.boundaryEdges(f).size() == 3){
-//				if (f.isInteriorFace())
-//					throw new SurfaceException("Cannot subdivide inner triangles consistently, in createStripSubdivision()");
-				E b = f.getBoundaryEdge();
-//				for (E e : HalfEdgeUtils.boundaryEdges(f))
-//					if (!e.isInteriorEdge())
-//						b = e;
-//				if (!b.getNextEdge().isInteriorEdge()){
-//					b = b.getNextEdge();
-//				}
-//				 check if next in boundary is a triangle
-//				if (!b.getPreviousEdge().isInteriorEdge()){
-//					F nextInBoundary = b.getOppositeEdge().getPreviousEdge().getRightFace();
-//					if (HalfEdgeUtils.boundaryEdges(nextInBoundary).size() != 3)
-//						b = b.getPreviousEdge();
-//				}
-				V v1 = vertexVertexMap.get(b.getStartVertex());
-				V v2 = edgeVertexMap.get(b);
-				V v3 = vertexVertexMap.get(b.getTargetVertex());
-				V v4 = edgeVertexMap.get(b.getNextEdge());
-				V v5 = vertexVertexMap.get(b.getNextEdge().getTargetVertex());
-				V v6 = edgeVertexMap.get(b.getPreviousEdge());
-				g.addFace(v1, v2, v6);
-				g.addFace(v2, v3, v4);
-				g.addFace(v4, v5, v6, v2);
-			} else {
-				throw new SurfaceException("Cant handle face " + f + ", in createStripSubdivision()");
-			}
-		}
-		SurfaceUtility.linkBoundary(quad);
-		return quad;
-	}
-	
-
 	// EDGE QUAD SUBDIVIDE
+	// combinatorially equivalent to catmull-clark!
 	//
 	// x-----x-----x
 	// |     |     |
@@ -228,6 +150,7 @@ public class Subdivision {
 	}
 
 	// VERTEX QUAD SUBDIVIDE
+	// root-three without the flipped edges in the quads
 	//
 	// x-----------x
 	// |\         /|
@@ -236,7 +159,6 @@ public class Subdivision {
 	// |   /   \   |
 	// |/         \|
 	// x-----------x
-	
 	public static 
 	<
 		V extends Vertex<V, E, F>,
@@ -258,13 +180,6 @@ public class Subdivision {
 		
 		// vertices
 		for (V v : graph.getVertices()){
-			// quads only for inner edges
-			boolean isNewVertex = false;
-//			for (E e : HalfEdgeUtils.incomingEdges(v))
-//				if (e.isInteriorEdge())
-//				if(true)
-//					isNewVertex = true;
-//			if (!isNewVertex) continue;
 			V newVertex = quad.addNewVertex();
 			vA.setCoord(newVertex, vA.getCoord(v));
 			vertexVertexMap.put(v, newVertex);
@@ -275,9 +190,6 @@ public class Subdivision {
 			faceVertexMap.put(f, newVertex);
 		}
 		for (E e : graph.getPositiveEdges()){
-//			 quads only for inner edges
-//			if (!e.isInteriorEdge())
-//				continue;
 			F newFace = quad.addNewFace();
 			edgeFaceMap.put(e, newFace);
 			edgeFaceMap.put(e.getOppositeEdge(), newFace);
@@ -286,8 +198,6 @@ public class Subdivision {
 		
 		// create inner edges
 		for (E e : graph.getPositiveEdges()){
-			// quads only for inner edges
-//			if (!e.isInteriorEdge()) continue;
 			V v1 = vertexVertexMap.get(e.getStartVertex());
 			V v2 = vertexVertexMap.get(e.getTargetVertex());
 			V v3 = faceVertexMap.get(e.getRightFace());
@@ -320,37 +230,132 @@ public class Subdivision {
 		
 		// connections inside
 		for (E e : graph.getEdges()){
-//			if (!e.isInteriorEdge()) continue;
 			E e1 = leftQuadEdgeMap.get(e);
-//			if (!e.getNextEdge().isInteriorEdge()) continue;
 			E e2 = leftQuadEdgeMap.get(e.getNextEdge()).getNextEdge();
 			e1.linkOppositeEdge(e2);
 		}
 		
-		// create boundary edges
-		for (int i = 0; i < quad.numEdges(); i++){
-			E e = quad.getEdge(i);
-			if (e.getOppositeEdge() != null) continue;
-			E opp = quad.addNewEdge();
+		return quad;
+	}
+	
+	
+	public static 
+	<
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V,E,F>
+	> HDS createRootThree(
+			HDS graph, 
+			HDS quad, 
+			HashMap<V, V> vertexVertexMap, 
+			HashMap<F, V> faceVertexMap,
+			Coord3DAdapter<V> vA,
+			Coord3DAdapter<E> eA,
+			Coord3DAdapter<F> fA)
+	throws SurfaceException{
+		
+		HashMap<E, E> leftQuadEdgeMap = new HashMap<E, E>();
+		HashMap<E, F> edgeFaceMap = new HashMap<E, F>();
+		
+		// vertices
+		for (V v : graph.getVertices()){
+			V newVertex = quad.addNewVertex();
+			vA.setCoord(newVertex, vA.getCoord(v));
+			vertexVertexMap.put(v, newVertex);
+		}
+		for (F f : graph.getFaces()){
+			V newVertex = quad.addNewVertex();
+			vA.setCoord(newVertex, fA.getCoord(f));
+			faceVertexMap.put(f, newVertex);
+		}
+		for (E e : graph.getPositiveEdges()){
+			F newFace = quad.addNewFace();
+			F newFace2 = quad.addNewFace();
+			edgeFaceMap.put(e, newFace);
+			edgeFaceMap.put(e.getOppositeEdge(), newFace2);
+		}
+		
+		
+		// create inner edges
+		for (E e : graph.getPositiveEdges()){
+			// quads only for inner edges
+//			if (!e.isInteriorEdge()) continue;
+			V v1 = vertexVertexMap.get(e.getStartVertex());
+			V v2 = vertexVertexMap.get(e.getTargetVertex());
+			V v3 = faceVertexMap.get(e.getRightFace());
+			V v4 = faceVertexMap.get(e.getLeftFace());
+			F fl = edgeFaceMap.get(e);
+			F fr = edgeFaceMap.get(e.getOppositeEdge());
 			
-			opp.linkOppositeEdge(e);
+			E e1 = quad.addNewEdge();
+			E e2 = quad.addNewEdge();
+			E e3 = quad.addNewEdge();
+			E e4 = quad.addNewEdge();
+			E e5 = quad.addNewEdge();
+			E e6 = quad.addNewEdge();
+			
+			e1.linkNextEdge(e2);
+			e2.linkNextEdge(e3);
+			e3.linkNextEdge(e1);
+			
+			e4.linkNextEdge(e5);
+			e5.linkNextEdge(e6);
+			e6.linkNextEdge(e4);
+			
+			e1.setTargetVertex(v2);
+			e2.setTargetVertex(v4);
+			e3.setTargetVertex(v3);
+			
+			e4.setTargetVertex(v4);
+			e5.setTargetVertex(v1);
+			e6.setTargetVertex(v3);
+			
+			e3.linkOppositeEdge(e4);
+		
+			e1.setLeftFace(fr);
+			e2.setLeftFace(fr);
+			e3.setLeftFace(fr);
+			
+			e4.setLeftFace(fl);
+			e5.setLeftFace(fl);
+			e6.setLeftFace(fl);
+			
+			leftQuadEdgeMap.put(e, e2);
+			leftQuadEdgeMap.put(e.getOppositeEdge(), e6);
 		}
 		
-		// connect boundary
-		for (E e : quad.getEdges()){
-			if (e.getLeftFace() != null) continue;
-			E prev = e;
-			do {
-				prev = prev.getOppositeEdge().getNextEdge();
-			} while (prev.getRightFace() != null);
-			prev = prev.getOppositeEdge();
-			e.linkPreviousEdge(prev);
+		// connections inside
+		for (E e : graph.getEdges()){
+			E e1 = leftQuadEdgeMap.get(e);
+			E e2 = leftQuadEdgeMap.get(e.getNextEdge()).getNextEdge().getOppositeEdge().getNextEdge();
+			e1.linkOppositeEdge(e2);
 		}
 		
-		for (E e : quad.getEdges()){
-			if (e.getLeftFace() != null) continue;
-			e.setTargetVertex(e.getNextEdge().getStartVertex());
-		}
+//		// create boundary edges
+//		for (int i = 0; i < quad.numEdges(); i++){
+//			E e = quad.getEdge(i);
+//			if (e.getOppositeEdge() != null) continue;
+//			E opp = quad.addNewEdge();
+//			
+//			opp.linkOppositeEdge(e);
+//		}
+//		
+//		// connect boundary
+//		for (E e : quad.getEdges()){
+//			if (e.getLeftFace() != null) continue;
+//			E prev = e;
+//			do {
+//				prev = prev.getOppositeEdge().getNextEdge();
+//			} while (prev.getRightFace() != null);
+//			prev = prev.getOppositeEdge();
+//			e.linkPreviousEdge(prev);
+//		}
+//		
+//		for (E e : quad.getEdges()){
+//			if (e.getLeftFace() != null) continue;
+//			e.setTargetVertex(e.getNextEdge().getStartVertex());
+//		}
 		
 		return quad;
 	}
@@ -358,6 +363,8 @@ public class Subdivision {
 	
 	
 	/**
+	 * Doo-Sabin
+	 *
 	 * Generates the medial graph for the given graph
 	 * @param graph the graph
 	 * @param vClass the vertex class type of the result

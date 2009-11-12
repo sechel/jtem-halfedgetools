@@ -13,7 +13,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin;
 import de.jtem.halfedgetools.util.surfaceutilities.SurfaceException;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class QuadStripPlugin<
+public class RootThreePlugin<
 V extends Vertex<V,E,F>,
 E extends Edge<V,E,F> ,
 F extends Face<V,E,F>,
@@ -24,7 +24,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 	private Coord3DAdapter<E> eA;
 	private Coord3DAdapter<V> vA;
 
-	public QuadStripPlugin(Coord3DAdapter<V> vA, Coord3DAdapter<E> eA, Coord3DAdapter<F> fA){
+	public RootThreePlugin(Coord3DAdapter<V> vA, Coord3DAdapter<E> eA, Coord3DAdapter<F> fA){
 		this.vA = vA;
 		this.eA = eA;
 		this.fA = fA;
@@ -40,7 +40,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		}
 		
 		try {
-			Subdivision.createStripSubdivision(hds, tHDS, new HashMap<V,V>(), new HashMap<E,V>(), new HashMap<F,V>(), vA, eA, fA);
+			Subdivision.createRootThree(hds, tHDS, new HashMap<V,V>(), new HashMap<F,V>(), vA, eA, fA);
 		} catch (SurfaceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -62,12 +62,12 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 
 	@Override
 	public String getAlgorithmName() {
-		return "Quad strip";
+		return "Root three";
 	}
 	
 	@Override
 	public PluginInfo getPluginInfo() {
-		PluginInfo info = new PluginInfo("Quad strip Subdivision");
+		PluginInfo info = new PluginInfo("Root three Subdivision");
 		return info;
 	}
 

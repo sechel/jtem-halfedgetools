@@ -4,16 +4,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.jreality.geometry.Primitives;
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.Inspector;
-import de.jreality.plugin.basic.Scene;
-import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewMenuBar;
 import de.jreality.plugin.basic.ViewToolBar;
-import de.jreality.plugin.content.ContentAppearance;
 import de.jreality.plugin.content.ContentLoader;
 import de.jreality.plugin.content.ContentTools;
 import de.jreality.plugin.menu.BackgroundColor;
@@ -37,7 +33,7 @@ import de.jtem.halfedgetools.plugin.buildin.CatmullClarkPlugin;
 import de.jtem.halfedgetools.plugin.buildin.EdgeQuadPlugin;
 import de.jtem.halfedgetools.plugin.buildin.LoopPlugin;
 import de.jtem.halfedgetools.plugin.buildin.MedialGraphPlugin;
-import de.jtem.halfedgetools.plugin.buildin.QuadStripPlugin;
+import de.jtem.halfedgetools.plugin.buildin.RootThreePlugin;
 import de.jtem.halfedgetools.plugin.buildin.TriangulatePlugin;
 import de.jtem.halfedgetools.plugin.buildin.VertexQuadPlugin;
 import de.jtem.jrworkspace.plugin.Plugin;
@@ -108,8 +104,9 @@ public class TopologyOperations {
 		hs.add(new LoopPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardEAdapter()));
 		hs.add(new EdgeQuadPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
 		hs.add(new VertexQuadPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
+		hs.add(new RootThreePlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
 		hs.add(new MedialGraphPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
-		hs.add(new QuadStripPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
+		
 		return hs;
 	}
 	
@@ -137,8 +134,8 @@ public class TopologyOperations {
 		hs.add(new LoopPlugin<V,E,F,HDS>(vA,eA));
 		hs.add(new EdgeQuadPlugin<V,E,F,HDS>(vA,eA,fA));
 		hs.add(new VertexQuadPlugin<V,E,F,HDS>(vA,eA,fA));
+		hs.add(new RootThreePlugin<V,E,F,HDS>(vA,eA,fA));
 		hs.add(new MedialGraphPlugin<V,E,F,HDS>(vA,eA,fA));
-		hs.add(new QuadStripPlugin<V,E,F,HDS>(vA,eA,fA));
 		return hs;
 	}
 	

@@ -137,7 +137,8 @@ F extends SymmetricFace<V, E, F>
 			return g1;
 		return null;
 	}
-	
+
+	// not really used...
 	public DiscreteGroupElement isRightIncomingOnCycle() {
 
 		CuttingInfo<V,E,F> ci = getSymmetryCycleInfo();

@@ -40,7 +40,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		}
 		
 		try {
-			Subdivision.createVertexQuadGraph(hds, tHDS, new HashMap<V,V>(), new HashMap<F,V>(), vA, eA, fA);
+			Subdivision.createRootThree(hds, tHDS, new HashMap<V,V>(), new HashMap<F,V>(), vA, eA, fA);
 		} catch (SurfaceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
