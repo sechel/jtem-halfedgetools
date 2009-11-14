@@ -114,19 +114,19 @@ public class CuttingUtility {
 					toCompose = null;
 				} else 	if(verts.contains(targetV)) {
 					
-					E incomingCycle = null;
-					E outgoingCycle = null;
+					E incomingCycleEdge = null;
+					E outgoingCycleEdge = null;
 					for(E c : cycle) {
 						if(c.getTargetVertex() == targetV)
-							incomingCycle = c;
+							incomingCycleEdge = c;
 						if(c.getStartVertex() == targetV)
-							outgoingCycle = c;
+							outgoingCycleEdge = c;
 					}
-					if(incomingCycle == null || outgoingCycle == null){
-						System.err.println("cycle is defect: iC = " + incomingCycle + " oC = " + outgoingCycle);
+					if(incomingCycleEdge == null || outgoingCycleEdge == null){
+						System.err.println("cycle is defect: iC = " + incomingCycleEdge + " oC = " + outgoingCycleEdge);
 					} 
 					
-					if(incomingCycle == e) {
+					if(incomingCycleEdge == e) {
 						toCompose =  null;
 					}
 					
@@ -135,11 +135,11 @@ public class CuttingUtility {
 					
 					do {
 
-						if(nextOut == outgoingCycle) {
+						if(nextOut == outgoingCycleEdge) {
 							toCompose =  null;
 						}
 						
-						if(nextIn == incomingCycle) {
+						if(nextIn == incomingCycleEdge) {
 							toCompose = paths.get(cycle);
 						}
 						

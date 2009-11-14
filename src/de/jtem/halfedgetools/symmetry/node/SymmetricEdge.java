@@ -48,6 +48,51 @@ F extends SymmetricFace<V, E, F>
 		flipCount = 0;
 	}
 	
+	/**
+	 *  TODO only works for triangles! loop through face boundary and sort(?) for general case
+	 *  a = 0 corresponds to embedded start
+	 *  a = 1 corresponds to embedded target
+	 * @param a
+	 * @return
+	 */
+	public double[] getEmbeddingOnEdge(double a) {
+		
+		
+		double[] toRet = null;
+		
+		double[] t = getTargetVertex().getEmbedding();
+		double[] s = getStartVertex().getEmbedding();
+		
+		DiscreteGroupElement trans = isRightOfSymmetryCycle();
+		if(trans != null) {
+			System.err.println("we are on right of cycle");
+			s = trans.getMatrix().multiplyVector(s);
+		}
+		
+		toRet = Rn.linearCombination(null, 1-a, s, a, t);
+		
+//		double[] t = getTargetVertex().getEmbedding();
+//		double[] s = getStartVertex().getEmbedding();
+//		
+//		if(transIn != null) {
+//			
+//			s = transIn.getMatrix().multiplyVector(s);
+//			toRet = Rn.linearCombination(null, 1-a, s, a, t);
+//			
+//		} else if(transOut != null) {
+//			
+//			t = transOut.getMatrix().multiplyVector(t);
+//			toRet = Rn.linearCombination(null, 1-a, s, a, t);
+//			
+//		} else {
+//			
+//			toRet = Rn.linearCombination(null, 1-a, s, a, t);
+//		}
+		
+		return toRet;
+	}
+	
+	
 	// Note: 
 	// the absolute value of this must NOT correspond to the proper length 
 	// (in case of intrinsic triangulation).
@@ -138,30 +183,26 @@ F extends SymmetricFace<V, E, F>
 		return null;
 	}
 
-	// not really used...
-	public DiscreteGroupElement isRightIncomingOnCycle() {
+	public DiscreteGroupElement isRightIncomingOfSymmetryCycle() {
 
 		CuttingInfo<V,E,F> ci = getSymmetryCycleInfo();
 
-//		DiscreteGroupElement g1 = null;
-		DiscreteGroupElement g2 = null;
+		DiscreteGroupElement g1 = null;
 		if(ci == null) {
 			System.err.println("symmetry cycle info not set, defaulting to true");
 			return null;
 		} else {
-			if(isPositive()) {
-				// FIXME should not be necessary
-				E eo = getOppositeEdge();
-//				E e = eo.getOppositeEdge();
-//				g1 = (DiscreteGroupElement)(ci.isRightIncomingOnCycle(e));
-				g2 = (DiscreteGroupElement)(ci.isRightIncomingOnCycle(eo));
-			}
+			// FIXME should not be necessary
+			E eo = getOppositeEdge();
+			E e = eo.getOppositeEdge();
+			g1 = (DiscreteGroupElement)(ci.isRightIncomingOnCycle(e));
 	
 		}
-		if(g2 != null)
-			return g2;;
+		if(g1 != null)
+			return g1;
 		return null;
 	}
+
 
 	@Bundle(dimension=1, type=BundleType.Value, display=DisplayType.List, name="sc")
 	public boolean isSymmetryEdge() {
