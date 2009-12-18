@@ -13,7 +13,8 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionCoord3DAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdge3DAdapter;
 
 public class LoopSubdivision <
 V extends Vertex<V, E, F>,
@@ -29,7 +30,7 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 	
 	
 	//return new HEDS approximated using dyadic scheme
-	public Map<E, Set<E>> subdivide(HEDS oldHeds, HEDS newHeds, Coord3DAdapter<V> vA, Coord3DAdapter<E> eA){
+	public Map<E, Set<E>> subdivide(HEDS oldHeds, HEDS newHeds, SubdivisionCoord3DAdapter<V> vA, SubdivisionEdge3DAdapter<E> eA){
 		
 		int maxDeg = 0;
 		for(V v : oldHeds.getVertices()) {
@@ -50,22 +51,26 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 			alphaMap.put(i, alpha);
 		}
 		
-		// Verschiebung der neuen Punkte p_neu = 1/8*(3*a+1*b+3*c+1*d)
+		// Verschiebung der neuen Punkte p_neu = 1/8*(3*a+3*b+1*c+1*d)
+		
+		Set<E> checkE = new HashSet<E>();
+		
 		for(E e : oldHeds.getPositiveEdges()) {
 
 			double[] pos = new double[] {0,0,0};
-			double[] a = eA.getCoord(e.getPreviousEdge());
-			double[] b = eA.getCoord(e.getOppositeEdge().getPreviousEdge());
-			double[] c = eA.getCoord(e.getOppositeEdge().getNextEdge());
-			double[] d = eA.getCoord(e.getNextEdge());
+			pos = eA.getCoord(e, 0.5, true);
 			
-			
-			Rn.times(a,3.0,a);
-			Rn.times(b,3.0,b);
-			Rn.add(pos, b, a);
-			Rn.add(pos, c, pos);
-			Rn.add(pos, d, pos);
-			Rn.times(pos, 1.0/8.0, pos);
+//			double[] a = eA.getCoord(e.getPreviousEdge(),1.0,true);
+//			double[] b = eA.getCoord(e.getOppositeEdge().getPreviousEdge(),1.0,true);
+//			double[] c = eA.getCoord(e.getOppositeEdge().getNextEdge(),1.0,true);
+//			double[] d = eA.getCoord(e.getNextEdge().getOppositeEdge(),1.0,true);
+//			
+//			Rn.times(a,3.0,a);
+//			Rn.times(b,3.0,b);
+//			Rn.add(pos, b, a);
+//			Rn.add(pos, c, pos);
+//			Rn.add(pos, d, pos);
+//			Rn.times(pos, 1.0/8.0, pos);			
 			
 			oldEtoPos.put(e, pos);
 			
@@ -81,8 +86,7 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 			
 			double[] mid = new double[]{0,0,0};
 			for(E e : star) {
-				E eo = e.getOppositeEdge();
-				Rn.add(mid, eA.getCoord(eo), mid);
+				Rn.add(mid, eA.getCoord(e,0.0, false), mid);
 			}
 			Rn.times(mid, 1.0 / deg, mid);	
 			

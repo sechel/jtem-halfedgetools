@@ -76,9 +76,7 @@ F extends Face<V,E,F>>  implements ColorAdapter2Ifs<E>
 				}
 			}
 		}
-		if(context.isRightIncomingOnCycle((E)e)!=null || context.isRightIncomingOnCycle((E)e.getOppositeEdge()) != null) {
-			return new double[] {0,0,1,0};
-		}
+
 		return normalColor;
 	}
 	

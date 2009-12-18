@@ -43,7 +43,7 @@ F extends Face<V,E,F>,
 HDS extends HalfEdgeDataStructure<V,E,F>
 > extends ShrinkPanelPlugin implements ActionListener, ChangeListener {
 
-	private HalfedgeConnectorPlugin<V,E,F,HDS>
+	private HalfedgeInterfacePlugin<V,E,F,HDS>
 		hcp = null;
 	private SimpleModeller2D
 		moddeller = new GraphicsModeller2D();
@@ -365,7 +365,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
-		hcp = c.getPlugin(HalfedgeConnectorPlugin.class);
+		hcp = c.getPlugin(HalfedgeInterfacePlugin.class);
 	}
 	
 	

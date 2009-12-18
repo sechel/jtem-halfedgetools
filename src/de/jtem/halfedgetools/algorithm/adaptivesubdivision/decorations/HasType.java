@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.algorithm.subdivision.decorations;
+package de.jtem.halfedgetools.algorithm.adaptivesubdivision.decorations;
 
 public interface HasType {
 	

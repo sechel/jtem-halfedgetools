@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.algorithm.subdivision.interpolators;
+package de.jtem.halfedgetools.algorithm.adaptivesubdivision.interpolators;
 
 import java.util.Random;
 

@@ -6,7 +6,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.IsFlippable;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
-import de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin;
+import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.util.triangulationutilities.TriangulationException;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
@@ -19,7 +19,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 
 
 	
-	public void execute(HalfedgeConnectorPlugin<V,E,F,HDS> hcp) { 
+	public void execute(HalfedgeInterfacePlugin<V,E,F,HDS> hcp) { 
 		HDS hds = hcp.getCachedHalfEdgeDataStructure();
 		
 		E e= hds.getEdge(hcp.getSelectedEdgeIndex());

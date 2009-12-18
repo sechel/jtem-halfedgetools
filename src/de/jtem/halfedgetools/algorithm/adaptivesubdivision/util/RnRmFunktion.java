@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.algorithm.subdivision.util;
+package de.jtem.halfedgetools.algorithm.adaptivesubdivision.util;
 public interface RnRmFunktion {
 	public double[] map(double[] param);
 	/** Normiert den gegebenen Vektor (0 bleibt 0).

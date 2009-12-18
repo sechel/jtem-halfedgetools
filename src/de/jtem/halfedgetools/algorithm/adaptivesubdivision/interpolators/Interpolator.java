@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.algorithm.subdivision.interpolators;
+package de.jtem.halfedgetools.algorithm.adaptivesubdivision.interpolators;
 
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.HasLengthSquared;
 import de.jtem.halfedgetools.jreality.node.JREdge;

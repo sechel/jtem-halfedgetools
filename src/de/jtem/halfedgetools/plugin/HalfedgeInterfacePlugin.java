@@ -62,13 +62,15 @@ import de.jtem.halfedgetools.jreality.node.standard.StandardEdge;
 import de.jtem.halfedgetools.jreality.node.standard.StandardFace;
 import de.jtem.halfedgetools.jreality.node.standard.StandardHDS;
 import de.jtem.halfedgetools.jreality.node.standard.StandardVertex;
+import de.jtem.halfedgetools.symmetry.node.SymmetricHDS;
+import de.jtem.halfedgetools.symmetry.standard.SHDS;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.flavor.StatusFlavor;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
-public  class HalfedgeConnectorPlugin 
+public  class HalfedgeInterfacePlugin 
 	< 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>, 
@@ -124,13 +126,13 @@ public  class HalfedgeConnectorPlugin
 
 	private Class<HDS> hdsClass = null;
 	
-	public static HalfedgeConnectorPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS> getStandardHalfedgeConnectorPlugin() {
-		return new HalfedgeConnectorPlugin
+	public static HalfedgeInterfacePlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS> getStandardHalfedgeConnectorPlugin() {
+		return new HalfedgeInterfacePlugin
 		<StandardVertex,StandardEdge,StandardFace,StandardHDS>
 		(StandardHDS.class, new StandardCoordinateAdapter(AdapterType.VERTEX_ADAPTER));
 	}
 	
-	public HalfedgeConnectorPlugin(Class<HDS> hdsClass, Adapter... a) {
+	public HalfedgeInterfacePlugin(Class<HDS> hdsClass, Adapter... a) {
 		
 		try {
 			cachedHEDS = hdsClass.newInstance();
@@ -326,7 +328,13 @@ public  class HalfedgeConnectorPlugin
 			activeGeometry = new GeomObject(root);
 		}
 		ConverterHeds2JR<V, E, F> c = new ConverterHeds2JR<V, E, F>();
-		IndexedFaceSet ifs = c.heds2ifs(hds, a);
+
+		IndexedFaceSet ifs = null;
+		if(hds.getClass() == SHDS.class) {
+			
+		} else { 
+			ifs = c.heds2ifs(hds, a);
+		}
 		if (normals) {
 			IndexedFaceSetUtility.calculateAndSetNormals(ifs);
 		}
@@ -419,27 +427,26 @@ public  class HalfedgeConnectorPlugin
 
 	    	}
 	    	public void lineDragged(LineDragEvent e) {
-	    		selectedEdge = e.getIndex();
-	    		IndexedFaceSet ifs = (IndexedFaceSet)((GeomObject)geometryModel.get(0)).cgc.getGeometry();
-	    		IntArrayArray iiData=null;
-	    		int[][][] indices=new int[3][][];
-	    		iiData = (IntArrayArray)ifs.getEdgeAttributes(Attribute.INDICES);
-	    		if (iiData!=null)
-	    			indices[1]= iiData.toIntArrayArray(null);
-
-	    		// FIXME for general case
-	    		int[] vs = indices[1][selectedEdge];
-	    		int v1 = vs[0];
-	    		int v2 = vs[1];
-	    		
-	    		E ee = HalfEdgeUtils.findEdgeBetweenVertices(cachedHEDS.getVertex(v1), cachedHEDS.getVertex(v2));
-	    		selectedEdge = ee.getIndex();
-		
-	    		updateSelectedLabel();
-	    		selE.clear();
-	    		selE.add(selectedEdge);
-//	    		updateIfsFromSelection();
-	    		statusChangedListener.statusChanged("Selected edge: " + selectedEdge);
+//	    		selectedEdge = e.getIndex();
+//	    		IndexedFaceSet ifs = (IndexedFaceSet)((GeomObject)geometryModel.get(0)).cgc.getGeometry();
+//	    		IntArrayArray iiData=null;
+//	    		int[][][] indices=new int[3][][];
+//	    		iiData = (IntArrayArray)ifs.getEdgeAttributes(Attribute.INDICES);
+//	    		if (iiData!=null)
+//	    			indices[1]= iiData.toIntArrayArray(null);
+//
+//	    		// FIXME for general case
+//	    		int[] vs = indices[1][selectedEdge];
+//	    		int v1 = vs[0];
+//	    		int v2 = vs[1];
+//	    		
+//	    		E ee = HalfEdgeUtils.findEdgeBetweenVertices(cachedHEDS.getVertex(v1), cachedHEDS.getVertex(v2));
+//	    		selectedEdge = ee.getIndex();
+//		
+//	    		updateSelectedLabel();
+//	    		selE.clear();
+//	    		selE.add(selectedEdge);
+//	    		statusChangedListener.statusChanged("Selected edge: " + selectedEdge);
 	    	};
 	    	public void lineDragEnd(LineDragEvent e) {
 

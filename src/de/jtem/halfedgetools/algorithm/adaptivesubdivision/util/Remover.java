@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.algorithm.subdivision.util;
+package de.jtem.halfedgetools.algorithm.adaptivesubdivision.util;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

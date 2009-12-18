@@ -23,7 +23,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		viewMenuBar = null;
 	protected HalfedgeToolBar
 		halfedgeToolBar = null;
-	protected HalfedgeConnectorPlugin<V,E,F,HDS>
+	protected HalfedgeInterfacePlugin<V,E,F,HDS>
 		hcp = null;
 	protected double
 		actionPriority = 1.0;
@@ -64,7 +64,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		HalfedgeAction action = new HalfedgeAction();
-		hcp = c.getPlugin(HalfedgeConnectorPlugin.class);
+		hcp = c.getPlugin(HalfedgeInterfacePlugin.class);
 		viewMenuBar = c.getPlugin(ViewMenuBar.class);
 		viewMenuBar.addMenuItem(getClass(), actionPriority, action, "Halfedge", getCategoryName());
 		halfedgeToolBar = c.getPlugin(HalfedgeToolBar.class);
@@ -84,6 +84,6 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 	
 	public abstract String getAlgorithmName();
 
-	public abstract void execute(HalfedgeConnectorPlugin<V,E,F,HDS> hcp);
+	public abstract void execute(HalfedgeInterfacePlugin<V,E,F,HDS> hcp);
 	
 }

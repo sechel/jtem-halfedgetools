@@ -5,7 +5,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
-import de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin;
+import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
@@ -18,7 +18,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 
 	
 	
-	public void execute(HalfedgeConnectorPlugin<V,E,F,HDS> hcp) { 
+	public void execute(HalfedgeInterfacePlugin<V,E,F,HDS> hcp) { 
 		HDS hds = hcp.getCachedHalfEdgeDataStructure();
 		
 		HalfEdgeTopologyOperations.removeFace(hds.getFace(hcp.getSelectedFaceIndex()));

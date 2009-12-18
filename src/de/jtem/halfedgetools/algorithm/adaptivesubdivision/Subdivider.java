@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.algorithm.subdivision;
+package de.jtem.halfedgetools.algorithm.adaptivesubdivision;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,13 +15,13 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
+import de.jtem.halfedgetools.algorithm.adaptivesubdivision.decorations.HasType.Type;
+import de.jtem.halfedgetools.algorithm.adaptivesubdivision.interpolators.Interpolator;
+import de.jtem.halfedgetools.algorithm.adaptivesubdivision.interpolators.LinearEdgeSubdivAlg;
+import de.jtem.halfedgetools.algorithm.adaptivesubdivision.interpolators.ModButterflyAlg;
+import de.jtem.halfedgetools.algorithm.adaptivesubdivision.interpolators.SplineInterpolator;
+import de.jtem.halfedgetools.algorithm.adaptivesubdivision.util.Calculator;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.HasLengthSquared;
-import de.jtem.halfedgetools.algorithm.subdivision.decorations.HasType.Type;
-import de.jtem.halfedgetools.algorithm.subdivision.interpolators.Interpolator;
-import de.jtem.halfedgetools.algorithm.subdivision.interpolators.LinearEdgeSubdivAlg;
-import de.jtem.halfedgetools.algorithm.subdivision.interpolators.ModButterflyAlg;
-import de.jtem.halfedgetools.algorithm.subdivision.interpolators.SplineInterpolator;
-import de.jtem.halfedgetools.algorithm.subdivision.util.Calculator;
 import de.jtem.halfedgetools.jreality.node.JREdge;
 import de.jtem.halfedgetools.jreality.node.JRFace;
 import de.jtem.halfedgetools.jreality.node.JRVertex;
@@ -34,7 +34,8 @@ import de.jtem.halfedgetools.jreality.node.JRVertex;
 public class Subdivider<
 	V extends JRVertex<V,E,F>,
 	E extends JREdge<V,E,F> & HasLengthSquared,
-	F extends JRFace<V,E,F>
+	F extends JRFace<V,E,F>,
+	HDS extends HalfEdgeDataStructure<V,E,F>
 >  {
 	/* edge:bad=>to long 
 	 * edge:good=>not to long
@@ -66,7 +67,7 @@ public class Subdivider<
 //	private static final double[] newOne=new double[]	{1,.5,.8};
 //	private static final double[] oldOne=new double[]	{.5,.7,.5};
 	// Datas----------------------------------------
-	private HalfEdgeDataStructure< V ,E,F> heds;
+	private HDS heds;
 	private List<E> lostSide= new LinkedList<E>();
 	private List<F> badFaces= new LinkedList<F>();
 	private List<E> badEdge= new LinkedList<E>();
@@ -103,17 +104,10 @@ public class Subdivider<
 	private Map<E, Type> eTypes = new HashMap<E, Type>();
 	private Map<F, Type> fTypes = new HashMap<F, Type>();
 	
+	private HDS newHeds = null;
 	
-	private Class<V> vClass = null;
-	private Class<E> eClass = null;
-	private Class<F> fClass = null;
-	private Coord3DAdapter<V> ad;
-	
-	public Subdivider(Class<V> vClass, Class<E> eClass, Class<F> fClass, Coord3DAdapter<V> ad) {
-		this.vClass = vClass;
-		this.eClass = eClass;
-		this.fClass = fClass;
-		this.ad = ad;
+	public Subdivider(HDS newHeds) {
+		this.newHeds = newHeds;
 	}
 	
 	
@@ -695,30 +689,27 @@ public class Subdivider<
 	 */
 		private void removeMarkedNodes(){
 			
-		HalfEdgeDataStructure< V ,E,F> hedsNew
-		=new HalfEdgeDataStructure<V, E, F>
-		(vClass,eClass,fClass);
 		
 		Object[]  forwardVert= new Object[heds.numVertices()];
 		Object[]  forwardEdg= new Object[heds.numEdges()];
 		Object[]  forwardFac= new Object[heds.numFaces()];
 		for(V v:heds.getVertices()){
 			if(vTypes.get(v)!=Type.illegal){
-				V vNew=hedsNew.addNewVertex();
+				V vNew=newHeds.addNewVertex();
 				copy(v, vNew);
 				forwardVert[v.getIndex()]=vNew;
 			}
 		}
 		for(E e:heds.getEdges()){
 			if(eTypes.get(e)!=Type.illegal){
-				E eNew=hedsNew.addNewEdge();
+				E eNew=newHeds.addNewEdge();
 				copy(e, eNew);
 				forwardEdg[e.getIndex()]=eNew;
 			}
 		}
 		for(F f:heds.getFaces()){
 			if(fTypes.get(f)!=Type.illegal){
-				F fNew=hedsNew.addNewFace();
+				F fNew=newHeds.addNewFace();
 				copy(f, fNew);
 				forwardFac[f.getIndex()]=fNew;
 			}
@@ -736,7 +727,7 @@ public class Subdivider<
 					eNew.linkOppositeEdge((E)forwardEdg[e.getOppositeEdge().getIndex()]);
 			}
 		}
-		heds=hedsNew;
+		heds=newHeds;
 	}
 	
 //	private void removeMarkedNodes() {
@@ -1479,14 +1470,14 @@ public class Subdivider<
 	}
 //	--------- getter setter -----------------------
 	/** Liefert die HalfEdgeDaten-Struktur der Flaeche. */
-	public HalfEdgeDataStructure<V, E, F> getHeds() {
-		return heds;
+	public HDS getHeds() {
+		return newHeds;
 	}
 	/** Setzt eine neue Flaeche.
 	 * @param heds
 	 */
 	public void setHeds(
-			HalfEdgeDataStructure<V, E, F> heds) {
+			HDS heds) {
 		this.heds = heds;
 	}
 	/** Kann auf false gesetzt werden, wenn die Datenstruktur bereits Normalen hat,

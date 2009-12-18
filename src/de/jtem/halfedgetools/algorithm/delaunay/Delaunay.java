@@ -636,8 +636,8 @@ public class Delaunay  {
 					ab.flip();
 //					secondLastEdge = lastEdge;
 //					lastEdge = ab;
-					System.err.println("flipping edge " + ab.getIndex()
-							+ " for the " + ab.getFlipCount() + ":th time");
+//					System.err.println("flipping edge " + ab.getIndex()
+//							+ " for the " + ab.getFlipCount() + ":th time");
 					for (E xy : getPositiveKiteBorder(ab)) {
 						if (!markSet.contains(xy)) {
 							markSet.add(xy);

@@ -1,6 +1,6 @@
-package de.jtem.halfedgetools.algorithm.subdivision;
+package de.jtem.halfedgetools.algorithm.adaptivesubdivision;
+import de.jtem.halfedgetools.algorithm.adaptivesubdivision.util.Calculator;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.HasLengthSquared;
-import de.jtem.halfedgetools.algorithm.subdivision.util.Calculator;
 import de.jtem.halfedgetools.jreality.node.JREdge;
 import de.jtem.halfedgetools.jreality.node.JRFace;
 import de.jtem.halfedgetools.jreality.node.JRVertex;

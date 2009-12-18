@@ -22,13 +22,16 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
+import de.jtem.halfedgetools.algorithm.Edge3DAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionCoord3DAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdge3DAdapter;
 import de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType;
 import de.jtem.halfedgetools.jreality.adapter.standard.StandardCoordinateAdapter;
 import de.jtem.halfedgetools.jreality.node.standard.StandardEdge;
 import de.jtem.halfedgetools.jreality.node.standard.StandardFace;
 import de.jtem.halfedgetools.jreality.node.standard.StandardHDS;
 import de.jtem.halfedgetools.jreality.node.standard.StandardVertex;
-import de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin;
+import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.plugin.buildin.CatmullClarkPlugin;
 import de.jtem.halfedgetools.plugin.buildin.EdgeQuadPlugin;
 import de.jtem.halfedgetools.plugin.buildin.LoopPlugin;
@@ -57,6 +60,21 @@ public class TopologyOperations {
 			}
 			public void setCoord(StandardEdge e, double[] c) {
 				e.getTargetVertex().position = c;
+			}
+		}
+		
+		final class StandardSubdivisionVAdapter implements SubdivisionCoord3DAdapter<StandardVertex> {
+			public double[] getCoord(StandardVertex v) {
+				return v.position.clone();
+			}
+			public void setCoord(StandardVertex v, double[] c) {
+				v.position = c;
+			}
+		}
+		
+		final class StandardSubdivisionEAdapter implements SubdivisionEdge3DAdapter<StandardEdge> {
+			public double[] getCoord(StandardEdge e, double a, boolean i) {
+				return Rn.linearCombination(null, a, e.getTargetVertex().position.clone(), 1-a, e.getStartVertex().position.clone());
 			}
 		}
 		
@@ -101,11 +119,12 @@ public class TopologyOperations {
 		hs.add(new CatmullClarkPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(),new StandardEAdapter(), new StandardFAdapter()));
 		hs.add(new TriangulatePlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>());
 		hs.add(new FillHolesPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>());
-		hs.add(new LoopPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardEAdapter()));
+		hs.add(new LoopPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardSubdivisionVAdapter(), new StandardSubdivisionEAdapter()));
 		hs.add(new EdgeQuadPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
 		hs.add(new VertexQuadPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
 		hs.add(new RootThreePlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
 		hs.add(new MedialGraphPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
+		hs.add(new PerturbPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter()));
 		
 		return hs;
 	}
@@ -116,7 +135,7 @@ public class TopologyOperations {
 	E extends Edge<V,E,F> ,
 	F extends Face<V,E,F>,
 	HDS extends HalfEdgeDataStructure<V,E,F>
-	> Set<Plugin> topologicalEditing(Coord3DAdapter<V> vA, Coord3DAdapter<E> eA, Coord3DAdapter<F> fA){
+	> Set<Plugin> topologicalEditing(Coord3DAdapter<V> vA, Coord3DAdapter<E> eA, Coord3DAdapter<F> fA, Edge3DAdapter<E> eA2){
 		HashSet<Plugin> hs = new HashSet<Plugin>();
 		hs.add(new VertexRemoverPlugin<V,E,F,HDS>()); 
 		hs.add(new VertexCollapserPlugin<V,E,F,HDS>()); 
@@ -131,11 +150,12 @@ public class TopologyOperations {
 		hs.add(new CatmullClarkPlugin<V,E,F,HDS>(vA,eA,fA));
 		hs.add(new TriangulatePlugin<V,E,F,HDS>());
 		hs.add(new FillHolesPlugin<V,E,F,HDS>());
-		hs.add(new LoopPlugin<V,E,F,HDS>(vA,eA));
+//		hs.add(new LoopPlugin<V,E,F,HDS>(vA,eA2));
 		hs.add(new EdgeQuadPlugin<V,E,F,HDS>(vA,eA,fA));
 		hs.add(new VertexQuadPlugin<V,E,F,HDS>(vA,eA,fA));
 		hs.add(new RootThreePlugin<V,E,F,HDS>(vA,eA,fA));
 		hs.add(new MedialGraphPlugin<V,E,F,HDS>(vA,eA,fA));
+		hs.add(new PerturbPlugin<V,E,F,HDS>(vA));
 		return hs;
 	}
 	
@@ -159,7 +179,7 @@ public class TopologyOperations {
 		
 		viewer.registerPlugins(TopologyOperations.topologicalEditingStandardHDS());
 	
-		HalfedgeConnectorPlugin<StandardVertex, StandardEdge, StandardFace, StandardHDS> hcp = new HalfedgeConnectorPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(
+		HalfedgeInterfacePlugin<StandardVertex, StandardEdge, StandardFace, StandardHDS> hcp = new HalfedgeInterfacePlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(
 				StandardHDS.class, new StandardCoordinateAdapter(AdapterType.VERTEX_ADAPTER));
 		
 		viewer.registerPlugin(hcp);

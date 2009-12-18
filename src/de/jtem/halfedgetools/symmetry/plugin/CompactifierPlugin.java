@@ -46,7 +46,7 @@ import de.jtem.discretegroup.core.FiniteStateAutomaton;
 import de.jtem.discretegroup.core.Platycosm;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType;
-import de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin;
+import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.symmetry.adapters.SymmetricCoordinateAdapter;
 import de.jtem.halfedgetools.symmetry.standard.SEdge;
 import de.jtem.halfedgetools.symmetry.standard.SFace;
@@ -63,7 +63,7 @@ import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
 public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavor, ActionListener {
 
-	private HalfedgeConnectorPlugin<SVertex,SEdge,SFace,SHDS>
+	private HalfedgeInterfacePlugin<SVertex,SEdge,SFace,SHDS>
 		hedsConnector = null;
 	private JSpinner
 		leftIndexSpinner = null,
@@ -199,7 +199,7 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 		super.install(c);
 		shrinkPanel.setHeaderColor(Color.orange);
 		content = JRViewerUtility.getContentPlugin(c);
-		hedsConnector = c.getPlugin(HalfedgeConnectorPlugin.class);
+		hedsConnector = c.getPlugin(HalfedgeInterfacePlugin.class);
 		
 		tl = new DragEventTool(InputSlot.SHIFT_LEFT_BUTTON);
 

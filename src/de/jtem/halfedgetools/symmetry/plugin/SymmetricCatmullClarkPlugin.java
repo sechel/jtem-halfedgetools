@@ -7,7 +7,7 @@ import java.util.Set;
 import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
 import de.jtem.halfedgetools.algorithm.catmullclark.CatmullClarkSubdivision;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
-import de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin;
+import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.symmetry.node.SymmetricEdge;
 import de.jtem.halfedgetools.symmetry.node.SymmetricFace;
 import de.jtem.halfedgetools.symmetry.node.SymmetricHDS;
@@ -53,7 +53,7 @@ public class SymmetricCatmullClarkPlugin
 	
 	
 	@Override
-	public void execute(HalfedgeConnectorPlugin<V,E,F,HDS> hcp) {
+	public void execute(HalfedgeInterfacePlugin<V,E,F,HDS> hcp) {
 		HDS hds = hcp.getCachedHalfEdgeDataStructure();
 		HDS tHDS = hcp.getBlankHDS();
 		hds.createCombinatoriallyEquivalentCopy(tHDS);

@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.algorithm.subdivision.util;
+package de.jtem.halfedgetools.algorithm.adaptivesubdivision.util;
 /** Diese Klasse dient der Unterstuetzung der Klassen FaceCycleSubdivider und Remover.
  * Sie beinhaltet Vektorrechnung des R3,
  * Spline-Interpolation, Methoden zur Normalenberechnung 

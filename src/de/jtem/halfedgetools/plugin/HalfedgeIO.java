@@ -8,10 +8,14 @@ import java.io.IOException;
 import com.thoughtworks.xstream.XStream;
 
 import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedgetools.symmetry.standard.SEdge;
+import de.jtem.halfedgetools.symmetry.standard.SFace;
+import de.jtem.halfedgetools.symmetry.standard.SHDS;
+import de.jtem.halfedgetools.symmetry.standard.SVertex;
 
 
 public class HalfedgeIO {
-	
+
 	static XStream xstream = new XStream();
 
 	private static String readTextFile(String fullPathFilename) throws IOException {
@@ -43,14 +47,17 @@ public class HalfedgeIO {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		xstream.setMode(XStream.ID_REFERENCES);
+		
 		return (HalfEdgeDataStructure<?,?,?>)xstream.fromXML(xml);
 	}
 	
 	
 	public static void writeHDS(HalfEdgeDataStructure<?,?,?> heds, String filename) {
 
-//		xstream.setMode(XStream.ID_REFERENCES);
-		
+		xstream.setMode(XStream.ID_REFERENCES);
+
 		String xml = xstream.toXML(heds);
 		try {
 			writeTextFile(xml, filename);
@@ -62,3 +69,4 @@ public class HalfedgeIO {
 	}
 
 }
+

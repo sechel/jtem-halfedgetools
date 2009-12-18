@@ -3,8 +3,6 @@ package de.jtem.halfedgetools.symmetry.adapters;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedgetools.jreality.adapter.ColorAdapter2Ifs;
 import de.jtem.halfedgetools.symmetry.node.SymmetricEdge;
-import de.jtem.halfedgetools.symmetry.node.SymmetricFace;
-import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 public class SymmetricSymmetryColorAdapter implements ColorAdapter2Ifs<Node<?, ?, ?>>  {
 	private final AdapterType typ;
 

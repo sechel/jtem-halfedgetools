@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.algorithm.subdivision.node;
+package de.jtem.halfedgetools.algorithm.adaptivesubdivision.node;
 
 import de.jtem.halfedgetools.jreality.node.JRVertex;
 /** Teil der Datenstruktur die fuer die Verwaltung des Subdividers genutzt wird.

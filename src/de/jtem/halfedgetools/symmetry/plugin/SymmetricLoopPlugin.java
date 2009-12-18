@@ -4,10 +4,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
 import de.jtem.halfedgetools.algorithm.loop.LoopSubdivision;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionCoord3DAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdge3DAdapter;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
-import de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin;
+import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.symmetry.node.SymmetricEdge;
 import de.jtem.halfedgetools.symmetry.node.SymmetricFace;
 import de.jtem.halfedgetools.symmetry.node.SymmetricHDS;
@@ -23,12 +24,12 @@ public class SymmetricLoopPlugin
 		HDS extends SymmetricHDS<V,E,F>
 	> extends HalfedgeAlgorithmPlugin<V,E,F,HDS> {
 	
-	private Coord3DAdapter<V> adapter = null;
-	private Coord3DAdapter<E> ead;
+	private SubdivisionCoord3DAdapter<V> vA = null;
+	private SubdivisionEdge3DAdapter<E> eA;
 	
-	public SymmetricLoopPlugin(Coord3DAdapter<V> ad, Coord3DAdapter<E> ead) {
-		adapter = ad;
-		this.ead = ead;
+	public SymmetricLoopPlugin(SubdivisionCoord3DAdapter<V> ad, SubdivisionEdge3DAdapter<E> ead) {
+		vA = ad;
+		this.eA = ead;
 	}
 
 	private LoopSubdivision<V,E,F,HDS> subdivider = new LoopSubdivision<V,E,F,HDS>();
@@ -51,7 +52,7 @@ public class SymmetricLoopPlugin
 	
 	
 	@Override
-	public void execute(HalfedgeConnectorPlugin<V,E,F,HDS> hcp) {
+	public void execute(HalfedgeInterfacePlugin<V,E,F,HDS> hcp) {
 		HDS hds = hcp.getCachedHalfEdgeDataStructure();
 		HDS tHDS = hcp.getBlankHDS();
 		hds.createCombinatoriallyEquivalentCopy(tHDS);
@@ -59,7 +60,7 @@ public class SymmetricLoopPlugin
 			return;
 		}
 		
-		Map<E,Set<E>> oldToDoubleNew = subdivider.subdivide(hds, tHDS, adapter,ead);
+		Map<E,Set<E>> oldToDoubleNew = subdivider.subdivide(hds, tHDS, vA,eA);
 		
 		CuttingInfo<V, E, F> symmCopy = new CuttingInfo<V, E, F>(); 
 		CuttingInfo<V, E, F> symmOld = hds.getSymmetryCycles();

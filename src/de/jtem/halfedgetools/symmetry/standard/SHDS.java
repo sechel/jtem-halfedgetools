@@ -1,8 +1,10 @@
 package de.jtem.halfedgetools.symmetry.standard;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.jtem.halfedgetools.symmetry.node.SymmetricHDS;
 
-
+@XStreamAlias("hds")
 public class SHDS extends SymmetricHDS<SVertex, SEdge, SFace>{
 
 

@@ -5,7 +5,7 @@
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentLoader:currentDirectory</string>
-    <string>/homes/geometer/josefsso/store/temp2</string>
+    <string>/homes/geometer/josefsso/store/workspace/GeometricFlows/data/models</string>
   </entry>
   <entry>
     <string>de.jreality.plugin.menu.DisplayOptions:showPick</string>

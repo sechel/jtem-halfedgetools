@@ -6,7 +6,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
-import de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin;
+import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class TriangulatePlugin <
@@ -36,7 +36,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 	
 	
 	@Override
-	public void execute(HalfedgeConnectorPlugin<V,E,F,HDS> hcp) {
+	public void execute(HalfedgeInterfacePlugin<V,E,F,HDS> hcp) {
 		HDS hds = hcp.getCachedHalfEdgeDataStructure();
 		if (hds == null) {
 			System.err.println("hds was null");

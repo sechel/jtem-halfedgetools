@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.algorithm.subdivision.node;
+package de.jtem.halfedgetools.algorithm.adaptivesubdivision.node;
 
 import de.jtem.halfedge.HalfEdgeDataStructure;
 

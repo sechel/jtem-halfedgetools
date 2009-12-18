@@ -2,11 +2,14 @@ package de.jtem.halfedgetools.symmetry.node;
 
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
 
 import de.jreality.math.Rn;
 import de.jtem.discretegroup.core.DiscreteGroupElement;
 import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.IsFlippable;
 import de.jtem.halfedgetools.jreality.Bundle;
 import de.jtem.halfedgetools.jreality.Bundle.BundleType;
@@ -48,6 +51,25 @@ F extends SymmetricFace<V, E, F>
 		flipCount = 0;
 	}
 	
+	public int getNr() {
+		F f = getLeftFace(); // should not be necessary
+		List<E> boundary = HalfEdgeUtils.boundaryEdges(f);
+		E e = boundary.get(0);
+		
+		int n = boundary.size();
+		int i = n;
+		
+		if(e.isRightIncomingOfSymmetryCycle() == null) {
+			e = e.getNextEdge();
+			i--;
+		} if(e.isRightIncomingOfSymmetryCycle() == null) {
+			e = e.getNextEdge();
+			i--;
+		}
+		
+		return 0;
+	}
+	
 	/**
 	 *  TODO only works for triangles! loop through face boundary and sort(?) for general case
 	 *  a = 0 corresponds to embedded start
@@ -55,41 +77,39 @@ F extends SymmetricFace<V, E, F>
 	 * @param a
 	 * @return
 	 */
-	public double[] getEmbeddingOnEdge(double a) {
-		
+	public double[] getEmbeddingOnEdge(double a, boolean i) {
 		
 		double[] toRet = null;
 		
 		double[] t = getTargetVertex().getEmbedding();
 		double[] s = getStartVertex().getEmbedding();
 		
-		DiscreteGroupElement trans = isRightOfSymmetryCycle();
+		SymmetricEdge<V, E, F> e = this;
+		
+		if(i && isRightIncomingOfSymmetryCycle() != null) {
+			e = getOppositeEdge();
+		}
+		
+		DiscreteGroupElement trans = e.isRightOfSymmetryCycle();
+		
 		if(trans != null) {
+
 			System.err.println("we are on right of cycle");
+
 			s = trans.getMatrix().multiplyVector(s);
+
 		}
 		
 		toRet = Rn.linearCombination(null, 1-a, s, a, t);
-		
-//		double[] t = getTargetVertex().getEmbedding();
-//		double[] s = getStartVertex().getEmbedding();
-//		
-//		if(transIn != null) {
-//			
-//			s = transIn.getMatrix().multiplyVector(s);
-//			toRet = Rn.linearCombination(null, 1-a, s, a, t);
-//			
-//		} else if(transOut != null) {
-//			
-//			t = transOut.getMatrix().multiplyVector(t);
-//			toRet = Rn.linearCombination(null, 1-a, s, a, t);
-//			
-//		} else {
-//			
-//			toRet = Rn.linearCombination(null, 1-a, s, a, t);
-//		}
-		
 		return toRet;
+		
+//		int n = getNr();
+//		F f = getLeftFace();
+//		return f.getEmbeddingOnBoundary(n+a);
+	}
+	
+	public double[] getEmbeddingOnEdge(double a) {
+		return getEmbeddingOnEdge(a, false);
 	}
 	
 	
