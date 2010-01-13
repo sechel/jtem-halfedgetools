@@ -132,10 +132,6 @@ public  class HalfedgeInterfacePlugin
 		(StandardHDS.class, new StandardCoordinateAdapter(AdapterType.VERTEX_ADAPTER));
 	}
 	
-	public HalfedgeInterfacePlugin() {
-		this((Class<HDS>)StandardHDS.class, new StandardCoordinateAdapter(AdapterType.VERTEX_ADAPTER));
-	}
-	
 	
 	public HalfedgeInterfacePlugin(Class<HDS> hdsClass, Adapter... a) {
 		
