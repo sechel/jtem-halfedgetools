@@ -1,18 +1,18 @@
 package de.jtem.halfedgetools.functional.edgelength.hds;
 
 import no.uib.cipr.matrix.Vector;
+import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.edgelength.EdgeLengthAdapters.Length;
-import de.jtem.halfedgetools.functional.edgelength.EdgeLengthAdapters.PositionDomainValue;
 import de.jtem.halfedgetools.functional.edgelength.EdgeLengthAdapters.WeightFunction;
 
 public class MyELAdapters {
 
-	public static class MyPositionDomainValue extends PositionDomainValue<ELVertex> {
+	public static class MyDomainValue implements DomainValue {
 
 		private Vector
 			x = null;
 		
-		public MyPositionDomainValue(Vector x) {
+		public MyDomainValue(Vector x) {
 			this.x = x;
 		}
 		

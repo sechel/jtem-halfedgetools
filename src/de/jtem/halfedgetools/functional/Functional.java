@@ -8,13 +8,14 @@ import de.jtem.halfedge.Vertex;
 public interface Functional <
 	V extends Vertex<V, E, F>,
 	E extends Edge<V, E, F>,
-	F extends Face<V, E, F>,
-	X extends DomainValue
+	F extends Face<V, E, F>
 > {
 
 	public <
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void evaluate(HDS hds, X x, Energy E, Gradient G, Hessian H);
+	> void evaluate(HDS hds, DomainValue x, Energy E, Gradient G, Hessian H);
+	
+	public boolean hasHessian();
 	
 	public <
 		HDS extends HalfEdgeDataStructure<V, E, F>

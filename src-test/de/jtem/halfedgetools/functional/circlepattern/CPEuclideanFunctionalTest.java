@@ -14,7 +14,7 @@ import de.jtem.halfedgetools.functional.circlepattern.hds.CPVertex;
 import de.jtem.halfedgetools.functional.circlepattern.hds.MyCPAdapters.MyPhi;
 import de.jtem.halfedgetools.functional.circlepattern.hds.MyCPAdapters.MyTheta;
 
-public class CPEuclideanFunctionalTest extends FunctionalTest<CPVertex, CPEdge, CPFace, MyDomainValue> {
+public class CPEuclideanFunctionalTest extends FunctionalTest<CPVertex, CPEdge, CPFace> {
 
 	@Override
 	public void init() {
@@ -25,8 +25,8 @@ public class CPEuclideanFunctionalTest extends FunctionalTest<CPVertex, CPEdge, 
 		MyTheta theta = new MyTheta();
 		MyPhi phi = new MyPhi();
 		
-		CPEuclideanFunctional<CPVertex, CPEdge, CPFace, MyDomainValue>
-			functional = new CPEuclideanFunctional<CPVertex, CPEdge, CPFace, MyDomainValue>(theta, phi);
+		CPEuclideanFunctional<CPVertex, CPEdge, CPFace>
+			functional = new CPEuclideanFunctional<CPVertex, CPEdge, CPFace>(theta, phi);
 		
 		int n = functional.getDimension(hds);
 		

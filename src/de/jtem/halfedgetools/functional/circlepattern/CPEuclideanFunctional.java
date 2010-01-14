@@ -34,9 +34,8 @@ import de.jtem.halfedgetools.functional.circlepattern.CPAdapters.Theta;
 public class CPEuclideanFunctional <
 	V extends Vertex<V, E, F>,
 	E extends Edge<V, E, F>,
-	F extends Face<V, E, F>,
-	X extends DomainValue
-> implements Functional<V, E, F, X> {
+	F extends Face<V, E, F>
+> implements Functional<V, E, F> {
 
 	private Theta<E> 
 		theta = null; 
@@ -55,7 +54,7 @@ public class CPEuclideanFunctional <
 	> void evaluate(
 		// input	
 			HDS hds, 
-			X x,
+			DomainValue x,
 		// output	
 			Energy E, 
 			Gradient G, 
@@ -106,7 +105,7 @@ public class CPEuclideanFunctional <
 	private void evaluateHessian(
 		// input	
 			HalfEdgeDataStructure<V, E, F> hds,
-			X x,
+			DomainValue x,
 		// output
 			Hessian H
 	) {
@@ -149,7 +148,7 @@ public class CPEuclideanFunctional <
 	private void evaluateEnergyAndGradient(
 		// input	
 			HalfEdgeDataStructure<V, E, F> hds,
-			X x,
+			DomainValue x,
 		// output
 			Energy E,
 			Gradient G
@@ -223,6 +222,11 @@ public class CPEuclideanFunctional <
         Double exp = Math.exp(diffRho);
         Double tanhDiffRhoHalf = (exp - 1.0) / (exp + 1.0);
         return  2.0 * Math.atan(Math.tan(0.5 * thStar) * tanhDiffRhoHalf);
+    }
+    
+    @Override
+    public boolean hasHessian() {
+    	return true;
     }
     
 	

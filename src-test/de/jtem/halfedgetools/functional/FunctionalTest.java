@@ -26,23 +26,22 @@ import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
 public abstract class FunctionalTest <
 	V extends Vertex<V, E, F>,
 	E extends Edge<V, E, F>,
-	F extends Face<V, E, F>,
-	X extends DomainValue
+	F extends Face<V, E, F>
 > {
 
 	private Double
 		eps = 1E-5,
 		error = 1E-4;
-	private Functional<V, E, F, X> 
+	private Functional<V, E, F> 
 		f = null;
 	private HalfEdgeDataStructure<V, E, F>
 		hds = null;
-	private X
+	private DomainValue
 		xGrad = null,
 		xHess = null;
 	
 	
-	public void setFuctional(Functional<V, E, F, X> f) {
+	public void setFuctional(Functional<V, E, F> f) {
 		this.f = f;
 	}
 	
@@ -50,11 +49,11 @@ public abstract class FunctionalTest <
 		this.hds = hds;
 	}
 	
-	public void setXGradient(X gradX) {
+	public void setXGradient(DomainValue gradX) {
 		xGrad = gradX;
 	}
 	
-	public void setXHessian(X hessX) {
+	public void setXHessian(DomainValue hessX) {
 		xHess = hessX;
 	}
 	

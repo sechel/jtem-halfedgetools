@@ -10,20 +10,19 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
 import de.jtem.halfedgetools.functional.edgelength.EdgeLengthAdapters.Length;
-import de.jtem.halfedgetools.functional.edgelength.EdgeLengthAdapters.PositionDomainValue;
 import de.jtem.halfedgetools.functional.edgelength.EdgeLengthAdapters.WeightFunction;
 
 public class EdgeLengthFunctional <
 	V extends Vertex<V, E, F>,
 	E extends Edge<V, E, F>,
-	F extends Face<V, E, F>,
-	X extends PositionDomainValue<V>
-> implements Functional<V, E, F, X> {
+	F extends Face<V, E, F>
+> implements Functional<V, E, F> {
 
 	private Length 
 		l0 = null;
@@ -39,7 +38,7 @@ public class EdgeLengthFunctional <
 	
 	@Override
 	public <HDS extends HalfEdgeDataStructure<V, E, F>> void evaluate(HDS hds,
-			X x, Energy E, Gradient G, Hessian H) {
+			DomainValue x, Energy E, Gradient G, Hessian H) {
 		if (E != null) {
 			E.set(evaluate(hds, x));
 		}
@@ -59,7 +58,7 @@ public class EdgeLengthFunctional <
 	
 	public double evaluate(
 		HalfEdgeDataStructure<V, E, F> G,
-		X x
+		DomainValue x
 	) {
 		double[] s = new double[3];
 		double[] t = new double[3];
@@ -67,8 +66,8 @@ public class EdgeLengthFunctional <
 		double l0sq = l0.getL0() * l0.getL0();
 		double result = 0.0;
 		for (E e : G.getPositiveEdges()) {
-			x.getPosition(e.getStartVertex(), s);
-			x.getPosition(e.getTargetVertex(), t);
+			getPosition(e.getStartVertex(), x, s);
+			getPosition(e.getTargetVertex(), x, t);
 			subtract(smt, s, t);
 			double dot = innerProduct(smt, smt);
 			double dif = dot - l0sq;
@@ -81,7 +80,7 @@ public class EdgeLengthFunctional <
 	public void evaluateGradient(
 		// input	
 			HalfEdgeDataStructure<V, E, F> G,
-			X x,
+			DomainValue x,
 		// output
 			Gradient grad
 	) {
@@ -92,8 +91,8 @@ public class EdgeLengthFunctional <
 		for (V v : G.getVertices()) {
 			double l0sq = l0.getL0() * l0.getL0();
 			for (E e : HalfEdgeUtils.incomingEdges(v)) {
-				x.getPosition(v, vk);
-				x.getPosition(e.getStartVertex(), vj);
+				getPosition(v, x, vk);
+				getPosition(e.getStartVertex(), x, vj);
 				subtract(smt, vk, vj);
 				double factor = innerProduct(smt, smt) - l0sq;
 				int off = v.getIndex() * 3;
@@ -110,7 +109,7 @@ public class EdgeLengthFunctional <
 	public void evaluateHessian(
 		// input
 			HalfEdgeDataStructure<V, E, F> G,
-			X x,
+			DomainValue x,
 		// output	
 			Hessian H
 	) {
@@ -125,8 +124,8 @@ public class EdgeLengthFunctional <
 			for (E e : star) {
 				V vj = e.getStartVertex();
 				int joff = vj.getIndex() * 3;
-				x.getPosition(vk, vkPos);
-				x.getPosition(vj, vjPos);
+				getPosition(vk, x, vkPos);
+				getPosition(vj, x, vjPos);
 				subtract(smt, vkPos, vjPos);
 				double edgeContrib = innerProduct(smt, smt) - l0sq;
 				for (int d = 0; d < 3; d++) {
@@ -221,4 +220,19 @@ public class EdgeLengthFunctional <
 		return nzPattern;
 	}
 
+	
+	public void getPosition(V v, DomainValue x, double[] pos) {
+		pos[0] = x.get(v.getIndex() * 3 + 0);
+		pos[1] = x.get(v.getIndex() * 3 + 1);
+		pos[2] = x.get(v.getIndex() * 3 + 2);
+	}
+	
+	
+    
+    @Override
+    public boolean hasHessian() {
+    	return true;
+    }
+    
+	
 }

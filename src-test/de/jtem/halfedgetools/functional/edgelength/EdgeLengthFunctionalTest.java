@@ -11,9 +11,9 @@ import de.jtem.halfedgetools.functional.edgelength.hds.ELHDS;
 import de.jtem.halfedgetools.functional.edgelength.hds.ELVertex;
 import de.jtem.halfedgetools.functional.edgelength.hds.MyELAdapters.ConstantWeight;
 import de.jtem.halfedgetools.functional.edgelength.hds.MyELAdapters.L0Adapter;
-import de.jtem.halfedgetools.functional.edgelength.hds.MyELAdapters.MyPositionDomainValue;
+import de.jtem.halfedgetools.functional.edgelength.hds.MyELAdapters.MyDomainValue;
 
-public class EdgeLengthFunctionalTest extends FunctionalTest<ELVertex, ELEdge, ELFace, MyPositionDomainValue> {
+public class EdgeLengthFunctionalTest extends FunctionalTest<ELVertex, ELEdge, ELFace> {
 
 	
 	@Override
@@ -38,12 +38,12 @@ public class EdgeLengthFunctionalTest extends FunctionalTest<ELVertex, ELEdge, E
 			result.set(v.getIndex() * 3 + 1, v.pos.y);
 			result.set(v.getIndex() * 3 + 2, v.pos.z);
 		}	
-		MyPositionDomainValue pos = new MyPositionDomainValue(result);
+		MyDomainValue pos = new MyDomainValue(result);
 		
 		setXGradient(pos);
 		setXHessian(pos);
 		setHDS(hds);
-		setFuctional(new EdgeLengthFunctional<ELVertex, ELEdge, ELFace, MyPositionDomainValue>(l0, w));
+		setFuctional(new EdgeLengthFunctional<ELVertex, ELEdge, ELFace>(l0, w));
 	}
 	
 	
