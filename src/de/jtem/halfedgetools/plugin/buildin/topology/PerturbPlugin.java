@@ -39,7 +39,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 			adapter.setCoord(v, Rn.add(null, coord, noise));
 		}
 
-		hcp.updateHalfedgeContentAndActiveGeometry(hds, true);
+		hcp.updateHalfedgeContentAndActiveGeometry(hds);
 		
 	}
 

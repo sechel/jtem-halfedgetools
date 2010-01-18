@@ -79,7 +79,7 @@ public class SymmetricCatmullClarkPlugin
 		
 		tHDS.setGroup(hds.getGroup());
 		
-		hcp.updateHalfedgeContentAndActiveGeometry(tHDS, true);	
+		hcp.updateHalfedgeContentAndActiveGeometry(tHDS);	
 	}
 	
 

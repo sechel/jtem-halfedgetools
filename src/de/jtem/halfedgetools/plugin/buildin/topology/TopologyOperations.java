@@ -1,10 +1,8 @@
 package de.jtem.halfedgetools.plugin.buildin.topology;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.Inspector;
@@ -20,13 +18,14 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
 import de.jtem.halfedgetools.algorithm.Edge3DAdapter;
-import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionCoord3DAdapter;
-import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdge3DAdapter;
 import de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType;
 import de.jtem.halfedgetools.jreality.adapter.standard.StandardCoordinateAdapter;
+import de.jtem.halfedgetools.jreality.adapter.standard.subdivision.standardAdapters;
+import de.jtem.halfedgetools.jreality.node.JREdge;
+import de.jtem.halfedgetools.jreality.node.JRFace;
+import de.jtem.halfedgetools.jreality.node.JRVertex;
 import de.jtem.halfedgetools.jreality.node.standard.StandardEdge;
 import de.jtem.halfedgetools.jreality.node.standard.StandardFace;
 import de.jtem.halfedgetools.jreality.node.standard.StandardHDS;
@@ -45,86 +44,57 @@ public class TopologyOperations {
 
 	public static Set<Plugin> topologicalEditingStandardHDS() {
 		
-		final class StandardVAdapter implements Coord3DAdapter<StandardVertex> {
-			public double[] getCoord(StandardVertex v) {
-				return v.position.clone();
-			}
-			public void setCoord(StandardVertex v, double[] c) {
-				v.position = c;
-			}
-		}
-		
-		final class StandardEAdapter implements Coord3DAdapter<StandardEdge> {
-			public double[] getCoord(StandardEdge e) {
-				return e.getTargetVertex().position.clone();
-			}
-			public void setCoord(StandardEdge e, double[] c) {
-				e.getTargetVertex().position = c;
-			}
-		}
-		
-		final class StandardSubdivisionVAdapter implements SubdivisionCoord3DAdapter<StandardVertex> {
-			public double[] getCoord(StandardVertex v) {
-				return v.position.clone();
-			}
-			public void setCoord(StandardVertex v, double[] c) {
-				v.position = c;
-			}
-		}
-		
-		final class StandardSubdivisionEAdapter implements SubdivisionEdge3DAdapter<StandardEdge> {
-			public double[] getCoord(StandardEdge e, double a, boolean i) {
-				return Rn.linearCombination(null, a, e.getTargetVertex().position.clone(), 1-a, e.getStartVertex().position.clone());
-			}
-		}
-		
-		final class StandardMedEAdapter implements Coord3DAdapter<StandardEdge> {
-			public double[] getCoord(StandardEdge e) {
-				return Rn.linearCombination(null, 0.5, e.getTargetVertex().position, 0.5, e.getStartVertex().position);
-			}
-			public void setCoord(StandardEdge e, double[] c) {
-				e.getTargetVertex().position = c;
-			}
-		}
-		
-		final class StandardFAdapter implements Coord3DAdapter<StandardFace> {
-			public double[] getCoord(StandardFace f) {
-				double[] sum = {0, 0, 0};
-				List<StandardEdge> b = HalfEdgeUtils.boundaryEdges(f);
-				int size = 0;
-				for (StandardEdge e : b) {
-					Rn.add(sum, sum, e.getTargetVertex().position);
-					size++;
-				}
-				Rn.times(sum, 1.0 / size, sum);
-				return sum;
-				
-			}
-			public void setCoord(StandardFace f, double[] c) {
-			}
-		}
-		
-		
 		HashSet<Plugin> hs = new HashSet<Plugin>();
 		hs.add(new VertexRemoverPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>());
 		hs.add(new VertexCollapserPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>());
 		hs.add(new FaceRemoverPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>());
-		hs.add(new FaceCollapserPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter()));
-		hs.add(new FaceScalerPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter()));
-		hs.add(new FaceSplitterPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter()));
-		hs.add(new EdgeCollapserPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter()));
+		hs.add(new FaceCollapserPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardVAdapter<StandardVertex>()));
+		hs.add(new FaceScalerPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardVAdapter<StandardVertex>()));
+		hs.add(new FaceSplitterPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardVAdapter<StandardVertex>()));
+		hs.add(new EdgeCollapserPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardVAdapter<StandardVertex>()));
 		hs.add(new EdgeRemoverFillPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>());
 		hs.add(new EdgeRemoverPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>());
-		hs.add(new EdgeSplitterPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter()));
-		hs.add(new CatmullClarkPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(),new StandardEAdapter(), new StandardFAdapter()));
+		hs.add(new EdgeSplitterPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardVAdapter<StandardVertex>()));
+		hs.add(new CatmullClarkPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardVAdapter<StandardVertex>(),new standardAdapters.StandardEAdapter<StandardEdge>(), new standardAdapters.StandardFAdapter<StandardFace, StandardEdge>()));
 		hs.add(new TriangulatePlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>());
 		hs.add(new FillHolesPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>());
-		hs.add(new LoopPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardSubdivisionVAdapter(), new StandardSubdivisionEAdapter()));
-		hs.add(new EdgeQuadPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
-		hs.add(new VertexQuadPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
-		hs.add(new RootThreePlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
-		hs.add(new MedialGraphPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter(), new StandardMedEAdapter(), new StandardFAdapter()));
-		hs.add(new PerturbPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new StandardVAdapter()));
+		hs.add(new LoopPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardSubdivisionVAdapter<StandardVertex>(), new standardAdapters.StandardSubdivisionEAdapter<StandardEdge>()));
+		hs.add(new EdgeQuadPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardVAdapter<StandardVertex>(), new standardAdapters.StandardMedEAdapter<StandardEdge>(), new standardAdapters.StandardFAdapter<StandardFace, StandardEdge>()));
+		hs.add(new VertexQuadPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardVAdapter<StandardVertex>(), new standardAdapters.StandardMedEAdapter<StandardEdge>(), new standardAdapters.StandardFAdapter<StandardFace, StandardEdge>()));
+		hs.add(new RootThreePlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardVAdapter<StandardVertex>(), new standardAdapters.StandardMedEAdapter<StandardEdge>(), new standardAdapters.StandardFAdapter<StandardFace, StandardEdge>()));
+		hs.add(new MedialGraphPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardVAdapter<StandardVertex>(), new standardAdapters.StandardMedEAdapter<StandardEdge>(), new standardAdapters.StandardFAdapter<StandardFace, StandardEdge>()));
+		hs.add(new PerturbPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardVAdapter<StandardVertex>()));
+		
+		return hs;
+	}
+	
+	public static 
+	<
+	V extends JRVertex<V,E,F>, 
+	E extends JREdge<V,E,F>, 
+	F extends JRFace<V,E,F>
+	>  Set<Plugin> topologicalEditingJR(V v) {
+		
+		HashSet<Plugin> hs = new HashSet<Plugin>();
+		hs.add(new VertexRemoverPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>());
+		hs.add(new VertexCollapserPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>());
+		hs.add(new FaceRemoverPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>());
+		hs.add(new FaceCollapserPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardVAdapter<V>()));
+		hs.add(new FaceScalerPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardVAdapter<V>()));
+		hs.add(new FaceSplitterPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardVAdapter<V>()));
+		hs.add(new EdgeCollapserPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardVAdapter<V>()));
+		hs.add(new EdgeRemoverFillPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>());
+		hs.add(new EdgeRemoverPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>());
+		hs.add(new EdgeSplitterPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardVAdapter<V>()));
+		hs.add(new CatmullClarkPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardVAdapter<V>(),new standardAdapters.StandardEAdapter<E>(), new standardAdapters.StandardFAdapter<F, E>()));
+		hs.add(new TriangulatePlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>());
+		hs.add(new FillHolesPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>());
+		hs.add(new LoopPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardSubdivisionVAdapter<V>(), new standardAdapters.StandardSubdivisionEAdapter<E>()));
+		hs.add(new EdgeQuadPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardVAdapter<V>(), new standardAdapters.StandardMedEAdapter<E>(), new standardAdapters.StandardFAdapter<F, E>()));
+		hs.add(new VertexQuadPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardVAdapter<V>(), new standardAdapters.StandardMedEAdapter<E>(), new standardAdapters.StandardFAdapter<F, E>()));
+		hs.add(new RootThreePlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardVAdapter<V>(), new standardAdapters.StandardMedEAdapter<E>(), new standardAdapters.StandardFAdapter<F, E>()));
+		hs.add(new MedialGraphPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardVAdapter<V>(), new standardAdapters.StandardMedEAdapter<E>(), new standardAdapters.StandardFAdapter<F, E>()));
+		hs.add(new PerturbPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardVAdapter<V>()));
 		
 		return hs;
 	}

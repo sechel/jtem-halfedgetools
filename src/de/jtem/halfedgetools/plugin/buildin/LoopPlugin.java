@@ -41,7 +41,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		
 		subdivider.subdivide(hds, tHDS, vA, eA);
 		
-		hcp.updateHalfedgeContentAndActiveGeometry(tHDS, true);	
+		hcp.updateHalfedgeContentAndActiveGeometry(tHDS);	
 		
 	}
 

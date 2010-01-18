@@ -23,8 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.plugin.JRViewerUtility;
@@ -62,21 +60,27 @@ import de.jtem.halfedgetools.jreality.node.standard.StandardEdge;
 import de.jtem.halfedgetools.jreality.node.standard.StandardFace;
 import de.jtem.halfedgetools.jreality.node.standard.StandardHDS;
 import de.jtem.halfedgetools.jreality.node.standard.StandardVertex;
-import de.jtem.halfedgetools.symmetry.node.SymmetricHDS;
-import de.jtem.halfedgetools.symmetry.standard.SHDS;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.flavor.StatusFlavor;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
+/**
+ * @author josefsso
+ *
+ * @param <V>
+ * @param <E>
+ * @param <F>
+ * @param <HDS>
+ */
 public  class HalfedgeInterfacePlugin 
 	< 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V,E,F>
-	> extends ShrinkPanelPlugin implements ListSelectionListener, StatusFlavor, ActionListener {
+	> extends ShrinkPanelPlugin implements StatusFlavor, ActionListener {
 
 	private Scene
 		scene = null;
@@ -85,12 +89,14 @@ public  class HalfedgeInterfacePlugin
 	private SceneGraphComponent
 		contentParseRoot = null;
 	private DefaultListModel
-		geometryModel = new DefaultListModel();
+		geometryModel = new DefaultListModel(),
+		adapterModel = new DefaultListModel();
 	private JList	
-		geometryList = new JList(geometryModel);
+		adapterList = new JList(adapterModel);
 	private JScrollPane
-		geometriesScroller = new JScrollPane(geometryList, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
+		adaptersScroller = new JScrollPane(adapterList, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
 	private JLabel
+		displayedIFSLabel = new JLabel("Euler: "),
 		selectedNodesLabel = new JLabel("Sel. V: E: F: "),
 		vClassLabel = new JLabel("vClass: "),
 		eClassLabel = new JLabel("eClass: "),
@@ -126,7 +132,7 @@ public  class HalfedgeInterfacePlugin
 
 	private Class<HDS> hdsClass = null;
 	
-	public static HalfedgeInterfacePlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS> getStandardHalfedgeConnectorPlugin() {
+	public static HalfedgeInterfacePlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS> getStandardHalfedgeInterfacePlugin() {
 		return new HalfedgeInterfacePlugin
 		<StandardVertex,StandardEdge,StandardFace,StandardHDS>
 		(StandardHDS.class, new StandardCoordinateAdapter(AdapterType.VERTEX_ADAPTER));
@@ -146,8 +152,9 @@ public  class HalfedgeInterfacePlugin
 		}
 		
 		this.hdsClass = hdsClass;
-		
 		this.adapters  = a;
+		
+		
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = BOTH;
 		c.weightx = 1.0;
@@ -156,14 +163,14 @@ public  class HalfedgeInterfacePlugin
 		shrinkPanel.add(vClassLabel, c);
 		shrinkPanel.add(eClassLabel, c);
 		shrinkPanel.add(fClassLabel, c);
+		shrinkPanel.add(displayedIFSLabel, c);
 		shrinkPanel.add(selectedNodesLabel, c);
-		
-		geometryList.getSelectionModel().addListSelectionListener(this);
-		geometriesScroller.setMinimumSize(new Dimension(30, 70));
-		JPanel geometriesPanel = new JPanel();
-		geometriesPanel.setLayout(new GridLayout());
-		geometriesPanel.add(geometriesScroller);
-		geometriesPanel.setBorder(BorderFactory.createTitledBorder("Available Face Sets"));
+				
+		adaptersScroller.setMinimumSize(new Dimension(30, 70));
+		JPanel adaptersPanel = new JPanel();
+		adaptersPanel.setLayout(new GridLayout());
+		adaptersPanel.add(adaptersScroller);
+		adaptersPanel.setBorder(BorderFactory.createTitledBorder("Available Adapters"));
 		
 		c.gridwidth = 1;
 		c.weightx = 1.0;
@@ -177,11 +184,23 @@ public  class HalfedgeInterfacePlugin
 		shrinkPanel.add(rescanButton, c);
 		
 		c.weighty = 1.0;
-		shrinkPanel.add(geometriesPanel, c);
+		shrinkPanel.add(adaptersPanel, c);
 		
 		rescanButton.addActionListener(this);
 		loadButton.addActionListener(this);
 		saveButton.addActionListener(this);
+		
+		setAdapters(a);
+		
+	}
+	
+	
+	public void setAdapters(Adapter... apts) {
+		for(Adapter a : apts) {
+			adapterModel.addElement(a);
+		}
+		
+		adapters = apts;
 	}
 	
 	
@@ -198,13 +217,8 @@ public  class HalfedgeInterfacePlugin
 			}
 			if (file != null) {
 				HDS newHeds = (HDS)HalfedgeIO.readHDS(file.getAbsolutePath());
-				ConverterHeds2JR<V,E,F> c = new ConverterHeds2JR<V,E,F>();
-				if(adapters == null)
-					adapters = new Adapter[] {new StandardCoordinateAdapter(AdapterType.VERTEX_ADAPTER)};
-				IndexedFaceSet ifs = c.heds2ifs(newHeds, adapters);
-				IndexedFaceSetUtility.calculateAndSetNormals(ifs);
 
-				updateHalfedgeContentAndActiveGeometry(newHeds, true);
+				updateHalfedgeContentAndActiveGeometry(newHeds);
 
 			}
 			
@@ -249,25 +263,28 @@ public  class HalfedgeInterfacePlugin
 	}
 
 	
-	public void convertActiveGeometryToHDS(HDS hds, Adapter... a) {
+	public void convertActiveGeometryToHDS(HDS hds) {
 		
 		hds.clear();
 
 		IndexedFaceSet ifs = null;
-		if (activeGeometry == null) {
-			// is there a better way to get this?
-			// TODO check if remove
-			ifs = (IndexedFaceSet)((GeomObject)geometryModel.get(0)).cgc.getGeometry();
-		}
-		ConverterJR2Heds<V, E, F> c = new ConverterJR2Heds<V, E, F>(hds.getVertexClass(), hds.getEdgeClass(), hds.getFaceClass());
-		ifs = (IndexedFaceSet)activeGeometry.cgc.getGeometry();
-		boolean oriented = IndexedFaceSetUtility.makeConsistentOrientation(ifs);
-		if (!oriented) {
-			statusChangedListener.statusChanged("Surface is not orientable!");
-			return;
-		}
 		
-		c.ifs2heds(ifs, hds, a);
+		if(activeGeometry != null) {
+			ifs = (IndexedFaceSet)activeGeometry.cgc.getGeometry();
+		
+			ConverterJR2Heds<V, E, F> c = new ConverterJR2Heds<V, E, F>(hds.getVertexClass(), hds.getEdgeClass(), hds.getFaceClass());
+	
+			boolean oriented = IndexedFaceSetUtility.makeConsistentOrientation(ifs);
+			if (!oriented) {
+				statusChangedListener.statusChanged("Surface is not orientable!");
+				return;
+			}
+			
+			c.ifs2heds(ifs, hds, adapters);
+		} else {
+			hds = getBlankHDS();
+		}
+		updateCache(hds);
 	}
 	
 	
@@ -287,20 +304,6 @@ public  class HalfedgeInterfacePlugin
 		return result;
 	}
 	
-	public HDS getCachedHalfEdgeDataStructureElseConvert(HDS hds, Adapter... a) {
-
-		if(cachedHEDS.getVertexClass() == hds.getVertexClass() &&
-				cachedHEDS.getEdgeClass() == hds.getEdgeClass() &&
-				cachedHEDS.getFaceClass() == hds.getFaceClass()) {
-			
-			hds = cachedHEDS;
-		} else {
-			System.err.println("cache didnt match class so returning as default hds");
-			convertActiveGeometryToHDS(hds, a);
-		}
-		
-		return hds;
-	}
 	
 	public HDS getCachedHalfEdgeDataStructure() {
 		return cachedHEDS;
@@ -323,53 +326,26 @@ public  class HalfedgeInterfacePlugin
 		return newHds;
 	}
 
-	public  void updateHalfedgeContentAndActiveGeometry(HDS hds, boolean normals, Adapter... a) {
-		if (activeGeometry == null) {
-			SceneGraphComponent root = new SceneGraphComponent();
-			activeGeometry = new GeomObject(root);
-		}
-		ConverterHeds2JR<V, E, F> c = new ConverterHeds2JR<V, E, F>();
-
-		IndexedFaceSet ifs = null;
-		if(hds.getClass() == SHDS.class) {
-			
-		} else { 
-			ifs = c.heds2ifs(hds, a);
-		}
-		if (normals) {
-			IndexedFaceSetUtility.calculateAndSetNormals(ifs);
-		}
-		updateCache(hds);
-		activeGeometry.cgc.setGeometry(ifs);
-//		contentChangedListener.skipNextUpdate(true);
-//		contentChangedListener.contentChanged(new ContentChangedEvent(ChangeEventTypeContentChanged));
-	}
 	
-	public void updateHalfedgeContentAndActiveGeometry(HDS hds, boolean normals) {
-		if (activeGeometry == null) {
-			SceneGraphComponent root = new SceneGraphComponent();
-			activeGeometry = new GeomObject(root);
-		}
+	public void updateHalfedgeContentAndActiveGeometry(HDS hds, Adapter... a) {
+
 		ConverterHeds2JR<V, E, F> c = new ConverterHeds2JR<V, E, F>();
-		IndexedFaceSet ifs = c.heds2ifs(hds, adapters);
-		if (normals) {
-			IndexedFaceSetUtility.calculateAndSetNormals(ifs);
-		}
+		IndexedFaceSet ifs = c.heds2ifs(hds, a);
+
 		updateCache(hds);
-		activeGeometry.cgc.setGeometry(ifs);
+		
+		if(ifs != null) {
+			IndexedFaceSetUtility.calculateAndSetNormals(ifs);
+			activeGeometry.cgc.setGeometry(ifs);
+		}
 		
 //		contentChangedListener.skipNextUpdate(true);
 //		contentChangedListener.contentChanged(new ContentChangedEvent(ChangeEventType.ContentChanged));
 	}
 	
-	@Deprecated
-	public IndexedFaceSet toIndexedFaceSet(HDS hds, boolean normals, Adapter... a) {
-		ConverterHeds2JR<V, E, F> c = new ConverterHeds2JR<V, E, F>();
-		IndexedFaceSet ifs = c.heds2ifs(hds, a);
-		if (normals) {
-			IndexedFaceSetUtility.calculateAndSetNormals(ifs);
-		}
-		return ifs;
+	public void updateHalfedgeContentAndActiveGeometry(HDS hds) {
+
+		updateHalfedgeContentAndActiveGeometry(hds, adapters);
 	}
 	
 	
@@ -379,18 +355,7 @@ public  class HalfedgeInterfacePlugin
 		} else {
 			return activeGeometry.cgc.getGeometry().getName();
 		}
-	}
-	
-	
-	public void valueChanged(ListSelectionEvent e) {
-		Object cgcObject = geometryList.getSelectedValue();
-		if (cgcObject != null) {
-			activeGeometry = (GeomObject)cgcObject;
-		} else {
-			activeGeometry = null;
-		}
-	}
-	
+	}	
 	
 	@Override
 	public void install(Controller c) throws Exception {
@@ -428,26 +393,26 @@ public  class HalfedgeInterfacePlugin
 
 	    	}
 	    	public void lineDragged(LineDragEvent e) {
-//	    		selectedEdge = e.getIndex();
-//	    		IndexedFaceSet ifs = (IndexedFaceSet)((GeomObject)geometryModel.get(0)).cgc.getGeometry();
-//	    		IntArrayArray iiData=null;
-//	    		int[][][] indices=new int[3][][];
-//	    		iiData = (IntArrayArray)ifs.getEdgeAttributes(Attribute.INDICES);
-//	    		if (iiData!=null)
-//	    			indices[1]= iiData.toIntArrayArray(null);
-//
-//	    		// FIXME for general case
-//	    		int[] vs = indices[1][selectedEdge];
-//	    		int v1 = vs[0];
-//	    		int v2 = vs[1];
-//	    		
-//	    		E ee = HalfEdgeUtils.findEdgeBetweenVertices(cachedHEDS.getVertex(v1), cachedHEDS.getVertex(v2));
-//	    		selectedEdge = ee.getIndex();
-//		
-//	    		updateSelectedLabel();
-//	    		selE.clear();
-//	    		selE.add(selectedEdge);
-//	    		statusChangedListener.statusChanged("Selected edge: " + selectedEdge);
+	    		selectedEdge = e.getIndex();
+	    		IndexedFaceSet ifs = (IndexedFaceSet)((GeomObject)geometryModel.get(0)).cgc.getGeometry();
+	    		IntArrayArray iiData=null;
+	    		int[][][] indices=new int[3][][];
+	    		iiData = (IntArrayArray)ifs.getEdgeAttributes(Attribute.INDICES);
+	    		if (iiData!=null)
+	    			indices[1]= iiData.toIntArrayArray(null);
+
+	    		// FIXME for general case
+	    		int[] vs = indices[1][selectedEdge];
+	    		int v1 = vs[0];
+	    		int v2 = vs[1];
+	    		
+	    		E ee = HalfEdgeUtils.findEdgeBetweenVertices(cachedHEDS.getVertex(v1), cachedHEDS.getVertex(v2));
+	    		selectedEdge = ee.getIndex();
+		
+	    		updateSelectedLabel();
+	    		selE.clear();
+	    		selE.add(selectedEdge);
+	    		statusChangedListener.statusChanged("Selected edge: " + selectedEdge);
 	    	};
 	    	public void lineDragEnd(LineDragEvent e) {
 
@@ -500,8 +465,8 @@ public  class HalfedgeInterfacePlugin
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo();
-		info.name = "Halfedge Connector";
-		info.vendorName = "Stefan Sechelmann";
+		info.name = "Halfedge Interface";
+		info.vendorName = "Kristoffer Josefsson";
 		return info;
 	}
 	
@@ -517,12 +482,20 @@ public  class HalfedgeInterfacePlugin
 	
 	void updateCache(HDS hds) {
 		cachedHEDS = hds;
+		displayedIFSLabel.setText("Euler: " + "V: " + hds.numVertices() + " E: " + hds.numEdges() + " F: " + hds.numFaces());
 		vClassLabel.setText("vClass: " + hds.getVertexClass().getSimpleName());
 		eClassLabel.setText("eClass: " + hds.getEdgeClass().getSimpleName());
 		fClassLabel.setText("fClass: " + hds.getFaceClass().getSimpleName());
 		
 	}
 	
+	
+	
+	/**
+	 * @author josefsso
+	 * If someone overwrites our content, immediately convert the new IFS to a HDS, then convert back with
+	 * the adapters to a new IFS and rewrite. Unless skipNextUpdate is called before explicitly.
+	 */
 	public class SelfAwareContentChangedListener implements ContentChangedListener {
 		
 		private boolean ownUpdate = false;
@@ -548,34 +521,20 @@ public  class HalfedgeInterfacePlugin
 						return;
 					}
 					if (c.getGeometry() instanceof IndexedFaceSet) {
-						GeomObject go = new GeomObject(c);
-						geometryModel.add(geometryModel.size(), go);
+						activeGeometry = new GeomObject(c);
 					}
 					c.childrenAccept(this);
 				}
 			
 			});
 			if(!ownUpdate ) {
-			
-				if (geometryModel.getSize() != 0) {
-					geometryList.setSelectedIndex(0);
-				// content updated, create heds from JRNode
+		
+				convertActiveGeometryToHDS(cachedHEDS);
+				updateHalfedgeContentAndActiveGeometry(cachedHEDS);
 
-////				HDS hds = (HDS)new StandardHDS();
-//				HDS hds = convertActiveGeometryToHDS(cachedHEDS,adapters);
-					convertActiveGeometryToHDS(cachedHEDS,adapters);
-
-				
-				
-//					System.err.println("Heds connector updating");
-//					updateCache(cachedHEDS);
-				}
+			} else {
+				ownUpdate = false;
 			}
-			 else {
-//					System.err.println("Heds not updating because self-caused update");
-//					updateCache(hds);
-					ownUpdate = false;
-				}
 		}
 		
 	}

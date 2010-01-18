@@ -57,7 +57,7 @@ public class CatmullClarkPlugin
 			return;
 		}
 		subdivider.subdivide(hds, tHDS, vA, eA, fA);
-		hcp.updateHalfedgeContentAndActiveGeometry(tHDS, true);	
+		hcp.updateHalfedgeContentAndActiveGeometry(tHDS);	
 	}
 	
 

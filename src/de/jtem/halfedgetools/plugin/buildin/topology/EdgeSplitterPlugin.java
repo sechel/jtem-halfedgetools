@@ -35,7 +35,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		V v = HalfEdgeTopologyOperations.splitEdge(e);
 		adapter.setCoord(v, Rn.linearCombination(null, 0.5, p1, 0.5, p2));
 		
-		hcp.updateHalfedgeContentAndActiveGeometry(hds, true);
+		hcp.updateHalfedgeContentAndActiveGeometry(hds);
 		
 		hcp.setSelectedVertexIndex(v.getIndex());
 		

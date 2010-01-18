@@ -25,7 +25,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		
 		HalfEdgeTopologyOperations.removeEdge(e);
 		
-		hcp.updateHalfedgeContentAndActiveGeometry(hds, true);
+		hcp.updateHalfedgeContentAndActiveGeometry(hds);
 		
 		
 	}

@@ -449,7 +449,7 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 			generateGroup();
 			hds.setGroup(theGroup);
 			
-			hedsConnector.updateHalfedgeContentAndActiveGeometry(hds, true);
+			hedsConnector.updateHalfedgeContentAndActiveGeometry(hds);
 			
 			leftIndexSpinner.setValue(0);
 			leftIndexVertexSpinner.setValue(0);

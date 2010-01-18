@@ -25,7 +25,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		
 		F f = HalfEdgeTopologyOperations.collapseVertex(v);
 
-		hcp.updateHalfedgeContentAndActiveGeometry(hds, true);
+		hcp.updateHalfedgeContentAndActiveGeometry(hds);
 		hcp.setSelectedFaceIndex(f.getIndex());
 		
 	}

@@ -51,7 +51,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 			e.printStackTrace();
 		}
 		
-		hcp.updateHalfedgeContentAndActiveGeometry(tHDS, true);	
+		hcp.updateHalfedgeContentAndActiveGeometry(tHDS);	
 		
 	}
 

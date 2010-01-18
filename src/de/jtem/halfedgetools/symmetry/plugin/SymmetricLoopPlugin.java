@@ -79,7 +79,7 @@ public class SymmetricLoopPlugin
 		
 		tHDS.setGroup(hds.getGroup());
 		
-		hcp.updateHalfedgeContentAndActiveGeometry(tHDS, true);	
+		hcp.updateHalfedgeContentAndActiveGeometry(tHDS);	
 	}
 	
 

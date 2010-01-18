@@ -57,7 +57,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 			i++;
 		}
 		
-		hcp.updateHalfedgeContentAndActiveGeometry(hds, true);
+		hcp.updateHalfedgeContentAndActiveGeometry(hds);
 		
 		hcp.setSelectedFaceIndex(f.getIndex());
 		

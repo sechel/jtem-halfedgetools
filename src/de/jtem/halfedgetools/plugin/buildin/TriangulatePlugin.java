@@ -26,7 +26,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 	
 	@Override
 	public String getCategoryName() {
-		return "Edit";
+		return "Editing";
 	}
 	
 	@Override
@@ -43,7 +43,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 			return;
 		}
 		triangulator.triangulate(hds);
-		hcp.updateHalfedgeContentAndActiveGeometry(hds, true);
+		hcp.updateHalfedgeContentAndActiveGeometry(hds);
 
 	}
 	

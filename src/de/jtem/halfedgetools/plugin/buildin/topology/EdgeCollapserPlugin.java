@@ -39,7 +39,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 //		StandardVertex v = HalfEdgeTopologyOperations.collapseEdge(e);
 //		v.position = Rn.linearCombination(null, 0.5, p1, 0.5, p2);
 		
-		hcp.updateHalfedgeContentAndActiveGeometry(hds, true);
+		hcp.updateHalfedgeContentAndActiveGeometry(hds);
 		
 		hcp.setSelectedVertexIndex(v.getIndex());
 		

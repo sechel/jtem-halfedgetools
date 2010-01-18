@@ -57,6 +57,16 @@ F extends SymmetricFace<V, E, F>
 		return boundaryCycles;
 	}
 	
+	public Set<V> getInteriorVertices() {
+		Set<V> bv = getBoundaryVertices();
+		Set<V> allV = new HashSet<V>(getVertices());
+		allV.removeAll(bv);
+		Set<V> cone = getConeVertices();
+		allV.removeAll(cone);
+				
+		return allV;
+	}
+	
 	public Set<V> getBoundaryVertices() {
 		Set<V> bv = new HashSet<V>();
 		
