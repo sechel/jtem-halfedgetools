@@ -24,15 +24,14 @@ public class EdgeLengthFunctional <
 	F extends Face<V, E, F>
 > implements Functional<V, E, F> {
 
-	private Length 
+	private Length<E>
 		l0 = null;
-	private WeightFunction 
+	private WeightFunction<E> 
 		w = null;
 	
-	public EdgeLengthFunctional(Length l0, WeightFunction w) {
+	public EdgeLengthFunctional(Length<E> l0, WeightFunction<E> w) {
 		this.l0 = l0;
 		this.w = w;
-		this.w.evalWeight(0.0); // warning
 	}
 	
 	
@@ -63,15 +62,15 @@ public class EdgeLengthFunctional <
 		double[] s = new double[3];
 		double[] t = new double[3];
 		double[] smt = new double[3];
-		double l0sq = l0.getL0() * l0.getL0();
 		double result = 0.0;
 		for (E e : G.getPositiveEdges()) {
+			double lsq = l0.getTargetLength(e) * l0.getTargetLength(e);
 			getPosition(e.getStartVertex(), x, s);
 			getPosition(e.getTargetVertex(), x, t);
 			subtract(smt, s, t);
 			double dot = innerProduct(smt, smt);
-			double dif = dot - l0sq;
-			result += dif * dif;
+			double dif = dot - lsq;
+			result += dif * dif * w.getWeight(e);
 		}
 		return result;
 	}
@@ -89,15 +88,15 @@ public class EdgeLengthFunctional <
 		double[] vj = new double[3];
 		double[] smt = new double[3];
 		for (V v : G.getVertices()) {
-			double l0sq = l0.getL0() * l0.getL0();
 			for (E e : HalfEdgeUtils.incomingEdges(v)) {
+				double lsq = l0.getTargetLength(e) * l0.getTargetLength(e);
 				getPosition(v, x, vk);
 				getPosition(e.getStartVertex(), x, vj);
 				subtract(smt, vk, vj);
-				double factor = innerProduct(smt, smt) - l0sq;
+				double factor = innerProduct(smt, smt) - lsq;
 				int off = v.getIndex() * 3;
 				for (int d = 0; d < 3; d++) {
-					grad.add(off + d, 4 * (vk[d] - vj[d]) * factor);
+					grad.add(off + d, 4 * (vk[d] - vj[d]) * factor * w.getWeight(e));
 				}
 			}
 		}
@@ -119,28 +118,28 @@ public class EdgeLengthFunctional <
 		double[] smt = new double[3];
 		for (V vk : G.getVertices()) {
 			int koff = vk.getIndex() * 3;
-			double l0sq = l0.getL0() * l0.getL0();
 			List<E> star = HalfEdgeUtils.incomingEdges(vk);
 			for (E e : star) {
+				double lsq = l0.getTargetLength(e) * l0.getTargetLength(e);
 				V vj = e.getStartVertex();
 				int joff = vj.getIndex() * 3;
 				getPosition(vk, x, vkPos);
 				getPosition(vj, x, vjPos);
 				subtract(smt, vkPos, vjPos);
-				double edgeContrib = innerProduct(smt, smt) - l0sq;
+				double edgeContrib = innerProduct(smt, smt) - lsq;
 				for (int d = 0; d < 3; d++) {
 					double vContrib = vkPos[d] - vjPos[d];
 					double vContribSq = 2 * vContrib * vContrib;
 					double diag = 4 * (vContribSq + edgeContrib);
-					H.add(koff + d, koff + d, diag);
-					H.add(koff + d, joff + d, -diag);
+					H.add(koff + d, koff + d, diag * w.getWeight(e));
+					H.add(koff + d, joff + d, -diag * w.getWeight(e));
 					for (int d2 = 0; d2 < 3; d2++) {
 						if (d2 == d) {
 							continue;
 						}
 						double d2Contrib = vkPos[d2] - vjPos[d2];
-						H.add(koff + d, koff + d2, 8 * d2Contrib * vContrib);
-						H.add(koff + d, joff + d2, -8 * d2Contrib * vContrib);
+						H.add(koff + d, koff + d2, 8 * d2Contrib * vContrib * w.getWeight(e));
+						H.add(koff + d, joff + d2, -8 * d2Contrib * vContrib * w.getWeight(e));
 					}
 				}
 			}

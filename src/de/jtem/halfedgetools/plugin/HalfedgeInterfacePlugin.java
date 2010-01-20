@@ -368,78 +368,78 @@ public  class HalfedgeInterfacePlugin
 		SceneGraphComponent sc = scene.getContentComponent();
 		setContentParseRoot(sc); // also calls contentChanged()
 		
-		det.setDescription("Select node");
-	    det.addFaceDragListener(new FaceDragListener() {
-	    	public void faceDragStart(FaceDragEvent e) { 
-
-	    	}
-	    	public void faceDragged(FaceDragEvent e) {
-	      
-	    	};
-	    	public void faceDragEnd(FaceDragEvent e) {
-	    		selectedFace = e.getIndex();
-	    		updateSelectedLabel();
-	    		selF.clear();
-	    		selF.add(selectedFace);
-//	    		updateIfsFromSelection();
-	    		statusChangedListener.statusChanged("Selected face: " + selectedFace);
-	    		
-	    		
-	    	} 
-	    
-	    });
-	    det.addLineDragListener(new LineDragListener() {
-	    	public void lineDragStart(LineDragEvent e) { 
-
-	    	}
-	    	public void lineDragged(LineDragEvent e) {
-	    		selectedEdge = e.getIndex();
-	    		IndexedFaceSet ifs = (IndexedFaceSet)((GeomObject)geometryModel.get(0)).cgc.getGeometry();
-	    		IntArrayArray iiData=null;
-	    		int[][][] indices=new int[3][][];
-	    		iiData = (IntArrayArray)ifs.getEdgeAttributes(Attribute.INDICES);
-	    		if (iiData!=null)
-	    			indices[1]= iiData.toIntArrayArray(null);
-
-	    		// FIXME for general case
-	    		int[] vs = indices[1][selectedEdge];
-	    		int v1 = vs[0];
-	    		int v2 = vs[1];
-	    		
-	    		E ee = HalfEdgeUtils.findEdgeBetweenVertices(cachedHEDS.getVertex(v1), cachedHEDS.getVertex(v2));
-	    		selectedEdge = ee.getIndex();
-		
-	    		updateSelectedLabel();
-	    		selE.clear();
-	    		selE.add(selectedEdge);
-	    		statusChangedListener.statusChanged("Selected edge: " + selectedEdge);
-	    	};
-	    	public void lineDragEnd(LineDragEvent e) {
-
-	    		
-	    	} 
-	    
-	    });
-	    det.addPointDragListener(new PointDragListener() {
-			public void pointDragStart(PointDragEvent e) { 
-
-	    	}
-	    	public void pointDragged(PointDragEvent e) {
-	      
-	    	};
-	    	public void pointDragEnd(PointDragEvent e) {
-	    		selectedVertex = e.getIndex();
-	    		updateSelectedLabel();
-	    		selV.clear();
-	    		selV.add(selectedVertex);
-//	    		updateIfsFromSelection();
-	    		statusChangedListener.statusChanged("Selected vertex: " + selectedVertex);
-	    		
-	    		
-	    	} 
-	    
-	    });
-		    
+//		det.setDescription("Select node");
+//	    det.addFaceDragListener(new FaceDragListener() {
+//	    	public void faceDragStart(FaceDragEvent e) { 
+//
+//	    	}
+//	    	public void faceDragged(FaceDragEvent e) {
+//	      
+//	    	};
+//	    	public void faceDragEnd(FaceDragEvent e) {
+//	    		selectedFace = e.getIndex();
+//	    		updateSelectedLabel();
+//	    		selF.clear();
+//	    		selF.add(selectedFace);
+////	    		updateIfsFromSelection();
+//	    		statusChangedListener.statusChanged("Selected face: " + selectedFace);
+//	    		
+//	    		
+//	    	} 
+//	    
+//	    });
+//	    det.addLineDragListener(new LineDragListener() {
+//	    	public void lineDragStart(LineDragEvent e) { 
+//
+//	    	}
+//	    	public void lineDragged(LineDragEvent e) {
+//	    		selectedEdge = e.getIndex();
+//	    		IndexedFaceSet ifs = (IndexedFaceSet)((GeomObject)geometryModel.get(0)).cgc.getGeometry();
+//	    		IntArrayArray iiData=null;
+//	    		int[][][] indices=new int[3][][];
+//	    		iiData = (IntArrayArray)ifs.getEdgeAttributes(Attribute.INDICES);
+//	    		if (iiData!=null)
+//	    			indices[1]= iiData.toIntArrayArray(null);
+//
+//	    		// FIXME for general case
+//	    		int[] vs = indices[1][selectedEdge];
+//	    		int v1 = vs[0];
+//	    		int v2 = vs[1];
+//	    		
+//	    		E ee = HalfEdgeUtils.findEdgeBetweenVertices(cachedHEDS.getVertex(v1), cachedHEDS.getVertex(v2));
+//	    		selectedEdge = ee.getIndex();
+//		
+//	    		updateSelectedLabel();
+//	    		selE.clear();
+//	    		selE.add(selectedEdge);
+//	    		statusChangedListener.statusChanged("Selected edge: " + selectedEdge);
+//	    	};
+//	    	public void lineDragEnd(LineDragEvent e) {
+//
+//	    		
+//	    	} 
+//	    
+//	    });
+//	    det.addPointDragListener(new PointDragListener() {
+//			public void pointDragStart(PointDragEvent e) { 
+//
+//	    	}
+//	    	public void pointDragged(PointDragEvent e) {
+//	      
+//	    	};
+//	    	public void pointDragEnd(PointDragEvent e) {
+//	    		selectedVertex = e.getIndex();
+//	    		updateSelectedLabel();
+//	    		selV.clear();
+//	    		selV.add(selectedVertex);
+////	    		updateIfsFromSelection();
+//	    		statusChangedListener.statusChanged("Selected vertex: " + selectedVertex);
+//	    		
+//	    		
+//	    	} 
+//	    
+//	    });
+//		    
 		content.addContentTool(det);
 	}
 	

@@ -38,17 +38,17 @@ public class MyELAdapters {
 		
 	}
 	
-	public static class L0Adapter implements Length {
+	public static class LAdapter implements Length<ELEdge> {
 
 		private double 
 			l0 = 0.0;
 		
-		public L0Adapter(double l0) {
-			this.l0 = l0;
+		public LAdapter(double l) {
+			this.l0 = l;
 		}
 		
 		@Override
-		public Double getL0() {
+		public Double getTargetLength(ELEdge e) {
 			return l0;
 		}
 		
@@ -59,7 +59,7 @@ public class MyELAdapters {
 	}
 	
 	
-	public static class ConstantWeight implements WeightFunction {
+	public static class ConstantWeight implements WeightFunction<ELEdge> {
 
 		public double 
 			w = 1.0;
@@ -69,7 +69,7 @@ public class MyELAdapters {
 		}
 		
 		@Override
-		public Double evalWeight(Double l) {
+		public Double getWeight(ELEdge e) {
 			return w;
 		}
 		

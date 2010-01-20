@@ -10,7 +10,7 @@ import de.jtem.halfedgetools.functional.edgelength.hds.ELFace;
 import de.jtem.halfedgetools.functional.edgelength.hds.ELHDS;
 import de.jtem.halfedgetools.functional.edgelength.hds.ELVertex;
 import de.jtem.halfedgetools.functional.edgelength.hds.MyELAdapters.ConstantWeight;
-import de.jtem.halfedgetools.functional.edgelength.hds.MyELAdapters.L0Adapter;
+import de.jtem.halfedgetools.functional.edgelength.hds.MyELAdapters.LAdapter;
 import de.jtem.halfedgetools.functional.edgelength.hds.MyELAdapters.MyDomainValue;
 
 public class EdgeLengthFunctionalTest extends FunctionalTest<ELVertex, ELEdge, ELFace> {
@@ -29,7 +29,7 @@ public class EdgeLengthFunctionalTest extends FunctionalTest<ELVertex, ELEdge, E
 		}
 		l /= hds.numEdges() / 2.0;
 		
-		L0Adapter l0 = new L0Adapter(l);
+		LAdapter l0 = new LAdapter(l);
 		ConstantWeight w = new ConstantWeight(1.0);
 		
 		Vector result = new DenseVector(hds.numVertices() * 3);

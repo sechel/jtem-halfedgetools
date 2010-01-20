@@ -25,5 +25,10 @@ public class MyHessian implements Hessian {
 	public void setZero() {
 		H.zero();
 	}
+	
+	@Override
+	public double get(int i, int j) {
+		return H.get(i, j);
+	}
 
 }

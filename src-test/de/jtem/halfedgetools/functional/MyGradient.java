@@ -25,5 +25,10 @@ public class MyGradient implements Gradient {
 	public void setZero() {
 		G.zero();
 	}
+	
+	@Override
+	public double get(int i) {
+		return G.get(i);
+	}
 
 }
