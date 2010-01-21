@@ -12,6 +12,10 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -91,7 +95,7 @@ public  class HalfedgeInterfacePlugin
 	private DefaultListModel
 		geometryModel = new DefaultListModel(),
 		adapterModel = new DefaultListModel();
-	private JList	
+	private JList
 		adapterList = new JList(adapterModel);
 	private JScrollPane
 		adaptersScroller = new JScrollPane(adapterList, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
@@ -115,22 +119,31 @@ public  class HalfedgeInterfacePlugin
 	private JFileChooser 
 		chooser = FileLoaderDialog.createFileChooser("heml", "HalfEdge Markup Language");
 	
-	private HDS cachedHEDS = null;
+	private HDS 
+		cachedHEDS = null;
 	
 	private DragEventTool
 		det = new DragEventTool(InputSlot.LEFT_BUTTON);
 	
 	private int
-		selectedFace, selectedEdge, selectedVertex;
-	private Component parent;
+		selectedFace, 
+		selectedEdge, 
+		selectedVertex;
+	private Component 
+		parent;
 	
 	
-	private Set<Integer> selV = new TreeSet<Integer>();
-	private Set<Integer> selE = new TreeSet<Integer>();
-	private Set<Integer> selF = new TreeSet<Integer>();
-	private Adapter[] adapters = null;
+	private Set<Integer> 
+		selV = new TreeSet<Integer>(),
+		selE = new TreeSet<Integer>(),
+		selF = new TreeSet<Integer>();
+	private List<Adapter> 
+		adapters = new LinkedList<Adapter>();
 
-	private Class<HDS> hdsClass = null;
+	private Class<HDS> 
+		hdsClass = null;
+	
+	
 	
 	public static HalfedgeInterfacePlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS> getStandardHalfedgeInterfacePlugin() {
 		return new HalfedgeInterfacePlugin
@@ -139,20 +152,25 @@ public  class HalfedgeInterfacePlugin
 	}
 	
 	
+	public HalfedgeInterfacePlugin() {
+		this(null);
+	}
+	
+	
 	public HalfedgeInterfacePlugin(Class<HDS> hdsClass, Adapter... a) {
 		
-		try {
-			cachedHEDS = hdsClass.newInstance();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (hdsClass != null) {
+			try {
+				cachedHEDS = hdsClass.newInstance();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		this.hdsClass = hdsClass;
-		this.adapters  = a;
+		this.adapters.addAll(Arrays.asList(a));
 		
 		
 		GridBagConstraints c = new GridBagConstraints();
@@ -191,16 +209,39 @@ public  class HalfedgeInterfacePlugin
 		saveButton.addActionListener(this);
 		
 		setAdapters(a);
-		
 	}
 	
+	
+	public void setHalfedgeClass(Class<HDS> hdsClass) {
+		try {
+			cachedHEDS = hdsClass.newInstance();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		this.hdsClass = hdsClass;
+	}
+	
+	
+	public void addAdapter(Adapter a) {
+		adapters.add(a);
+	}
+	
+	public void removeAdapter(Adapter a) {
+		adapters.remove(a);
+	}
 	
 	public void setAdapters(Adapter... apts) {
 		for(Adapter a : apts) {
 			adapterModel.addElement(a);
 		}
-		
-		adapters = apts;
+		adapters.clear();
+		adapters.addAll(Arrays.asList(apts));
+	}
+	
+	public List<Adapter> getAdapters() {
+		return Collections.unmodifiableList(adapters);
 	}
 	
 	
@@ -280,7 +321,7 @@ public  class HalfedgeInterfacePlugin
 				return;
 			}
 			
-			c.ifs2heds(ifs, hds, adapters);
+			c.ifs2heds(ifs, hds, adapters.toArray(new Adapter[] {}));
 		} else {
 			hds = getBlankHDS();
 		}
@@ -345,7 +386,7 @@ public  class HalfedgeInterfacePlugin
 	
 	public void updateHalfedgeContentAndActiveGeometry(HDS hds) {
 
-		updateHalfedgeContentAndActiveGeometry(hds, adapters);
+		updateHalfedgeContentAndActiveGeometry(hds, adapters.toArray(new Adapter[0]));
 	}
 	
 	
