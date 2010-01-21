@@ -11,7 +11,7 @@ import de.jtem.halfedgetools.jreality.adapter.LabelAdapter2Ifs;
 public class DebugBundleAdapter implements LabelAdapter2Ifs<Node<?, ?, ?>>{
 	private final AdapterType typ;
 	private static String newline = System.getProperty("line.separator");
-	private DecimalFormat twoPlaces = new DecimalFormat("0.00");
+	private DecimalFormat twoPlaces = new DecimalFormat("0.000");
 
 	public DebugBundleAdapter(AdapterType typ) {
 		this.typ=typ;
@@ -36,7 +36,7 @@ public class DebugBundleAdapter implements LabelAdapter2Ifs<Node<?, ?, ?>>{
 					
 					Object ret = null;
 					try {
-						ret = m.invoke(node, (Object[])null);
+						ret = m.invoke(node);
 					} catch (IllegalArgumentException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -54,10 +54,11 @@ public class DebugBundleAdapter implements LabelAdapter2Ifs<Node<?, ?, ?>>{
 	//						toAdd = name + " " + ret.toString() + newline;			
 	//				}
 	
+					if (ret == null) {
+						continue;
+					}
 					if(ret instanceof Double) {
 						toAdd = name + " " + twoPlaces.format(ret) + newline;
-					} if(ret == null){
-	
 					} else {
 						toAdd = name + " " + ret.toString() + newline;
 					}
