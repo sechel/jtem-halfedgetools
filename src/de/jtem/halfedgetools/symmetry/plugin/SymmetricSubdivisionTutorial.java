@@ -77,6 +77,13 @@ public class SymmetricSubdivisionTutorial {
 				new MyEAdapter()
 				));
 		
+//		viewer.registerPlugin(new SymmetricSqrtRoot3Plugin<SVertex,SEdge,SFace,SHDS>(
+//		new MyVAdapter(),
+//		new MyEAdapter(),
+//		new MyFAdapter()
+//		));
+//
+		
 		viewer.registerPlugin(new CompactifierPlugin());
 		
 		viewer.registerPlugin(new EdgeFlipperPlugin<SVertex,SEdge,SFace,SHDS>());
