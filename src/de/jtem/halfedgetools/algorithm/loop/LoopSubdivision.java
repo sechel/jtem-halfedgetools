@@ -47,6 +47,9 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionCoord3DAdapter;
 import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdge3DAdapter;
 
+/**
+ * @author Kristoffer Josefsson, Andre Heydt 
+ */
 public class LoopSubdivision <
 V extends Vertex<V, E, F>,
 E extends Edge<V, E, F> ,
@@ -54,9 +57,9 @@ F extends Face<V, E, F>,
 HEDS extends HalfEdgeDataStructure<V, E, F>>
  {
 
-	private Map<E, double[]> oldEtoPos = new HashMap<E, double[]>();;
-	private HashMap<V, double[]> oldVtoPos = new HashMap<V, double[]>();;
-	private Map<V,E> newVtoOldE = new HashMap<V,E>();;
+	private Map<E, double[]> oldEtoPos = new HashMap<E, double[]>();
+	private HashMap<V, double[]> oldVtoPos = new HashMap<V, double[]>();
+	private Map<V,E> newVtoOldE = new HashMap<V,E>();
 	private Map<E, Set<E>> oldEtoNewEs = new HashMap<E,Set<E>>();
 	
 	
