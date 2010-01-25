@@ -440,26 +440,26 @@ public  class HalfedgeInterfacePlugin
 		SceneGraphComponent sc = scene.getContentComponent();
 		setContentParseRoot(sc); // also calls contentChanged()
 		
-//		det.setDescription("Select node");
-//	    det.addFaceDragListener(new FaceDragListener() {
-//	    	public void faceDragStart(FaceDragEvent e) { 
-//
-//	    	}
-//	    	public void faceDragged(FaceDragEvent e) {
-//	      
-//	    	};
-//	    	public void faceDragEnd(FaceDragEvent e) {
-//	    		selectedFace = e.getIndex();
-//	    		updateSelectedLabel();
-//	    		selF.clear();
-//	    		selF.add(selectedFace);
-////	    		updateIfsFromSelection();
-//	    		statusChangedListener.statusChanged("Selected face: " + selectedFace);
-//	    		
-//	    		
-//	    	} 
-//	    
-//	    });
+		det.setDescription("Select node");
+	    det.addFaceDragListener(new FaceDragListener() {
+	    	public void faceDragStart(FaceDragEvent e) { 
+
+	    	}
+	    	public void faceDragged(FaceDragEvent e) {
+	      
+	    	};
+	    	public void faceDragEnd(FaceDragEvent e) {
+	    		selectedFace = e.getIndex();
+	    		updateSelectedLabel();
+	    		selF.clear();
+	    		selF.add(selectedFace);
+//	    		updateIfsFromSelection();
+	    		statusChangedListener.statusChanged("Selected face: " + selectedFace);
+	    		
+	    		
+	    	} 
+	    
+	    });
 //	    det.addLineDragListener(new LineDragListener() {
 //	    	public void lineDragStart(LineDragEvent e) { 
 //
@@ -492,26 +492,26 @@ public  class HalfedgeInterfacePlugin
 //	    	} 
 //	    
 //	    });
-//	    det.addPointDragListener(new PointDragListener() {
-//			public void pointDragStart(PointDragEvent e) { 
-//
-//	    	}
-//	    	public void pointDragged(PointDragEvent e) {
-//	      
-//	    	};
-//	    	public void pointDragEnd(PointDragEvent e) {
-//	    		selectedVertex = e.getIndex();
-//	    		updateSelectedLabel();
-//	    		selV.clear();
-//	    		selV.add(selectedVertex);
-////	    		updateIfsFromSelection();
-//	    		statusChangedListener.statusChanged("Selected vertex: " + selectedVertex);
-//	    		
-//	    		
-//	    	} 
-//	    
-//	    });
-//		    
+	    det.addPointDragListener(new PointDragListener() {
+			public void pointDragStart(PointDragEvent e) { 
+
+	    	}
+	    	public void pointDragged(PointDragEvent e) {
+	      
+	    	};
+	    	public void pointDragEnd(PointDragEvent e) {
+	    		selectedVertex = e.getIndex();
+	    		updateSelectedLabel();
+	    		selV.clear();
+	    		selV.add(selectedVertex);
+//	    		updateIfsFromSelection();
+	    		statusChangedListener.statusChanged("Selected vertex: " + selectedVertex);
+	    		
+	    		
+	    	} 
+	    
+	    });
+		    
 		content.addContentTool(det);
 	}
 	
