@@ -52,6 +52,7 @@ public interface Functional <
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> int getDimension(HDS hds);
 
+	// Non-zero pattern of the hessian
 	public <
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> int[][] getNonZeroPattern(HDS hds);

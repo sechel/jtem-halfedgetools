@@ -153,6 +153,9 @@ public abstract class FunctionalTest <
 		if (f == null) {
 			Assert.fail("Functional has not been set");
 		}
+		if (!f.hasHessian()) {
+			return;
+		}
 		if (hds == null) {
 			Assert.fail("No HalfEdgedatastructure has been set");
 		}
@@ -244,8 +247,6 @@ public abstract class FunctionalTest <
 		constructFaceByVertices(hds, v1, v3, v4);
 		constructFaceByVertices(hds, v1, v4, v2);
 	}
-	
-	
 	
 	public static <
 		V extends Vertex<V, E, F> & HasPosition,
