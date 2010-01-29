@@ -38,6 +38,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionVertexAdapter;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
@@ -50,9 +51,9 @@ F extends Face<V,E,F>,
 HDS extends HalfEdgeDataStructure<V,E,F>
 > extends HalfedgeAlgorithmPlugin<V,E,F,HDS>{
 
-	private Coord3DAdapter<V> adapter;
+	private SubdivisionVertexAdapter<V> adapter;
 
-	public FaceScalerPlugin(Coord3DAdapter<V> ad) {
+	public FaceScalerPlugin(SubdivisionVertexAdapter<V> ad) {
 		this.adapter = ad;
 	}
 	
@@ -74,8 +75,8 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		double[] pos = new double[] {0.0,0.0,0.0};
 		int i = 0;
 		for(V bv : HalfEdgeUtils.boundaryVertices(oldF)) {
-			pos = Rn.add(null, pos, adapter.getCoord(bv));
-			oldVs[i] = adapter.getCoord(bv);
+			pos = Rn.add(null, pos, adapter.getData(bv));
+			oldVs[i] = adapter.getData(bv);
 			i++;
 		}
 		pos = Rn.times(null, 1/((double)n), pos);
@@ -84,7 +85,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		
 		i = 0;
 		for(V v : HalfEdgeUtils.boundaryVertices(f)) {
-			adapter.setCoord(v, Rn.linearCombination(null, t, pos, 1.0-t, oldVs[(i+twist-1+n)%n]));
+			adapter.setData(v, Rn.linearCombination(null, t, pos, 1.0-t, oldVs[(i+twist-1+n)%n]));
 			i++;
 		}
 		

@@ -36,13 +36,14 @@ import java.util.List;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
-import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionCoord3DAdapter;
-import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdge3DAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionFaceBarycenter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionVertexAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdgeInterpolator;
 import de.jtem.halfedgetools.jreality.node.JREdge;
 import de.jtem.halfedgetools.jreality.node.JRFace;
 import de.jtem.halfedgetools.jreality.node.JRVertex;
 
-public interface standardAdapters {
+public interface SA {
 	final class StandardVAdapter <V extends JRVertex<V,?,?>> implements Coord3DAdapter<V> {
 		public double[] getCoord(V v) {
 			return v.position.clone();
@@ -61,21 +62,6 @@ public interface standardAdapters {
 		}
 	}
 	
-	final class StandardSubdivisionVAdapter <V extends JRVertex<V,?,?>> implements SubdivisionCoord3DAdapter<V> {
-		public double[] getCoord(V v) {
-			return v.position.clone();
-		}
-		public void setCoord(V v, double[] c) {
-			v.position = c;
-		}
-	}
-	
-	final class StandardSubdivisionEAdapter <E extends JREdge<?,E,?>> implements SubdivisionEdge3DAdapter<E> {
-		public double[] getCoord(E e, double a, boolean i) {
-			return Rn.linearCombination(null, a, e.getTargetVertex().position.clone(), 1-a, e.getStartVertex().position.clone());
-		}
-	}
-	
 	final class StandardMedEAdapter <E extends JREdge<?,E,?>> implements Coord3DAdapter<E> {
 		public double[] getCoord(E e) {
 			return Rn.linearCombination(null, 0.5, e.getTargetVertex().position, 0.5, e.getStartVertex().position);
@@ -85,8 +71,25 @@ public interface standardAdapters {
 		}
 	}
 	
-	final class StandardFAdapter <F extends JRFace<?,E,F>, E extends JREdge<?,E,F>> implements Coord3DAdapter<F> {
-		public double[] getCoord(F f) {
+	final class StandardSubdivisionVAdapter <V extends JRVertex<V,?,?>> implements SubdivisionVertexAdapter<V> {
+		public double[] getData(V v) {
+			return v.position.clone();
+		}
+		public void setData(V v, double[] c) {
+			v.position = c;
+		}
+	}
+	
+	final class StandardSubdivisionEAdapter <E extends JREdge<?,E,?>> implements SubdivisionEdgeInterpolator<E> {
+		public double[] getData(E e, double a, boolean i) {
+			return Rn.linearCombination(null, a, e.getTargetVertex().position.clone(), 1-a, e.getStartVertex().position.clone());
+		}
+	}
+	
+
+	
+	final class StandardSubdivisionFAdapter <F extends JRFace<?,E,F>, E extends JREdge<?,E,F>> implements SubdivisionFaceBarycenter<F> {
+		public double[] getData(F f) {
 			double[] sum = {0, 0, 0};
 			List<E> b = HalfEdgeUtils.boundaryEdges(f);
 			int size = 0;
@@ -98,7 +101,6 @@ public interface standardAdapters {
 			return sum;
 			
 		}
-		public void setCoord(F f, double[] c) {
-		}
+
 	}
 }

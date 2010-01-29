@@ -38,6 +38,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionVertexAdapter;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
@@ -50,9 +51,9 @@ F extends Face<V,E,F>,
 HDS extends HalfEdgeDataStructure<V,E,F>
 > extends HalfedgeAlgorithmPlugin<V,E,F,HDS>{
 
-	private Coord3DAdapter<V> adapter;
+	private SubdivisionVertexAdapter<V> adapter;
 
-	public FaceCollapserPlugin(Coord3DAdapter<V> ad) {
+	public FaceCollapserPlugin(SubdivisionVertexAdapter<V> ad) {
 		this.adapter = ad;
 	}
 	
@@ -65,12 +66,12 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		double[] pos = new double[] {0.0,0.0,0.0};
 		double n = 0.0;
 		for(V bv : HalfEdgeUtils.boundaryVertices(f)) {
-			pos = Rn.add(null, pos, adapter.getCoord(bv));
+			pos = Rn.add(null, pos, adapter.getData(bv));
 			n+=1.0;
 		}
 		pos = Rn.times(null, 1/n, pos);
 		V v = HalfEdgeTopologyOperations.collapseFace(f);
-		adapter.setCoord(v, pos);
+		adapter.setData(v, pos);
 		
 		hcp.updateHalfedgeContentAndActiveGeometry(hds);
 		

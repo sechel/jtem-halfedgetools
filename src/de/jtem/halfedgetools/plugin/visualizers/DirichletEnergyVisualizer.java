@@ -46,7 +46,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.jreality.math.Rn;
-import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.jreality.adapter.Adapter;
 import de.jtem.halfedgetools.jreality.adapter.LabelAdapter2Ifs;
 import de.jtem.halfedgetools.jreality.node.JREdge;

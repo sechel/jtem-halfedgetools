@@ -35,14 +35,12 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
-import de.jtem.halfedgetools.algorithm.Edge3DAdapter;
-import de.jtem.halfedgetools.algorithm.loop.LoopSubdivision;
-import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionCoord3DAdapter;
-import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdge3DAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdgeInterpolator;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionFaceBarycenter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionVertexAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.loop.LoopSubdivision;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
-import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin.AlgorithmType;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class LoopPlugin<
@@ -52,15 +50,16 @@ F extends Face<V,E,F>,
 HDS extends HalfEdgeDataStructure<V,E,F>
 > extends HalfedgeAlgorithmPlugin<V, E, F, HDS> {
 
-	private SubdivisionCoord3DAdapter<V> vA;
-	private SubdivisionEdge3DAdapter<E> eA;
-	private Coord3DAdapter<F> fA;
+	private SubdivisionVertexAdapter<V> vA;
+	private SubdivisionEdgeInterpolator<E> eA;
+	private SubdivisionFaceBarycenter<F> fA;
 	
 	private LoopSubdivision<V,E,F,HDS> subdivider = new LoopSubdivision<V, E, F, HDS>();
 
-	public LoopPlugin(SubdivisionCoord3DAdapter<V> ad, SubdivisionEdge3DAdapter<E> ead){
+	public LoopPlugin(SubdivisionVertexAdapter<V> ad, SubdivisionEdgeInterpolator<E> ead, SubdivisionFaceBarycenter<F> fad){
 		this.vA = ad;
 		this.eA = ead;
+		this.fA = fad;
 	}
 	
 	@Override

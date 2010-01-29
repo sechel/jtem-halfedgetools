@@ -39,6 +39,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionVertexAdapter;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin.AlgorithmType;
@@ -52,9 +53,9 @@ F extends Face<V,E,F>,
 HDS extends HalfEdgeDataStructure<V,E,F>
 > extends HalfedgeAlgorithmPlugin<V,E,F,HDS>{
 
-	private Coord3DAdapter<V> adapter;
+	private SubdivisionVertexAdapter<V> adapter;
 
-	public PerturbPlugin(Coord3DAdapter<V> ad) {
+	public PerturbPlugin(SubdivisionVertexAdapter<V> ad) {
 		this.adapter = ad;
 	}
 
@@ -64,10 +65,10 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 
 		Random r = new Random();
 		for(V v : hds.getVertices()) {
-			double[] coord = adapter.getCoord(v);
+			double[] coord = adapter.getData(v);
 			double[] noise = new double[] {r.nextDouble()-0.5,r.nextDouble()-0.5,r.nextDouble()-0.5};
 			noise = Rn.times(null, 0.05, noise);
-			adapter.setCoord(v, Rn.add(null, coord, noise));
+			adapter.setData(v, Rn.add(null, coord, noise));
 		}
 
 		hcp.updateHalfedgeContentAndActiveGeometry(hds);

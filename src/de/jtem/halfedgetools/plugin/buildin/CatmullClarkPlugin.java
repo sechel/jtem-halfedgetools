@@ -35,8 +35,10 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
-import de.jtem.halfedgetools.algorithm.catmullclark.CatmullClarkSubdivision;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdgeInterpolator;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionFaceBarycenter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionVertexAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.catmullclark.CatmullClarkSubdivision;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -49,12 +51,12 @@ public class CatmullClarkPlugin
 		HDS extends HalfEdgeDataStructure<V,E,F>
 	> extends HalfedgeAlgorithmPlugin<V,E,F,HDS> {
 	
-	private Coord3DAdapter<V> vA = null;
-	private Coord3DAdapter<E> eA;
-	private Coord3DAdapter<F> fA;
+	private SubdivisionVertexAdapter<V> vA = null;
+	private SubdivisionEdgeInterpolator<E> eA;
+	private SubdivisionFaceBarycenter<F> fA;
 	
 	
-	public CatmullClarkPlugin(Coord3DAdapter<V> ad, Coord3DAdapter<E> ead, Coord3DAdapter<F> fac) {
+	public CatmullClarkPlugin(SubdivisionVertexAdapter<V> ad, SubdivisionEdgeInterpolator<E> ead, SubdivisionFaceBarycenter<F> fac) {
 		this.vA = ad;
 		this.eA = ead;
 		this.fA  = fac;

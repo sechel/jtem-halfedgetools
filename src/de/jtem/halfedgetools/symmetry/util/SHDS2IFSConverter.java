@@ -31,7 +31,6 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.symmetry.util;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,10 +44,6 @@ import de.jreality.scene.IndexedLineSet;
 import de.jreality.scene.PointSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.shader.CommonAttributes;
-import de.jreality.shader.DefaultGeometryShader;
-import de.jreality.shader.GlslProgram;
-import de.jreality.shader.ShaderUtility;
-import de.jreality.util.Input;
 import de.jreality.util.SceneGraphUtility;
 import de.jtem.discretegroup.core.DiscreteGroup;
 import de.jtem.discretegroup.core.DiscreteGroupSceneGraphRepresentation;

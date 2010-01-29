@@ -39,10 +39,6 @@ import java.io.IOException;
 import com.thoughtworks.xstream.XStream;
 
 import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedgetools.symmetry.standard.SEdge;
-import de.jtem.halfedgetools.symmetry.standard.SFace;
-import de.jtem.halfedgetools.symmetry.standard.SHDS;
-import de.jtem.halfedgetools.symmetry.standard.SVertex;
 
 
 public class HalfedgeIO {

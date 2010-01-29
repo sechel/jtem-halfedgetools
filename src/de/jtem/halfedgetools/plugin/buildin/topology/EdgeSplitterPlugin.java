@@ -37,6 +37,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionVertexAdapter;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
@@ -49,9 +50,9 @@ F extends Face<V,E,F>,
 HDS extends HalfEdgeDataStructure<V,E,F>
 > extends HalfedgeAlgorithmPlugin<V,E,F,HDS>{
 
-	private Coord3DAdapter<V> adapter;
+	private SubdivisionVertexAdapter<V> adapter;
 	
-	public EdgeSplitterPlugin(Coord3DAdapter<V> ad) {
+	public EdgeSplitterPlugin(SubdivisionVertexAdapter<V> ad) {
 		this.adapter = ad;
 	}
 	
@@ -61,10 +62,10 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		E e= hds.getEdge(hcp.getSelectedEdgeIndex());
 		
 	
-		double[] p1 = adapter.getCoord(e.getTargetVertex());
-		double[] p2 = adapter.getCoord(e.getStartVertex());
+		double[] p1 = adapter.getData(e.getTargetVertex());
+		double[] p2 = adapter.getData(e.getStartVertex());
 		V v = HalfEdgeTopologyOperations.splitEdge(e);
-		adapter.setCoord(v, Rn.linearCombination(null, 0.5, p1, 0.5, p2));
+		adapter.setData(v, Rn.linearCombination(null, 0.5, p1, 0.5, p2));
 		
 		hcp.updateHalfedgeContentAndActiveGeometry(hds);
 		

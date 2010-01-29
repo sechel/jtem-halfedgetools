@@ -37,8 +37,10 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
 import de.jtem.halfedgetools.algorithm.stefansub.Subdivision;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdgeInterpolator;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionFaceBarycenter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionVertexAdapter;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.util.surfaceutilities.SurfaceException;
@@ -51,11 +53,11 @@ F extends Face<V,E,F>,
 HDS extends HalfEdgeDataStructure<V,E,F>
 > extends HalfedgeAlgorithmPlugin<V, E, F, HDS> {
 
-	private Coord3DAdapter<F> fA;
-	private Coord3DAdapter<E> eA;
-	private Coord3DAdapter<V> vA;
+	private SubdivisionVertexAdapter<V> vA;
+	private SubdivisionEdgeInterpolator<E> eA;
+	private SubdivisionFaceBarycenter<F> fA;
 
-	public RootThreePlugin(Coord3DAdapter<V> vA, Coord3DAdapter<E> eA, Coord3DAdapter<F> fA){
+	public RootThreePlugin(SubdivisionVertexAdapter<V> vA, SubdivisionEdgeInterpolator<E> eA, SubdivisionFaceBarycenter<F> fA){
 		this.vA = vA;
 		this.eA = eA;
 		this.fA = fA;
@@ -71,7 +73,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		}
 		
 		try {
-			Subdivision.createRootThree(hds, tHDS, new HashMap<V,V>(), new HashMap<F,V>(), vA, eA, fA);
+			Subdivision.createRootThree(hds, tHDS, new HashMap<V,V>(), new HashMap<F,V>(), vA, fA);
 		} catch (SurfaceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

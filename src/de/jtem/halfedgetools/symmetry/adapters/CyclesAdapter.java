@@ -35,7 +35,6 @@ import static de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType.EDGE_AD
 
 import java.util.Set;
 
-import de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType;
 import de.jtem.halfedgetools.symmetry.node.SymmetricEdge;
 import de.jtem.halfedgetools.symmetry.node.SymmetricFace;
 import de.jtem.halfedgetools.symmetry.node.SymmetricHDS;
