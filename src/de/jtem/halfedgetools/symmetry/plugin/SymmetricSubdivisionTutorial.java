@@ -31,6 +31,9 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.symmetry.plugin;
 
+import java.util.List;
+
+import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.Inspector;
 import de.jreality.plugin.basic.ViewMenuBar;
@@ -39,6 +42,8 @@ import de.jreality.plugin.menu.BackgroundColor;
 import de.jreality.plugin.menu.CameraMenu;
 import de.jreality.plugin.menu.DisplayOptions;
 import de.jreality.plugin.menu.ExportMenu;
+import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
 import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionCoord3DAdapter;
 import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdge3DAdapter;
 import de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType;
@@ -76,7 +81,27 @@ public class SymmetricSubdivisionTutorial {
 			return e.getEmbeddingOnEdge(a, ignore);
 			
 		}
+	}
+		
+	private static class MyFAdapter implements Coord3DAdapter<SFace> {
 
+		public double[] getCoord(SFace f) {
+			double[] sum = {0, 0, 0};
+			List<SEdge> b = HalfEdgeUtils.boundaryEdges(f);
+			int size = 0;
+			for (SEdge e : b) {
+				Rn.add(sum, sum, e.getEmbeddingOnEdge(1,true));
+				size++;
+			}
+			Rn.times(sum, 1.0 / size, sum);
+			return sum;
+		}
+
+		public void setCoord(SFace f, double[] c) {
+			// doesn't make sense
+		}
+		
+	
 		
 	}
 
@@ -108,12 +133,12 @@ public class SymmetricSubdivisionTutorial {
 				new MyEAdapter()
 				));
 		
-//		viewer.registerPlugin(new SymmetricSqrtRoot3Plugin<SVertex,SEdge,SFace,SHDS>(
-//		new MyVAdapter(),
-//		new MyEAdapter(),
-//		new MyFAdapter()
-//		));
-//
+		viewer.registerPlugin(new SymmetricSqrt3Plugin<SVertex,SEdge,SFace,SHDS>(
+		new MyVAdapter(),
+		new MyEAdapter(),
+		new MyFAdapter()
+		));
+
 		
 		viewer.registerPlugin(new CompactifierPlugin());
 		

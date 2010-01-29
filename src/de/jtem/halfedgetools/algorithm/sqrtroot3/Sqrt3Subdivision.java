@@ -90,7 +90,9 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 		}
 		
 		//calc coordinates for the new points
-		
+		for(F oldF : oldHeds.getFaces()) {
+			oldFtoPos.put(oldF, fA.getCoord(oldF));
+		}
 		
 		
 		//calc coordinates for the old points
