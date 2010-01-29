@@ -54,6 +54,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 
 	private SubdivisionCoord3DAdapter<V> vA;
 	private SubdivisionEdge3DAdapter<E> eA;
+	private Coord3DAdapter<F> fA;
 	
 	private LoopSubdivision<V,E,F,HDS> subdivider = new LoopSubdivision<V, E, F, HDS>();
 
@@ -70,7 +71,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 			return;
 		}
 		
-		subdivider.subdivide(hds, tHDS, vA, eA);
+		subdivider.subdivide(hds, tHDS, vA, eA, fA);
 		
 		hcp.updateHalfedgeContentAndActiveGeometry(tHDS);	
 		

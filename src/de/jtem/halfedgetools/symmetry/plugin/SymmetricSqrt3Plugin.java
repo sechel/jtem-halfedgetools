@@ -99,26 +99,34 @@ public class SymmetricSqrt3Plugin
 		Map<E, Set<E>> oldToDoubleNew;
 		try {
 			oldToDoubleNew = subdivider.subdivide(hds, tHDS, adapter,ead,fac);
+		
+		
+			CuttingInfo<V, E, F> symmCopy = new CuttingInfo<V, E, F>(); 
+			CuttingInfo<V, E, F> symmOld = hds.getSymmetryCycles();
+			
+			for(Set<E> es: symmOld.paths.keySet()) {
+				Set<E> newPath = new HashSet<E>();
+				for(E e : es) {	
+					Set<E> toAdd = oldToDoubleNew.get(e);
+//					if(toAdd != null)
+						newPath.addAll(toAdd);
+				}
+				symmCopy.paths.put(newPath, symmOld.paths.get(es));
+			}
+			
+			tHDS.setSymmetryCycles(symmCopy);
+			
+			tHDS.setGroup(hds.getGroup());
+			
+			for(Set<E> es : oldToDoubleNew.values()) {
+				E e = es.iterator().next();
+				e.flip();
+			}
+		
 		} catch (TriangulationException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-//		CuttingInfo<V, E, F> symmCopy = new CuttingInfo<V, E, F>(); 
-//		CuttingInfo<V, E, F> symmOld = hds.getSymmetryCycles();
-//		for(Set<E> es: symmOld.paths.keySet()) {
-//			Set<E> newPath = new HashSet<E>();
-//			for(E e : es) {
-//				for(E ee : oldToDoubleNew.get(e)) {
-//					newPath.add(ee);
-//				}
-//			}
-//			symmCopy.paths.put(newPath, symmOld.paths.get(es));
-//		}
-//		
-//		tHDS.setSymmetryCycles(symmCopy);
-//		
-//		tHDS.setGroup(hds.getGroup());
 		
 		hcp.updateHalfedgeContentAndActiveGeometry(tHDS);	
 	}

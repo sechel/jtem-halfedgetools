@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
 import de.jtem.halfedgetools.algorithm.loop.LoopSubdivision;
 import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionCoord3DAdapter;
 import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdge3DAdapter;
@@ -57,10 +58,12 @@ public class SymmetricLoopPlugin
 	
 	private SubdivisionCoord3DAdapter<V> vA = null;
 	private SubdivisionEdge3DAdapter<E> eA;
+	private Coord3DAdapter<F> fA;
 	
-	public SymmetricLoopPlugin(SubdivisionCoord3DAdapter<V> ad, SubdivisionEdge3DAdapter<E> ead) {
+	public SymmetricLoopPlugin(SubdivisionCoord3DAdapter<V> ad, SubdivisionEdge3DAdapter<E> ead, Coord3DAdapter<F> fA) {
 		vA = ad;
 		this.eA = ead;
+		this.fA = fA;
 	}
 
 	private LoopSubdivision<V,E,F,HDS> subdivider = new LoopSubdivision<V,E,F,HDS>();
@@ -91,7 +94,7 @@ public class SymmetricLoopPlugin
 			return;
 		}
 		
-		Map<E,Set<E>> oldToDoubleNew = subdivider.subdivide(hds, tHDS, vA,eA);
+		Map<E,Set<E>> oldToDoubleNew = subdivider.subdivide(hds, tHDS, vA,eA,fA);
 		
 		CuttingInfo<V, E, F> symmCopy = new CuttingInfo<V, E, F>(); 
 		CuttingInfo<V, E, F> symmOld = hds.getSymmetryCycles();

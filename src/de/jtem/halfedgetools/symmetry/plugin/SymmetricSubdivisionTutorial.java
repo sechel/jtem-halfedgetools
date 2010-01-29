@@ -130,7 +130,8 @@ public class SymmetricSubdivisionTutorial {
 //		
 		viewer.registerPlugin(new SymmetricLoopPlugin<SVertex,SEdge,SFace,SHDS>(
 				new MyVAdapter(),
-				new MyEAdapter()
+				new MyEAdapter(),
+				new MyFAdapter()
 				));
 		
 		viewer.registerPlugin(new SymmetricSqrt3Plugin<SVertex,SEdge,SFace,SHDS>(
