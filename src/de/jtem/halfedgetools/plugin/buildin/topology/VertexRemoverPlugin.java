@@ -79,7 +79,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 
 	
 	public PluginInfo getPluginInfo() {
-		return new PluginInfo("Vertex remover");
+		return new PluginInfo("Vertex remover", "Kristoffer Josefsson");
 	}
 
 }

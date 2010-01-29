@@ -77,7 +77,7 @@ public class Delaunay  {
 		E extends Edge<V, E, F>  & HasLength, 
 		F extends Face<V, E, F>
 	> boolean isObtuse(E e) throws TriangulationException {
-		return getAngle(e) > Math.PI;
+		return getAngle(e) > Math.PI/2.0;
 	}
 
 	public static <

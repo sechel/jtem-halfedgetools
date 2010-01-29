@@ -44,6 +44,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
 import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionCoord3DAdapter;
 import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdge3DAdapter;
 
@@ -64,7 +65,7 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 	
 	
 	//return new HEDS approximated using dyadic scheme
-	public Map<E, Set<E>> subdivide(HEDS oldHeds, HEDS newHeds, SubdivisionCoord3DAdapter<V> vA, SubdivisionEdge3DAdapter<E> eA){
+	public Map<E, Set<E>> subdivide(HEDS oldHeds, HEDS newHeds, SubdivisionCoord3DAdapter<V> vA, SubdivisionEdge3DAdapter<E> eA, Coord3DAdapter<F> fA){
 		
 		int maxDeg = 0;
 		for(V v : oldHeds.getVertices()) {
@@ -92,8 +93,10 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 		for(E e : oldHeds.getPositiveEdges()) {
 
 			double[] pos = new double[] {0,0,0};
-			pos = eA.getCoord(e, 0.5, true);
+			// calc with edge midpoint
+//			pos = eA.getCoord(e, 0.5, true);
 			
+			// calc with original scheme
 //			double[] a = eA.getCoord(e.getPreviousEdge(),1.0,true);
 //			double[] b = eA.getCoord(e.getOppositeEdge().getPreviousEdge(),1.0,true);
 //			double[] c = eA.getCoord(e.getOppositeEdge().getNextEdge(),1.0,true);
@@ -104,7 +107,19 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 //			Rn.add(pos, b, a);
 //			Rn.add(pos, c, pos);
 //			Rn.add(pos, d, pos);
-//			Rn.times(pos, 1.0/8.0, pos);			
+//			Rn.times(pos, 1.0/8.0, pos);
+			
+			// calc with mid of barycenters and edge midpoint
+			double[] b1 = fA.getCoord(e.getLeftFace());
+			double[] b2 = fA.getCoord(e.getRightFace());
+			double[] m = eA.getCoord(e, 0.5, true);
+			
+			Rn.times(b1, 3.0/8.0, b1);
+			Rn.times(b2, 3.0/8.0, b2);
+			Rn.times(m, 1.0/4.0, m);
+			
+			Rn.add(pos, b1, b2);
+			Rn.add(pos, m, pos);
 			
 			oldEtoPos.put(e, pos);
 			

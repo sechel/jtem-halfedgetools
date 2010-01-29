@@ -53,24 +53,24 @@
     <int>3</int>
   </entry>
   <entry>
-    <string>de.jreality.plugin.content.ContentTools:rotationEnabled</string>
-    <boolean>true</boolean>
-  </entry>
-  <entry>
     <string>de.jreality.plugin.content.ContentAppearance:lineLabelResolution</string>
     <int>48</int>
+  </entry>
+  <entry>
+    <string>de.jreality.plugin.content.ContentTools:rotationEnabled</string>
+    <boolean>true</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentAppearance:preferredPosition</string>
     <int>2</int>
   </entry>
   <entry>
-    <string>de.jreality.plugin.content.ContentTools:dragEnabled</string>
-    <boolean>true</boolean>
-  </entry>
-  <entry>
     <string>de.jreality.plugin.basic.View:hidePanels</string>
     <boolean>false</boolean>
+  </entry>
+  <entry>
+    <string>de.jreality.plugin.content.ContentTools:dragEnabled</string>
+    <boolean>true</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentAppearance:showLines</string>
@@ -219,12 +219,12 @@
     <boolean>false</boolean>
   </entry>
   <entry>
-    <string>de.jreality.plugin.menu.BackgroundColor:color</string>
-    <string>White</string>
-  </entry>
-  <entry>
     <string>de.jtem.halfedgetools.plugin.HalfedgeDebuggerPlugin:showPanel</string>
     <boolean>true</boolean>
+  </entry>
+  <entry>
+    <string>de.jreality.plugin.menu.BackgroundColor:color</string>
+    <string>White</string>
   </entry>
   <entry>
     <string>de.jtem.halfedgetools.plugin.HalfedgeDebuggerPlugin:initPosition</string>
@@ -235,23 +235,23 @@
     <double>0.5</double>
   </entry>
   <entry>
-    <string>de.jreality.plugin.content.ContentTools:snapTogrid</string>
-    <boolean>false</boolean>
-  </entry>
-  <entry>
     <string>de.jreality.plugin.basic.View:showLeft</string>
     <boolean>true</boolean>
+  </entry>
+  <entry>
+    <string>de.jreality.plugin.content.ContentTools:snapTogrid</string>
+    <boolean>false</boolean>
   </entry>
   <entry>
     <string>de.jtem.halfedgetools.symmetry.plugin.CompactifierPlugin:initPosition</string>
     <int>1</int>
   </entry>
   <entry>
-    <string>de.jreality.plugin.content.ContentTools:encompassEnabled</string>
+    <string>de.jreality.plugin.content.ContentAppearance:pointsReflecting</string>
     <boolean>true</boolean>
   </entry>
   <entry>
-    <string>de.jreality.plugin.content.ContentAppearance:pointsReflecting</string>
+    <string>de.jreality.plugin.content.ContentTools:encompassEnabled</string>
     <boolean>true</boolean>
   </entry>
   <entry>
@@ -263,8 +263,8 @@
     <boolean>true</boolean>
   </entry>
   <entry>
-    <string>de.jreality.plugin.content.ContentTools:pickFaces</string>
-    <boolean>true</boolean>
+    <string>de.jreality.plugin.content.ContentAppearance:texture</string>
+    <string>none</string>
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentAppearance:faceColor</string>
@@ -276,19 +276,19 @@
     </awt-color>
   </entry>
   <entry>
-    <string>de.jreality.plugin.content.ContentAppearance:texture</string>
-    <string>none</string>
+    <string>de.jreality.plugin.content.ContentTools:pickFaces</string>
+    <boolean>true</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentAppearance:faceLabelResolution</string>
     <int>48</int>
   </entry>
   <entry>
-    <string>de.jtem.halfedgetools.plugin.HalfedgeDebuggerPlugin:shrinked</string>
+    <string>de.jreality.plugin.basic.ViewPreferences:showMenuBar</string>
     <boolean>true</boolean>
   </entry>
   <entry>
-    <string>de.jreality.plugin.basic.ViewPreferences:showMenuBar</string>
+    <string>de.jtem.halfedgetools.plugin.HalfedgeDebuggerPlugin:shrinked</string>
     <boolean>true</boolean>
   </entry>
   <entry>
@@ -304,12 +304,12 @@
     <boolean>true</boolean>
   </entry>
   <entry>
-    <string>de.jreality.plugin.content.ContentAppearance:showPanel</string>
-    <boolean>true</boolean>
-  </entry>
-  <entry>
     <string>de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin:preferredPosition</string>
     <int>3</int>
+  </entry>
+  <entry>
+    <string>de.jreality.plugin.content.ContentAppearance:showPanel</string>
+    <boolean>true</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentAppearance:tubeRadius</string>
@@ -324,24 +324,24 @@
     <boolean>true</boolean>
   </entry>
   <entry>
-    <string>de.jreality.plugin.basic.Inspector:propagateSelections</string>
-    <boolean>true</boolean>
+    <string>de.jreality.plugin.basic.View:showTop</string>
+    <boolean>false</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.basic.Inspector:receiveSelections</string>
     <boolean>true</boolean>
   </entry>
   <entry>
-    <string>de.jreality.plugin.basic.View:showTop</string>
-    <boolean>false</boolean>
-  </entry>
-  <entry>
-    <string>de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin:initPosition</string>
-    <int>1</int>
+    <string>de.jreality.plugin.basic.Inspector:propagateSelections</string>
+    <boolean>true</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentAppearance:faceLabelColor</string>
     <awt-color reference="../../entry[32]/awt-color"/>
+  </entry>
+  <entry>
+    <string>de.jtem.halfedgetools.plugin.HalfedgeConnectorPlugin:initPosition</string>
+    <int>1</int>
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentAppearance:lineColor</string>

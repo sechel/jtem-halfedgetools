@@ -90,7 +90,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 
 	
 	public PluginInfo getPluginInfo() {
-		return new PluginInfo("Vertex perturber");
+		return new PluginInfo("Project to sphere", "Kristoffer Josefsson");
 	}
 
 }

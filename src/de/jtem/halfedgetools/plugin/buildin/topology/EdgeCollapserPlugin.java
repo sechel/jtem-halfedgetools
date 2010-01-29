@@ -93,7 +93,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 
 	
 	public PluginInfo getPluginInfo() {
-		return new PluginInfo("Edge collapser");
+		return new PluginInfo("Edge collapser", "Kristoffer Josefsson");
 	}
 
 

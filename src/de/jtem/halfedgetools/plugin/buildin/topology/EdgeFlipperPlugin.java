@@ -83,7 +83,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 
 	
 	public PluginInfo getPluginInfo() {
-		return new PluginInfo("Edge flipper");
+		return new PluginInfo("Edge flipper", "Kristoffer Josefsson");
 	}
 	
 	

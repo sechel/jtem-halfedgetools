@@ -100,9 +100,6 @@ public class SymmetricSubdivisionTutorial {
 		public void setCoord(SFace f, double[] c) {
 			// doesn't make sense
 		}
-		
-	
-		
 	}
 
 	public static void main(String[] args) {

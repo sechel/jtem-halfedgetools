@@ -31,6 +31,7 @@ OF SUCH DAMAGE.
 package de.jtem.halfedgetools.algorithm.sqrtroot3;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 	private Map<V,F> newVtoOldF = new HashMap<V,F>();;
 	private HashMap<V, double[]> oldVtoPos = new HashMap<V, double[]>();;
 	private Map<F, double[]> oldFtoPos = new HashMap<F, double[]>();
+	private Map<E, Set<E>> oldEtoNewEs = new HashMap<E,Set<E>>();
 	
 	public Map<E, Set<E>> subdivide(HEDS oldHeds, HEDS newHeds, SubdivisionCoord3DAdapter<V> vA, SubdivisionEdge3DAdapter<E> eA, Coord3DAdapter<F> fA) throws TriangulationException {
 	
@@ -114,6 +116,13 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 			oldVtoPos.put(v, newpos);			
 		}
 		
+		
+		for(E oldE : oldHeds.getEdges()) {
+			Set<E> newEs = new HashSet<E>();
+			newEs.add(newHeds.getEdge(oldE.getIndex()));
+			oldEtoNewEs.put(oldE, newEs);
+		}
+		
 		trian(oldHeds, newHeds);
 		
 		//set coordinates for the old points
@@ -130,7 +139,7 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 			vA.setCoord(nv, pos);
 		}		
 	
-		return null;
+		return oldEtoNewEs;
 	}
 
 

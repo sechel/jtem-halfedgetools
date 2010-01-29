@@ -95,6 +95,7 @@ public class TopologyOperations {
 		hs.add(new RootThreePlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardVAdapter<StandardVertex>(), new standardAdapters.StandardMedEAdapter<StandardEdge>(), new standardAdapters.StandardFAdapter<StandardFace, StandardEdge>()));
 		hs.add(new MedialGraphPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardVAdapter<StandardVertex>(), new standardAdapters.StandardMedEAdapter<StandardEdge>(), new standardAdapters.StandardFAdapter<StandardFace, StandardEdge>()));
 		hs.add(new PerturbPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardVAdapter<StandardVertex>()));
+		hs.add(new ProjectPlugin<StandardVertex,StandardEdge,StandardFace,StandardHDS>(new standardAdapters.StandardVAdapter<StandardVertex>()));
 		
 		return hs;
 	}
@@ -126,6 +127,7 @@ public class TopologyOperations {
 		hs.add(new RootThreePlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardVAdapter<V>(), new standardAdapters.StandardMedEAdapter<E>(), new standardAdapters.StandardFAdapter<F, E>()));
 		hs.add(new MedialGraphPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardVAdapter<V>(), new standardAdapters.StandardMedEAdapter<E>(), new standardAdapters.StandardFAdapter<F, E>()));
 		hs.add(new PerturbPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardVAdapter<V>()));
+		hs.add(new ProjectPlugin<V,E,F,HalfEdgeDataStructure<V,E,F>>(new standardAdapters.StandardVAdapter<V>()));
 		
 		return hs;
 	}
@@ -157,6 +159,7 @@ public class TopologyOperations {
 		hs.add(new RootThreePlugin<V,E,F,HDS>(vA,eA,fA));
 		hs.add(new MedialGraphPlugin<V,E,F,HDS>(vA,eA,fA));
 		hs.add(new PerturbPlugin<V,E,F,HDS>(vA));
+		hs.add(new ProjectPlugin<V,E,F,HDS>(vA));
 		return hs;
 	}
 	

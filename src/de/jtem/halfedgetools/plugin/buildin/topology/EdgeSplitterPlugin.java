@@ -89,7 +89,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 
 	
 	public PluginInfo getPluginInfo() {
-		return new PluginInfo("Edge splitter");
+		return new PluginInfo("Edge splitter", "Kristoffer Josefsson");
 	}
 	
 

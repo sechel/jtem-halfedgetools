@@ -74,7 +74,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 
 	
 	public PluginInfo getPluginInfo() {
-		return new PluginInfo("Face remover");
+		return new PluginInfo("Face remover", "Kristoffer Josefsson");
 	}
 	
 	
