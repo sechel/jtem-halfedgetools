@@ -13,7 +13,7 @@ import de.jtem.halfedge.Vertex;
 
 public class AdapterSet implements Set<Adapter<?>> {
 
-	private Set<Adapter<?>>
+	protected Set<Adapter<?>>
 		adapters = new HashSet<Adapter<?>>();
 	
 	public AdapterSet() {
@@ -43,7 +43,7 @@ public class AdapterSet implements Set<Adapter<?>> {
 	> Adapter<O> queryGetter(Class<A> type, Class<N> noteType, Class<O> out) {
 		Adapter<O> result = null;
 		for (Adapter<?> a : adapters) {
-			if (a.getClass().isAnnotationPresent(type) && a.canAccept(noteType) && a.canOutput(out)) {
+			if (a.getClass().isAnnotationPresent(type) && a.canAccept(noteType) && a.checkType(out)) {
 				result = (Adapter<O>)a;
 				break;
 			}
@@ -68,7 +68,7 @@ public class AdapterSet implements Set<Adapter<?>> {
 	> Adapter<I> querySetter(Class<A> type, Class<N> noteType, Class<I> in) {
 		Adapter<I> result = null;
 		for (Adapter<?> a : adapters) {
-			if (a.getClass().isAnnotationPresent(type) && a.canAccept(noteType) && a.canInput(in)) {
+			if (a.getClass().isAnnotationPresent(type) && a.canAccept(noteType) && a.checkType(in)) {
 				result = (Adapter<I>)a;
 				break;
 			}
@@ -88,10 +88,10 @@ public class AdapterSet implements Set<Adapter<?>> {
 	public <
 		N extends Node<?, ?, ?>,
 		O
-	> AdapterSet queryGetter(Class<N> noteType, Class<O> out) throws AdapterException {
-		AdapterSet set = new AdapterSet();
+	> TypedAdapterSet<O> queryGetter(Class<N> noteType, Class<O> out) throws AdapterException {
+		TypedAdapterSet<O> set = new TypedAdapterSet<O>(out);
 		for (Adapter<?> a : adapters) {
-			if (a.canAccept(noteType) && a.canOutput(out)) {
+			if (a.canAccept(noteType) && a.checkType(out)) {
 				set.add(a);
 			}
 		}
@@ -102,10 +102,10 @@ public class AdapterSet implements Set<Adapter<?>> {
 	public <
 		N extends Node<?, ?, ?>,
 		I
-	> AdapterSet querySetter(Class<N> noteType, Class<I> in) throws AdapterException {
-		AdapterSet set = new AdapterSet();
+	> TypedAdapterSet<I> querySetter(Class<N> noteType, Class<I> in) throws AdapterException {
+		TypedAdapterSet<I> set = new TypedAdapterSet<I>(in);
 		for (Adapter<?> a : adapters) {
-			if (a.canAccept(noteType) && a.canInput(in)) {
+			if (a.canAccept(noteType) && a.checkType(in)) {
 				set.add(a);
 			}
 		}

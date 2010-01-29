@@ -10,9 +10,7 @@ public interface Adapter<VAL> {
 	  
 	public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass);
 	
-	public boolean canInput(Class<?> typeClass); 
-	
-	public boolean canOutput(Class<?> typeClass);
+	public boolean checkType(Class<?> typeClass); 
 	
 	public <
 		V extends Vertex<V, E, F>,

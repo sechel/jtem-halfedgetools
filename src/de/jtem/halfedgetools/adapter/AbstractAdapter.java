@@ -13,12 +13,7 @@ public class AbstractAdapter <VAL> implements Adapter<VAL> {
 	}
 
 	@Override
-	public boolean canInput(Class<?> typeClass) {
-		return false;
-	}
-
-	@Override
-	public boolean canOutput(Class<?> typeClass) {
+	public boolean checkType(Class<?> typeClass) {
 		return false;
 	}
 
