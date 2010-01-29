@@ -35,8 +35,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
-import de.jtem.halfedgetools.algorithm.catmullclark.CatmullClarkSubdivision;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdgeInterpolator;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionFaceBarycenter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionVertexAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.catmullclark.CatmullClarkSubdivision;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.symmetry.node.SymmetricEdge;
@@ -54,11 +56,11 @@ public class SymmetricCatmullClarkPlugin
 		HDS extends SymmetricHDS<V,E,F>
 	> extends HalfedgeAlgorithmPlugin<V,E,F,HDS> {
 	
-	private Coord3DAdapter<V> adapter = null;
-	private Coord3DAdapter<E> ead;
-	private Coord3DAdapter<F> fac;
+	private SubdivisionVertexAdapter<V> adapter = null;
+	private SubdivisionEdgeInterpolator<E> ead;
+	private SubdivisionFaceBarycenter<F> fac;
 	
-	public SymmetricCatmullClarkPlugin(Coord3DAdapter<V> ad, Coord3DAdapter<E> ead, Coord3DAdapter<F> fac) {
+	public SymmetricCatmullClarkPlugin(SubdivisionVertexAdapter<V> ad, SubdivisionEdgeInterpolator<E> ead, SubdivisionFaceBarycenter<F> fac) {
 		adapter = ad;
 		this.ead = ead;
 		this.fac  = fac;

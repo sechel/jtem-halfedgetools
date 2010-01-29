@@ -35,10 +35,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
-import de.jtem.halfedgetools.algorithm.loop.LoopSubdivision;
-import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionCoord3DAdapter;
-import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdge3DAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdgeInterpolator;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionFaceBarycenter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionVertexAdapter;
+import de.jtem.halfedgetools.algorithm.subdivision.loop.LoopSubdivision;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.symmetry.node.SymmetricEdge;
@@ -56,11 +56,11 @@ public class SymmetricLoopPlugin
 		HDS extends SymmetricHDS<V,E,F>
 	> extends HalfedgeAlgorithmPlugin<V,E,F,HDS> {
 	
-	private SubdivisionCoord3DAdapter<V> vA = null;
-	private SubdivisionEdge3DAdapter<E> eA;
-	private Coord3DAdapter<F> fA;
+	private SubdivisionVertexAdapter<V> vA = null;
+	private SubdivisionEdgeInterpolator<E> eA;
+	private SubdivisionFaceBarycenter<F> fA;
 	
-	public SymmetricLoopPlugin(SubdivisionCoord3DAdapter<V> ad, SubdivisionEdge3DAdapter<E> ead, Coord3DAdapter<F> fA) {
+	public SymmetricLoopPlugin(SubdivisionVertexAdapter<V> ad, SubdivisionEdgeInterpolator<E> ead, SubdivisionFaceBarycenter<F> fA) {
 		vA = ad;
 		this.eA = ead;
 		this.fA = fA;
