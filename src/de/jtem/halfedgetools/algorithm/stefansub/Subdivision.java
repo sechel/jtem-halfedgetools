@@ -40,12 +40,10 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
-import de.jtem.halfedgetools.algorithm.delaunay.decorations.IsFlippable;
-import de.jtem.halfedgetools.functional.alexandrov.SurfaceUtility;
-import de.jtem.halfedgetools.plugin.buildin.topology.TopologyOperations;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdgeInterpolator;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionFaceBarycenter;
+import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionVertexAdapter;
 import de.jtem.halfedgetools.util.surfaceutilities.SurfaceException;
-import de.jtem.halfedgetools.util.triangulationutilities.TriangulationException;
 
 public class Subdivision {
 
@@ -73,27 +71,27 @@ public class Subdivision {
 			HashMap<V, V> vertexVertexMap, 
 			HashMap<E, V> edgeVertexMap, 
 			HashMap<F, V> faceVertexMap,
-			Coord3DAdapter<V> vA,
-			Coord3DAdapter<E> eA,
-			Coord3DAdapter<F> fA)
+			SubdivisionVertexAdapter<V> vA,
+			SubdivisionEdgeInterpolator<E> eA,
+			SubdivisionFaceBarycenter<F> fA)
 			throws SurfaceException{
 		
 		
 		// vertices
 		for (V v : graph.getVertices()){
 			V newVertex = quad.addNewVertex();
-			vA.setCoord(newVertex, vA.getCoord(v));
+			vA.setData(newVertex, vA.getData(v));
 			vertexVertexMap.put(v, newVertex);
 		}
 		for (E e : graph.getPositiveEdges()){
 			V newVertex = quad.addNewVertex();
-			vA.setCoord(newVertex, eA.getCoord(e));
+			vA.setData(newVertex, eA.getData(e,0.5,true));
 			edgeVertexMap.put(e, newVertex);
 			edgeVertexMap.put(e.getOppositeEdge(), newVertex);
 		}
 		for (F f : graph.getFaces()){
 			V newVertex = quad.addNewVertex();
-			vA.setCoord(newVertex, fA.getCoord(f));
+			vA.setData(newVertex, fA.getData(f));
 			faceVertexMap.put(f, newVertex);
 		}
 		
@@ -201,9 +199,8 @@ public class Subdivision {
 			HDS quad, 
 			HashMap<V, V> vertexVertexMap, 
 			HashMap<F, V> faceVertexMap,
-			Coord3DAdapter<V> vA,
-			Coord3DAdapter<E> eA,
-			Coord3DAdapter<F> fA)
+			SubdivisionVertexAdapter<V> vA,
+			SubdivisionFaceBarycenter<F> fA)
 	throws SurfaceException{
 		
 		HashMap<E, E> leftQuadEdgeMap = new HashMap<E, E>();
@@ -212,12 +209,12 @@ public class Subdivision {
 		// vertices
 		for (V v : graph.getVertices()){
 			V newVertex = quad.addNewVertex();
-			vA.setCoord(newVertex, vA.getCoord(v));
+			vA.setData(newVertex, vA.getData(v));
 			vertexVertexMap.put(v, newVertex);
 		}
 		for (F f : graph.getFaces()){
 			V newVertex = quad.addNewVertex();
-			vA.setCoord(newVertex, fA.getCoord(f));
+			vA.setData(newVertex, fA.getData(f));
 			faceVertexMap.put(f, newVertex);
 		}
 		for (E e : graph.getPositiveEdges()){
@@ -281,9 +278,8 @@ public class Subdivision {
 			HDS quad, 
 			HashMap<V, V> vertexVertexMap, 
 			HashMap<F, V> faceVertexMap,
-			Coord3DAdapter<V> vA,
-			Coord3DAdapter<E> eA,
-			Coord3DAdapter<F> fA)
+			SubdivisionVertexAdapter<V> vA,
+			SubdivisionFaceBarycenter<F> fA)
 	throws SurfaceException{
 		
 		HashMap<E, E> leftQuadEdgeMap = new HashMap<E, E>();
@@ -292,12 +288,12 @@ public class Subdivision {
 		// vertices
 		for (V v : graph.getVertices()){
 			V newVertex = quad.addNewVertex();
-			vA.setCoord(newVertex, vA.getCoord(v));
+			vA.setData(newVertex, vA.getData(v));
 			vertexVertexMap.put(v, newVertex);
 		}
 		for (F f : graph.getFaces()){
 			V newVertex = quad.addNewVertex();
-			vA.setCoord(newVertex, fA.getCoord(f));
+			vA.setData(newVertex, fA.getData(f));
 			faceVertexMap.put(f, newVertex);
 		}
 		for (E e : graph.getPositiveEdges()){
@@ -419,9 +415,8 @@ public class Subdivision {
 				HashMap<E, V> edgeVertexMap,
 				HashMap<F, F> faceFaceMap,
 				HashMap<E, E> edgeEdgeMap1,
-				Coord3DAdapter<V> vA,
-				Coord3DAdapter<E> eA,
-				Coord3DAdapter<F> fA
+				SubdivisionVertexAdapter<V> vA,
+				SubdivisionEdgeInterpolator<E> eA
 			) throws SurfaceException
 	{
 		vertexFaceMap.clear();
@@ -448,7 +443,7 @@ public class Subdivision {
 				v = result.addNewVertex();
 				edgeVertexMap.put(e, v);
 				edgeVertexMap.put(e.getOppositeEdge(), v);
-				vA.setCoord(v, eA.getCoord(e));
+				vA.setData(v, eA.getData(e,0.5,true));
 			}
 			E e1 = result.addNewEdge();
 			E e2 = result.addNewEdge();
