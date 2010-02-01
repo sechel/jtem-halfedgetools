@@ -44,6 +44,7 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.functional.DomainValue;
 import de.jtem.halfedgetools.functional.Energy;
 import de.jtem.halfedgetools.functional.Functional;
+import de.jtem.halfedgetools.functional.FunctionalUtils;
 import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
 import de.jtem.halfedgetools.functional.edgelength.EdgeLengthAdapters.Length;
@@ -96,8 +97,8 @@ public class EdgeLengthFunctional <
 		double result = 0.0;
 		for (E e : G.getPositiveEdges()) {
 			double lsq = l0.getTargetLength(e) * l0.getTargetLength(e);
-			getPosition(e.getStartVertex(), x, s);
-			getPosition(e.getTargetVertex(), x, t);
+			FunctionalUtils.getPosition(e.getStartVertex(), x, s);
+			FunctionalUtils.getPosition(e.getTargetVertex(), x, t);
 			subtract(smt, s, t);
 			double dot = innerProduct(smt, smt);
 			double dif = dot - lsq;
@@ -121,8 +122,8 @@ public class EdgeLengthFunctional <
 		for (V v : G.getVertices()) {
 			for (E e : HalfEdgeUtils.incomingEdges(v)) {
 				double lsq = l0.getTargetLength(e) * l0.getTargetLength(e);
-				getPosition(v, x, vk);
-				getPosition(e.getStartVertex(), x, vj);
+				FunctionalUtils.getPosition(v, x, vk);
+				FunctionalUtils.getPosition(e.getStartVertex(), x, vj);
 				subtract(smt, vk, vj);
 				double factor = innerProduct(smt, smt) - lsq;
 				int off = v.getIndex() * 3;
@@ -154,8 +155,8 @@ public class EdgeLengthFunctional <
 				double lsq = l0.getTargetLength(e) * l0.getTargetLength(e);
 				V vj = e.getStartVertex();
 				int joff = vj.getIndex() * 3;
-				getPosition(vk, x, vkPos);
-				getPosition(vj, x, vjPos);
+				FunctionalUtils.getPosition(vk, x, vkPos);
+				FunctionalUtils.getPosition(vj, x, vjPos);
 				subtract(smt, vkPos, vjPos);
 				double edgeContrib = innerProduct(smt, smt) - lsq;
 				for (int d = 0; d < 3; d++) {
@@ -250,16 +251,7 @@ public class EdgeLengthFunctional <
 		return nzPattern;
 	}
 
-	
-	public void getPosition(V v, DomainValue x, double[] pos) {
-		pos[0] = x.get(v.getIndex() * 3 + 0);
-		pos[1] = x.get(v.getIndex() * 3 + 1);
-		pos[2] = x.get(v.getIndex() * 3 + 2);
-	}
-	
-	
-    
-    @Override
+	@Override
     public boolean hasHessian() {
     	return true;
     }
