@@ -57,6 +57,7 @@ public class WillmoreFunctional<V extends Vertex<V, E, F>, E extends Edge<V, E, 
 		//output
 			Gradient G
 	) {
+		G.setZero();
 		for (E e : hds.getPositiveEdges()) {
 			if(e.getRightFace() == null || e.getLeftFace() == null) {
 				//boundary edges
