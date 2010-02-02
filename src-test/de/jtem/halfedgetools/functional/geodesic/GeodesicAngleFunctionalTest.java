@@ -12,7 +12,7 @@ import de.jtem.halfedgetools.jreality.node.standard.StandardFace;
 import de.jtem.halfedgetools.jreality.node.standard.StandardHDS;
 import de.jtem.halfedgetools.jreality.node.standard.StandardVertex;
 
-public class GeodesicFunctionalTest
+public class GeodesicAngleFunctionalTest
 		extends
 		FunctionalTest<StandardVertex, StandardEdge, StandardFace> {
 
@@ -44,7 +44,7 @@ public class GeodesicFunctionalTest
 		setXGradient(pos);
 		// setXHessian(pos);
 		setHDS(hds);
-		setFuctional(new GeodesicFunctional<StandardVertex, StandardEdge, StandardFace>());
+		setFuctional(new GeodesicAngleFunctional<StandardVertex, StandardEdge, StandardFace>());
 	}
 
 }
