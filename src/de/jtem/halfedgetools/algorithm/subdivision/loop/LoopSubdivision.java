@@ -94,13 +94,13 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 
 			double[] pos = new double[] {0,0,0};
 			// calc with edge midpoint
-//			pos = eA.getCoord(e, 0.5, true);
+			pos = eA.getData(e, 0.5, true);
 			
 			// calc with original scheme
-//			double[] a = eA.getCoord(e.getPreviousEdge(),1.0,true);
-//			double[] b = eA.getCoord(e.getOppositeEdge().getPreviousEdge(),1.0,true);
-//			double[] c = eA.getCoord(e.getOppositeEdge().getNextEdge(),1.0,true);
-//			double[] d = eA.getCoord(e.getNextEdge().getOppositeEdge(),1.0,true);
+//			double[] a = eA.getData(e.getPreviousEdge(),1.0,true);
+//			double[] b = eA.getData(e.getOppositeEdge().getPreviousEdge(),1.0,true);
+//			double[] c = eA.getData(e.getOppositeEdge().getNextEdge(),1.0,true);
+//			double[] d = eA.getData(e.getNextEdge().getOppositeEdge(),1.0,true);
 //			
 //			Rn.times(a,3.0,a);
 //			Rn.times(b,3.0,b);
@@ -110,16 +110,16 @@ HEDS extends HalfEdgeDataStructure<V, E, F>>
 //			Rn.times(pos, 1.0/8.0, pos);
 			
 			// calc with mid of barycenters and edge midpoint
-			double[] b1 = fA.getData(e.getLeftFace());
-			double[] b2 = fA.getData(e.getRightFace());
-			double[] m = eA.getData(e, 0.5, true);
-			
-			Rn.times(b1, 3.0/8.0, b1);
-			Rn.times(b2, 3.0/8.0, b2);
-			Rn.times(m, 1.0/4.0, m);
-			
-			Rn.add(pos, b1, b2);
-			Rn.add(pos, m, pos);
+//			double[] b1 = fA.getData(e.getLeftFace());
+//			double[] b2 = fA.getData(e.getRightFace());
+//			double[] m = eA.getData(e, 0.5, true);
+//			
+//			Rn.times(b1, 3.0/8.0, b1);
+//			Rn.times(b2, 3.0/8.0, b2);
+//			Rn.times(m, 1.0/4.0, m);
+//			
+//			Rn.add(pos, b1, b2);
+//			Rn.add(pos, m, pos);
 			
 			oldEtoPos.put(e, pos);
 			
