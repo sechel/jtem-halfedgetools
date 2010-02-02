@@ -282,6 +282,168 @@ public class HalfEdgeTopologyOperations {
 		
 		return newV;
 	}
+	
+	public  <
+	V extends Vertex<V, E, F>,
+	E extends Edge<V, E, F>,
+	F extends Face<V, E, F>
+> void split(E e) {
+	       F leftFace = e.getLeftFace();
+	       F rightFace = e.getRightFace();
+	       // dont split if we are the boundary
+	       // TODO: implement for the boundary
+	       if (leftFace == null || rightFace == null)
+	               return;
+	       
+	       HalfEdgeDataStructure<V,E,F> graph = e.getHalfEdgeDataStructure();
+
+	       V E = graph.addNewVertex();
+	       E ne1 = graph.addNewEdge();
+	       E ne2 = graph.addNewEdge();
+	       E ne3 = graph.addNewEdge();
+	       E ne4 = graph.addNewEdge();
+	       E ne5 = graph.addNewEdge();
+	       E ne6 = graph.addNewEdge();
+
+	       F f3 = graph.addNewFace();
+	       F f4 = graph.addNewFace();
+
+	       E o = e.getOppositeEdge();
+	       E a = e.getNextEdge();
+	       E b = a.getNextEdge();
+	       E c = o.getNextEdge();
+	       E d = c.getNextEdge();
+	       F f1 = e.getLeftFace();
+	       F f2 = o.getLeftFace();
+
+	       V A = e.getTargetVertex();
+	       V B = a.getTargetVertex();
+	       V C = b.getTargetVertex();
+	       V D = c.getTargetVertex();
+
+	       // face 1
+	       b.linkNextEdge(e);
+	       e.linkNextEdge(ne4);
+	       ne4.linkNextEdge(b);
+	       b.setLeftFace(f1);
+	       e.setLeftFace(f1);
+	       ne4.setLeftFace(f1);
+	       e.linkOppositeEdge(ne1);
+	       ne4.linkOppositeEdge(ne3);
+
+	       // face 2
+	       ne1.linkNextEdge(c);
+	       c.linkNextEdge(ne6);
+	       ne6.linkNextEdge(ne1);
+	       ne1.setLeftFace(f2);
+	       c.setLeftFace(f2);
+	       ne6.setLeftFace(f2);
+	       ne6.linkOppositeEdge(ne5);
+
+	       // face 3
+	       o.linkNextEdge(ne5);
+	       ne5.linkNextEdge(d);
+	       d.linkNextEdge(o);
+	       o.setLeftFace(f3);
+	       ne5.setLeftFace(f3);
+	       d.setLeftFace(f3);
+	       o.linkOppositeEdge(ne2);
+
+	       // face 4
+	       ne2.linkNextEdge(a);
+	       a.linkNextEdge(ne3);
+	       ne3.linkNextEdge(ne2);
+	       ne2.setLeftFace(f4);
+	       a.setLeftFace(f4);
+	       ne3.setLeftFace(f4);
+
+	       // target vertex
+	       b.setTargetVertex(C);
+	       e.setTargetVertex(E);
+	       ne4.setTargetVertex(B);
+
+	       c.setTargetVertex(D);
+	       ne6.setTargetVertex(E);
+	       ne1.setTargetVertex(C);
+
+	       d.setTargetVertex(A);
+	       o.setTargetVertex(E);
+	       ne5.setTargetVertex(D);
+
+	       a.setTargetVertex(B);
+	       ne3.setTargetVertex(E);
+	       ne2.setTargetVertex(A);
+
+	   }
+	
+	  // @SuppressWarnings("unchecked")
+	   public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	>  V collapse(E e) {
+
+	       F leftFace = e.getLeftFace();
+	       F rightFace = e.getRightFace();
+	       // dont collapse if we are the boundary
+	       // TODO: implement for the boundary
+	       if (leftFace == null || rightFace == null)
+	               return null;
+
+	       HalfEdgeDataStructure<V,E,F> heds = e.getHalfEdgeDataStructure();
+
+	       E o = e.getOppositeEdge();
+	       E a = e.getNextEdge();
+	       E b = a.getNextEdge();
+	       E c = o.getNextEdge();
+	       E d = c.getNextEdge();
+
+	       E oa = a.getOppositeEdge();
+	       E ob = b.getOppositeEdge();
+	       E oc = c.getOppositeEdge();
+	       E od = d.getOppositeEdge();
+
+	       F f1 = e.getLeftFace();
+	       F f2 = o.getLeftFace();
+
+	       V A = e.getTargetVertex();
+	       V C = b.getTargetVertex();
+	       V B = a.getTargetVertex();
+	       V D = c.getTargetVertex();
+
+	       // get edges with target C, those have to be relinked
+	       LinkedList<E> cTargetEdges = new LinkedList<E>();
+	       E actEdge = o;
+
+	       while (actEdge != oc){
+	           actEdge = actEdge.getOppositeEdge().getPreviousEdge();
+	           cTargetEdges.add(actEdge);
+	       }
+
+	       // remove vertices
+	       heds.removeEdge(a);
+	       heds.removeEdge(b);
+	       heds.removeEdge(c);
+	       heds.removeEdge(d);
+	       heds.removeEdge(e);
+	       heds.removeEdge(o);
+	       heds.removeFace(f1);
+	       heds.removeFace(f2);
+	       heds.removeVertex(C);
+//	       A.setConnectedEdge(oa);
+//	       B.setConnectedEdge(ob);
+//	       D.setConnectedEdge(od);
+
+	       // relink
+	       oa.linkOppositeEdge(ob);
+	       od.linkOppositeEdge(oc);
+
+	       for (E ee : cTargetEdges)
+	           if (ee.isValid())
+	               ee.setTargetVertex(A);
+
+	       return A;
+	   }
 
 
 	// TODO 1) also allow for two different HEDS

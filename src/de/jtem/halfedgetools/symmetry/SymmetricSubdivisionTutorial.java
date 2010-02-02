@@ -29,7 +29,7 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.symmetry.plugin;
+package de.jtem.halfedgetools.symmetry;
 
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.Inspector;
@@ -42,6 +42,7 @@ import de.jreality.plugin.menu.ExportMenu;
 import de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType;
 import de.jtem.halfedgetools.plugin.HalfedgeDebuggerPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
+import de.jtem.halfedgetools.plugin.buildin.SimplificationPlugin;
 import de.jtem.halfedgetools.plugin.buildin.TriangulatePlugin;
 import de.jtem.halfedgetools.plugin.buildin.topology.EdgeFlipperPlugin;
 import de.jtem.halfedgetools.plugin.buildin.topology.TopologyOperations;
@@ -49,6 +50,10 @@ import de.jtem.halfedgetools.symmetry.adapters.CyclesAdapter;
 import de.jtem.halfedgetools.symmetry.adapters.DebugBundleAdapter;
 import de.jtem.halfedgetools.symmetry.adapters.SymmetricCoordinateAdapter;
 import de.jtem.halfedgetools.symmetry.adapters.SymmetricSymmetryFaceColorAdapter;
+import de.jtem.halfedgetools.symmetry.plugin.CompactifierPlugin;
+import de.jtem.halfedgetools.symmetry.plugin.SymmetricCatmullClarkPlugin;
+import de.jtem.halfedgetools.symmetry.plugin.SymmetricLoopPlugin;
+import de.jtem.halfedgetools.symmetry.plugin.SymmetricSqrt3Plugin;
 import de.jtem.halfedgetools.symmetry.standard.SEdge;
 import de.jtem.halfedgetools.symmetry.standard.SFace;
 import de.jtem.halfedgetools.symmetry.standard.SHDS;
@@ -92,8 +97,8 @@ public class SymmetricSubdivisionTutorial {
 				new SSubdivisionAdapters.SSubdivisionEA(),
 				new SSubdivisionAdapters.SSubdivisionFA()
 		));
-
 		
+
 		viewer.registerPlugin(new CompactifierPlugin());
 		
 		viewer.registerPlugin(new EdgeFlipperPlugin<SVertex,SEdge,SFace,SHDS>());

@@ -1,6 +1,9 @@
 package de.jtem.halfedgetools.symmetry.standard.adapters;
 
+import java.util.List;
+
 import de.jreality.math.Rn;
+import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdgeInterpolator;
 import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionFaceBarycenter;
 import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionVertexAdapter;
@@ -52,6 +55,7 @@ public class SSubdivisionAdapters {
 			Rn.add(sum, sum, f.getEmbeddingOnBoundary(2));
 			Rn.times(sum, 1.0/3.0, sum);
 			return sum;
+			
 		}
 		
 	}
