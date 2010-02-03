@@ -30,7 +30,7 @@ LIBDIR=lib
 #web site
 RELDIR=rel
 
-#directories of the JUnit tests, all files that match Test*.java or *Test.java will be executed 
+#directories of the JUnit tests, all classes whose source files match Test*.java or *Test.java will be executed 
 TESTDIR=src-test
 TESTBINDIR=$(TESTDIR)
 #exclude the following tests  
@@ -56,7 +56,8 @@ JAVADOCOPTS= -author -protected -nodeprecated -nodeprecatedlist \
 	   
 
 #things that are removed recursively by the clean target
-CLEAN=$(BINDIR) $(DOCDIR) $(WEBDIR) $(RELDIR) .testscompiled `find $(TESTDIR) -name '*.class' 2> /dev/null` \
+CLEAN=$(BINDIR) $(DOCDIR) $(WEBDIR) $(RELDIR) .testscompiled \
+	`if [ "$(TESTDIR)" != "" ]; then find $(TESTDIR) -name '*.class' 2> /dev/null; fi` \
 	$(LIBDIR)/.lastUpdateDepsPlusADay $(LIBDIR)/.lastUpdateDepsCheck
 
 #jtem site url
@@ -70,13 +71,13 @@ JTEMURL=http://www.math.tu-berlin.de/jtem
 
 SOURCEFILES=$(shell find $(SRCDIRS) -name '*.java')
 
-TESTSOURCEFILES=$(shell find $(TESTDIR) -name '*.java' 2> /dev/null)
 ifeq ($(strip $(TESTDIR)),) 
   ALLTESTS=
   et_=
   TESTS=
   ext_= 
 else
+  TESTSOURCEFILES=$(shell find $(TESTDIR) -name '*.java' 2> /dev/null)
   ALLTESTS=$(shell  find $(TESTDIR) -name '*Test*.java' 2> /dev/null\
     | sed -e 's,$(TESTDIR)/,,g' -e 's/.java//g' -e 'y,/,.,' )
   et_=$(addprefix %,$(EXCLTESTS:.java=))
@@ -156,7 +157,9 @@ $(BINDIR): $(SOURCEFILES) | $(DEPS)
 	javac $(JAVACOPTS) \
 		`if [ -n "$${cp}" ]; then echo -classpath "$${cp}"; fi` \
 		-d $(BINDIR)/ \
-		$(SOURCEFILES) || { rm -rf $(BINDIR); echo "ERROR: compilation failed, folder \"$(BINDIR)\" removed"; exit 1; }
+		-sourcepath `echo $(SRCDIRS) | tr " " ";"`  \
+		$(SOURCEFILES) \
+		|| { rm -rf $(BINDIR); echo "ERROR: compilation failed, folder \"$(BINDIR)\" removed"; exit 1; }
 	@touch $(BINDIR)
 	@echo " - compilation of sources in \"$(SRCDIRS)\" successfull, class files in \"$(BINDIR)\" "
 	
@@ -258,13 +261,13 @@ $(RELDIR)/$(NAME).jar: $(BINDIR) $(RELDIR)/manifest.txt
 #archive of source and jars of all dependencies
 $(RELDIR)/$(NAME).tgz:  $(shell find $(SRCDIRS)) | updatedeps 
 	@if [ ! -d $(RELDIR) ]; then mkdir $(RELDIR); fi
-	@tar czf $(RELDIR)/$(NAME).tgz $(SRCDIRS) $(LIBDIR) --exclude-vcs
+	@tar czf $(RELDIR)/$(NAME).tgz $(SRCDIRS) $(LIBDIR) --exclude-vcs --exclude "\.*"
 	
 #jar and jars of all dependencies
 $(RELDIR)/$(NAME).zip:  $(RELDIR)/$(NAME).jar | updatedeps 
 	@if [ ! -d $(RELDIR) ]; then mkdir $(RELDIR); fi
 	@cd $(RELDIR); zip $(NAME).zip $(NAME).jar 
-	@if [ ! $(LIBDIR)="" -a -d $(LIBDIR) ]; then cd $(LIBDIR); zip -g ../$(RELDIR)/$(NAME).zip *; fi
+	@if [ ! $(LIBDIR)="" -a -d $(LIBDIR) ]; then cd $(LIBDIR); zip -g ../$(RELDIR)/$(NAME).zip *.jar *license* *License* *LICENSE*; fi
 	
 #archive of api-documentation
 $(RELDIR)/$(NAME)-api.tgz:  $(DOCDIR)
