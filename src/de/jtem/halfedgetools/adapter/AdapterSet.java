@@ -35,6 +35,21 @@ public class AdapterSet implements Set<Adapter<?>> {
 		add(a);
 	}
 	
+	
+	@SuppressWarnings("unchecked")
+	public <
+		A extends Adapter<VAL>,
+		VAL
+	> A queryAdapter(Class<A> aClass) {
+		for (Adapter<?> a : adapters) {
+			if (aClass.isAssignableFrom(a.getClass())) {
+				return (A)a;
+			}
+		}
+		return null;	
+	}
+	
+	
 	@SuppressWarnings("unchecked")
 	public <
 		A extends Annotation, 
