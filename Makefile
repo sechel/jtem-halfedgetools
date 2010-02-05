@@ -267,7 +267,7 @@ $(RELDIR)/$(NAME).tgz:  $(shell find $(SRCDIRS)) | updatedeps
 $(RELDIR)/$(NAME).zip:  $(RELDIR)/$(NAME).jar | updatedeps 
 	@if [ ! -d $(RELDIR) ]; then mkdir $(RELDIR); fi
 	@cd $(RELDIR); zip $(NAME).zip $(NAME).jar 
-	@if [ ! $(LIBDIR)="" -a -d $(LIBDIR) ]; then cd $(LIBDIR); zip -g ../$(RELDIR)/$(NAME).zip *.jar *license* *License* *LICENSE*; fi
+	@if [ $(LIBDIR) != "" -a -d $(LIBDIR) ]; then cd $(LIBDIR); zip -g ../$(RELDIR)/$(NAME).zip *.jar *license* *License* *LICENSE* >> /dev/null; fi
 	
 #archive of api-documentation
 $(RELDIR)/$(NAME)-api.tgz:  $(DOCDIR)
