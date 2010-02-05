@@ -20,6 +20,11 @@ public class FunctionalUtils {
 	}
 	
 	
+	public  static void addVectorToGradient(Gradient G, int startIndex, double[] d) {
+		for (int i = 0; i < d.length; i++) {
+			G.add(startIndex+i, d[i]);
+		}
+	}
 	public static double angle(double[] a, double[] b) {
 		return Math.atan2(Rn.euclideanNorm(Rn.crossProduct(null, a, b)),Rn.innerProduct(a, b));
 	}

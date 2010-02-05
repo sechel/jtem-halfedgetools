@@ -1,6 +1,5 @@
 package de.jtem.halfedgetools.functional.geodesic;
 
-import java.util.Arrays;
 import java.util.List;
 
 import de.jreality.math.Rn;
@@ -57,8 +56,6 @@ public class GeodesicAngleFunctional<
 						FunctionalUtils.getPosition(star.get((i+1)%nn), x, vt);
 						angles[i%(nn/2)] += ((i>=nn/2)?1.0:-1.0)*FunctionalUtils.angle(vs,vv,vt); 
 					}
-//					System.out.println("vertex " + v.getIndex());
-//					System.out.println("angles " + Arrays.toString(angles));
 					result += Rn.euclideanNormSquared(angles);
 				} else { // interior vertex of odd degree.
 					
@@ -115,15 +112,10 @@ public class GeodesicAngleFunctional<
 						Rn.times(dv,scale, dv);
 						Rn.times(dt,scale, dt);
 						
-						for (int j = 0; j < ds.length; j++) {
-							G.add(3*si+j, ds[j]);
-						}
-						for (int j = 0; j < dv.length; j++) {
-							G.add(3*vi+j, dv[j]);
-						}
-						for (int j = 0; j < dt.length; j++) {
-							G.add(3*ti+j, dt[j]);
-						}
+						FunctionalUtils.addVectorToGradient(G, 3*si, ds);
+						FunctionalUtils.addVectorToGradient(G, 3*vi, dv);
+						FunctionalUtils.addVectorToGradient(G, 3*ti, dt);
+						
 					}
 				} else { // interior vertex of odd degree.
 					

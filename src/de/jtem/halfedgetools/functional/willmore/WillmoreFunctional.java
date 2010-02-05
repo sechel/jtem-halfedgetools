@@ -36,9 +36,14 @@ public class WillmoreFunctional<V extends Vertex<V, E, F>, E extends Edge<V, E, 
 	// Calculate the energy of a given configuration
 	public double evaluate(HalfEdgeDataStructure<V, E, F> hds, DomainValue x) {
 		double result = -hds.numVertices() * Math.PI;
+		
 		for (E e : hds.getPositiveEdges()) {
 			double beta = 0.0;
-			if (e.getRightFace() == null || e.getLeftFace() == null) {
+			if(e.getLeftFace() == null) {
+				e = e.getOppositeEdge();
+			}
+			
+			if (e.getRightFace() == null) { // boundary edge
 				beta = BetaBnd(hds, x, e);
 				double betaInf = BetaInfinity(hds,x,e);
 				beta += betaInf;
@@ -57,7 +62,7 @@ public class WillmoreFunctional<V extends Vertex<V, E, F>, E extends Edge<V, E, 
 		//output
 			Gradient G
 	) {
-		G.setZero();
+//		G.setZero();
 		for (E e : hds.getPositiveEdges()) {
 			if(e.getRightFace() == null || e.getLeftFace() == null) {
 				//boundary edges
@@ -248,27 +253,19 @@ public class WillmoreFunctional<V extends Vertex<V, E, F>, E extends Edge<V, E, 
 
 		// derivative wrt i
 		BetaDk(vl, vk, vi, vj, dk);
-		for (int m = 0; m < dk.length; m++) {
-			G.add(3 * i + m, dk[m]);
-		}
+		FunctionalUtils.addVectorToGradient(G, 3*i, dk);
 
 		// derivative wrt j
 		BetaDk(vk, vl, vj, vi, dk);
-		for (int m = 0; m < dk.length; m++) {
-			G.add(3 * j + m, dk[m]);
-		}
+		FunctionalUtils.addVectorToGradient(G, 3*j, dk);
 
 		// derivative wrt k
 		BetaDk(vi, vj, vk, vl, dk);
-		for (int m = 0; m < dk.length; m++) {
-			G.add(3 * k + m, dk[m]);
-		}
+		FunctionalUtils.addVectorToGradient(G, 3*k, dk);
 
 		// derivative wrt l
 		BetaDk(vj, vi, vl, vk, dk);
-		for (int m = 0; m < dk.length; m++) {
-			G.add(3 * l + m, dk[m]);
-		}
+		FunctionalUtils.addVectorToGradient(G, 3*l, dk);
 	}
 
 	public void BetaDk(
@@ -323,19 +320,9 @@ public class WillmoreFunctional<V extends Vertex<V, E, F>, E extends Edge<V, E, 
 
 		FunctionalUtils.angleGradient(vj, vk, vi, dj, dk, di);
 		//derivative with respect to vi
-		for (int m = 0; m < di.length; m++) {
-			G.add(3*i+m, -di[m]);
-		}
-		
-		//derivative with respect to vj
-		for (int m = 0; m < dj.length; m++) {
-			G.add(3*j+m, -dj[m]);
-		}
-		
-		//derivative with respect to vk
-		for (int m = 0; m < di.length; m++) {
-			G.add(3*k+m, -dk[m]);
-		}
+		FunctionalUtils.addVectorToGradient(G, 3*i, Rn.negate(null, di));
+		FunctionalUtils.addVectorToGradient(G, 3*j, Rn.negate(null, dj));
+		FunctionalUtils.addVectorToGradient(G, 3*k, Rn.negate(null, dk));
 	}
 
 	public void BetaInfinityD(
@@ -352,7 +339,7 @@ public class WillmoreFunctional<V extends Vertex<V, E, F>, E extends Edge<V, E, 
 		       dj = new double[3],
 		       dk = new double[3];
 		
-		if (e.getRightFace() == null) {
+		if (e.getLeftFace() != null) {
 			e = e.getOppositeEdge();
 		} 
 		
@@ -368,21 +355,9 @@ public class WillmoreFunctional<V extends Vertex<V, E, F>, E extends Edge<V, E, 
 		FunctionalUtils.angleGradient(vi, vj, vk, di, dj, dk);
 		// Note: angleGradient points in the opposite direction since the angle 
 		//       is Pi-angle(vi,vj,vk)!
-		
-		//derivative with respect to vi
-		for (int m = 0; m < di.length; m++) {
-			G.add(3*i+m, -di[m]);
-		}
-		
-		//derivative with respect to vj
-		for (int m = 0; m < di.length; m++) {
-			G.add(3*j+m, -dj[m]);
-		}
-
-		//derivative with respect to vk
-		for (int m = 0; m < dk.length; m++) {
-			G.add(3*k+m, -dk[m]);
-		}
+		FunctionalUtils.addVectorToGradient(G, 3*i, Rn.negate(null, di));
+		FunctionalUtils.addVectorToGradient(G, 3*j, Rn.negate(null, dj));
+		FunctionalUtils.addVectorToGradient(G, 3*k, Rn.negate(null, dk));
 	}
 	
 }
