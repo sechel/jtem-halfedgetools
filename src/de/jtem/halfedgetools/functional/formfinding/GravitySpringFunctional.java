@@ -22,19 +22,19 @@ public class GravitySpringFunctional<
 	implements Functional<V, E, F> {
 
 	private Length<E>
-		l0 = null;
+		length = null;
 	private WeightFunction<E> 
-		w = null;
+		weight = null;
 	private double
-		g = 9.81;
+		gravity = 9.81;
 
 	private double[] 
-	    dir = new double[] {0.0,1.0,0.0};
+	    dir = new double[] {0,0,1};
 	
 	public GravitySpringFunctional(Length<E> l0, WeightFunction<E> w, double g, double[] dir) {
-		this.l0 = l0;
-		this.w = w;
-		this.g = g;
+		this.length = l0;
+		this.weight = w;
+		this.gravity = g;
 		Rn.times(this.dir, g, Rn.normalize(null, dir));
 	}
 	
@@ -62,8 +62,8 @@ public class GravitySpringFunctional<
 			if(e.getLeftFace() != null && e.getRightFace() != null) {
 				FunctionalUtils.getPosition(e.getStartVertex(), x, s);
 				FunctionalUtils.getPosition(e.getTargetVertex(), x, t);
-				double length = Rn.euclideanDistance(s, t);
-				result += w.getWeight(e)*(length-l0.getTargetLength(e))*(length-l0.getTargetLength(e));
+				double el = Rn.euclideanDistance(s, t);
+				result += weight.getWeight(e)*(el-length.getTargetLength(e) )*(el-length.getTargetLength(e));
 			}
 		}
 		for(V v : hds.getVertices()) {
@@ -90,13 +90,13 @@ public class GravitySpringFunctional<
 		for (V v : G.getVertices()) {
 			FunctionalUtils.getPosition(v, x, vk);
 			for (E e : HalfEdgeUtils.incomingEdges(v)) {
-				double l = l0.getTargetLength(e);
+				double l = length.getTargetLength(e);
 				FunctionalUtils.getPosition(e.getStartVertex(), x, vj);
 				Rn.subtract(smt, vk, vj);
 				double factor = (1-l/Rn.euclideanDistance(vk, vj));
 				int off = v.getIndex() * 3;
 				for (int d = 0; d < 3; d++) {
-					grad.add(off + d, 2*(vk[d] - vj[d]) * factor * w.getWeight(e));
+					grad.add(off + d, 2*(vk[d] - vj[d]) * factor * weight.getWeight(e));
 				}
 			}
 			if(!HalfEdgeUtils.isBoundaryVertex(v)){
@@ -135,5 +135,21 @@ public class GravitySpringFunctional<
 		return false;
 	}
 
+	public void setLength(Length<E> length) {
+		this.length = length;
+	}
+
+	public void setWeight(WeightFunction<E> weight) {
+		this.weight = weight;
+	}
+
+	public void setGravity(double gravity) {
+		this.gravity = gravity;
+		Rn.times(this.dir, gravity, Rn.normalize(null, dir));
+	}
+
+	public void setDirection(double[] dir) {
+		Rn.times(this.dir, gravity, Rn.normalize(null, dir));
+	}
 
 }
