@@ -1,6 +1,5 @@
 package de.jtem.halfedgetools.functional.electrostatic;
 
-import java.util.Arrays;
 import java.util.List;
 
 import de.jreality.math.Rn;

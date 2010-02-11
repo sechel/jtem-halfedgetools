@@ -46,7 +46,7 @@ import de.jtem.halfedgetools.functional.Gradient;
 import de.jtem.halfedgetools.functional.Hessian;
 import de.jtem.halfedgetools.functional.planarfaces.PlanarFacesAdapters.VolumeWeight;
 
-public class VolumeFunctional <
+public class VolumeFuctional <
 	V extends Vertex<V, E, F>,
 	E extends Edge<V, E, F>,
 	F extends Face<V, E, F>
@@ -58,7 +58,7 @@ public class VolumeFunctional <
 		scale = 1.0,
 		alpha = 0.0;
 	
-	public VolumeFunctional(VolumeWeight<F> weight, double scale, double alpha) {
+	public VolumeFuctional(VolumeWeight<F> weight, double scale, double alpha) {
 		this.weight = weight;
 		this.scale = scale;
 		this.alpha = alpha;
@@ -74,7 +74,6 @@ public class VolumeFunctional <
 		Gradient G, 
 		Hessian H
 	) {
-		
 		E.setZero();
 		for (F f : hds.getFaces()) { // flatness
 			E.add(getDet2(x, f) * weight.getWeight(f) * weight.getWeight(f) * scale);
@@ -224,10 +223,5 @@ public class VolumeFunctional <
     public boolean hasHessian() {
     	return false;
     }
-
-
-	public void setScale(double s) {
-		scale = s;
-	}
     
 }

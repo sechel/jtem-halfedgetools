@@ -36,6 +36,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
+import de.jtem.halfedgetools.image.ImageHook;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -82,6 +83,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Triangulator");
+		info.icon = ImageHook.getIcon("triangulate.png");
 		return info;
 	}
 

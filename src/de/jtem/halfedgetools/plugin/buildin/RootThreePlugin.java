@@ -41,6 +41,7 @@ import de.jtem.halfedgetools.algorithm.stefansub.Subdivision;
 import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdgeInterpolator;
 import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionFaceBarycenter;
 import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionVertexAdapter;
+import de.jtem.halfedgetools.image.ImageHook;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.util.surfaceutilities.SurfaceException;
@@ -101,6 +102,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Root three Subdivision");
+		info.icon = ImageHook.getIcon("rootThree.png");
 		return info;
 	}
 
