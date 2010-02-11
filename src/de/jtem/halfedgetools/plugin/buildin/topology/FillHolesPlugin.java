@@ -38,6 +38,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.functional.alexandrov.SurfaceUtility;
+import de.jtem.halfedgetools.image.ImageHook;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
 import de.jtem.halfedgetools.util.surfaceutilities.SurfaceException;
@@ -94,7 +95,9 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 
 	
 	public PluginInfo getPluginInfo() {
-		return new PluginInfo("Holes filler", "Kristoffer Josefsson");
+		PluginInfo info = new PluginInfo("Holes filler", "Kristoffer Josefsson");
+		info.icon = ImageHook.getIcon("fill.png");
+		return info;
 	}
 	
 	
