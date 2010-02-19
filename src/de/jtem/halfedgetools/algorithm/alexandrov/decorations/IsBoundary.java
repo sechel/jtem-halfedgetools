@@ -29,25 +29,12 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.functional.alexandrov.decorations;
+package de.jtem.halfedgetools.algorithm.alexandrov.decorations;
 
+public interface IsBoundary {
 
-import javax.vecmath.Point2d;
-
-
-/**
- * Implementers will have the getXY and setXY methods. It uses the
- * vecmath.Poiny2D class 
- * <p>
- * Copyright 2005 <a href="http://www.sechel.de">Stefan Sechelmann</a>
- * <a href="http://www.math.tu-berlin.de/geometrie">TU-Berlin</a> 
- * @author Stefan Sechelmann
- * @see javax.vecmath.Point2d
- */
-public interface HasXY {
-
-	public void setXY(Point2d p);
+	public Boolean isBoundary();
 	
-	public Point2d getXY();
+	public void setBoundary(Boolean border);
 	
 }

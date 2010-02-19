@@ -29,7 +29,7 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.functional.alexandrov;
+package de.jtem.halfedgetools.algorithm.alexandrov;
 
 
 import java.util.HashSet;
@@ -44,11 +44,11 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasRadius;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasXYZW;
 import de.jtem.halfedgetools.algorithm.delaunay.Delaunay;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.HasLength;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.IsFlippable;
-import de.jtem.halfedgetools.functional.alexandrov.decorations.HasRadius;
-import de.jtem.halfedgetools.functional.alexandrov.decorations.HasXYZW;
 import de.jtem.halfedgetools.util.Consistency;
 import de.jtem.halfedgetools.util.ConsistencyCheck;
 import de.jtem.halfedgetools.util.TriangulationException;
@@ -66,7 +66,7 @@ import de.varylab.mtjoptimization.newton.NewtonSolver;
  * <a href="http://www.math.tu-berlin.de/geometrie">TU-Berlin</a> 
  * @author Stefan Sechelmann
  */
-public class Alexandrov {
+public class AlexandrovSimple {
 
 	private static Double
 		solverError = 1E-10;
@@ -112,7 +112,7 @@ public class Alexandrov {
 	
 	private static class TipRootFinder <
 		V extends Vertex<V, E, F> & HasXYZW & HasRadius,
-		E extends Edge<V, E, F> & IsFlippable&HasLength,
+		E extends Edge<V, E, F> & IsFlippable &HasLength,
 		F extends Face<V, E, F>
 	> implements RealVectorValuedFunctionOfSeveralVariablesWithJacobien{
 
@@ -171,7 +171,7 @@ public class Alexandrov {
 
 	private static  <
 		V extends Vertex<V, E, F> & HasXYZW & HasRadius,
-		E extends Edge<V, E, F> & IsFlippable&HasLength,
+		E extends Edge<V, E, F> & IsFlippable &HasLength,
 		F extends Face<V, E, F>
 	> Point4d getPyramideTip(E edge){
 		TipRootFinder<V, E, F> rootFinder = new TipRootFinder<V, E, F>(edge);
@@ -200,7 +200,7 @@ public class Alexandrov {
 			throw new TriangulationException("Triangulation is no sphere!");
 		if (!CPMCurvatureFunctional.isMetricConvex(graph))
 			throw new TriangulationException("Metric not convex!");
-		
+		System.err.println("Alexandrov Simple!");
 		// flip counters are set to zero
 		resetFlipStates(graph);
 		
@@ -236,12 +236,10 @@ public class Alexandrov {
 //		DBGTracer.msg(jacobi.toString());
 		
 		double max_delta = 0.75;
-		double boost = 1;
 		double delta = max_delta;
-		
-		CPMLinearizable<V, E, F> fun = new CPMLinearizable<V, E, F>(graph);
 		NewtonSolver solver = new NewtonSolver();
 		solver.setError(solverError);
+		CPMLinearizable<V, E, F> fun = new CPMLinearizable<V, E, F>(graph);
 		Vector kappa = CPMCurvatureFunctional.getCurvature(graph);
 //		DBGTracer.msg("start kappas:");
 //		DBGTracer.msg(kappa.toString());
@@ -270,7 +268,6 @@ public class Alexandrov {
 				stepKappa = kappa.copy().add(-delta, kappa);
 				newRadii = oldRadii;
 //				DBGTracer.msg("triangle inequation! -> delta = " + delta);
-				boost = 1;
 				actInteration++;
 				continue;
 			}
@@ -285,30 +282,24 @@ public class Alexandrov {
 				E flip = concaveEdges.iterator().next();
 				flip.flip();
 //				DBGTracer.msg("Edge " + flip + "flipped");
-				boost = 1;
-				max_delta = delta;
 				actInteration++;
 				continue;
 			}
 			// step was too large
 			if (concaveEdges.size() > 1){
-				delta *= 0.2;
-//				delta = Math.pow(delta, 2);
+				delta = Math.pow(delta, 2);
 //				DBGTracer.msg("concave edges: " + concaveEdges);
 //				DBGTracer.msg("-> delta = " + delta);
 				stepKappa = kappa.copy().add(-delta, kappa);
 				newRadii = oldRadii;
-				boost = 1;
 				actInteration++;
 				continue;
 			}
-			max_delta = delta;
 			kappa.set(stepKappa);
-			delta = Math.pow(max_delta, 1.0 / boost);
+			delta = max_delta;
 //			DBGTracer.msg("resetting or boosting delta to " + delta);
 			stepKappa = stepKappa.copy().add(-delta, stepKappa);
-//			DBGTracer.msg("|Kappa|: " + kappa.norm(Norm.Two) + " boost: " + boost);
-			boost *= 2;
+//			DBGTracer.msg("|Kappa|: " + kappa.norm(Norm.Two));
 			actInteration++;
 			Vector radii = new DenseVector(graph.numVertices());
 			getRadii(graph, radii);
@@ -348,7 +339,7 @@ public class Alexandrov {
 		}
 	}
 	
-	public static <
+	protected static <
 	V extends Vertex<V, E, F> & HasXYZW & HasRadius,
 	E extends Edge<V, E, F> & IsFlippable,
 	F extends Face<V, E, F>

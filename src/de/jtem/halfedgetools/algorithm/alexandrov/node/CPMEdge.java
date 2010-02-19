@@ -29,15 +29,15 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.functional.alexandrov.node;
+package de.jtem.halfedgetools.algorithm.alexandrov.node;
 
 import de.jtem.halfedge.Edge;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasAngle;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.IsBoundary;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.IsHidable;
 import de.jtem.halfedgetools.algorithm.delaunay.Delaunay;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.HasLength;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.IsFlippable;
-import de.jtem.halfedgetools.functional.alexandrov.decorations.HasAngle;
-import de.jtem.halfedgetools.functional.alexandrov.decorations.IsBoundary;
-import de.jtem.halfedgetools.functional.alexandrov.decorations.IsHidable;
 import de.jtem.halfedgetools.util.TriangulationException;
 
 

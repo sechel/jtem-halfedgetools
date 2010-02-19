@@ -29,12 +29,52 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.functional.alexandrov.decorations;
+package de.jtem.halfedgetools.algorithm.alexandrov.node;
 
-public interface IsHidable {
 
-	public Boolean isHidden();
+import javax.vecmath.Color3f;
+import javax.vecmath.Point4d;
 
-	public void setHidden(Boolean hide);
+import de.jtem.halfedge.Face;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasColor;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasXYZW;
+
+
+/**
+ * The face class for the alexandrov project
+ * <p>
+ * Copyright 2005 <a href="http://www.sechel.de">Stefan Sechelmann</a>
+ * <a href="http://www.math.tu-berlin.de/geometrie">TU-Berlin</a> 
+ * @author Stefan Sechelmann
+ */
+public class CPMFace extends Face<CPMVertex, CPMEdge, CPMFace> implements HasXYZW, HasColor{
+
+	private static final long 
+		serialVersionUID = 1L;
+	private Point4d
+		pos = new Point4d();
+	private Color3f
+		color = new Color3f();
+
+//	@Override
+	protected CPMFace getThis() {
+		return this;
+	}
+	
+	public Point4d getXYZW() {
+		return pos;
+	}
+	
+	public void setXYZW(Point4d p) {
+		pos.set(p);
+	}
+
+	public void setColor(Color3f c) {
+		color.set(c);
+	}
+	
+	public Color3f getColor() {
+		return color;
+	}
 	
 }

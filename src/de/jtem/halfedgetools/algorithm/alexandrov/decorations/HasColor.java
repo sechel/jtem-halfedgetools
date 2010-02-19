@@ -29,12 +29,14 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.functional.alexandrov.decorations;
+package de.jtem.halfedgetools.algorithm.alexandrov.decorations;
 
-public interface IsBoundary {
+import javax.vecmath.Color3f;
 
-	public Boolean isBoundary();
-	
-	public void setBoundary(Boolean border);
+public interface HasColor {
+
+	public Color3f getColor();
+
+	public void setColor(Color3f label);
 	
 }

@@ -29,7 +29,7 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.functional.alexandrov;
+package de.jtem.halfedgetools.algorithm.alexandrov;
 
 import no.uib.cipr.matrix.Matrix;
 import no.uib.cipr.matrix.Vector;
@@ -37,10 +37,10 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasRadius;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasXYZW;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.HasLength;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.IsFlippable;
-import de.jtem.halfedgetools.functional.alexandrov.decorations.HasRadius;
-import de.jtem.halfedgetools.functional.alexandrov.decorations.HasXYZW;
 import de.jtem.halfedgetools.util.TriangulationException;
 import de.varylab.mtjoptimization.FunctionNotDefinedException;
 import de.varylab.mtjoptimization.Linearizable;

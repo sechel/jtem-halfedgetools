@@ -29,7 +29,7 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.functional.alexandrov;
+package de.jtem.halfedgetools.algorithm.alexandrov;
 
 import static java.lang.Math.PI;
 import static java.lang.Math.acos;
@@ -48,12 +48,12 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasRadius;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasXYZW;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.IsBoundary;
 import de.jtem.halfedgetools.algorithm.delaunay.Delaunay;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.HasLength;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.IsFlippable;
-import de.jtem.halfedgetools.functional.alexandrov.decorations.HasRadius;
-import de.jtem.halfedgetools.functional.alexandrov.decorations.HasXYZW;
-import de.jtem.halfedgetools.functional.alexandrov.decorations.IsBoundary;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.halfedgetools.util.TriangulationException;
 

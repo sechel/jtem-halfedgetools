@@ -40,8 +40,8 @@ import java.util.Set;
 
 import de.jtem.discretegroup.core.DiscreteGroup;
 import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedgetools.algorithm.alexandrov.SurfaceUtility;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
-import de.jtem.halfedgetools.functional.alexandrov.SurfaceUtility;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.halfedgetools.util.PathUtility;
 import de.jtem.halfedgetools.util.SurfaceException;

@@ -29,52 +29,90 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.functional.alexandrov.node;
+package de.jtem.halfedgetools.algorithm.alexandrov.node;
 
-
-import javax.vecmath.Color3f;
+import javax.vecmath.Point2d;
 import javax.vecmath.Point4d;
 
-import de.jtem.halfedge.Face;
-import de.jtem.halfedgetools.functional.alexandrov.decorations.HasColor;
-import de.jtem.halfedgetools.functional.alexandrov.decorations.HasXYZW;
-
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasCurvature;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasRadius;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasXY;
+import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasXYZW;
 
 /**
- * The face class for the alexandrov project
+ * The vertex class for the alexandrov project
  * <p>
  * Copyright 2005 <a href="http://www.sechel.de">Stefan Sechelmann</a>
  * <a href="http://www.math.tu-berlin.de/geometrie">TU-Berlin</a> 
  * @author Stefan Sechelmann
  */
-public class CPMFace extends Face<CPMVertex, CPMEdge, CPMFace> implements HasXYZW, HasColor{
+public class CPMVertex extends Vertex<CPMVertex, CPMEdge, CPMFace> implements HasXYZW, HasXY, HasRadius, HasCurvature{
 
 	private static final long 
 		serialVersionUID = 1L;
 	private Point4d
-		pos = new Point4d();
-	private Color3f
-		color = new Color3f();
+		pos4d = new Point4d();
+	private Point2d
+		pos2d = new Point2d();
+	private Double
+		radius = 100.0;
+	
+//	/*
+//	 * Unfold project only
+//	 */
+//	private Boolean curvature = true;
+//	
 
+	public Boolean hasCurvature() {
+		return true;
+	}
+	
+	public void setCurvature(Boolean c) {
+//		curvature = c;
+	}
+	
 //	@Override
-	protected CPMFace getThis() {
+	protected CPMVertex getThis() {
 		return this;
 	}
 	
 	public Point4d getXYZW() {
-		return pos;
-	}
-	
-	public void setXYZW(Point4d p) {
-		pos.set(p);
+		return pos4d;
 	}
 
-	public void setColor(Color3f c) {
-		color.set(c);
+	public void setXYZW(Point4d p) {
+		pos4d.set(p);
 	}
-	
-	public Color3f getColor() {
-		return color;
+
+	public void setXY(Point2d p) {
+		pos2d.set(p);
+	}
+
+	public Point2d getXY() {
+		return pos2d;
+	}
+
+	public Double getRadius() {
+		if (radius == null)
+			radius = 100.0;
+		return radius;
+	}
+
+	public void setRadius(Double radius) {
+		this.radius = radius;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + " radius = " + radius;
+	}
+
+	public double[] getPosition() {
+		return new double[]{pos4d.x, pos4d.y, pos4d.z, pos4d.w}; 
+	}
+	public void setPosition(double[] pos) {
+		setXYZW(new Point4d(pos[0], pos[1], pos[2], pos[3]));
 	}
 	
 }

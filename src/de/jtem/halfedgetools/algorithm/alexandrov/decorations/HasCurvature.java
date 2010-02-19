@@ -29,11 +29,12 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.functional.alexandrov;
-public interface RemoteControl{
+package de.jtem.halfedgetools.algorithm.alexandrov.decorations;
 
-	public void setStopAsFastAsPossible(boolean stop);
-	
-	public boolean isStopAsFastAsPossible();
+public interface HasCurvature {
+
+	public Boolean hasCurvature();
+
+	public void setCurvature(Boolean curvature);
 	
 }
