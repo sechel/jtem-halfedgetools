@@ -31,7 +31,7 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.algorithm.delaunay.decorations;
 
-import de.jtem.halfedgetools.util.triangulationutilities.TriangulationException;
+import de.jtem.halfedgetools.util.TriangulationException;
 
 
 

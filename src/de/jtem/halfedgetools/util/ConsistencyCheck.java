@@ -29,13 +29,12 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.util.triangulationutilities;
+package de.jtem.halfedgetools.util;
 
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 
 
 /**

@@ -9,7 +9,6 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
-import de.jtem.halfedgetools.util.surfaceutilities.SurfaceException;
 
 public class DooSabinLinear {
 

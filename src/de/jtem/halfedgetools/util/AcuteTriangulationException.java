@@ -29,23 +29,15 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.util.triangulationutilities;
+package de.jtem.halfedgetools.util;
 
-/**
- * Thrown if a datastructure represents no triangulation.
- * <p>
- * Copyright 2005 <a href="http://www.sechel.de">Stefan Sechelmann</a>
- * <a href="http://www.math.tu-berlin.de/geometrie">TU-Berlin</a> 
- * @author Stefan Sechelmann
- * @see halfedge.HalfEdgeDataStructure
- * @see alexandrov.Alexandrov
- */
-public class TriangulationException extends Exception {
+
+public class AcuteTriangulationException extends Exception {
 
 	private static final long 
 		serialVersionUID = 1L;
 	
-	public TriangulationException(String msg){
+	public AcuteTriangulationException(String msg){
 		super(msg);
 	}
 }

@@ -52,8 +52,8 @@ import de.jtem.halfedgetools.functional.alexandrov.decorations.HasXY;
 import de.jtem.halfedgetools.functional.alexandrov.decorations.HasXYZW;
 import de.jtem.halfedgetools.functional.alexandrov.decorations.IsBoundary;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
-import de.jtem.halfedgetools.util.surfaceutilities.SurfaceException;
-import de.jtem.halfedgetools.util.triangulationutilities.TriangulationException;
+import de.jtem.halfedgetools.util.SurfaceException;
+import de.jtem.halfedgetools.util.TriangulationException;
 
 
 /**

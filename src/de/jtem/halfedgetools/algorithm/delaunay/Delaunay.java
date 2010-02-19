@@ -46,8 +46,8 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.HasLength;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.IsFlippable;
-import de.jtem.halfedgetools.util.triangulationutilities.ConsistencyCheck;
-import de.jtem.halfedgetools.util.triangulationutilities.TriangulationException;
+import de.jtem.halfedgetools.util.ConsistencyCheck;
+import de.jtem.halfedgetools.util.TriangulationException;
 
 /**
  * Construct a delaunay triangulation from a given triangulation

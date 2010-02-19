@@ -11,10 +11,10 @@ import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
-import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class EdgeCollapsePlugin extends HalfedgeAlgorithmPlugin {
@@ -34,7 +34,7 @@ public class EdgeCollapsePlugin extends HalfedgeAlgorithmPlugin {
 			TypedAdapterSet<double[]> a = hcp.getAdapters().query(double[].class);
 			double[] p1 = a.get(Position.class, e.getTargetVertex());
 			double[] p2 = a.get(Position.class, e.getStartVertex());
-			V v = HalfEdgeTopologyOperations.collapseEdge(e);
+			V v = TopologyAlgorithms.collapseEdge(e);
 			a.set(Position.class, v, Rn.linearCombination(null, 0.5, p1, 0.5, p2));
 			s.setSelected(v, true);
 		}

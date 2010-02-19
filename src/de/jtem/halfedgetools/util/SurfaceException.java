@@ -29,7 +29,7 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.util.surfaceutilities;
+package de.jtem.halfedgetools.util;
 
 public class SurfaceException extends Exception {
 

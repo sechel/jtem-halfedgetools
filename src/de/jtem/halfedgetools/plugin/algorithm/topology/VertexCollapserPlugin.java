@@ -39,10 +39,10 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
-import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class VertexCollapserPlugin extends HalfedgeAlgorithmPlugin {
@@ -59,7 +59,7 @@ public class VertexCollapserPlugin extends HalfedgeAlgorithmPlugin {
 		if (vertices.isEmpty()) return;
 		HalfedgeSelection s = new HalfedgeSelection();
 		for (V v : vertices) {
-			F f = HalfEdgeTopologyOperations.collapseVertex(v);
+			F f = TopologyAlgorithms.collapseVertex(v);
 			s.setSelected(f, true);
 		}
 		hif.setSelection(s);

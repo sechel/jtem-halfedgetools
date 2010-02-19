@@ -39,9 +39,9 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class EdgeFlipperPlugin extends HalfedgeAlgorithmPlugin {
@@ -58,7 +58,7 @@ public class EdgeFlipperPlugin extends HalfedgeAlgorithmPlugin {
 		if (edges.isEmpty()) return;
 		for (E e : edges) {
 			if (e.isPositive()) continue;
-			HalfEdgeTopologyOperations.flipEdge(e);
+			TopologyAlgorithms.flipEdge(e);
 		}
 		hcp.update();
 	}

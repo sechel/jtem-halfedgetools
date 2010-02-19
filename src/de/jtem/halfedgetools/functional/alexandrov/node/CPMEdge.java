@@ -38,7 +38,7 @@ import de.jtem.halfedgetools.algorithm.delaunay.decorations.IsFlippable;
 import de.jtem.halfedgetools.functional.alexandrov.decorations.HasAngle;
 import de.jtem.halfedgetools.functional.alexandrov.decorations.IsBoundary;
 import de.jtem.halfedgetools.functional.alexandrov.decorations.IsHidable;
-import de.jtem.halfedgetools.util.triangulationutilities.TriangulationException;
+import de.jtem.halfedgetools.util.TriangulationException;
 
 
 /**

@@ -42,10 +42,10 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
-import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class FaceSplitterPlugin extends HalfedgeAlgorithmPlugin {
@@ -72,7 +72,7 @@ public class FaceSplitterPlugin extends HalfedgeAlgorithmPlugin {
 				n+=1.0;
 			}
 			pos = Rn.times(null, 1/n, pos);
-			V v = HalfEdgeTopologyOperations.splitFace(f);
+			V v = TopologyAlgorithms.splitFace(f);
 			vc.set(v, pos);
 		}
 		hif.setSelection(s);

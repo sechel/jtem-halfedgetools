@@ -43,7 +43,7 @@ import de.jtem.halfedgetools.functional.alexandrov.SurfaceUtility;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
-import de.jtem.halfedgetools.util.surfaceutilities.SurfaceException;
+import de.jtem.halfedgetools.util.SurfaceException;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class FillHolesPlugin extends HalfedgeAlgorithmPlugin {

@@ -29,7 +29,7 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.util;
+package de.jtem.halfedgetools.algorithm.topology;
 
 
 import java.util.ArrayList;
@@ -45,8 +45,9 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 
-public class HalfEdgeTopologyOperations {
+public class TopologyAlgorithms {
 
 	public static <
 	V extends Vertex<V, E, F>,

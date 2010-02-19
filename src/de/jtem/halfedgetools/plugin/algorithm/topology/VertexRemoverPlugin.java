@@ -39,9 +39,9 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class VertexRemoverPlugin extends HalfedgeAlgorithmPlugin {
@@ -57,7 +57,7 @@ public class VertexRemoverPlugin extends HalfedgeAlgorithmPlugin {
 		Set<V> vertices = hif.getSelection().getVertices(hds);
 		if (vertices.isEmpty()) return;
 		for (V v : vertices) {
-			HalfEdgeTopologyOperations.removeVertex(v);
+			TopologyAlgorithms.removeVertex(v);
 		}
 		hcp.update();
 	}

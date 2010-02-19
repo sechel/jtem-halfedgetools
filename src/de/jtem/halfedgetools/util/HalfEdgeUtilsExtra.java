@@ -43,7 +43,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.util.triangulationutilities.ConsistencyCheck;
+import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 /**
  * Some utilities, not present in the current HalfEdgeUtils, that we need for alexandrov project
  * Feel free to add to HalfEdgeUtils, if they are considered universal.
@@ -82,8 +82,8 @@ public class HalfEdgeUtilsExtra {
 			return;
 		}
 		
-		HalfEdgeTopologyOperations.removeAllFaces(dest);
-		HalfEdgeTopologyOperations.removeAllEdges(dest);
+		TopologyAlgorithms.removeAllFaces(dest);
+		TopologyAlgorithms.removeAllEdges(dest);
 		
 		dest.addNewEdges(source.numEdges());
 		dest.addNewFaces(source.numFaces());

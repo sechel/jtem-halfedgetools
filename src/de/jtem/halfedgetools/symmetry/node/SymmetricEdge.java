@@ -44,8 +44,8 @@ import de.jtem.halfedgetools.adapter.Bundle;
 import de.jtem.halfedgetools.adapter.Bundle.BundleType;
 import de.jtem.halfedgetools.adapter.Bundle.DisplayType;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.IsFlippable;
+import de.jtem.halfedgetools.util.TriangulationException;
 import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
-import de.jtem.halfedgetools.util.triangulationutilities.TriangulationException;
 
 public abstract class SymmetricEdge <
 V extends SymmetricVertex<V, E, F>, 

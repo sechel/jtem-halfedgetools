@@ -77,12 +77,12 @@ import de.jtem.discretegroup.core.FiniteStateAutomaton;
 import de.jtem.discretegroup.core.Platycosm;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.symmetry.node.SEdge;
 import de.jtem.halfedgetools.symmetry.node.SFace;
 import de.jtem.halfedgetools.symmetry.node.SHDS;
 import de.jtem.halfedgetools.symmetry.node.SVertex;
-import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -474,7 +474,7 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 			generators.add(gen);
 			generators.add(genInv);
 			
-			Set<SEdge> symmetryCycle = HalfEdgeTopologyOperations.glueFacesAlongCycle(f1, f2, e1, e2);
+			Set<SEdge> symmetryCycle = TopologyAlgorithms.glueFacesAlongCycle(f1, f2, e1, e2);
 			
 			hds.getSymmetryCycles().paths.put(symmetryCycle,genInv);
 			

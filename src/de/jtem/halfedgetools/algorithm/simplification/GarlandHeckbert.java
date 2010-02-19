@@ -20,7 +20,7 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.calculator.FaceAreaCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.FaceNormalCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
-import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
+import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 
 public class GarlandHeckbert<
@@ -135,7 +135,7 @@ public class GarlandHeckbert<
 
 			if (checkLinkCondition(edge)) {
 				// v = HalfEdgeTopologyOperations.collapseEdge(edge);
-				v = HalfEdgeTopologyOperations.collapse(edge);
+				v = TopologyAlgorithms.collapse(edge);
 				if (v == null) { // topology not valid
 					System.out.println("Skipping edge as link condition failed."); // this should not happen..
 					return null;

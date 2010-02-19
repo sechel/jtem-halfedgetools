@@ -42,10 +42,10 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
-import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class FaceScalerPlugin extends HalfedgeAlgorithmPlugin {
@@ -82,7 +82,7 @@ public class FaceScalerPlugin extends HalfedgeAlgorithmPlugin {
 			}
 			pos = Rn.times(null, 1/((double)n), pos);
 			
-			F f = HalfEdgeTopologyOperations.scaleFace(oldF);
+			F f = TopologyAlgorithms.scaleFace(oldF);
 			i = 0;
 			for(V v : HalfEdgeUtils.boundaryVertices(f)) {
 				vc.set(v, Rn.linearCombination(null, t, pos, 1.0-t, oldVs[(i+twist-1+n)%n]));

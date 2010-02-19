@@ -40,12 +40,12 @@ import java.util.Set;
 
 import de.jtem.discretegroup.core.DiscreteGroup;
 import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.functional.alexandrov.SurfaceUtility;
-import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.halfedgetools.util.PathUtility;
+import de.jtem.halfedgetools.util.SurfaceException;
 import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
-import de.jtem.halfedgetools.util.surfaceutilities.SurfaceException;
 
 public class SymmetricHDS<
 V extends SymmetricVertex<V, E, F>, 
@@ -126,7 +126,7 @@ F extends SymmetricFace<V, E, F>
 				newPath.add(e);
 			}
 //			System.err.println("Constructing cone over face: " + face);
-			V cone = HalfEdgeTopologyOperations.splitFace(face);
+			V cone = TopologyAlgorithms.splitFace(face);
 
 			coneVerts.add(cone);
 			boundaryCycles.paths.put(newPath,true);
@@ -152,7 +152,7 @@ F extends SymmetricFace<V, E, F>
 					revPath.add(ee.getOppositeEdge());
 				}
 				
-				HalfEdgeTopologyOperations.removeVertex(cone);
+				TopologyAlgorithms.removeVertex(cone);
 
 				revertedPaths.put(revPath,boundaryCycles.paths.get(path));
 			}
