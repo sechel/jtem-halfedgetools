@@ -31,7 +31,6 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.algorithm.adaptivesubdivision;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -39,13 +38,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-
-import sun.misc.Compare;
-import de.jtem.halfedge.Edge;
-import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
 import de.jtem.halfedgetools.algorithm.adaptivesubdivision.decorations.HasType.Type;
 import de.jtem.halfedgetools.algorithm.adaptivesubdivision.interpolators.Interpolator;
 import de.jtem.halfedgetools.algorithm.adaptivesubdivision.interpolators.LinearEdgeSubdivAlg;
@@ -718,6 +711,7 @@ public class Subdivider<
 	 *      die weiterverzeigerten Ziele des alten.
 	 * 4) Loesche die alte Liste.
 	 */
+		@SuppressWarnings("unchecked")
 		private void removeMarkedNodes(){
 			
 		
@@ -1134,21 +1128,22 @@ public class Subdivider<
 				if (e.getLeftFace()!=null && e.getOppositeEdge().getLeftFace()!=null)	flipEdge(e);
 			}
 	} 
-	/** Objekt zum Vergleichen fuer das sortieren der Kanten nach Laenge.  
-	 */
-	private Compare compLength= new Compare(){
-		public int doCompare(Object e1, Object e2) {
-			E ed1=(E)e1;
-			E ed2=(E)e2;
-			if(ed1.getLengthSquared()<ed2.getLengthSquared())return-1;
-			if(ed1.getLengthSquared()>ed2.getLengthSquared())return 1;
-			if(ed1.getLengthSquared()==ed2.getLengthSquared()){
-				if(ed1.hashCode()<ed2.hashCode())	return -1;
-				if(ed1.hashCode()>ed2.hashCode())	return 1;
-			}
-			return 0;
-		}
-	};
+//	/** Objekt zum Vergleichen fuer das sortieren der Kanten nach Laenge.  
+//	 */
+//	private Compare compLength= new Compare(){
+//		@SuppressWarnings("unchecked")
+//		public int doCompare(Object e1, Object e2) {
+//			E ed1=(E)e1;
+//			E ed2=(E)e2;
+//			if(ed1.getLengthSquared()<ed2.getLengthSquared())return-1;
+//			if(ed1.getLengthSquared()>ed2.getLengthSquared())return 1;
+//			if(ed1.getLengthSquared()==ed2.getLengthSquared()){
+//				if(ed1.hashCode()<ed2.hashCode())	return -1;
+//				if(ed1.hashCode()>ed2.hashCode())	return 1;
+//			}
+//			return 0;
+//		}
+//	};
 	/** Sortiert die Kanten nach ihrer Laenge. 
 	 * @param up Gibt an, ob in aufsteigender(true) 
 	 * oder absteigender(false) Reihenfolge sortiert werden soll. 

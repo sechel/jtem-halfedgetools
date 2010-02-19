@@ -99,7 +99,7 @@ public class FaceCycleSubdivider {
 	// Dient dem Erhalt der Form der Flaeche. 
 	private double curvTol=0;
 	// Eine andere Form des selben Wertes.
-	private double curvTolSqSign=0;
+//	private double curvTolSqSign=0;
 	// Typ der Normalen-Berechnung
 	private Calculator.NormalType normalType=Calculator.NormalType.AREA;
 	// Einstellung ob mit pseudo-Normalen gerechnet wird.
@@ -1190,7 +1190,7 @@ public class FaceCycleSubdivider {
 	 */
 	public void setCurvTol(double curvTol) {
 		double cos=Math.cos(curvTol*Math.PI/180);
-		this.curvTolSqSign = Math.signum(cos)*cos*cos;
+//		this.curvTolSqSign = Math.signum(cos)*cos*cos;
 		this.curvTol=cos;
 	}
 	/** Gibt die Toleranz zurueck mit der Entschieden wird,

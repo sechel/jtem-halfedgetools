@@ -31,39 +31,55 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.symmetry.adapters;
 
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
-import de.jtem.halfedgetools.jreality.adapter.NormalAdapter2Heds;
-import de.jtem.halfedgetools.jreality.adapter.NormalAdapter2Ifs;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.AbstractAdapter;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Normal;
 import de.jtem.halfedgetools.symmetry.node.SymmetricVertex;
 
-public class SymmetricNormalAdapter implements NormalAdapter2Ifs<Node<?, ?, ?>> ,NormalAdapter2Heds<Node<?, ?, ?>> {
-	private final AdapterType typ;
-	public AdapterType getAdapterType() {
-		return typ;
-	}
-	/** This adapter can write and read Normals
-	 *  from StdJRVertex,StdJREdge,StdJRFace  
-	 *  it has a final blank for the adapter type
-	 *   wich it should support 
-	 * @author gonska
-	 * @param adapterType
-	 */
-	public SymmetricNormalAdapter(AdapterType typ) {
-		this.typ=typ;
-	}
-	@SuppressWarnings("unchecked")
-	public double[] getNormal(Node<?, ?, ?> node) {
+@Normal
+public class SymmetricNormalAdapter extends AbstractAdapter<double[]> {
 
-		if(typ==AdapterType.VERTEX_ADAPTER){
-			if(((SymmetricVertex)node).normal==null)
-				return new double[]{0,0,0};
-			return((SymmetricVertex)node).normal;
-		}
-		return new double[]{0,0,0};
+	private static double[]
+	    defaultNormal = {1, 0, 0};
+	
+	public SymmetricNormalAdapter() {
+		super(double[].class, true, true);
 	}
-	public void setNormal(Node<?, ?, ?> node, double[] normal) {
-		if(typ==AdapterType.VERTEX_ADAPTER){
-//			((SymmetricVertex)node).normal=normal;
+	
+	@Override
+	public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
+		return SymmetricVertex.class.isAssignableFrom(nodeClass);
+	}
+	
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	> double[] getV(V v, AdapterSet a) {
+		SymmetricVertex<?,?,?> sv = (SymmetricVertex<?,?,?>)v;
+		if (sv.normal == null) {
+			return defaultNormal;
+		} else {
+			return sv.normal;
 		}
 	}
+
+	
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	> void setV(V v, double[] value, AdapterSet a) {
+		SymmetricVertex<?,?,?> sv = (SymmetricVertex<?,?,?>)v;
+		if (value == null) {
+			sv.normal = defaultNormal;
+		} else {
+			sv.normal = value;
+		}
+	}
+	
 }

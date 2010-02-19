@@ -10,7 +10,7 @@ public abstract class AbstractTypedAdapter<
 	E extends Edge<V, E, F>,
 	F extends Face<V, E, F>,
 	VAL
-> implements Adapter<VAL> {
+> extends Adapter<VAL> {
 
 	private Class<? extends Vertex<?,?,?>>
 		vClass = null;
@@ -18,16 +18,23 @@ public abstract class AbstractTypedAdapter<
 		eClass = null;
 	private Class<? extends Face<?,?,?>>
 		fClass = null;
+	private Class<? extends VAL>
+		typeClass = null;
 	
 	
 	protected AbstractTypedAdapter(
 		Class<? extends Vertex<?,?,?>> vClass, 
 		Class<? extends Edge<?,?,?>> eClass, 
-		Class<? extends Face<?,?,?>> fClass
+		Class<? extends Face<?,?,?>> fClass,
+		Class<? extends VAL> typeClass,
+		boolean getter,
+		boolean setter
 	) {
+		super(getter, setter);
 		this.vClass = vClass;
 		this.eClass = eClass;
 		this.fClass = fClass;
+		this.typeClass = typeClass;
 	}
 	
 	
@@ -39,6 +46,13 @@ public abstract class AbstractTypedAdapter<
 		accept |= fClass != null && nodeClass.isAssignableFrom(fClass);
 		return accept;
 	}
+	
+	
+	@Override
+	public boolean checkType(Class<?> typeClass) {
+		return this.typeClass.isAssignableFrom(typeClass);
+	}
+	
 
 	public VAL getVertexValue(V v, AdapterSet a) {
 		throw new RuntimeException("getVertexValue not supported in this adapter");
@@ -61,7 +75,7 @@ public abstract class AbstractTypedAdapter<
 	
 	
 	@SuppressWarnings("unchecked")
-	public <
+	public final <
 		V1 extends Vertex<V1, E1, F1>,
 		E1 extends Edge<V1, E1, F1>,
 		F1 extends Face<V1, E1, F1>
@@ -69,7 +83,7 @@ public abstract class AbstractTypedAdapter<
 		return getVertexValue((V)v, a);
 	}
 	@SuppressWarnings("unchecked")
-	public <
+	public final <
 		V1 extends Vertex<V1, E1, F1>,
 		E1 extends Edge<V1, E1, F1>,
 		F1 extends Face<V1, E1, F1>
@@ -77,7 +91,7 @@ public abstract class AbstractTypedAdapter<
 		return getEdgeValue((E)e, a);
 	}	
 	@SuppressWarnings("unchecked")
-	public <
+	public final <
 		V1 extends Vertex<V1, E1, F1>,
 		E1 extends Edge<V1, E1, F1>,
 		F1 extends Face<V1, E1, F1>
@@ -86,7 +100,7 @@ public abstract class AbstractTypedAdapter<
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <
+	public final <
 		V1 extends Vertex<V1, E1, F1>,
 		E1 extends Edge<V1, E1, F1>,
 		F1 extends Face<V1, E1, F1>
@@ -94,7 +108,7 @@ public abstract class AbstractTypedAdapter<
 		setVertexValue((V)v, value, a);
 	}
 	@SuppressWarnings("unchecked")
-	public <
+	public final <
 		V1 extends Vertex<V1, E1, F1>,
 		E1 extends Edge<V1, E1, F1>,
 		F1 extends Face<V1, E1, F1>
@@ -102,7 +116,7 @@ public abstract class AbstractTypedAdapter<
 		setEdgeValue((E)e, value, a);
 	}
 	@SuppressWarnings("unchecked")
-	public <
+	public final <
 		V1 extends Vertex<V1, E1, F1>,
 		E1 extends Edge<V1, E1, F1>,
 		F1 extends Face<V1, E1, F1>

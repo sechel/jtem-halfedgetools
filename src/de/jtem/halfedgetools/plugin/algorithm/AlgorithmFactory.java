@@ -1,0 +1,104 @@
+/**
+This file is part of a jTEM project.
+All jTEM projects are licensed under the FreeBSD license 
+or 2-clause BSD license (see http://www.opensource.org/licenses/bsd-license.php). 
+
+Copyright (c) 2002-2010, Technische Universität Berlin, jTEM
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, 
+are permitted provided that the following conditions are met:
+
+-	Redistributions of source code must retain the above copyright notice, 
+	this list of conditions and the following disclaimer.
+
+-	Redistributions in binary form must reproduce the above copyright notice, 
+	this list of conditions and the following disclaimer in the documentation 
+	and/or other materials provided with the distribution.
+ 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS 
+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
+OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
+IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
+OF SUCH DAMAGE.
+**/
+
+package de.jtem.halfedgetools.plugin.algorithm;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import de.jtem.halfedgetools.plugin.algorithm.geometry.PerturbPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.geometry.ProjectPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkLinearPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.subdivision.DooSabinLinearPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.subdivision.GarlandHeckbertPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.subdivision.LoopPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.subdivision.QuadGraphLinearPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.subdivision.Sqrt3LinearPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.subdivision.Sqrt3Plugin;
+import de.jtem.halfedgetools.plugin.algorithm.subdivision.StellarLinearPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.subdivision.TriangulatePlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.EdgeCollapsePlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.EdgeRemoverFillPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.EdgeRemoverPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.EdgeSplitterPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.FaceCollapserPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.FaceRemoverPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.FaceScalerPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.FaceSplitterPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.FillHolesPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.VertexCollapserPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.VertexRemoverPlugin;
+import de.jtem.jrworkspace.plugin.Plugin;
+
+public class AlgorithmFactory {
+
+
+	public static Set<Plugin> createTopologyPlugins() {
+		Set<Plugin> hs = new HashSet<Plugin>();
+		hs.add(new VertexRemoverPlugin());
+		hs.add(new VertexCollapserPlugin());
+		hs.add(new FaceRemoverPlugin());
+		hs.add(new FaceCollapserPlugin());
+		hs.add(new FaceScalerPlugin());
+		hs.add(new FaceSplitterPlugin());
+		hs.add(new EdgeCollapsePlugin());
+		hs.add(new EdgeRemoverFillPlugin());
+		hs.add(new EdgeRemoverPlugin());
+		hs.add(new EdgeSplitterPlugin());
+		hs.add(new FillHolesPlugin());
+		return hs;
+	}
+	
+	public static Set<Plugin> createGeometryPlugins() {
+		Set<Plugin> hs = new HashSet<Plugin>();
+		hs.add(new PerturbPlugin());
+		hs.add(new ProjectPlugin());
+		return hs;
+	}
+	
+	
+	public static Set<Plugin> createSubdivisionPlugins() {
+		Set<Plugin> s = new HashSet<Plugin>();
+		s.add(new CatmullClarkLinearPlugin());
+		s.add(new CatmullClarkPlugin());
+		s.add(new DooSabinLinearPlugin());
+		s.add(new LoopPlugin());
+		s.add(new QuadGraphLinearPlugin());
+		s.add(new GarlandHeckbertPlugin());
+		s.add(new Sqrt3LinearPlugin());
+		s.add(new Sqrt3Plugin());
+		s.add(new StellarLinearPlugin());
+		s.add(new TriangulatePlugin());
+		return s;
+	}
+	
+}

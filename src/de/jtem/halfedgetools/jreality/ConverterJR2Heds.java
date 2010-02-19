@@ -1,39 +1,7 @@
-/**
-This file is part of a jTEM project.
-All jTEM projects are licensed under the FreeBSD license 
-or 2-clause BSD license (see http://www.opensource.org/licenses/bsd-license.php). 
-
-Copyright (c) 2002-2010, Technische Universität Berlin, jTEM
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, 
-are permitted provided that the following conditions are met:
-
--	Redistributions of source code must retain the above copyright notice, 
-	this list of conditions and the following disclaimer.
-
--	Redistributions in binary form must reproduce the above copyright notice, 
-	this list of conditions and the following disclaimer in the documentation 
-	and/or other materials provided with the distribution.
- 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
-THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS 
-BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
-OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
-IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
-OF SUCH DAMAGE.
-**/
-
 package de.jtem.halfedgetools.jreality;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
 
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.data.Attribute;
@@ -45,85 +13,46 @@ import de.jreality.scene.data.StringArray;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.jreality.adapter.Adapter;
-import de.jtem.halfedgetools.jreality.adapter.ColorAdapter2Heds;
-import de.jtem.halfedgetools.jreality.adapter.CoordinateAdapter2Heds;
-import de.jtem.halfedgetools.jreality.adapter.LabelAdapter2Heds;
-import de.jtem.halfedgetools.jreality.adapter.NormalAdapter2Heds;
-import de.jtem.halfedgetools.jreality.adapter.PointSizeAdapter2Heds;
-import de.jtem.halfedgetools.jreality.adapter.RelRadiusAdapter2Heds;
-import de.jtem.halfedgetools.jreality.adapter.TextCoordsAdapter2Heds;
-import de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Color;
+import de.jtem.halfedgetools.adapter.type.Label;
+import de.jtem.halfedgetools.adapter.type.Normal;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.Radius;
+import de.jtem.halfedgetools.adapter.type.Size;
+import de.jtem.halfedgetools.adapter.type.TexCoordinate;
 
 
-public class ConverterJR2Heds<
-V extends Vertex<V, E, F>,
-E extends Edge<V, E, F>, 
-F extends Face<V, E, F> > {
-
-	private Class<V> vClass=null;
-	private Class<E> eClass=null;
-	private Class<F> fClass=null;
+public class ConverterJR2Heds {
 
 	/** 
 	 * can convert an IndexedFaceSet(jreality) 
 	 * to a HalfEdgeDataStructure
-	 * 
-	 * the H.E.D.S. must be parametrised
-	 * with the same classes as the converter
 	 */
-	public ConverterJR2Heds(Class<V> vClass, Class<E> eClass, Class<F> fClass) {
-		this.vClass=vClass;
-		this.eClass=eClass;
-		this.fClass=fClass;
+	public ConverterJR2Heds() {
 	}
 
-	private int getTypNum(Adapter a){
-		if(a.getAdapterType()==AdapterType.VERTEX_ADAPTER)
+	private int getTypNum(Class<? extends Node<?,?,?>> nodeClass){
+		if(Vertex.class.isAssignableFrom(nodeClass)) {
 			return 0;
-		if(a.getAdapterType()==AdapterType.EDGE_ADAPTER)
+		}
+		if(Edge.class.isAssignableFrom(nodeClass)) {
 			return 1;
+		}
 		return 2;
 	}
-	private DataListSet getDataListOfTyp(Adapter a, IndexedFaceSet ifs){
-		if(a.getAdapterType().equals(AdapterType.VERTEX_ADAPTER))
+	private DataListSet getDataListOfTyp(Class<? extends Node<?,?,?>> nodeClass, IndexedFaceSet ifs){
+		if(Vertex.class.isAssignableFrom(nodeClass)) {
 			return ifs.getVertexAttributes();
-		if(a.getAdapterType().equals(AdapterType.EDGE_ADAPTER))
+		}
+		if(Edge.class.isAssignableFrom(nodeClass)) {
 			return ifs.getEdgeAttributes();
+		}
 		return ifs.getFaceAttributes();
 	}
 	
-	
-	/**
-	 * this converts a given IndexedFaceSet to a H.E.D.S.
-	 * 
-	 * remark:Adapters are nescecary to access the Data of the H.E.D.S.
-	 *  you can use adapters as subtypes of the following types:
-	 *  ColorAdapter2Heds			CoordinateAdapter2Heds 
-	 *  LabelAdapter2Heds			NormalAdapter2Heds
-	 *  PointSizeAdapter2Heds		RelRadiusAdapter2Heds
-	 *  TextCoordsAdapter2Heds
-	 *  
-	 * remark:every adapter supports only one geometry part:
-	 *   Vertices, Edges or Faces
-	 *    
-	 * if there is no adapter for an attribute of a geometry part, 
-	 *  then this attribute will not be written 
-	 *  under this geometry part
-	 *  
-	 * @param heds
-	 * @param adapters (a CoordinateAdapter2Ifs for Vertices must be given)
-	 * @return converted IndexedFaceSet as HalfEdgeDataStructure
-	 * @throws IllegalArgumentException
-	 */
-	public HalfEdgeDataStructure<V,E,F> ifs2heds(
-			IndexedFaceSet ifs, Adapter... adapters) 
-			throws IllegalArgumentException{
-		HalfEdgeDataStructure<V, E, F> heds = new HalfEdgeDataStructure<V, E, F>(vClass,eClass,fClass);
-		ifs2heds(ifs, heds, adapters);
-		return heds;
-	}
 	
 	/**
 	 * this converts a given IndexedFaceSet to a H.E.D.S.
@@ -147,32 +76,16 @@ F extends Face<V, E, F> > {
 	 * @throws IllegalArgumentException
 	 */
 	@SuppressWarnings("unchecked")
-	public void ifs2heds(
-			IndexedFaceSet ifs, HalfEdgeDataStructure<V,E,F> heds, Adapter... adapters) 
-			throws IllegalArgumentException{
-		
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F> 
+	> void ifs2heds(IndexedFaceSet ifs, HalfEdgeDataStructure<V, E, F> heds, AdapterSet adapters, Map<E, Integer> edgeMap) {
 		int initialVertices = heds.numVertices();
+		AdapterSet vAdapters = adapters.query(heds.getVertexClass(), double[].class);
+		AdapterSet eAdapters = adapters.query(heds.getEdgeClass(), double[].class);
+		AdapterSet fAdapters = adapters.query(heds.getFaceClass(), double[].class);
 		
-		// collect the adapterTypes
-		List<Adapter> vertexAdapters = new LinkedList<Adapter>(); 
-		List<Adapter> faceAdapters = new LinkedList<Adapter>(); 
-		List<Adapter> edgeAdapters = new LinkedList<Adapter>();
-		boolean hasCoords=false;
-		for(Adapter a: adapters){
-			if(a.getAdapterType()==AdapterType.VERTEX_ADAPTER){
-				vertexAdapters.add(a);
-				if (a instanceof CoordinateAdapter2Heds && a.getAdapterType()==AdapterType.VERTEX_ADAPTER)
-					hasCoords=true;
-			}
-			else if (a.getAdapterType()==AdapterType.EDGE_ADAPTER)
-				edgeAdapters.add(a);
-			else if (a.getAdapterType()==AdapterType.FACE_ADAPTER)
-				faceAdapters.add(a);
-		}	
-		if(!hasCoords) throw new IllegalArgumentException("No coordinateAdapter found");
-		
-		/// read out Data:
-		//		 first argument: 0=Vertex; 1=Edge; 2=Face; 
 		double[][][] coords=new double[3][][];		
 		int[][][] indices=new int[3][][];
 		double[][][] normals=new double[3][][];
@@ -187,53 +100,63 @@ F extends Face<V, E, F> > {
 		IntArrayArray iiData=null;
 		StringArray sData=null;
 		
-		for (Adapter vA : adapters) {
-			DataListSet AData= getDataListOfTyp(vA, ifs);
-			int typNum=getTypNum(vA);
-			if (vA instanceof CoordinateAdapter2Heds) {
-				ddData= (DoubleArrayArray)AData.getList(Attribute.COORDINATES);
-				if (ddData!=null)
+		 
+		Class<? extends Node<?,?,?>>[] nodeClasses = new Class[] {heds.getVertexClass(), heds.getEdgeClass(), heds.getFaceClass()};
+		for (Class<? extends Node<?,?,?>> nodeClass : nodeClasses) {
+			DataListSet AData= getDataListOfTyp(nodeClass, ifs);
+			int typNum=getTypNum(nodeClass);
+			if (adapters.isAvailable(Position.class, nodeClass, double[].class)) {
+				ddData = (DoubleArrayArray)AData.getList(Attribute.COORDINATES);
+				if (ddData!=null) {
 					coords[typNum]= ddData.toDoubleArrayArray(null);
+				}
 			}
-			if (vA instanceof ColorAdapter2Heds) {
+			if (adapters.isAvailable(Color.class, nodeClass, double[].class)) {
 				ddData= (DoubleArrayArray)AData.getList(Attribute.COLORS);
-				if (ddData!=null)
+				if (ddData!=null) {
 					colors[typNum]= ddData.toDoubleArrayArray(null);
+				}
 			}
-			if (vA instanceof LabelAdapter2Heds) {
+			if (adapters.isAvailable(Label.class, nodeClass, double[].class)) {
 				sData= (StringArray)AData.getList(Attribute.LABELS);
-				if (sData!=null)
+				if (sData!=null) {
 					labels[typNum]= sData.toStringArray(null);
+				}
 			}
-			if (vA instanceof NormalAdapter2Heds) {
+			if (adapters.isAvailable(Normal.class, nodeClass, double[].class)) {
 				ddData= (DoubleArrayArray)AData.getList(Attribute.NORMALS);
-				if (ddData!=null)
+				if (ddData!=null) {
 					normals[typNum]= ddData.toDoubleArrayArray(null);
+				}
 			}
-			if (vA instanceof PointSizeAdapter2Heds) {
+			if (adapters.isAvailable(Size.class, nodeClass, double[].class)) {
 				dData= (DoubleArray)AData.getList(Attribute.POINT_SIZE);
-				if (dData!=null)
+				if (dData!=null) {
 					pSize[typNum]= dData.toDoubleArray(null);
+				}
 			}
-			if (vA instanceof RelRadiusAdapter2Heds) {
+			if (adapters.isAvailable(Radius.class, nodeClass, double[].class)) {
 				dData= (DoubleArray)AData.getList(Attribute.RELATIVE_RADII);
-				if (dData!=null)
+				if (dData!=null) {
 					radii[typNum]= dData.toDoubleArray(null);
+				}
 			}
-			if (vA instanceof TextCoordsAdapter2Heds) {
+			if (adapters.isAvailable(TexCoordinate.class, nodeClass, double[].class)) {
 				ddData= (DoubleArrayArray)AData.getList(Attribute.TEXTURE_COORDINATES);
-				if (ddData!=null)
+				if (ddData!=null) {
 					textCoords[typNum]= ddData.toDoubleArrayArray(null);
+				}
 			}
 		}
-		
 		// indices:
 		iiData= (IntArrayArray)ifs.getEdgeAttributes(Attribute.INDICES);
-		if (iiData!=null)
+		if (iiData!=null) {
 			indices[1]= iiData.toIntArrayArray(null);
+		}
 		iiData= (IntArrayArray)ifs.getFaceAttributes(Attribute.INDICES);
-		if (iiData!=null)
+		if (iiData!=null) {
 			indices[2]= iiData.toIntArrayArray(null);
+		}
 		
 		/// some facts:
 		int numV = 0;
@@ -242,40 +165,21 @@ F extends Face<V, E, F> > {
 		if (indices[1] != null) numE = indices[1].length;
 		int numF = 0;
 		if (indices[2] != null) numF = indices[2].length;		
+
+		if (numV == 0) {
+			return;
+		}
 		
 		/// vertices
-	
 		for (int i = 0; i < numV; i++){
 			V v = heds.addNewVertex();
-			// set attributes
-			for (Adapter vA : vertexAdapters) {
-				if (vA instanceof CoordinateAdapter2Heds && coords[0]!=null) {
-//					CoordinateAdapter2Heds vAcoord = (CoordinateAdapter2Heds) vA;
-//					if (coords[0][i].length == 4)
-//						vAcoord.setCoordinate(v, coords[0][i]);
-//					else {
-//						double[] d= new double[]{
-//								coords[0][i][0],
-//								coords[0][i][1],
-//								coords[0][i][2],
-//								1.0			};
-//						vAcoord.setCoordinate(v, d);
-//					}
-					((CoordinateAdapter2Heds) vA).setCoordinate(v, coords[0][i]);
-				}
-				if (vA instanceof ColorAdapter2Heds && colors[0]!=null) 
-					((ColorAdapter2Heds) vA).setColor(v, colors[0][i]);
-				if (vA instanceof LabelAdapter2Heds && labels[0]!=null)
-					((LabelAdapter2Heds) vA).setLabel(v, labels[0][i]);
-				if (vA instanceof NormalAdapter2Heds && normals[0]!=null)
-					((NormalAdapter2Heds) vA).setNormal(v, normals[0][i]);
-				if (vA instanceof PointSizeAdapter2Heds && pSize[0]!=null)
-					((PointSizeAdapter2Heds) vA).setPointSize(v, pSize[0][i]);
-				if (vA instanceof RelRadiusAdapter2Heds && radii[0]!=null)
-					((RelRadiusAdapter2Heds) vA).setRelRadius(v, radii[0][i]);
-				if (vA instanceof TextCoordsAdapter2Heds && textCoords[0]!=null)
-					((TextCoordsAdapter2Heds) vA).setTextCoordinate(v, textCoords[0][i]);
-			}
+			if (coords[0] != null) vAdapters.set(Position.class, v, coords[0][i]);
+			if (colors[0] != null) vAdapters.set(Color.class, v, colors[0][i]);
+			if (labels[0] != null) vAdapters.set(Label.class, v, labels[0][i]);
+			if (normals[0] != null) vAdapters.set(Normal.class, v, normals[0][i]);
+			if (pSize[0] != null) vAdapters.set(Size.class, v, pSize[0][i]);
+			if (radii[0] != null) vAdapters.set(Radius.class, v, radii[0][i]);
+			if (textCoords[0] != null) vAdapters.set(TexCoordinate.class, v, textCoords[0][i]);
 		}
 		
 		// edges (from faces)
@@ -283,34 +187,21 @@ F extends Face<V, E, F> > {
 		for (int i = 0; i < numF; i++){
 			int[] f = indices[2][i];
 			for (int j = 0; j < f.length; j++){
-				//V s = heds.getVertex(f[j]);
-				//V t = heds.getVertex(f[(j + 1) % f.length]);
-				Integer s=f[j]+initialVertices;
-				Integer t=f[(j + 1) % f.length]+initialVertices;
-				if (vertexEdgeMap.containsKey(s,t))
+				Integer s=f[j] + initialVertices;
+				Integer t=f[(j + 1) % f.length] + initialVertices;
+				if (vertexEdgeMap.containsKey(s,t)) {
 					throw new RuntimeException("Inconsistently oriented face found in ifs2HEDS, discontinued!");
+				}
 				E e = heds.addNewEdge();
 				e.setTargetVertex(heds.getVertex(t));
 				vertexEdgeMap.put(s, t, e);
-				
-				// TODO:  <==>-----<<
-				for (Adapter vA : edgeAdapters) {
-					if (vA instanceof CoordinateAdapter2Heds && coords[1]!=null)
-						((CoordinateAdapter2Heds) vA).setCoordinate(e, coords[1][i]);
-					if (vA instanceof ColorAdapter2Heds && colors[1]!=null)
-						((ColorAdapter2Heds) vA).setColor(e, colors[1][i]);
-					if (vA instanceof LabelAdapter2Heds && labels[1]!=null)
-						((LabelAdapter2Heds) vA).setLabel(e, labels[1][i]);
-					if (vA instanceof NormalAdapter2Heds && normals[1]!=null)
-						((NormalAdapter2Heds) vA).setNormal(e, normals[1][i]);
-					if (vA instanceof PointSizeAdapter2Heds && pSize[1]!=null)
-						((PointSizeAdapter2Heds) vA).setPointSize(e, pSize[1][i]);
-					if (vA instanceof RelRadiusAdapter2Heds && radii[1]!=null)
-						((RelRadiusAdapter2Heds) vA).setRelRadius(e, radii[1][i]);
-					if (vA instanceof TextCoordsAdapter2Heds && textCoords[1]!=null)
-						((TextCoordsAdapter2Heds) vA).setTextCoordinate(e, textCoords[1][i]);
-				}
-				// TODO here make default Edge settings
+				if (coords[1] != null) eAdapters.set(Position.class, e, coords[1][i]);
+				if (colors[1] != null) eAdapters.set(Color.class, e, colors[1][i]);
+				if (labels[1] != null) eAdapters.set(Label.class, e, labels[1][i]);
+				if (normals[1] != null) eAdapters.set(Normal.class, e, normals[1][i]);
+				if (pSize[1] != null) eAdapters.set(Size.class, e, pSize[1][i]);
+				if (radii[1] != null) eAdapters.set(Radius.class, e, radii[1][i]);
+				if (textCoords[1] != null) eAdapters.set(TexCoordinate.class, e, textCoords[1][i]);
 			}
 		}
 		
@@ -322,8 +213,14 @@ F extends Face<V, E, F> > {
 //				V t = heds.getVertex(e[(j + 1)]);
 				Integer s=e[j]+initialVertices;
 				Integer t=e[(j + 1)]+initialVertices;
-				if (vertexEdgeMap.containsKey(s, t)||vertexEdgeMap.containsKey(t, s)){}
-				else {
+				if (vertexEdgeMap.containsKey(s, t) || vertexEdgeMap.containsKey(t, s)){
+					if (edgeMap == null) continue;
+					if (vertexEdgeMap.containsKey(s, t)) {
+						edgeMap.put(vertexEdgeMap.get(s, t), i);
+					} else {
+						edgeMap.put(vertexEdgeMap.get(t, s), i);
+					}
+				} else {
 					E ed = heds.addNewEdge();
 					ed.setTargetVertex(heds.getVertex(t));
 					vertexEdgeMap.put(s, t, ed);	
@@ -332,37 +229,24 @@ F extends Face<V, E, F> > {
 					vertexEdgeMap.put(t, s, ed);
 					ed.linkOppositeEdge(edOp);
 					
-					// make Edge settings
-					for (Adapter vA : edgeAdapters) {
-						if (vA instanceof CoordinateAdapter2Heds && coords[1]!=null){
-							((CoordinateAdapter2Heds) vA).setCoordinate(ed, coords[1][i]);
-							((CoordinateAdapter2Heds) vA).setCoordinate(edOp, coords[1][i]);
-						}
-						if (vA instanceof ColorAdapter2Heds && colors[1]!=null){
-							((ColorAdapter2Heds) vA).setColor(ed, colors[1][i]);
-							((ColorAdapter2Heds) vA).setColor(edOp, colors[1][i]);
-						}
-						if (vA instanceof LabelAdapter2Heds && labels[1]!=null){
-							((LabelAdapter2Heds) vA).setLabel(ed, labels[1][i]);
-							((LabelAdapter2Heds) vA).setLabel(edOp, labels[1][i]);
-						}
-						if (vA instanceof NormalAdapter2Heds && normals[1]!=null){
-							((NormalAdapter2Heds) vA).setNormal(ed, normals[1][i]);
-							((NormalAdapter2Heds) vA).setNormal(edOp, normals[1][i]);
-						}
-						if (vA instanceof PointSizeAdapter2Heds && pSize[1]!=null){
-							((PointSizeAdapter2Heds) vA).setPointSize(ed, pSize[1][i]);
-							((PointSizeAdapter2Heds) vA).setPointSize(edOp, pSize[1][i]);
-						}
-						if (vA instanceof RelRadiusAdapter2Heds && radii[1]!=null){
-							((RelRadiusAdapter2Heds) vA).setRelRadius(ed, radii[1][i]);
-							((RelRadiusAdapter2Heds) vA).setRelRadius(edOp, radii[1][i]);
-						}
-						if (vA instanceof TextCoordsAdapter2Heds && textCoords[1]!=null){
-							((TextCoordsAdapter2Heds) vA).setTextCoordinate(ed, textCoords[1][i]);
-							((TextCoordsAdapter2Heds) vA).setTextCoordinate(edOp, textCoords[1][i]);
-						}
-					}	
+					if (coords[1] != null) eAdapters.set(Position.class, ed, coords[1][i]);
+					if (colors[1] != null) eAdapters.set(Color.class, ed, colors[1][i]);
+					if (labels[1] != null) eAdapters.set(Label.class, ed, labels[1][i]);
+					if (normals[1] != null) eAdapters.set(Normal.class, ed, normals[1][i]);
+					if (pSize[1] != null) eAdapters.set(Size.class, ed, pSize[1][i]);
+					if (radii[1] != null) eAdapters.set(Radius.class, ed, radii[1][i]);
+					if (textCoords[1] != null) eAdapters.set(TexCoordinate.class, ed, textCoords[1][i]);
+					if (coords[1] != null) eAdapters.set(Position.class, edOp, coords[1][i]);
+					if (colors[1] != null) eAdapters.set(Color.class, edOp, colors[1][i]);
+					if (labels[1] != null) eAdapters.set(Label.class, edOp, labels[1][i]);
+					if (normals[1] != null) eAdapters.set(Normal.class, edOp, normals[1][i]);
+					if (pSize[1] != null) eAdapters.set(Size.class, edOp, pSize[1][i]);
+					if (radii[1] != null) eAdapters.set(Radius.class, edOp, radii[1][i]);
+					if (textCoords[1] != null) eAdapters.set(TexCoordinate.class, edOp, textCoords[1][i]);
+					
+					if (edgeMap == null) continue;
+					edgeMap.put(ed, i);
+					edgeMap.put(edOp, i);
 				}
 			}
 		}
@@ -391,24 +275,14 @@ F extends Face<V, E, F> > {
 				faceEdge.linkNextEdge(nextEdge);
 				faceEdge.setLeftFace(f);
 			}	
+			if (coords[2] != null) fAdapters.set(Position.class, f, coords[2][i]);
+			if (colors[2] != null) fAdapters.set(Color.class, f, colors[2][i]);
+			if (labels[2] != null) fAdapters.set(Label.class, f, labels[2][i]);
+			if (normals[2] != null) fAdapters.set(Normal.class, f, normals[2][i]);
+			if (pSize[2] != null) fAdapters.set(Size.class, f, pSize[2][i]);
+			if (radii[2] != null) fAdapters.set(Radius.class, f, radii[2][i]);
+			if (textCoords[2] != null) fAdapters.set(TexCoordinate.class, f, textCoords[2][i]);
 			
-			// set attributes
-			for (Adapter vA : faceAdapters) {
-				if (vA instanceof CoordinateAdapter2Heds && coords[2]!=null)
-					((CoordinateAdapter2Heds) vA).setCoordinate(f, coords[2][i]);
-				if (vA instanceof ColorAdapter2Heds && colors[2]!=null)
-					((ColorAdapter2Heds) vA).setColor(f, colors[2][i]);
-				if (vA instanceof LabelAdapter2Heds && labels[2]!=null)
-					((LabelAdapter2Heds) vA).setLabel(f, labels[2][i]);
-				if (vA instanceof NormalAdapter2Heds && normals[2]!=null)
-					((NormalAdapter2Heds) vA).setNormal(f, normals[2][i]);
-				if (vA instanceof PointSizeAdapter2Heds && pSize[2]!=null)
-					((PointSizeAdapter2Heds) vA).setPointSize(f, pSize[2][i]);
-				if (vA instanceof RelRadiusAdapter2Heds && radii[2]!=null)
-					((RelRadiusAdapter2Heds) vA).setRelRadius(f, radii[2][i]);
-				if (vA instanceof TextCoordsAdapter2Heds && textCoords[2]!=null)
-					((TextCoordsAdapter2Heds) vA).setTextCoordinate(f, textCoords[2][i]);
-			}
 		}
 		
 		// link boundary
@@ -425,7 +299,7 @@ F extends Face<V, E, F> > {
 		
 	}
 
-
+	
 	private static class DualHashMap<K1, K2, V> implements Cloneable{
 
 		private HashMap<K1, HashMap<K2, V>>

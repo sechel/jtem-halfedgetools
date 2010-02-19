@@ -34,9 +34,9 @@ package de.jtem.halfedgetools.symmetry.node;
 import java.util.Set;
 
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.jreality.Bundle;
-import de.jtem.halfedgetools.jreality.Bundle.BundleType;
-import de.jtem.halfedgetools.jreality.Bundle.DisplayType;
+import de.jtem.halfedgetools.adapter.Bundle;
+import de.jtem.halfedgetools.adapter.Bundle.BundleType;
+import de.jtem.halfedgetools.adapter.Bundle.DisplayType;
 import de.jtem.halfedgetools.util.PathUtility;
 
 public abstract class SymmetricVertex <
@@ -48,7 +48,7 @@ F extends SymmetricFace<V, E, F>
 	private double[] position = null;
 	public double[] normal;
 
-	@Bundle(dimension=1, type=BundleType.Value, display=DisplayType.Debug, name="boundary?")
+	@Bundle(dimension=1, type=BundleType.Value, display=DisplayType.Label, name="boundary?")
 	public boolean isBoundaryVertex() {
 		for(Set<E> p : getIncomingEdge().getBoundaryCycleInfo().paths.keySet()) {
 			if(PathUtility.getUnorderedVerticesOnPath(p).contains(this)) {
@@ -58,7 +58,7 @@ F extends SymmetricFace<V, E, F>
 		return false;
 	}
 	
-	@Bundle(dimension=1, type=BundleType.Value, display=DisplayType.Debug, name="cone?")
+	@Bundle(dimension=1, type=BundleType.Value, display=DisplayType.Label, name="cone?")
 	public boolean isConeVertex() {
 		E in = getIncomingEdge();
 		if(in.isConeEdge() && in.getPreviousEdge().getPreviousEdge().isConeEdge()) {

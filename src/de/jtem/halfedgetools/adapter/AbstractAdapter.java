@@ -4,8 +4,21 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Vertex;
 
-public abstract class AbstractAdapter<VAL> implements Adapter<VAL> {
+public abstract class AbstractAdapter<VAL> extends Adapter<VAL> {
 
+	private Class<? extends VAL>
+		typeClass = null;
+	
+	public AbstractAdapter(Class<? extends VAL> typeClass, boolean getter, boolean setter) {
+		super(getter, setter);
+		this.typeClass = typeClass;
+	}
+	
+	@Override
+	public boolean checkType(Class<?> typeClass) {
+		return this.typeClass.isAssignableFrom(typeClass);
+	}
+	
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

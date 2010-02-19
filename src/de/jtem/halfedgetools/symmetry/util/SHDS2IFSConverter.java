@@ -40,7 +40,6 @@ import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedFaceSet;
-import de.jreality.scene.IndexedLineSet;
 import de.jreality.scene.PointSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.shader.CommonAttributes;
@@ -49,14 +48,15 @@ import de.jtem.discretegroup.core.DiscreteGroup;
 import de.jtem.discretegroup.core.DiscreteGroupSceneGraphRepresentation;
 import de.jtem.discretegroup.core.DiscreteGroupSimpleConstraint;
 import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.adapter.Adapter;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.jreality.ConverterHeds2JR;
-import de.jtem.halfedgetools.jreality.adapter.Adapter;
-import de.jtem.halfedgetools.jreality.adapter.CoordinateAdapter2Ifs;
-import de.jtem.halfedgetools.symmetry.adapters.CyclesAdapter;
-import de.jtem.halfedgetools.symmetry.standard.SEdge;
-import de.jtem.halfedgetools.symmetry.standard.SFace;
-import de.jtem.halfedgetools.symmetry.standard.SHDS;
-import de.jtem.halfedgetools.symmetry.standard.SVertex;
+import de.jtem.halfedgetools.symmetry.adapters.BundleCycleColorAdapter;
+import de.jtem.halfedgetools.symmetry.node.SEdge;
+import de.jtem.halfedgetools.symmetry.node.SFace;
+import de.jtem.halfedgetools.symmetry.node.SHDS;
+import de.jtem.halfedgetools.symmetry.node.SVertex;
 import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
 
 public class SHDS2IFSConverter {
@@ -67,18 +67,18 @@ public class SHDS2IFSConverter {
 	private final SceneGraphComponent body = SceneGraphUtility.createFullSceneGraphComponent("body");
 	private final SceneGraphComponent cycles = SceneGraphUtility.createFullSceneGraphComponent("cycles");
 	
-	private ConverterHeds2JR<SVertex, SEdge, SFace> conv = null;
-	private Adapter[] adapters = null;
+	private ConverterHeds2JR conv = null;
+	private AdapterSet adapters = null;
 	
 	private SHDS shds = null;
 	
-	private Appearance bubbleApperance = new Appearance();
+//	private Appearance bubbleApperance = new Appearance();
 	
 //	private DisplayOptionsPlugin dop = null;
 	
-	public SHDS2IFSConverter(SHDS heds, Adapter... adapters) {
-		conv = new ConverterHeds2JR<SVertex, SEdge, SFace>();
-		this.adapters = adapters;
+	public SHDS2IFSConverter(SHDS heds, AdapterSet a) {
+		conv = new ConverterHeds2JR();
+		this.adapters = a;
 		this.shds = heds;
 
 		
@@ -142,16 +142,8 @@ public class SHDS2IFSConverter {
 //		if(dop.getSymmetryCycles())
 			ci.paths.putAll(embedding.getSymmetryCycles().paths);
 		
-		CyclesAdapter<SVertex,SEdge,SFace,SHDS> cyclesAdapter = new CyclesAdapter<SVertex, SEdge, SFace,SHDS>();
-		
-		Adapter ca = null;
-		for(Adapter a : adapters) {
-			if(a instanceof CoordinateAdapter2Ifs<?>) {
-				ca = a;
-			}
-		}
-		
-		
+		BundleCycleColorAdapter cyclesAdapter = adapters.query(BundleCycleColorAdapter.class);
+		Adapter<double[]> ca = adapters.query(Position.class, SVertex.class, double[].class);
 
 		// TODO this temporary hack since Sunflow can't handle colors/transparency
 //		if(rs.hasSymmetry()) {
@@ -172,7 +164,7 @@ public class SHDS2IFSConverter {
 //		}
 		
 		// BODY
-		IndexedFaceSet bodyIfs = conv.heds2ifs(embedding, adapters);
+		IndexedFaceSet bodyIfs = conv.heds2ifs(embedding, adapters, null);
 		
 		IndexedFaceSetUtility.calculateAndSetNormals(bodyIfs);
 		body.setGeometry(bodyIfs);
@@ -180,15 +172,18 @@ public class SHDS2IFSConverter {
 		Appearance appNoFaces = new Appearance();
 		appNoFaces.setAttribute(CommonAttributes.FACE_DRAW, false);
 		
-		IndexedFaceSet boundaryIfs = conv.heds2ifs(embedding, ca, cyclesAdapter);
+		AdapterSet a2 = new AdapterSet();
+		a2.add(ca);
+		a2.add(cyclesAdapter);
+		IndexedFaceSet boundaryIfs = conv.heds2ifs(embedding, a2, null);
 		cycles.setGeometry(boundaryIfs);
 		cycles.setAppearance(appNoFaces);
 		
 		// 2 NORMALS
 
-		IndexedLineSet[] ilss = new IndexedLineSet[shds.getInteriorVertices().size()];
-		
-		int i = 0;
+//		IndexedLineSet[] ilss = new IndexedLineSet[shds.getInteriorVertices().size()];
+//		
+//		int i = 0;
 		// create normal section
 //		for(SVertex vi : shds.getInteriorVertices()) {
 //			
@@ -387,7 +382,7 @@ public class SHDS2IFSConverter {
 				ilsextra.setEdgeIndices(extraIndices2);
 				ilsextra.setEdgeColors(extraColors2);
 				ilsextra.update();
-				IndexedLineSet eilse = ilsextra.getIndexedLineSet(); 
+//				IndexedLineSet eilse = ilsextra.getIndexedLineSet(); 
 				
 				IndexedFaceSetFactory ifsextra = new IndexedFaceSetFactory();
 				ifsextra.setVertexCount(extraCoords.length);

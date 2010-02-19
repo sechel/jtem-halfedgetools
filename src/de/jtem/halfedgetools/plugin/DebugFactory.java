@@ -55,9 +55,8 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.plugin.AnnotationAdapter.EdgeAnnotation;
-import de.jtem.halfedgetools.plugin.AnnotationAdapter.FaceAnnotation;
-import de.jtem.halfedgetools.plugin.AnnotationAdapter.VertexAnnotation;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Label;
 import de.jtem.java2d.Annotation;
 import de.jtem.java2dx.Line2DDouble;
 import de.jtem.java2dx.Point2DDouble;
@@ -91,7 +90,7 @@ public class DebugFactory {
 		boolean showEdges, 
 		boolean showFaces, 
 		SimpleModeller2D moddeller,
-		AnnotationAdapter<?>... a
+		AdapterSet a
 	) {
 		moddeller.getViewer().getRoot().removeAllChildren();
 //		MyHDS N = new MyHDS();
@@ -122,10 +121,9 @@ public class DebugFactory {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void makeVertexCloseUp(
-		HDS hds,
 		V v,
 		SimpleModeller2D moddeller,
-		AnnotationAdapter<?>... a
+		AdapterSet a
 	) {
 		moddeller.getViewer().getRoot().removeAllChildren();
 		Point2DDouble p0 = showVertex(v, new double[2], moddeller, a);
@@ -162,10 +160,9 @@ public class DebugFactory {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void makeEdgeCloseUp(
-		HDS hds,
 		E e,
 		SimpleModeller2D moddeller,
-		AnnotationAdapter<?>... a
+		AdapterSet a
 	) {
 		moddeller.getViewer().getRoot().removeAllChildren();
 		
@@ -224,10 +221,9 @@ public class DebugFactory {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void makeFaceCloseUp(
-		HDS hds,
 		F f,
 		SimpleModeller2D moddeller,
-		AnnotationAdapter<?>... a
+		AdapterSet a
 	) {
 		moddeller.getViewer().getRoot().removeAllChildren();
 		Map<V, Point2DDouble> pointMap = new HashMap<V, Point2DDouble>();
@@ -237,18 +233,17 @@ public class DebugFactory {
 		double[] pos = {sin(alpha), cos(alpha)};
 		Point2DList pList = new Point2DList();
 		for (E e : eList) {
-			Point2DDouble p1 = showVertex(e.getStartVertex(), pos, moddeller);
+			Point2DDouble p1 = showVertex(e.getStartVertex(), pos, moddeller, a);
 			alpha += delta;
 			pos[0] = sin(alpha);
 			pos[1] = cos(alpha);
-			Point2DDouble p2 = showVertex(e.getTargetVertex(), pos, moddeller);
+			Point2DDouble p2 = showVertex(e.getTargetVertex(), pos, moddeller, a);
 			pointMap.put(e.getStartVertex(), p1);
 			pointMap.put(e.getTargetVertex(), p2);
 			showEdge(e, p1, p2, moddeller, a);
 			showEdge(e.getOppositeEdge(), p2, p1, moddeller, a);
 			pList.add(p2);
 		} 
-		
 		showFace(f, pList, moddeller, a);
 	}
 	
@@ -276,7 +271,7 @@ public class DebugFactory {
 		boolean showEdges, 
 		boolean showFaces, 
 		SimpleModeller2D moddeller,
-		AnnotationAdapter<?>... a
+		AdapterSet a
 	) {
 		moddeller.getViewer().getRoot().removeAllChildren();
 		List<E> outerCycle = HalfEdgeUtils.boundaryEdges(bounds);
@@ -314,7 +309,7 @@ public class DebugFactory {
 			result[i][0] = coordsX.get(i);
 			result[i][1] = coordsY.get(i);
 		}
-		display(hds, result, showVertices, showEdges, showFaces, moddeller);
+		display(hds, result, showVertices, showEdges, showFaces, moddeller, a);
 	}
 	
 	
@@ -330,13 +325,14 @@ public class DebugFactory {
 		boolean showVertices, 
 		boolean showEdges, 
 		boolean showFaces, 
-		SimpleModeller2D moddeller
+		SimpleModeller2D moddeller,
+		AdapterSet a
 	) {
 		Map<V, Point2DDouble> pointMap = new HashMap<V, Point2DDouble>();
 		for (V v : hds.getVertices()) {
 			Point2DDouble p = null;
 			if (showVertices) {
-				p = showVertex(v, coords[v.getIndex()], moddeller);
+				p = showVertex(v, coords[v.getIndex()], moddeller, a);
 			} else {
 				p = new Point2DDouble(coords[v.getIndex()][0], coords[v.getIndex()][1]);
 			}
@@ -347,7 +343,7 @@ public class DebugFactory {
 			for (E e : hds.getEdges()) {
 				Point2DDouble s = pointMap.get(e.getStartVertex());
 				Point2DDouble t = pointMap.get(e.getTargetVertex());
-				showEdge(e, s, t, moddeller);
+				showEdge(e, s, t, moddeller, a);
 			}
 		}
 		
@@ -357,14 +353,13 @@ public class DebugFactory {
 				for (E e : HalfEdgeUtils.boundaryEdges(f)) {
 					pList.add(pointMap.get(e.getTargetVertex()));
 				}
-				showFace(f, pList, moddeller);
+				showFace(f, pList, moddeller, a);
 			}
 		}
 	}
 
 	
 	
-	@SuppressWarnings("unchecked")
 	private static <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -372,7 +367,7 @@ public class DebugFactory {
 	> Point2DDouble showVertex(
 		V v, double[] coord, 
 		SimpleModeller2D moddeller, 
-		AnnotationAdapter<?>... a
+		AdapterSet a
 	) {
 		Point2DDouble p = new Point2DDouble(coord[0], coord[1]);
 		DraggablePoint2D dragTool = new DraggablePoint2D(p);
@@ -380,13 +375,7 @@ public class DebugFactory {
 		dragTool.getViewScene().setPointShape(new Ellipse2D.Double(-3,-3,6,6));
 		moddeller.getViewer().getRoot().addChild(dragTool.getViewScene());
 		moddeller.getModeller().addTool(dragTool, null);
-		String annText = "";
-		for (AnnotationAdapter<?> aa : a) {
-			if (!(aa instanceof VertexAnnotation)) {
-				continue;
-			}
-			annText += " " + ((VertexAnnotation<V>)aa).getText(v);
-		}
+		String annText = a.getDefault(Label.class, v, "");
 		Annotation ann = new Annotation(annText, coord[0], coord[1], Annotation.WEST);
 		DraggableAnnotation dragAnn = new DraggableAnnotation(ann);
 		dragTool.getViewScene().addChild(dragAnn.getViewScene());
@@ -394,7 +383,6 @@ public class DebugFactory {
 		return p;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private static <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -404,7 +392,7 @@ public class DebugFactory {
 		Point2DDouble start,
 		Point2DDouble end,
 		SimpleModeller2D moddeller, 
-		AnnotationAdapter<?>... a
+		AdapterSet a
 	) {
 		Line2DDouble line = new Line2DDouble(start, end);
 		DraggableLine2D dragLine = new DraggableLine2D(line);
@@ -416,13 +404,7 @@ public class DebugFactory {
 		dragLine.getViewScene().setAnnotated(true);
 		moddeller.getModeller().addTool(dragLine, null);
 		moddeller.addScene(dragLine.getViewScene());
-		String annText = "";
-		for (AnnotationAdapter<?> aa : a) {
-			if (!(aa instanceof EdgeAnnotation)) {
-				continue;
-			}
-			annText += " " + ((EdgeAnnotation<E>)aa).getText(e);
-		}
+		String annText = a.getDefault(Label.class, e, "");
 		Annotation ann = new Annotation(annText, 0.4*start.x + 0.6*end.x, 0.4*start.y + 0.6*end.y, Annotation.WEST);
 		DraggableAnnotation dragAnn = new DraggableAnnotation(ann);
 		dragAnn.getViewScene().setPaint(Color.BLACK);
@@ -432,7 +414,6 @@ public class DebugFactory {
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	private static <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -441,7 +422,7 @@ public class DebugFactory {
 		F f, 
 		List<Point2DDouble> pList,
 		SimpleModeller2D moddeller,
-		AnnotationAdapter<?>... a
+		AdapterSet a
 	) {
 		Point2DDouble bary = new Point2DDouble(0, 0);
 		for (Point2DDouble p : pList) {
@@ -459,14 +440,7 @@ public class DebugFactory {
 		dragPolygon.getViewScene().setPaint(new Color(128,0,80,30));
 		dragPolygon.getViewScene().setOutlinePaint(Color.red);
 		dragPolygon.getViewScene().setPointPaint(Color.yellow);
-		
-		String annText = "";
-		for (AnnotationAdapter<?> aa : a) {
-			if (!(aa instanceof FaceAnnotation)) {
-				continue;
-			}
-			annText += " " + ((FaceAnnotation<F>)aa).getText(f);
-		}
+		String annText = a.getDefault(Label.class, f, "");
 		Annotation ann = new Annotation(annText, bary.x, bary.y, Annotation.WEST);
 		DraggableAnnotation dragAnn = new DraggableAnnotation(ann);
 		dragAnn.getViewScene().setPaint(Color.BLACK);

@@ -1,38 +1,8 @@
-/**
-This file is part of a jTEM project.
-All jTEM projects are licensed under the FreeBSD license 
-or 2-clause BSD license (see http://www.opensource.org/licenses/bsd-license.php). 
-
-Copyright (c) 2002-2010, Technische Universität Berlin, jTEM
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, 
-are permitted provided that the following conditions are met:
-
--	Redistributions of source code must retain the above copyright notice, 
-	this list of conditions and the following disclaimer.
-
--	Redistributions in binary form must reproduce the above copyright notice, 
-	this list of conditions and the following disclaimer in the documentation 
-	and/or other materials provided with the distribution.
- 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
-THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS 
-BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
-OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
-IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
-OF SUCH DAMAGE.
-**/
-
 package de.jtem.halfedgetools.jreality;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.data.Attribute;
@@ -47,22 +17,19 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.jreality.adapter.Adapter;
-import de.jtem.halfedgetools.jreality.adapter.ColorAdapter2Ifs;
-import de.jtem.halfedgetools.jreality.adapter.CoordinateAdapter2Ifs;
-import de.jtem.halfedgetools.jreality.adapter.LabelAdapter2Ifs;
-import de.jtem.halfedgetools.jreality.adapter.NormalAdapter2Ifs;
-import de.jtem.halfedgetools.jreality.adapter.PointSizeAdapter2Ifs;
-import de.jtem.halfedgetools.jreality.adapter.RelRadiusAdapter2Ifs;
-import de.jtem.halfedgetools.jreality.adapter.TextCoordsAdapter2Ifs;
-import de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType;
+import de.jtem.halfedgetools.adapter.Adapter;
+import de.jtem.halfedgetools.adapter.AdapterException;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Color;
+import de.jtem.halfedgetools.adapter.type.Label;
+import de.jtem.halfedgetools.adapter.type.Normal;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.Radius;
+import de.jtem.halfedgetools.adapter.type.Size;
+import de.jtem.halfedgetools.adapter.type.TexCoordinate;
 
 
-public class ConverterHeds2JR 
-<
-V extends Vertex<V, E, F>,
-E extends Edge<V, E, F>, 
-F extends Face<V, E, F> > {
+public class ConverterHeds2JR {
 	protected List<double[]> coordinates=null;
 	protected List<double[]> colors=null;
 	protected List<double[]> normals=null;
@@ -72,7 +39,6 @@ F extends Face<V, E, F> > {
 	protected List<Double> pointSize=null;
 
 	public IndexedFaceSet ifs;
-	public HalfEdgeDataStructure<V,E,F> heds;
 	/** 
 	 * can convert a HalfEdgeDataStructure 
 	 * to an IndexedFaceSet(JReality) 
@@ -105,28 +71,23 @@ F extends Face<V, E, F> > {
 	 * @return converted heds as IndexedFaceSet
 	 * @throws IllegalArgumentException
 	 */
-	@SuppressWarnings("unchecked")
-	public IndexedFaceSet heds2ifs(HalfEdgeDataStructure<V, E, F> heds
-			, Adapter... adapters) throws IllegalArgumentException{
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F> 
+	> IndexedFaceSet heds2ifs(HalfEdgeDataStructure<V, E, F> heds, AdapterSet adapters, Map<E, Integer> edgeMap) throws AdapterException {
+		if (!adapters.isAvailable(Position.class, heds.getVertexClass(), double[].class)) {
+			throw new AdapterException("No vertex position adapter found in ConverterHeds2Jr.heds2ifs");
+		}
 		// seperate adapters
-		List<Adapter> vertexAdapters = new LinkedList<Adapter>(); 
-		List<Adapter> faceAdapters = new LinkedList<Adapter>(); 
-		List<Adapter> edgeAdapters = new LinkedList<Adapter>();
-		boolean hasCoords=false;
-		for(Adapter a: adapters){
-			if(a.getAdapterType()==AdapterType.VERTEX_ADAPTER){
-				vertexAdapters.add(a);
-				if (a instanceof CoordinateAdapter2Ifs)
-					hasCoords=true;
-			}
-			else if (a.getAdapterType()==AdapterType.EDGE_ADAPTER)
-				edgeAdapters.add(a);
-			else if (a.getAdapterType()==AdapterType.FACE_ADAPTER)
-				faceAdapters.add(a);
-		}	
-		if(!hasCoords) throw new IllegalArgumentException("No coordinateAdapter found");
+		if (edgeMap != null) {
+			edgeMap.clear();
+		}
 		// some facts
-		int numV =heds.numVertices();	if (numV==0) return null; 
+		int numV =heds.numVertices();	
+		if (numV==0) {
+			return null; 
+		}
 		int numHE =heds.numEdges();
 		int numE =numHE/2;
 		int numF =heds.numFaces();
@@ -136,54 +97,53 @@ F extends Face<V, E, F> > {
 		ifs.setNumFaces(numF);
 		// Vertices
 		resetData();
-		for (int i = 0; i < numV; i++){
-			V v= heds.getVertex(i);
-			readOutData(vertexAdapters,v);
+		for (V v : heds.getVertices()){
+			readOutData(adapters, v);
 		}
-		ifs.setVertexAttributes(Attribute.COORDINATES,getdoubleArrayArray(coordinates));
-		if(colors.size()>0) ifs.setVertexAttributes(Attribute.COLORS,getdoubleArrayArray(colors)); 
-		if(normals.size()>0) ifs.setVertexAttributes(Attribute.NORMALS,getdoubleArrayArray(normals)); 
-		if(textCoords.size()>0) ifs.setVertexAttributes(Attribute.TEXTURE_COORDINATES,getdoubleArrayArray(textCoords)); 
-		if(labels.size()>0) ifs.setVertexAttributes(Attribute.LABELS,getStringArray(labels));
-		if(radius.size()>0) ifs.setVertexAttributes(Attribute.RELATIVE_RADII,getdoubleArray(radius));
-		if(pointSize.size()>0) ifs.setVertexAttributes(Attribute.POINT_SIZE,getdoubleArray(pointSize));
+		ifs.setVertexAttributes(Attribute.COORDINATES, getdoubleArrayArray(coordinates));
+		if(colors.size() > 0) ifs.setVertexAttributes(Attribute.COLORS, getdoubleArrayArray(colors)); 
+		if(normals.size() > 0) ifs.setVertexAttributes(Attribute.NORMALS, getdoubleArrayArray(normals)); 
+		if(textCoords.size() > 0) ifs.setVertexAttributes(Attribute.TEXTURE_COORDINATES, getdoubleArrayArray(textCoords)); 
+		if(labels.size() > 0) ifs.setVertexAttributes(Attribute.LABELS, getStringArray(labels));
+		if(radius.size() > 0) ifs.setVertexAttributes(Attribute.RELATIVE_RADII, getdoubleArray(radius));
+		if(pointSize.size() > 0) ifs.setVertexAttributes(Attribute.POINT_SIZE, getdoubleArray(pointSize));
 		// Edges
 		resetData();
 		int[][] edgeIndis= new int[numE][2];
 		
-		int k=0;
-		for (int i = 0; i < numHE; i++) {
-			E e= heds.getEdge(i);
-			if(e.isPositive()){
-				edgeIndis[k][0]=e.getOppositeEdge().getTargetVertex().getIndex();
-				edgeIndis[k][1]=e.getTargetVertex().getIndex();
-				k++;
-				readOutData(edgeAdapters, e);
+		int k = 0;
+		for (E e : heds.getPositiveEdges()) {
+			if (edgeMap != null) {
+				edgeMap.put(e, k);
+				edgeMap.put(e.getOppositeEdge(), k);
 			}
+			edgeIndis[k][0]=e.getOppositeEdge().getTargetVertex().getIndex();
+			edgeIndis[k][1]=e.getTargetVertex().getIndex();
+			readOutData(adapters, e);
+			k++;
 		}
-		ifs.setEdgeAttributes(Attribute.INDICES,new IntArrayArray.Array(edgeIndis)); 
-		if(coordinates.size()>0)ifs.setEdgeAttributes(Attribute.COORDINATES,getdoubleArrayArray(coordinates));
-		if(colors.size()>0) ifs.setEdgeAttributes(Attribute.COLORS,getdoubleArrayArray(colors)); 
-		if(normals.size()>0) ifs.setEdgeAttributes(Attribute.NORMALS,getdoubleArrayArray(normals)); 
-		if(textCoords.size()>0) ifs.setEdgeAttributes(Attribute.TEXTURE_COORDINATES,getdoubleArrayArray(textCoords)); 
-		if(labels.size()>0) ifs.setEdgeAttributes(Attribute.LABELS,getStringArray(labels));
-		if(radius.size()>0) ifs.setEdgeAttributes(Attribute.RELATIVE_RADII,getdoubleArray(radius));
-		if(pointSize.size()>0) ifs.setEdgeAttributes(Attribute.POINT_SIZE,getdoubleArray(pointSize));
+		ifs.setEdgeAttributes(Attribute.INDICES, new IntArrayArray.Array(edgeIndis)); 
+		if(coordinates.size() > 0)ifs.setEdgeAttributes(Attribute.COORDINATES, getdoubleArrayArray(coordinates));
+		if(colors.size() > 0) ifs.setEdgeAttributes(Attribute.COLORS, getdoubleArrayArray(colors)); 
+		if(normals.size() > 0) ifs.setEdgeAttributes(Attribute.NORMALS, getdoubleArrayArray(normals)); 
+		if(textCoords.size() > 0) ifs.setEdgeAttributes(Attribute.TEXTURE_COORDINATES, getdoubleArrayArray(textCoords)); 
+		if(labels.size() > 0) ifs.setEdgeAttributes(Attribute.LABELS, getStringArray(labels));
+		if(radius.size() > 0) ifs.setEdgeAttributes(Attribute.RELATIVE_RADII, getdoubleArray(radius));
+		if(pointSize.size() > 0) ifs.setEdgeAttributes(Attribute.POINT_SIZE, getdoubleArray(pointSize));
 		// Faces
 		///
 		resetData();
 		int[][] faceIndices = new int[numF][];
-		for (int i = 0; i < numF; i++) {
-			F f = heds.getFace(i);
+		int i = 0;
+		for (F f : heds.getFaces()) {
 			List<E> b = HalfEdgeUtils.boundaryEdges(f);
 			int[] face = new int[b.size()];
 			int j = 0;
 			for (E e : b) {
-				face[j] = e.getTargetVertex().getIndex();
-				j++;
+				face[j++] = e.getTargetVertex().getIndex();
 			}
-			readOutData(faceAdapters, f);
-			faceIndices[i] = face;
+			readOutData(adapters, f);
+			faceIndices[i++] = face;
 		}
 		ifs.setFaceAttributes(Attribute.INDICES,new IntArrayArray.Array(faceIndices)); 
 		if(coordinates.size()>0)ifs.setFaceAttributes(Attribute.COORDINATES,getdoubleArrayArray(coordinates));
@@ -196,6 +156,7 @@ F extends Face<V, E, F> > {
 		// 
 		return ifs;
 	}
+	
 	private static DataList getdoubleArrayArray(List<double[]> dl){
 		int len= dl.size();
 		double[][] data= new double[len][];
@@ -206,6 +167,7 @@ F extends Face<V, E, F> > {
 		}
 		return new DoubleArrayArray.Array(data);
 	}
+	
 	private static DataList getdoubleArray(List<Double> dl){
 		int len= dl.size();
 		double[]data= new double[len];
@@ -216,6 +178,7 @@ F extends Face<V, E, F> > {
 		}
 		return new DoubleArray(data);
 	}
+	
 	private static DataList getStringArray(List<String> dl){
 		int len= dl.size();
 		String[]data= new String[len];
@@ -226,37 +189,61 @@ F extends Face<V, E, F> > {
 		}
 		return new StringArray(data);
 	}
+
 	
-	@SuppressWarnings("unchecked")
-	private void readOutData(List<Adapter> adapters,Node<?,?,?> n){
-		for(Adapter a: adapters){
-			if (a instanceof CoordinateAdapter2Ifs) {
-				CoordinateAdapter2Ifs<Node<?, ?, ?>> c = (CoordinateAdapter2Ifs) a;
-				coordinates.add(c.getCoordinate(n));
+	private <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		N extends Node<V, E, F>
+	>	void readOutData(AdapterSet adapters, N n){
+		Adapter<double[]> pos = adapters.query(Position.class, n.getClass(), double[].class);
+		Adapter<double[]> color = adapters.query(Color.class, n.getClass(), double[].class);
+		Adapter<double[]> normal = adapters.query(Normal.class, n.getClass(), double[].class);
+		Adapter<double[]> texCoord = adapters.query(TexCoordinate.class, n.getClass(), double[].class);
+		Adapter<String> label = adapters.query(Label.class, n.getClass(), String.class);
+		Adapter<Double> rad = adapters.query(Radius.class, n.getClass(), Double.class); 
+		Adapter<Double> size = adapters.query(Size.class, n.getClass(), Double.class);
+		if (pos != null) {
+			double[] posArr = pos.get(n, adapters);
+			if (posArr != null) {
+				coordinates.add(posArr);
 			}
-			if (a instanceof ColorAdapter2Ifs) {
-				ColorAdapter2Ifs<Node<?, ?, ?>> c = (ColorAdapter2Ifs) a;
-				colors.add(c.getColor(n));
+		}
+		if (color != null) {
+			double[] colorArr = color.get(n, adapters);
+			if (colorArr != null) {
+				colors.add(colorArr);
 			}
-			if (a instanceof NormalAdapter2Ifs){
-				NormalAdapter2Ifs<Node<?, ?, ?>> c = (NormalAdapter2Ifs) a;
-				normals.add(c.getNormal(n));
+		}
+		if (normal != null) {
+			double[] normalArr = normal.get(n, adapters);
+			if (normalArr != null) {
+				normals.add(normalArr);
 			}
-			if (a instanceof TextCoordsAdapter2Ifs ){
-				TextCoordsAdapter2Ifs<Node<?, ?, ?>> c = (TextCoordsAdapter2Ifs) a;
-				textCoords.add(c.getTextCoordinate(n));
+		}
+		if (texCoord != null) {
+			double[] texArr = texCoord.get(n, adapters);
+			if (texArr != null) {
+				textCoords.add(texArr);
 			}
-			if (a instanceof LabelAdapter2Ifs){
-				LabelAdapter2Ifs<Node<?, ?, ?>> c = (LabelAdapter2Ifs) a;
-				labels.add(c.getLabel(n));
+		}
+		if (label != null) {
+			String lab = label.get(n, adapters);
+			if (lab != null) {
+				labels.add(lab);
 			}
-			if (a instanceof RelRadiusAdapter2Ifs){
-				RelRadiusAdapter2Ifs<Node<?, ?, ?>> c = (RelRadiusAdapter2Ifs) a;
-				radius.add(c.getReelRadius(n));
+		}
+		if (rad != null) {
+			Double radObj = rad.get(n, adapters);
+			if (radObj != null) {
+				radius.add(radObj);
 			}
-			if (a instanceof PointSizeAdapter2Ifs){
-				PointSizeAdapter2Ifs<Node<?, ?, ?>> c = (PointSizeAdapter2Ifs) a;
-				pointSize.add(c.getPointSize(n));
+		}
+		if (size != null) {
+			Double sizeObj = size.get(n, adapters);
+			if (sizeObj != null) {
+				pointSize.add(sizeObj);
 			}
 		}
 	}

@@ -31,29 +31,37 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.symmetry.adapters;
 
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
-import de.jtem.halfedgetools.jreality.adapter.ColorAdapter2Ifs;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.AbstractAdapter;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.symmetry.node.SymmetricEdge;
-public class SymmetricSymmetryColorAdapter implements ColorAdapter2Ifs<Node<?, ?, ?>>  {
-	private final AdapterType typ;
 
-	public SymmetricSymmetryColorAdapter(AdapterType typ) {
-		this.typ=typ;
-	}
-	public AdapterType getAdapterType() {
-		return typ;
-	}
+public class SymmetricSymmetryColorAdapter extends AbstractAdapter<double[]> {
 
-	@SuppressWarnings("unchecked")
-	public double[] getColor(Node<?, ?, ?> node) {
-		if(typ==AdapterType.EDGE_ADAPTER){
-			if(((SymmetricEdge)node).isRightOfSymmetryCycle() != null)
-				return new double[]{1,0,0,1};
-			else
-				return new double[] {1,1,1,1};
+	public SymmetricSymmetryColorAdapter() {
+		super(double[].class, true, false);
+	}
+	
+	@Override
+	public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
+		return SymmetricEdge.class.isAssignableFrom(nodeClass);
+	}
+	
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	> double[] getE(E e, AdapterSet a) {
+		SymmetricEdge<?,?,?> se = (SymmetricEdge<?,?,?>)e;
+		if (se.isRightOfSymmetryCycle() != null) {
+			return new double[]{1,0,0,1};
+		} else {
+			return new double[] {1,1,1,1};
 		}
-
-		return new double[]{0,0,1,1};
 	}
 
 }
+

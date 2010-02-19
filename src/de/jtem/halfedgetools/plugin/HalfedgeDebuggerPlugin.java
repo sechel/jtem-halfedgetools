@@ -56,9 +56,7 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.plugin.AnnotationAdapter.EdgeIndexAnnotation;
-import de.jtem.halfedgetools.plugin.AnnotationAdapter.FaceIndexAnnotation;
-import de.jtem.halfedgetools.plugin.AnnotationAdapter.VertexIndexAnnotation;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.java2dx.beans.Viewer2DWithInspector;
 import de.jtem.java2dx.modelling.GraphicsModeller2D;
 import de.jtem.java2dx.modelling.SimpleModeller2D;
@@ -67,14 +65,9 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
-public class HalfedgeDebuggerPlugin <
-V extends Vertex<V,E,F>,
-E extends Edge<V,E,F> ,
-F extends Face<V,E,F>,
-HDS extends HalfEdgeDataStructure<V,E,F>
-> extends ShrinkPanelPlugin implements ActionListener, ChangeListener {
+public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionListener, ChangeListener {
 
-	private HalfedgeInterfacePlugin<V,E,F,HDS>
+	private HalfedgeInterface
 		hcp = null;
 	private SimpleModeller2D
 		moddeller = new GraphicsModeller2D();
@@ -105,15 +98,10 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		navigationPanel = new JPanel(),
 		debugPanel = new JPanel();
 	
-	private HDS
+	private HalfEdgeDataStructure<?, ?, ?>
 		hds = null;
-	private AnnotationAdapter<?>[]
-	    defaultAnnotators = {
-			new VertexIndexAnnotation<V>(), 
-			new EdgeIndexAnnotation<E>(), 
-			new FaceIndexAnnotation<F>()
-		},
-		lastAnnotators = defaultAnnotators;
+	private AdapterSet
+		lastAdapters = new AdapterSet();
 
 	public HalfedgeDebuggerPlugin() {
 		makeLayout();
@@ -191,10 +179,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 	public void actionPerformed(ActionEvent e) {
 		Object s = e.getSource();
 		if (getGeometryButton == s) {
-			hds = hcp.getBlankHDS();
-//			hds = (HalfEdgeDataStructure<V, E, F>) new HalfEdgeDataStructure<StandardVertex, StandardEdge, StandardFace>(StandardVertex.class, StandardEdge.class, StandardFace.class);
-//			hcp.convertActiveGeometryToHDS(hds, new StandardCoordinateAdapter(VERTEX_ADAPTER));
-			hds = hcp.getCachedHalfEdgeDataStructure();
+			hds = hcp.get(hds);
 			setData(hds);
 		}
 		if (continueButton == s) {
@@ -206,20 +191,20 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 			return;
 		}
 		if (makeTutte == s) {
-			makeTutte(0, false, lastAnnotators);
+			makeTutte(0, false, lastAdapters);
 		}
 	}
 	
 	public void stateChanged(ChangeEvent e) {
 		Object s = e.getSource();
 		if (vertexSpinner == s) {
-			makeVertexCloseUp(vertexNumberModel.getNumber().intValue(), false, lastAnnotators);
+			makeVertexCloseUp(vertexNumberModel.getNumber().intValue(), false, lastAdapters);
 		}
 		if (edgeSpinner == s) {
-			makeEdgeCloseUp(edgeNumberModel.getNumber().intValue(), false, lastAnnotators);
+			makeEdgeCloseUp(edgeNumberModel.getNumber().intValue(), false, lastAdapters);
 		}
 		if (faceSpinner == s) {
-			makeFaceCloseUp(faceNumberModel.getNumber().intValue(), false, lastAnnotators);
+			makeFaceCloseUp(faceNumberModel.getNumber().intValue(), false, lastAdapters);
 		}
 	}
 	
@@ -248,7 +233,7 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 	}
 	
 	
-	public void makeNeighborhood(int rootVertexIndex, int neighborhood, boolean wait, AnnotationAdapter<?>... a) {
+	public void makeNeighborhood(int rootVertexIndex, int neighborhood, boolean wait, AdapterSet a) {
 		if (hds == null) {
 			throw new IllegalArgumentException("No data structure set in HalfedgeDebuggetPlugin");
 		}
@@ -269,13 +254,13 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 			a
 		);
 		updateSceneOnEventThread();
-		lastAnnotators = a;
+		lastAdapters = a;
 		if (wait) {
 			parkInvokeThread();
 		}
 	}
 	
-	public void makeTutte(int boundFaceIndex, boolean wait, AnnotationAdapter<?>... a) {
+	public void makeTutte(int boundFaceIndex, boolean wait, AdapterSet a) {
 		if (hds == null) {
 			throw new IllegalArgumentException("No data structure set in HalfedgeDebuggetPlugin");
 		}
@@ -283,24 +268,24 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 			throw new IllegalArgumentException("Face index out of range in makeTutte()");
 		}
 		setData(hds);
-		DebugFactory.makeTutte(
-			hds, 
-			hds.getFace(boundFaceIndex), 			
-			showVertices, 
-			showEdges, 
-			showFaces, 
-			moddeller,
-			a
-		);
+//		DebugFactory.makeTutte(
+//			hds, 
+//			hds.getFace(boundFaceIndex), 			
+//			showVertices, 
+//			showEdges, 
+//			showFaces, 
+//			moddeller,
+//			a
+//		);
 		updateSceneOnEventThread();
-		lastAnnotators = a;
+		lastAdapters = a;
 		if (wait) {
 			parkInvokeThread();
 		}
 	}
 	
 	
-	public void makeVertexCloseUp(int vertexIndex, boolean wait, AnnotationAdapter<?>... a) {
+	public void makeVertexCloseUp(int vertexIndex, boolean wait, AdapterSet a) {
 		if (hds == null) {
 			throw new IllegalArgumentException("No data structure set in HalfedgeDebuggetPlugin");
 		}
@@ -308,15 +293,15 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 			throw new IllegalArgumentException("Vertex index out of range in makeVertexCloseUp()");
 		}
 		setData(hds);
-		DebugFactory.makeVertexCloseUp(hds, hds.getVertex(vertexIndex), moddeller, a);
+		DebugFactory.makeVertexCloseUp(hds.getVertex(vertexIndex), moddeller, a);
 		updateSceneOnEventThread();
-		lastAnnotators = a;
+		lastAdapters = a;
 		if (wait) {
 			parkInvokeThread();
 		}
 	}
 	
-	public void makeEdgeCloseUp(int edgeIndex, boolean wait, AnnotationAdapter<?>... a) {
+	public void makeEdgeCloseUp(int edgeIndex, boolean wait, AdapterSet a) {
 		if (hds == null) {
 			throw new IllegalArgumentException("No data structure set in HalfedgeDebuggetPlugin");
 		}
@@ -324,15 +309,15 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 			throw new IllegalArgumentException("Edge index out of range in makeEdgeCloseUp()");
 		}
 		setData(hds);
-		DebugFactory.makeEdgeCloseUp(hds, hds.getEdge(edgeIndex), moddeller, a);
+		DebugFactory.makeEdgeCloseUp(hds.getEdge(edgeIndex), moddeller, a);
 		updateSceneOnEventThread();
-		lastAnnotators = a; 
+		lastAdapters = a; 
 		if (wait) {
 			parkInvokeThread();
 		}
 	}
 	
-	public void makeFaceCloseUp(int faceIndex, boolean wait, AnnotationAdapter<?>... a) {
+	public void makeFaceCloseUp(int faceIndex, boolean wait, AdapterSet a) {
 		if (hds == null) {
 			throw new IllegalArgumentException("No data structure set in HalfedgeDebuggetPlugin");
 		}
@@ -340,16 +325,21 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 			throw new IllegalArgumentException("Face index out of range in makeFaceCloseUp()");
 		}
 		setData(hds);
-		DebugFactory.makeFaceCloseUp(hds, hds.getFace(faceIndex), moddeller, a);
+		DebugFactory.makeFaceCloseUp(hds.getFace(faceIndex), moddeller, a);
 		updateSceneOnEventThread();
-		lastAnnotators = a;
+		lastAdapters = a;
 		if (wait) {
 			parkInvokeThread();
 		}
 	}
 	
 	
-	public void setData(HDS hds) {
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void setData(HDS hds) {
 		this.hds = hds;
 		vertexSpinner.removeChangeListener(this);
 		edgeSpinner.removeChangeListener(this);
@@ -364,7 +354,6 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		dataLabel.repaint();
 		moddeller.getViewer().getRoot().removeAllChildren();
 		moddeller.getViewer().repaint();
-		lastAnnotators = defaultAnnotators;
 	}
 	
 	
@@ -392,11 +381,10 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		return View.class;
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
-		hcp = c.getPlugin(HalfedgeInterfacePlugin.class);
+		hcp = c.getPlugin(HalfedgeInterface.class);
 	}
 	
 	

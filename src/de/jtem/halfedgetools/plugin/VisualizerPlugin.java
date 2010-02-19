@@ -35,13 +35,13 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 
-import de.jtem.halfedgetools.jreality.adapter.Adapter;
+import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 
 public abstract class VisualizerPlugin extends Plugin {
 
-	public abstract Set<? extends Adapter> getAdapters();
+	public abstract Set<? extends Adapter<?>> getAdapters();
 	
 	protected VisualizersManager
 		manager = null;

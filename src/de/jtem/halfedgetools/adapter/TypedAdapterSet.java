@@ -2,7 +2,6 @@ package de.jtem.halfedgetools.adapter;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
-import java.util.Iterator;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -11,6 +10,8 @@ import de.jtem.halfedge.Vertex;
 
 public class TypedAdapterSet <VAL> extends AdapterSet {
 
+	private static final long 
+		serialVersionUID = 1L;
 	private Class<VAL>
 		typeClass = null;
 	
@@ -40,9 +41,9 @@ public class TypedAdapterSet <VAL> extends AdapterSet {
 	public <
 		A extends Annotation, 
 		N extends Node<?, ?, ?>
-	> Adapter<VAL> queryGetter(Class<A> type, Class<N> noteType) {
+	> Adapter<VAL> query(Class<A> type, Class<N> noteType) {
 		Adapter<VAL> result = null;
-		for (Adapter<?> a : adapters) {
+		for (Adapter<?> a : this) {
 			if (a.getClass().isAnnotationPresent(type) && a.canAccept(noteType)) {
 				result = (Adapter<VAL>)a;
 				break;
@@ -55,7 +56,7 @@ public class TypedAdapterSet <VAL> extends AdapterSet {
 		A extends Annotation, 
 		N extends Node<?, ?, ?>
 	> boolean hasGetter(Class<A> type, Class<N> noteType) {
-		return queryGetter(type, noteType) != null;
+		return query(type, noteType) != null;
 	}
 	
 	
@@ -65,7 +66,7 @@ public class TypedAdapterSet <VAL> extends AdapterSet {
 		N extends Node<?, ?, ?>
 	> Adapter<VAL> querySetter(Class<A> type, Class<N> noteType) {
 		Adapter<VAL> result = null;
-		for (Adapter<?> a : adapters) {
+		for (Adapter<?> a : this) {
 			if (a.getClass().isAnnotationPresent(type) && a.canAccept(noteType)) {
 				result = (Adapter<VAL>)a;
 				break;
@@ -86,7 +87,7 @@ public class TypedAdapterSet <VAL> extends AdapterSet {
 		N extends Node<?, ?, ?>
 	> TypedAdapterSet<VAL> queryGetter(Class<N> noteType) throws AdapterException {
 		TypedAdapterSet<VAL> set = new TypedAdapterSet<VAL>(typeClass);
-		for (Adapter<?> a : adapters) {
+		for (Adapter<?> a : this) {
 			if (a.canAccept(noteType)) {
 				set.add(a);
 			}
@@ -99,7 +100,7 @@ public class TypedAdapterSet <VAL> extends AdapterSet {
 		N extends Node<?, ?, ?>
 	> TypedAdapterSet<VAL> querySetter(Class<N> noteType) throws AdapterException {
 		TypedAdapterSet<VAL> set = new TypedAdapterSet<VAL>(typeClass);
-		for (Adapter<?> a : adapters) {
+		for (Adapter<?> a : this) {
 			if (a.canAccept(noteType)) {
 				set.add(a);
 			}
@@ -116,7 +117,7 @@ public class TypedAdapterSet <VAL> extends AdapterSet {
 		F extends Face<V, E, F>,		
 		N extends Node<V, E, F>
 	> VAL get(Class<A> type, N n) {
-		Adapter<VAL> a = queryGetter(type, n.getClass());
+		Adapter<VAL> a = query(type, n.getClass());
 		if (a != null) {
 			if (n instanceof Vertex<?, ?, ?>) {
 				return typeClass.cast(a.getV((V)n, this));	
@@ -130,82 +131,5 @@ public class TypedAdapterSet <VAL> extends AdapterSet {
 		}
 		return null;
 	}
-	
-
-	public boolean add(Adapter<?> e) {
-		return adapters.add(e);
-	}
-
-	@Override
-	public boolean addAll(Collection<? extends Adapter<?>> c) {
-		return adapters.addAll(c);
-	}
-	
-	public void addAll(Adapter<?>[] aArr) {
-		for (Adapter<?> a : aArr) {
-			add(a);
-		}
-	}
-
-	@Override
-	public void clear() {
-		adapters.clear();
-	}
-
-	@Override
-	public boolean contains(Object o) {
-		return adapters.contains(o);
-	}
-
-	@Override
-	public boolean containsAll(Collection<?> c) {
-		return adapters.containsAll(c);
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return adapters.isEmpty();
-	}
-
-	@Override
-	public Iterator<Adapter<?>> iterator() {
-		return adapters.iterator();
-	}
-
-	@Override
-	public boolean remove(Object o) {
-		return adapters.remove(o);
-	}
-
-	@Override
-	public boolean removeAll(Collection<?> c) {
-		return adapters.removeAll(c);
-	}
-
-	@Override
-	public boolean retainAll(Collection<?> c) {
-		return adapters.retainAll(c);
-	}
-
-	@Override
-	public int size() {
-		return adapters.size();
-	}
-
-	@Override
-	public Object[] toArray() {
-		return adapters.toArray();
-	}
-
-	@Override
-	public <T> T[] toArray(T[] a) {
-		return adapters.toArray(a);
-	}
-	
-	@Override
-	public String toString() {
-		return adapters.toString();
-	}
-	
 	
 }

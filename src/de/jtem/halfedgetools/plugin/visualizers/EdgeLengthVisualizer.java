@@ -46,9 +46,15 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.jreality.math.Rn;
-import de.jtem.halfedgetools.jreality.adapter.Adapter;
-import de.jtem.halfedgetools.jreality.adapter.LabelAdapter2Ifs;
-import de.jtem.halfedgetools.jreality.node.JREdge;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.Node;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.AbstractAdapter;
+import de.jtem.halfedgetools.adapter.Adapter;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Label;
+import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
 
 public class EdgeLengthVisualizer extends VisualizerPlugin implements ChangeListener {
@@ -92,22 +98,31 @@ public class EdgeLengthVisualizer extends VisualizerPlugin implements ChangeList
 		updateContent();
 	}
 	
-	public class EdgeLengthAdapter <E extends JREdge<?, E, ?>> implements  LabelAdapter2Ifs<E> {
+	
+	@Label
+	public class EdgeLengthAdapter extends AbstractAdapter<String> {
 
-		@Override
-		public AdapterType getAdapterType() {
-			return AdapterType.EDGE_ADAPTER;
-		}
-
-		@Override
-		public String getLabel(E e) {
-			double[] p1 = e.getStartVertex().position;
-			double[] p2 = e.getTargetVertex().position;
-			double l = Rn.euclideanDistance(p1, p2);
-			return format.format(l);
+		public EdgeLengthAdapter() {
+			super(String.class, true, false);
 		}
 		
+		public <T extends Node<?, ?, ?>> boolean canAccept(Class<T> nodeClass) {
+			return Edge.class.isAssignableFrom(nodeClass);
+		}
+		
+		public <
+			V extends Vertex<V, E, F>,
+			E extends Edge<V, E, F>,
+			F extends Face<V, E, F>
+		> String getE(E e, AdapterSet a) {
+			double[] s = a.getDefault(Position.class, e.getStartVertex(), new double[] {0, 0, 0});
+			double[] t = a.getDefault(Position.class, e.getTargetVertex(), new double[] {0, 0, 0});
+			double l = Rn.euclideanDistance(s, t);
+			return format.format(l);
+		}	
+
 	}
+	
 	
 	@Override
 	public JPanel getOptionPanel() {
@@ -115,9 +130,8 @@ public class EdgeLengthVisualizer extends VisualizerPlugin implements ChangeList
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public Set<? extends Adapter> getAdapters() {
+	public Set<? extends Adapter<?>> getAdapters() {
 		return Collections.singleton(new EdgeLengthAdapter());
 	}
 

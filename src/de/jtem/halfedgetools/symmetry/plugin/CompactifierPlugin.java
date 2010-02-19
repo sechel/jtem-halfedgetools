@@ -76,13 +76,12 @@ import de.jtem.discretegroup.core.DiscreteGroupUtility;
 import de.jtem.discretegroup.core.FiniteStateAutomaton;
 import de.jtem.discretegroup.core.Platycosm;
 import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType;
-import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
-import de.jtem.halfedgetools.symmetry.adapters.SymmetricCoordinateAdapter;
-import de.jtem.halfedgetools.symmetry.standard.SEdge;
-import de.jtem.halfedgetools.symmetry.standard.SFace;
-import de.jtem.halfedgetools.symmetry.standard.SHDS;
-import de.jtem.halfedgetools.symmetry.standard.SVertex;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.symmetry.node.SEdge;
+import de.jtem.halfedgetools.symmetry.node.SFace;
+import de.jtem.halfedgetools.symmetry.node.SHDS;
+import de.jtem.halfedgetools.symmetry.node.SVertex;
 import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.jrworkspace.plugin.Controller;
@@ -94,7 +93,7 @@ import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
 public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavor, ActionListener {
 
-	private HalfedgeInterfacePlugin<SVertex,SEdge,SFace,SHDS>
+	private HalfedgeInterface
 		hedsConnector = null;
 	private JSpinner
 		leftIndexSpinner = null,
@@ -121,8 +120,6 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 
 	Platycosm theGroup = null;
 	private List<DiscreteGroupElement> generators = new LinkedList<DiscreteGroupElement>();
-	private SymmetricCoordinateAdapter coordApt = new SymmetricCoordinateAdapter(AdapterType.VERTEX_ADAPTER);
-	
 	
 	public void createControls() {
 		Insets insets = new Insets(2, 2, 2, 2);
@@ -225,12 +222,11 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		shrinkPanel.setHeaderColor(Color.orange);
 		content = JRViewerUtility.getContentPlugin(c);
-		hedsConnector = c.getPlugin(HalfedgeInterfacePlugin.class);
+		hedsConnector = c.getPlugin(HalfedgeInterface.class);
 		
 		tl = new DragEventTool(InputSlot.SHIFT_LEFT_BUTTON);
 
@@ -321,8 +317,7 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 		}
 		
 		if(e.getSource() == identifyButton) {
-			
-			SHDS hds = hedsConnector.getCachedHalfEdgeDataStructure();
+			SHDS hds = hedsConnector.get(new SHDS(), new AdapterSet());
 
 			SFace f1 = null, f2 = null;
 			SEdge e1 = null, e2 = null;
@@ -338,6 +333,9 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 				if(ee.getTargetVertex() == v1)
 					e1 = ee;
 			}
+			if (e1 == null) {
+				throw new RuntimeException(v1 + " is not in the boundary of " + f1);
+			}
 			
 			for(SEdge ee : HalfEdgeUtilsExtra.getBoundary(f2)) {
 				if(ee.getStartVertex() == v2)
@@ -349,17 +347,20 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 				if(ee.getTargetVertex() == v2)
 					e3 = ee;
 			}
+			if (e3 == null) {
+				throw new RuntimeException(v2 + " is not in the boundary of " + f2);
+			}
 			
 			// create generator for this identification
-			double[] generator = Rn.subtract(null, coordApt.getCoordinate(v2), coordApt.getCoordinate(v1));
+			double[] generator = Rn.subtract(null, v2.getEmbedding(), v1.getEmbedding());
 			DiscreteGroupElement gen = new DiscreteGroupElement();
 
 			
 			
 			// calc first frame
-			double[] p0 = coordApt.getCoordinate(e1.getNextEdge().getTargetVertex());
-			double[] p1 = coordApt.getCoordinate(v1);
-			double[] p2 = coordApt.getCoordinate(e1.getPreviousEdge().getTargetVertex());
+			double[] p0 = e1.getNextEdge().getTargetVertex().getEmbedding();
+			double[] p1 = v1.getEmbedding();
+			double[] p2 = e1.getPreviousEdge().getTargetVertex().getEmbedding();
 			
 			double[] ee1 = Rn.normalize(null, Rn.subtract(null, p0, p1));
 			double[] ee2 = Rn.normalize(null, Rn.subtract(null, p2, p1));
@@ -369,9 +370,9 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 //			double[] q0 = coordApt.getCoordinate(e2.getTargetVertex());
 //			double[] q1 = coordApt.getCoordinate(v2);
 //			double[] q2 = coordApt.getCoordinate(e2.getPreviouSymmetricEdge().getStartVertex());
-			double[] q2 = coordApt.getCoordinate(e3.getNextEdge().getTargetVertex());
-			double[] q1 = coordApt.getCoordinate(v2);
-			double[] q0 = coordApt.getCoordinate(e3.getPreviousEdge().getTargetVertex());
+			double[] q2 = e3.getNextEdge().getTargetVertex().getEmbedding();
+			double[] q1 = v2.getEmbedding();
+			double[] q0 = e3.getPreviousEdge().getTargetVertex().getEmbedding();
 			
 			
 			double[] ff1 = Rn.normalize(null, Rn.subtract(null, q0, q1));
@@ -480,7 +481,7 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 			generateGroup();
 			hds.setGroup(theGroup);
 			
-			hedsConnector.updateHalfedgeContentAndActiveGeometry(hds);
+			hedsConnector.set(hds, new AdapterSet());
 			
 			leftIndexSpinner.setValue(0);
 			leftIndexVertexSpinner.setValue(0);

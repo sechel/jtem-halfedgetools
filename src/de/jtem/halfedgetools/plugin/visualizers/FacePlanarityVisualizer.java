@@ -41,7 +41,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.DecimalFormat;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -53,13 +53,18 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.jreality.math.Rn;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Node;
+import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.jreality.adapter.Adapter;
-import de.jtem.halfedgetools.jreality.adapter.ColorAdapter2Ifs;
-import de.jtem.halfedgetools.jreality.adapter.LabelAdapter2Ifs;
-import de.jtem.halfedgetools.jreality.node.JREdge;
-import de.jtem.halfedgetools.jreality.node.JRFace;
+import de.jtem.halfedgetools.adapter.AbstractAdapter;
+import de.jtem.halfedgetools.adapter.Adapter;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Color;
+import de.jtem.halfedgetools.adapter.type.Label;
+import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
 
 public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeListener {
@@ -105,12 +110,14 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 	
 
 	public static <
-		E extends JREdge<?, E, F>, 
-		F extends JRFace<?, E, F>
-	> double getMaxUnevenness(HalfEdgeDataStructure<?, E, F> hds){
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> double getMaxUnevenness(HDS hds, AdapterSet a){
 		double maxUneven = 0.0;
 		for (F f : hds.getFaces()) {
-			double vol = getRelativeUnevenness(f);
+			double vol = getRelativeUnevenness(f, a);
 			if (vol > maxUneven)
 				maxUneven = vol;
 		}
@@ -119,12 +126,14 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 
 
 	public static <
-		E extends JREdge<?, E, F>, 
-		F extends JRFace<?, E, F>
-	> double getMinUnevenness(HalfEdgeDataStructure<?, E, F> hds){
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> double getMinUnevenness(HDS hds, AdapterSet a){
 		double minUneven = Double.MAX_VALUE;
 		for (F f : hds.getFaces()) {
-			double vol = getRelativeUnevenness(f);
+			double vol = getRelativeUnevenness(f, a);
 			if (vol < minUneven)
 				minUneven = vol;
 		}
@@ -133,13 +142,15 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 
 
 	public static <
-		E extends JREdge<?, E, F>, 
-		F extends JRFace<?, E, F>
-	> double getMeanUnevenness(HalfEdgeDataStructure<?, E, F> hds){
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> double getMeanUnevenness(HDS hds, AdapterSet a){
 		double meanVol = 0.0;
 		int count = 0;
 		for (F f : hds.getFaces()) {
-			meanVol += getRelativeUnevenness(f);
+			meanVol += getRelativeUnevenness(f, a);
 			count++;
 		}
 		return meanVol / count;
@@ -147,16 +158,17 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 
 
 	public static <
-		E extends JREdge<?, E, F>, 
-		F extends JRFace<?, E, F>
-	> double getRelativeUnevenness(F f) {
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	> double getRelativeUnevenness(F f, AdapterSet ad) {
 		List<E> boundary = HalfEdgeUtils.boundaryEdges(f);
 		if (boundary.size() != 4)
 			return 0.0;
-		double[] a = boundary.get(0).getTargetVertex().position;
-		double[] b = boundary.get(1).getTargetVertex().position;
-		double[] c = boundary.get(2).getTargetVertex().position;
-		double[] d = boundary.get(3).getTargetVertex().position;
+		double[] a = ad.get(Position.class, boundary.get(0).getTargetVertex(), double[].class);
+		double[] b = ad.get(Position.class, boundary.get(1).getTargetVertex(), double[].class);
+		double[] c = ad.get(Position.class, boundary.get(2).getTargetVertex(), double[].class);
+		double[] d = ad.get(Position.class, boundary.get(3).getTargetVertex(), double[].class);
 		double[] Mtetraeder = {c[0] - a[0], c[1] - a[1], c[2] - a[2], b[0] - a[0], b[1] - a[1], b[2] - a[2], d[0] - a[0], d[1] - a[1], d[2] - a[2]};
 		double vol = determinant(Mtetraeder);
 		double[][] point = {a,b,c,d};
@@ -176,29 +188,55 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 	}
 	
 	
-	public class PlanarityAdapter <
-		E extends JREdge<?, E, F>, 
-		F extends JRFace<?, E, F>
-	>  implements LabelAdapter2Ifs<F>, ColorAdapter2Ifs<F> {
-
-		@Override
-		public AdapterType getAdapterType() {
-			return AdapterType.FACE_ADAPTER;
+	@Label
+	private class PlanarityLabelAdapter extends AbstractAdapter<String> {
+		
+		public PlanarityLabelAdapter() {
+			super(String.class, true, false);
 		}
 
 		@Override
-		public String getLabel(F f) {
-			return format.format(getRelativeUnevenness(f) * 100) + "%";
+		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
+			return Face.class.isAssignableFrom(nodeClass);
 		}
 		
+		public <
+			V extends Vertex<V, E, F>,
+			E extends Edge<V, E, F>,
+			F extends Face<V, E, F>
+		> String getF(F f, AdapterSet a) {
+			return format.format(getRelativeUnevenness(f, a) * 100) + "%";
+		}
+		
+	}
+
+	
+	
+	@Color
+	private class PlanarityColorAdapter extends AbstractAdapter<double[]> {
+		
+		public PlanarityColorAdapter() {
+			super(double[].class, true, false);
+		}
+
 		@Override
-		public double[] getColor(F f) {
-			double maxUnevenness = getMaxUnevenness(f.getHalfEdgeDataStructure());
-			double col = getRelativeUnevenness(f) / maxUnevenness;
+		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
+			return Face.class.isAssignableFrom(nodeClass);
+		}
+		
+		public <
+			V extends Vertex<V, E, F>,
+			E extends Edge<V, E, F>,
+			F extends Face<V, E, F>
+		> double[] getF(F f, AdapterSet a) {
+			double maxUnevenness = getMaxUnevenness(f.getHalfEdgeDataStructure(), a);
+			double col = getRelativeUnevenness(f, a) / maxUnevenness;
 			return new double[]{col, 1 - col, 0};
 		}
 		
 	}
+	
+	
 	
 	@Override
 	public JPanel getOptionPanel() {
@@ -206,10 +244,12 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public Set<? extends Adapter> getAdapters() {
-		return Collections.singleton(new PlanarityAdapter());
+	public Set<? extends Adapter<?>> getAdapters() {
+		Set<Adapter<?>> result = new HashSet<Adapter<?>>();
+		result.add(new PlanarityColorAdapter());
+		result.add(new PlanarityLabelAdapter());
+		return result;
 	}
 
 

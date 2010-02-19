@@ -36,15 +36,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 import de.jreality.math.Rn;
 import de.jtem.discretegroup.core.DiscreteGroupElement;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.adapter.Bundle;
+import de.jtem.halfedgetools.adapter.Bundle.BundleType;
+import de.jtem.halfedgetools.adapter.Bundle.DisplayType;
 import de.jtem.halfedgetools.algorithm.delaunay.decorations.IsFlippable;
-import de.jtem.halfedgetools.jreality.Bundle;
-import de.jtem.halfedgetools.jreality.Bundle.BundleType;
-import de.jtem.halfedgetools.jreality.Bundle.DisplayType;
 import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
 import de.jtem.halfedgetools.util.triangulationutilities.TriangulationException;
 
@@ -255,7 +254,7 @@ F extends SymmetricFace<V, E, F>
 	}
 
 
-	@Bundle(dimension=1, type=BundleType.Value, display=DisplayType.List, name="sc")
+	@Bundle(dimension=1, type=BundleType.Value, display=DisplayType.Label, name="sc")
 	public boolean isSymmetryEdge() {
 		CuttingInfo<V,E,F> ci = getSymmetryCycleInfo();
 		if(ci == null) {
@@ -273,6 +272,26 @@ F extends SymmetricFace<V, E, F>
 		return false;
 
 	}
+	
+	@Bundle(dimension=1, type=BundleType.Transformation, display=DisplayType.Geometry, name="sc")
+	public DiscreteGroupElement getSymmetryCycle() {
+		CuttingInfo<V,E,F> ci = getSymmetryCycleInfo();
+		if(ci == null) {
+			return null;
+		}
+
+		for(Set<E> cycle : ci.paths.keySet()) {
+			
+			if(cycle.contains(getOppositeEdge()) || cycle.contains(this)) {
+				return (DiscreteGroupElement)ci.paths.get(cycle);
+			}
+		}
+		
+		return null;
+
+	}
+	
+	
 	
 	public void flip() throws TriangulationException{
 //		if (!ConsistencyCheck.isValidSurface(getHalfEdgeDataStructure()))

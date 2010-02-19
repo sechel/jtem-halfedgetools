@@ -17,18 +17,19 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
-import de.jtem.halfedgetools.algorithm.simplification.adapters.SimplificationAdapters.AreaAdapter;
-import de.jtem.halfedgetools.algorithm.simplification.adapters.SimplificationAdapters.NormalAdapter;
+import de.jtem.halfedgetools.algorithm.calculator.FaceAreaCalculator;
+import de.jtem.halfedgetools.algorithm.calculator.FaceNormalCalculator;
+import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 import de.jtem.halfedgetools.util.HalfEdgeTopologyOperations;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 
 public class GarlandHeckbert<
-		V extends Vertex<V, E, F>, 
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>, 
-		HEDS extends HalfEdgeDataStructure<V, E, F>
-	> {
+	V extends Vertex<V, E, F>, 
+	E extends Edge<V, E, F>, 
+	F extends Face<V, E, F>, 
+	HEDS extends HalfEdgeDataStructure<V, E, F>
+> {
+	
 	HEDS activeMesh;
 	int vertexCount;
 	int edgeCount;
@@ -58,9 +59,9 @@ public class GarlandHeckbert<
 	}
 
 	HashMap<V, Quadric> quadric_map = new HashMap<V, Quadric>();
-	private Coord3DAdapter<V> pa;
-	private NormalAdapter<F> na;
-	private AreaAdapter<F> aa;
+	VertexPositionCalculator pa;
+	FaceNormalCalculator na;
+	FaceAreaCalculator aa;
 
 	public boolean isValidEdgeOperation(E edge) {
 
@@ -136,16 +137,12 @@ public class GarlandHeckbert<
 				// v = HalfEdgeTopologyOperations.collapseEdge(edge);
 				v = HalfEdgeTopologyOperations.collapse(edge);
 				if (v == null) { // topology not valid
-					System.out
-							.println("Skipping edge as link condition failed."); // this
-																					// should
-																					// not
-																					// happen..
+					System.out.println("Skipping edge as link condition failed."); // this should not happen..
 					return null;
 				}
 			}
 
-			pa.setCoord(v, location);
+			pa.set(v, location);
 
 			// get 2 ring (as sets)
 			Set<E> ring2EdgeSet = new HashSet<E>();
@@ -233,8 +230,12 @@ public class GarlandHeckbert<
 				+ newVertices + " vertices");
 	}
 
-	public GarlandHeckbert(HEDS mesh, Coord3DAdapter<V> pa,
-			NormalAdapter<F> na, AreaAdapter<F> aa) {
+	public GarlandHeckbert(
+		HEDS mesh, 
+		VertexPositionCalculator pa,
+		FaceNormalCalculator na, 
+		FaceAreaCalculator aa
+	) {
 		activeMesh = mesh;
 		vertexCount = mesh.numVertices();
 		edgeCount = mesh.numEdges();
@@ -255,9 +256,9 @@ public class GarlandHeckbert<
 
 		List<F> faceStar = HalfEdgeUtilsExtra.getFaceStar(v);
 		for (F f : faceStar) {
-			double[] faceNormal = na.getNormal(f);
-			area = aa.getArea(f); // weight by area maybe try 1 first...
-			d = -Rn.innerProduct(faceNormal, pa.getCoord(v));
+			double[] faceNormal = na.get(f);
+			area = aa.get(f); // weight by area maybe try 1 first...
+			d = -Rn.innerProduct(faceNormal, pa.get(v));
 			quadric_c += area * d * d;
 			for (j = 0; j < 3; j++) {
 				quadric_b[j] += area * d * faceNormal[j];
@@ -296,13 +297,11 @@ public class GarlandHeckbert<
 		boolean v2ob = HalfEdgeUtils.isBoundaryVertex(v2);
 
 		if (v1ob && !v2ob) {
-			v = pa.getCoord(v1).clone();
+			v = pa.get(v1).clone();
 		} else if (!v1ob && v2ob) {
-			v = pa.getCoord(v2).clone();
+			v = pa.get(v2).clone();
 		} else if (A.determinant() < Rn.TOLERANCE || (v1ob && v2ob)) {
-			v = Rn
-					.linearCombination(null, .5, pa.getCoord(v1), .5, pa
-							.getCoord(v2));
+			v = Rn.linearCombination(null, 0.5, pa.get(v1), .5, pa.get(v2));
 		} else {
 			Ainv = new Matrix3d(A);
 			Ainv.invert();

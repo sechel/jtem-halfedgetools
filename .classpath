@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="de/jtem/halfedgetools/plugin/HalfedgeSubdivisonPlugin.java" kind="src" path="src">
+	<classpathentry excluding="de/jtem/halfedgetools/plugin/HalfedgeSubdivisonPlugin.java|de/jtem/halfedgetools/plugin/HalfedgeConnectorPlugin.java" kind="src" path="src">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="jreality/jni/linux64"/>
 		</attributes>
@@ -9,19 +9,19 @@
 	<classpathentry excluding="HalfedgeSubdivisonPlugin.java" kind="src" path="src-defect"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/halfedge"/>
-	<classpathentry kind="lib" path="lib/mtj.jar"/>
 	<classpathentry kind="lib" path="lib/xpp3-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="lib/vecmath.jar"/>
 	<classpathentry kind="lib" path="lib/mjtOptimization.jar"/>
 	<classpathentry kind="lib" path="lib/xstream-1.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/mtj.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/java2d"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/java2dx"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/modelling"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/mfc"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/numericalMethods"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="lib/jReality.jar" sourcepath="/jreality"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jrworkspace"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/discretegroup"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jreality"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

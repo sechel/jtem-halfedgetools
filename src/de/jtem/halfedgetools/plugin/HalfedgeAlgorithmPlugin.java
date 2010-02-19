@@ -40,21 +40,18 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.CalculatorException;
+import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 
-public abstract class HalfedgeAlgorithmPlugin <
-V extends Vertex<V,E,F>,
-E extends Edge<V,E,F> ,
-F extends Face<V,E,F>,
-HDS extends HalfEdgeDataStructure<V,E,F>
->  extends Plugin {
+public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 
 	protected ViewMenuBar
 		viewMenuBar = null;
 	protected HalfedgeToolBar
 		halfedgeToolBar = null;
-	protected HalfedgeInterfacePlugin<V,E,F,HDS>
+	protected HalfedgeInterface
 		hcp = null;
 	protected double
 		actionPriority = 1.0;
@@ -75,11 +72,17 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 
 		public HalfedgeAction() {
 			putValue(NAME, getAlgorithmName());
+			putValue(SHORT_DESCRIPTION, getAlgorithmName());
 			putValue(SMALL_ICON, getPluginInfo().icon);
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			execute(hcp);
+			try {
+				execute(hcp.get(null), hcp.getCalculators(), hcp);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+//				JOptionPane.showMessageDialog(null, e1.getMessage(), getAlgorithmName(), PLAIN_MESSAGE);
+			}
 		}
 		
 	}
@@ -90,12 +93,11 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 		Diagnosis
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		HalfedgeAction action = new HalfedgeAction();
-		hcp = c.getPlugin(HalfedgeInterfacePlugin.class);
+		hcp = c.getPlugin(HalfedgeInterface.class);
 		viewMenuBar = c.getPlugin(ViewMenuBar.class);
 		viewMenuBar.addMenuItem(getClass(), actionPriority, action, "Halfedge", getCategoryName());
 		halfedgeToolBar = c.getPlugin(HalfedgeToolBar.class);
@@ -115,6 +117,11 @@ HDS extends HalfEdgeDataStructure<V,E,F>
 	
 	public abstract String getAlgorithmName();
 
-	public abstract void execute(HalfedgeInterfacePlugin<V,E,F,HDS> hcp);
+	public abstract < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException;
 	
 }

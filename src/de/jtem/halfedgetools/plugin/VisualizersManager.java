@@ -57,16 +57,14 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import de.jreality.plugin.basic.View;
-import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedgetools.jreality.adapter.Adapter;
+import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
 public class VisualizersManager extends ShrinkPanelPlugin implements ListSelectionListener {
 
-	@SuppressWarnings("unchecked")
-	private HalfedgeInterfacePlugin
+	private HalfedgeInterface
 		hif = null;
 	private List<VisualizerPlugin>
 		visualizers = new LinkedList<VisualizerPlugin>();
@@ -76,8 +74,8 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 		optionsPanel = new JPanel();
 	private JTable
 		pluginTable = new JTable();
-	private Map<VisualizerPlugin, Set<? extends Adapter>>
-		adapterMap = new HashMap<VisualizerPlugin, Set<? extends Adapter>>();
+	private Map<VisualizerPlugin, Set<? extends Adapter<?>>>
+		adapterMap = new HashMap<VisualizerPlugin, Set<? extends Adapter<?>>>();
 	
 	
 	public VisualizersManager() {
@@ -203,11 +201,11 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 			VisualizerPlugin op = visualizers.get(row);
 			setActive(op, !isActive(op));
 			if (isActive(op)) {
-				for (Adapter a : adapterMap.get(op)) {
+				for (Adapter<?> a : adapterMap.get(op)) {
 					hif.addAdapter(a);
 				}
 			} else {
-				for (Adapter a : adapterMap.get(op)) {
+				for (Adapter<?> a : adapterMap.get(op)) {
 					hif.removeAdapter(a);
 				}
 			}
@@ -217,10 +215,8 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	public void updateContent() {
-		HalfEdgeDataStructure hds = hif.getCachedHalfEdgeDataStructure();
-		hif.updateHalfedgeContentAndActiveGeometry(hds);
+		hif.update();		
 	}
 	
 	
@@ -245,7 +241,7 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
-		hif = c.getPlugin(HalfedgeInterfacePlugin.class);
+		hif = c.getPlugin(HalfedgeInterface.class);
 	}
 	
 	

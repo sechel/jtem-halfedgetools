@@ -66,6 +66,7 @@ F extends SymmetricFace<V, E, F>
 		E e = boundary.get(0);
 		
 		int n = boundary.size();
+		if (n > 3) return new double[] {0,0,0,0};
 		
 		if(e.isRightIncomingOfSymmetryCycle() == null)
 			e = e.getNextEdge();
@@ -74,7 +75,7 @@ F extends SymmetricFace<V, E, F>
 		
 		double[][] coords = new double[n][];
 		
-		coords[0]   = Rn.add(null, e.getStartVertex().getEmbedding(), e.getDirection());
+		coords[0] = Rn.add(null, e.getStartVertex().getEmbedding(), e.getDirection());
 		coords[1] = Rn.add(null, coords[0], e.getNextEdge().getDirection());
 		coords[2] = Rn.add(null, coords[1], e.getPreviousEdge().getDirection());
 		

@@ -46,9 +46,15 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.jreality.math.Rn;
-import de.jtem.halfedgetools.jreality.adapter.Adapter;
-import de.jtem.halfedgetools.jreality.adapter.LabelAdapter2Ifs;
-import de.jtem.halfedgetools.jreality.node.JREdge;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.Node;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.AbstractAdapter;
+import de.jtem.halfedgetools.adapter.Adapter;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Label;
+import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
 
 public class DirichletEnergyVisualizer extends VisualizerPlugin implements ChangeListener {
@@ -92,51 +98,73 @@ public class DirichletEnergyVisualizer extends VisualizerPlugin implements Chang
 		updateContent();
 	}
 	
-	public class EdgeLengthAdapter <E extends JREdge<?, E, ?>> implements  LabelAdapter2Ifs<E> {
+	@Label
+	public class EdgeLengthAdapter extends AbstractAdapter<String> {
 
-		@Override
-		public AdapterType getAdapterType() {
-			return AdapterType.EDGE_ADAPTER;
+		public EdgeLengthAdapter() {
+			super(String.class, true, false);
 		}
 
-		@Override
-		public String getLabel(E e) {
-			double l = w(e)*getLengthSquared(e);
+		public <
+			V extends Vertex<V, E, F>,
+			E extends Edge<V, E, F>,
+			F extends Face<V, E, F>
+		> String getE(E e, AdapterSet a) {
+			double l = w(e, a) * getLengthSquared(e, a);
 			return format.format(l);
 		}
 		
+		
+		@Override
+		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
+			return Edge.class.isAssignableFrom(nodeClass);
+		}
+
 	}
 	
 	public static double cot(Double phi) {
 		return 1.0 / StrictMath.tan(phi);
 	}
 	
-	public<E extends JREdge<?, E, ?>> double getLengthSquared(E e) {
-		return Rn.euclideanDistanceSquared(e.getTargetVertex().position, e.getStartVertex().position);
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	>  double getLengthSquared(E e, AdapterSet a) {
+		double[] s = a.get(Position.class, e.getStartVertex(), double[].class);
+		double[] t = a.get(Position.class, e.getStartVertex(), double[].class);
+		return Rn.euclideanDistanceSquared(t, s);
 	}
 	
-	public <E extends JREdge<?, E, ?>> double getAlpha(E e){
-		double a = getLengthSquared(e.getNextEdge());
-		double b = getLengthSquared(e.getPreviousEdge());
-		double c = getLengthSquared(e);
-	
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	>  double getAlpha(E e, AdapterSet ad){
+		double a = getLengthSquared(e.getNextEdge(), ad);
+		double b = getLengthSquared(e.getPreviousEdge(), ad);
+		double c = getLengthSquared(e, ad);
 		return Math.acos((a + b - c) / (2.0 * Math.sqrt(a * b)));
 	}
 	
 
-	private <E extends JREdge<?, E, ?>> double w(E e) {
+	private <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	> double w(E e, AdapterSet a) {
 		E e1 = e;
 		E e2 = e.getOppositeEdge();
 		double val = 0.0;
 		double w = 0.5;
 		
 		if(e.getLeftFace() == null) {
-			val = w * cot(getAlpha(e2));
+			val = w * cot(getAlpha(e2, a));
 		} else if(e.getRightFace() == null) {
-			val = w * cot(getAlpha(e1));
+			val = w * cot(getAlpha(e1, a));
 		} else { // interior edge
-			double alpha_ij = cot(getAlpha(e1));
-			double alpha_ji = cot(getAlpha(e2));
+			double alpha_ij = cot(getAlpha(e1, a));
+			double alpha_ji = cot(getAlpha(e2, a));
 
 			// optimize
 			val = w * (cot(alpha_ij) + cot(alpha_ji));
@@ -151,9 +179,8 @@ public class DirichletEnergyVisualizer extends VisualizerPlugin implements Chang
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public Set<? extends Adapter> getAdapters() {
+	public Set<? extends Adapter<?>> getAdapters() {
 		return Collections.singleton(new EdgeLengthAdapter());
 	}
 

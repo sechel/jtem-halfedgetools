@@ -408,8 +408,8 @@ public class HalfEdgeTopologyOperations {
 
 	       V A = e.getTargetVertex();
 	       V C = b.getTargetVertex();
-	       V B = a.getTargetVertex();
-	       V D = c.getTargetVertex();
+//	       V B = a.getTargetVertex();
+//	       V D = c.getTargetVertex();
 
 	       // get edges with target C, those have to be relinked
 	       LinkedList<E> cTargetEdges = new LinkedList<E>();

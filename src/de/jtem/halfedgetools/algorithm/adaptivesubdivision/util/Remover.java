@@ -175,6 +175,7 @@ public class Remover {
 		}
 	}
 	/** Setzt jedem Vertex eine Liste seiner angrenzenden Facetten. */
+	@SuppressWarnings("unchecked")
 	private void initFaceOfVert(){
 		faceOfVert=new ArrayList[s.coords.size()];
 		for(int i = 0; i < faceOfVert.length; i++) 
@@ -464,17 +465,17 @@ public class Remover {
 	 * @param v Vertex
 	 * @return true, falls der Winkel kein Problem darstellt.
 	 */
-	private boolean checkAngles(int v){
-		double[] vNormal=s.normals.get(v);
-		if(Calculator.lenSq(vNormal)==0)
-			return false;
-		for(int f:faceOfVert[v]){
-			double[] fNormal=s.faceNormals.get(f);
-			if(Calculator.isCosSmalerToleranceSq(fNormal, vNormal, tolNormalAngleSq,usePseudoNormals))
-				return false;
-		}
-		return true;
-	}		
+//	private boolean checkAngles(int v){
+//		double[] vNormal=s.normals.get(v);
+//		if(Calculator.lenSq(vNormal)==0)
+//			return false;
+//		for(int f:faceOfVert[v]){
+//			double[] fNormal=s.faceNormals.get(f);
+//			if(Calculator.isCosSmalerToleranceSq(fNormal, vNormal, tolNormalAngleSq,usePseudoNormals))
+//				return false;
+//		}
+//		return true;
+//	}		
 	/** @return FaceCycleSubdivider der die zu bearbeitende Flaeche enthaelt. */
 	public FaceCycleSubdivider getSubdivider() {
 		return s;

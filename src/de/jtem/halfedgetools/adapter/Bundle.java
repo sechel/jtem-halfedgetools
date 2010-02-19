@@ -29,7 +29,8 @@ public @interface Bundle {
 	public enum DisplayType {
 		Debug,
 		Geometry,
-		List
+		List,
+		Label
 	}
 
 	public int dimension();

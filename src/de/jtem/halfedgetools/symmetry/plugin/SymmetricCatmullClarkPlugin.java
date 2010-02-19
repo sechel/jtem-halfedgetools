@@ -35,39 +35,29 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionEdgeInterpolator;
-import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionFaceBarycenter;
-import de.jtem.halfedgetools.algorithm.subdivision.adapters.SubdivisionVertexAdapter;
-import de.jtem.halfedgetools.algorithm.subdivision.catmullclark.CatmullClarkSubdivision;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.CalculatorException;
+import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
+import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
+import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.algorithm.subdivision.CatmullClark;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
-import de.jtem.halfedgetools.plugin.HalfedgeInterfacePlugin;
-import de.jtem.halfedgetools.symmetry.node.SymmetricEdge;
-import de.jtem.halfedgetools.symmetry.node.SymmetricFace;
-import de.jtem.halfedgetools.symmetry.node.SymmetricHDS;
-import de.jtem.halfedgetools.symmetry.node.SymmetricVertex;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.symmetry.node.SEdge;
+import de.jtem.halfedgetools.symmetry.node.SFace;
+import de.jtem.halfedgetools.symmetry.node.SHDS;
+import de.jtem.halfedgetools.symmetry.node.SVertex;
 import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class SymmetricCatmullClarkPlugin
-	<
-		V extends SymmetricVertex<V,E,F>,
-		E extends SymmetricEdge<V,E,F> ,
-		F extends SymmetricFace<V,E,F>,
-		HDS extends SymmetricHDS<V,E,F>
-	> extends HalfedgeAlgorithmPlugin<V,E,F,HDS> {
+public class SymmetricCatmullClarkPlugin extends HalfedgeAlgorithmPlugin {
 	
-	private SubdivisionVertexAdapter<V> adapter = null;
-	private SubdivisionEdgeInterpolator<E> ead;
-	private SubdivisionFaceBarycenter<F> fac;
-	
-	public SymmetricCatmullClarkPlugin(SubdivisionVertexAdapter<V> ad, SubdivisionEdgeInterpolator<E> ead, SubdivisionFaceBarycenter<F> fac) {
-		adapter = ad;
-		this.ead = ead;
-		this.fac  = fac;
-	}
-
-	private CatmullClarkSubdivision<V,E,F> subdivider = new CatmullClarkSubdivision<V,E,F>();
-	
+	private CatmullClark
+		subdivider = new CatmullClark();
 	
 	@Override
 	public AlgorithmType getAlgorithmType() {
@@ -85,35 +75,40 @@ public class SymmetricCatmullClarkPlugin
 	}
 	
 	
-	@Override
-	public void execute(HalfedgeInterfacePlugin<V,E,F,HDS> hcp) {
-		HDS hds = hcp.getCachedHalfEdgeDataStructure();
-		HDS tHDS = hcp.getBlankHDS();
-		hds.createCombinatoriallyEquivalentCopy(tHDS);
-		if (hds == null) {
-			return;
+	public < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) {
+		SHDS shds = hcp.get(new SHDS());
+		SHDS result = new SHDS();
+		VertexPositionCalculator vc = c.get(shds.getVertexClass(), VertexPositionCalculator.class);
+		EdgeAverageCalculator ec = c.get(shds.getEdgeClass(), EdgeAverageCalculator.class);
+		FaceBarycenterCalculator fc = c.get(shds.getFaceClass(), FaceBarycenterCalculator.class);
+		if (vc == null || ec == null || fc == null) {
+			throw new CalculatorException("No Subdivision calculators found for " + hds);
 		}
-		
-		Map<E,Set<E>> oldToDoubleNew = subdivider.subdivide(hds, tHDS, adapter,ead,fac);
-		
-		CuttingInfo<V, E, F> symmCopy = new CuttingInfo<V, E, F>(); 
-		CuttingInfo<V, E, F> symmOld = hds.getSymmetryCycles();
-		for(Set<E> es: symmOld.paths.keySet()) {
-			Set<E> newPath = new HashSet<E>();
-			for(E e : es) {
-				for(E ee : oldToDoubleNew.get(e)) {
-					newPath.add(ee);
+		Map<SEdge, Set<SEdge>> oldToDoubleNew = subdivider.subdivide(shds, result, vc, ec, fc);
+		CuttingInfo<SVertex, SEdge, SFace> symmCopy = new CuttingInfo<SVertex, SEdge, SFace>(); 
+		CuttingInfo<SVertex, SEdge, SFace> symmOld = shds.getSymmetryCycles();
+		if (symmOld != null) {
+			for(Set<SEdge> es: symmOld.paths.keySet()) {
+				Set<SEdge> newPath = new HashSet<SEdge>();
+				for(SEdge e : es) {
+					if (!oldToDoubleNew.containsKey(e)) continue;
+					for(SEdge ee : oldToDoubleNew.get(e)) {
+						newPath.add(ee);
+					}
 				}
+				symmCopy.paths.put(newPath, symmOld.paths.get(es));
 			}
-			symmCopy.paths.put(newPath, symmOld.paths.get(es));
+			result.setSymmetryCycles(symmCopy);
+			result.setGroup(shds.getGroup());
 		}
-		
-		tHDS.setSymmetryCycles(symmCopy);
-		
-		tHDS.setGroup(hds.getGroup());
-		
-		hcp.updateHalfedgeContentAndActiveGeometry(tHDS);	
+		hcp.set(result);
 	}
+	
 	
 
 	@Override
