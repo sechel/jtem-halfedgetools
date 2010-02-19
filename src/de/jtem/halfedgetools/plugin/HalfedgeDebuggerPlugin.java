@@ -57,6 +57,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.jreality.adapter.IndexLabelAdapter;
 import de.jtem.java2dx.beans.Viewer2DWithInspector;
 import de.jtem.java2dx.modelling.GraphicsModeller2D;
 import de.jtem.java2dx.modelling.SimpleModeller2D;
@@ -101,7 +102,7 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 	private HalfEdgeDataStructure<?, ?, ?>
 		hds = null;
 	private AdapterSet
-		lastAdapters = new AdapterSet();
+		adapters = new AdapterSet(new IndexLabelAdapter());
 
 	public HalfedgeDebuggerPlugin() {
 		makeLayout();
@@ -191,20 +192,20 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 			return;
 		}
 		if (makeTutte == s) {
-			makeTutte(0, false, lastAdapters);
+			makeTutte(0, false, adapters);
 		}
 	}
 	
 	public void stateChanged(ChangeEvent e) {
 		Object s = e.getSource();
 		if (vertexSpinner == s) {
-			makeVertexCloseUp(vertexNumberModel.getNumber().intValue(), false, lastAdapters);
+			makeVertexCloseUp(vertexNumberModel.getNumber().intValue(), false, adapters);
 		}
 		if (edgeSpinner == s) {
-			makeEdgeCloseUp(edgeNumberModel.getNumber().intValue(), false, lastAdapters);
+			makeEdgeCloseUp(edgeNumberModel.getNumber().intValue(), false, adapters);
 		}
 		if (faceSpinner == s) {
-			makeFaceCloseUp(faceNumberModel.getNumber().intValue(), false, lastAdapters);
+			makeFaceCloseUp(faceNumberModel.getNumber().intValue(), false, adapters);
 		}
 	}
 	
@@ -254,7 +255,7 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 			a
 		);
 		updateSceneOnEventThread();
-		lastAdapters = a;
+		adapters = a;
 		if (wait) {
 			parkInvokeThread();
 		}
@@ -278,7 +279,7 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 //			a
 //		);
 		updateSceneOnEventThread();
-		lastAdapters = a;
+		adapters = a;
 		if (wait) {
 			parkInvokeThread();
 		}
@@ -295,7 +296,7 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 		setData(hds);
 		DebugFactory.makeVertexCloseUp(hds.getVertex(vertexIndex), moddeller, a);
 		updateSceneOnEventThread();
-		lastAdapters = a;
+		adapters = a;
 		if (wait) {
 			parkInvokeThread();
 		}
@@ -311,7 +312,7 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 		setData(hds);
 		DebugFactory.makeEdgeCloseUp(hds.getEdge(edgeIndex), moddeller, a);
 		updateSceneOnEventThread();
-		lastAdapters = a; 
+		adapters = a; 
 		if (wait) {
 			parkInvokeThread();
 		}
@@ -327,7 +328,7 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 		setData(hds);
 		DebugFactory.makeFaceCloseUp(hds.getFace(faceIndex), moddeller, a);
 		updateSceneOnEventThread();
-		lastAdapters = a;
+		adapters = a;
 		if (wait) {
 			parkInvokeThread();
 		}

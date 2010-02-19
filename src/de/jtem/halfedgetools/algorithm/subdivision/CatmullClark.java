@@ -241,9 +241,7 @@ public class CatmullClark {
 				if (linkIn.getOppositeEdge().getLeftFace() == null) {
 					linkOut.getOppositeEdge().linkNextEdge(linkIn.getOppositeEdge());
 				}
-				
 				tempEmap.put(e, in);
-				
 			}
 			if (firstOut != null) {
 				firstOut.linkPreviousEdge(lastIn);
@@ -253,8 +251,9 @@ public class CatmullClark {
 		for(E e : hds.getEdges()) {
 			Set<E> newEs = new HashSet<E>();
 			newEs.add(tempEmap.get(e));
-			newEs.add(tempEmap.get(e.getOppositeEdge()).getOppositeEdge());
-			
+			if (tempEmap.get(e.getOppositeEdge()) != null) {
+				newEs.add(tempEmap.get(e.getOppositeEdge()).getOppositeEdge());
+			}
 			oldEtoSubDivEs.put(e, newEs);
 		}
 

@@ -33,6 +33,7 @@ package de.jtem.halfedgetools;
 
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
+import de.jtem.halfedgetools.plugin.HalfedgeDebuggerPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.VisualizersManager;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmFactory;
@@ -48,6 +49,7 @@ public class JRHalfedgeViewer {
 		v.addBasicUI();
 		v.addContentSupport(ContentType.CenteredAndScaled);
 		v.registerPlugin(new HalfedgeInterface());
+		v.registerPlugin(new HalfedgeDebuggerPlugin());
 		v.registerPlugin(new VisualizersManager());
 		v.registerPlugin(new DirichletEnergyVisualizer());
 		v.registerPlugin(new FacePlanarityVisualizer());

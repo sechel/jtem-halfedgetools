@@ -115,7 +115,6 @@ public class AdapterSet extends HashSet<Adapter<?>> {
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	public <		
 		A extends Annotation, 
 		V extends Vertex<V, E, F>,
@@ -126,21 +125,13 @@ public class AdapterSet extends HashSet<Adapter<?>> {
 	> VAL get(Class<A> type, N n, Class<VAL> typeClass) {
 		Adapter<VAL> a = query(type, n.getClass(), typeClass);
 		if (a != null && a.isGetter()) {
-			if (n instanceof Vertex<?, ?, ?>) {
-				return a.getV((V)n, this);	
-			}
-			if (n instanceof Edge<?, ?, ?>) {
-				return a.getE((E)n, this);
-			}
-			if (n instanceof Face<?, ?, ?>) {
-				return a.getF((F)n, this);
-			}
+			return a.get(n, this);
+		} else {
+			return null;
 		}
-		return null;
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	public <		
 		A extends Adapter<VAL>,
 		T extends Annotation, 
@@ -155,17 +146,10 @@ public class AdapterSet extends HashSet<Adapter<?>> {
 			a = query(type, n.getClass(), typeClass);
 		}
 		if (a != null && a.isGetter()) {
-			if (n instanceof Vertex<?, ?, ?>) {
-				return a.getV((V)n, this);	
-			}
-			if (n instanceof Edge<?, ?, ?>) {
-				return a.getE((E)n, this);
-			}
-			if (n instanceof Face<?, ?, ?>) {
-				return a.getF((F)n, this);
-			}
+			return a.get(n, this);
+		} else {
+			return null;
 		}
-		return null;
 	}
 	
 	
@@ -180,18 +164,11 @@ public class AdapterSet extends HashSet<Adapter<?>> {
 		VAL
 	> VAL getDefault(Class<A> type, N n, VAL defaultValue) {
 		Adapter<VAL> a = query(type, n.getClass(), (Class<VAL>)defaultValue.getClass());
-		if (a != null) {
-			if (n instanceof Vertex<?, ?, ?>) {
-				return a.getV((V)n, this);	
-			}
-			if (n instanceof Edge<?, ?, ?>) {
-				return a.getE((E)n, this);
-			}
-			if (n instanceof Face<?, ?, ?>) {
-				return a.getF((F)n, this);
-			}
+		if (a != null && a.isGetter()) {
+			return a.get(n, this);
+		} else {
+			return null;
 		}
-		return null;
 	}
 	
 	
@@ -206,15 +183,7 @@ public class AdapterSet extends HashSet<Adapter<?>> {
 	> void set(Class<A> type, N n, VAL value) {
 		Adapter<VAL> a = query(type, n.getClass(), (Class<VAL>)value.getClass());
 		if (a != null && a.isSetter()) {
-			if (n instanceof Vertex<?, ?, ?>) {
-				a.setV((V)n, value, this);	
-			}
-			if (n instanceof Edge<?, ?, ?>) {
-				a.setE((E)n, value, this);
-			}
-			if (n instanceof Face<?, ?, ?>) {
-				a.setF((F)n, value, this);
-			}
+			a.set(n, value, this);
 		}
 	}
 	
