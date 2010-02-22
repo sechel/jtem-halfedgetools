@@ -54,7 +54,7 @@ public abstract class JREdge <
 	    color = null,
 	    textCoord = null;
 	public String 
-		label = "";
+		label = null;
 	public double 
 		radius = 1,
 		pointSize = 1;

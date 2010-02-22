@@ -3,14 +3,16 @@ package de.jtem.halfedgetools.adapter;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeSet;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 
-public class AdapterSet extends HashSet<Adapter<?>> {
+public class AdapterSet extends TreeSet<Adapter<?>> {
 
 	private static final long 
 		serialVersionUID = 1L;
@@ -66,6 +68,21 @@ public class AdapterSet extends HashSet<Adapter<?>> {
 			if (a.getClass().isAnnotationPresent(type) && a.canAccept(noteType) && a.checkType(out)) {
 				result = (Adapter<O>)a;
 				break;
+			}
+		}
+		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <
+		A extends Annotation, 
+		N extends Node<?, ?, ?>,
+		O 
+	> List<Adapter<O>> queryAll(Class<A> type, Class<N> noteType, Class<O> out) {
+		LinkedList<Adapter<O>> result = new LinkedList<Adapter<O>>();
+		for (Adapter<?> a : this) {
+			if (a.getClass().isAnnotationPresent(type) && a.canAccept(noteType) && a.checkType(out)) {
+				result.add((Adapter<O>)a);
 			}
 		}
 		return result;

@@ -372,7 +372,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	
 	public void update() {
-		if (cachedHEDS == null) return;
 		set(cachedHEDS, cachedAdapters);
 	}
 	

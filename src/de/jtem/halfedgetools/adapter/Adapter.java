@@ -6,7 +6,7 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 
 
-public abstract class Adapter<VAL> {
+public abstract class Adapter<VAL> implements Comparable<Adapter<VAL>> {
 	  
 	private boolean
 		getter = false,
@@ -96,6 +96,13 @@ public abstract class Adapter<VAL> {
 	
 	public boolean isSetter() {
 		return setter;
+	}
+	
+	@Override
+	public int compareTo(Adapter<VAL> o) {
+		String n1 = getClass().getSimpleName();
+		String n2 = o.getClass().getSimpleName();
+		return n1.compareTo(n2);
 	}
 	
 }

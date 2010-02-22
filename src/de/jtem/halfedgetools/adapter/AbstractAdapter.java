@@ -62,5 +62,6 @@ public abstract class AbstractAdapter<VAL> extends Adapter<VAL> {
 	> void setF(F f, VAL value, AdapterSet a) {
 		throw new RuntimeException("setF not supported in this adapter");
 	}
+	
 
 }

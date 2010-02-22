@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import de.jreality.math.Rn;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.data.Attribute;
 import de.jreality.scene.data.DataList;
@@ -198,10 +199,10 @@ public class ConverterHeds2JR {
 		N extends Node<V, E, F>
 	>	void readOutData(AdapterSet adapters, N n){
 		Adapter<double[]> pos = adapters.query(Position.class, n.getClass(), double[].class);
-		Adapter<double[]> color = adapters.query(Color.class, n.getClass(), double[].class);
+		List<Adapter<double[]>> cols = adapters.queryAll(Color.class, n.getClass(), double[].class);
 		Adapter<double[]> normal = adapters.query(Normal.class, n.getClass(), double[].class);
 		Adapter<double[]> texCoord = adapters.query(TexCoordinate.class, n.getClass(), double[].class);
-		Adapter<String> label = adapters.query(Label.class, n.getClass(), String.class);
+		List<Adapter<String>> labs = adapters.queryAll(Label.class, n.getClass(), String.class);
 		Adapter<Double> rad = adapters.query(Radius.class, n.getClass(), Double.class); 
 		Adapter<Double> size = adapters.query(Size.class, n.getClass(), Double.class);
 		if (pos != null) {
@@ -210,10 +211,17 @@ public class ConverterHeds2JR {
 				coordinates.add(posArr);
 			}
 		}
-		if (color != null) {
-			double[] colorArr = color.get(n, adapters);
-			if (colorArr != null) {
-				colors.add(colorArr);
+		if (!cols.isEmpty()) {
+			double[] c = {0, 0, 0};
+			boolean colorValid = false;
+			for (Adapter<double[]> color : cols) {
+				double[] colorArr = color.get(n, adapters);
+				if (colorArr == null) continue;
+				Rn.add(c, c, colorArr);
+				colorValid = true;
+			}
+			if (colorValid) {
+				colors.add(c);
 			}
 		}
 		if (normal != null) {
@@ -228,9 +236,20 @@ public class ConverterHeds2JR {
 				textCoords.add(texArr);
 			}
 		}
-		if (label != null) {
-			String lab = label.get(n, adapters);
-			if (lab != null) {
+		if (!labs.isEmpty()) {
+			String lab = "";
+			boolean labelValid = false;
+			int i = 0;
+			for (Adapter<String> label : labs) {
+				String l = label.get(n, adapters);
+				if (l == null) continue;
+				lab += l;
+				if (++i < labs.size()) {
+					lab += ", ";
+				}
+				labelValid = true;
+			}
+			if (labelValid) {
 				labels.add(lab);
 			}
 		}
