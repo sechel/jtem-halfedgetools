@@ -4,7 +4,8 @@ import static java.awt.GridBagConstraints.BOTH;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
-import java.awt.Dimension; 
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
 import java.awt.Insets;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -153,20 +155,24 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		c.insets = new Insets(2, 2, 2, 2);
 		c.gridwidth = GridBagConstraints.REMAINDER;
 				
+		geometryList.setCellRenderer(new GeometryListRenderer());
 		geometriesScroller.setMinimumSize(new Dimension(30, 70));
 		JPanel adaptersPanel = new JPanel();
 		adaptersPanel.setLayout(new GridLayout());
 		adaptersPanel.add(geometriesScroller);
 		adaptersPanel.setBorder(BorderFactory.createTitledBorder("Available Geometries"));
 		
-		c.gridwidth = 1;
+		c.gridwidth = GridBagConstraints.REMAINDER;
 		c.weightx = 1.0;
 		shrinkPanel.add(hdsLabel, c);
-		c.gridwidth = GridBagConstraints.RELATIVE;
+		c.gridwidth = 1;
 		c.weightx = 0.0;
 		shrinkPanel.add(loadHDSButton, c);
-		c.gridwidth = GridBagConstraints.REMAINDER;
+		c.gridwidth = GridBagConstraints.RELATIVE;
 		shrinkPanel.add(saveHDSButton, c);
+		c.gridwidth = GridBagConstraints.REMAINDER;
+		c.weightx = 1.0;
+		shrinkPanel.add(new JPanel(), c);
 		c.weightx = 0.0;
 		c.weighty = 1.0;
 		shrinkPanel.add(adaptersPanel, c);
@@ -208,6 +214,35 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		viewSelectionChecker.addActionListener(this);
 		saveHDSButton.addActionListener(this);
 		loadHDSButton.addActionListener(this);
+	}
+	
+	
+	private class GeometryListRenderer extends DefaultListCellRenderer {
+		
+		private static final long 
+			serialVersionUID = 1L;
+
+		@Override
+		public Component getListCellRendererComponent(
+			JList list, 
+			Object value, 
+			int index, 
+			boolean 
+			isSelected, 
+			boolean cellHasFocus
+		) {
+			DefaultListCellRenderer c = (DefaultListCellRenderer)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			if (value instanceof SceneGraphComponent) {
+				SceneGraphComponent sgc = (SceneGraphComponent)value;
+				if (sgc.getGeometry() != null) {
+					setText(sgc.getGeometry().getName());
+				} else {
+					sgc.getName();
+				}
+			}
+			return c;
+		}
+		
 	}
 	
 	
