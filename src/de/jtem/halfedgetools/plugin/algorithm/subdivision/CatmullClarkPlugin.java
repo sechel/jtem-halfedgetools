@@ -43,6 +43,8 @@ import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 import de.jtem.halfedgetools.algorithm.subdivision.CatmullClark;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 
@@ -69,13 +71,8 @@ public class CatmullClarkPlugin extends HalfedgeAlgorithmPlugin {
 	}
 	
 	@Override
-	public AlgorithmType getAlgorithmType() {
-		return AlgorithmType.Geometry;
-	}
-	
-	@Override
-	public String getCategoryName() {
-		return "Subdivision";
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Subdivision;
 	}
 	
 	@Override
@@ -86,6 +83,7 @@ public class CatmullClarkPlugin extends HalfedgeAlgorithmPlugin {
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Catmull Clark Subdivision");
+		info.icon = ImageHook.getIcon("CatmullClark.png");
 		return info;
 	}
 

@@ -47,6 +47,7 @@ import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 import de.jtem.halfedgetools.algorithm.subdivision.CatmullClark;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.symmetry.node.SEdge;
 import de.jtem.halfedgetools.symmetry.node.SFace;
 import de.jtem.halfedgetools.symmetry.node.SHDS;
@@ -60,13 +61,8 @@ public class SymmetricCatmullClarkPlugin extends HalfedgeAlgorithmPlugin {
 		subdivider = new CatmullClark();
 	
 	@Override
-	public AlgorithmType getAlgorithmType() {
-		return AlgorithmType.Geometry;
-	}
-	
-	@Override
-	public String getCategoryName() {
-		return "Subdivision";
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Subdivision;
 	}
 	
 	@Override

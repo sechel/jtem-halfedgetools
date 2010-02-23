@@ -46,6 +46,8 @@ import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 import de.jtem.halfedgetools.algorithm.subdivision.CatmullClarkLinear;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 
@@ -75,23 +77,19 @@ public class CatmullClarkLinearPlugin extends HalfedgeAlgorithmPlugin {
 	}
 	
 	@Override
-	public AlgorithmType getAlgorithmType() {
-		return AlgorithmType.Geometry;
-	}
-	
-	@Override
-	public String getCategoryName() {
-		return "Linear Subdivision";
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Subdivision;
 	}
 	
 	@Override
 	public String getAlgorithmName() {
-		return "Linear Catmull Clark";
+		return "Catmull Clark Linear";
 	}
 	
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Linear Catmull Clark Subdivision");
+		info.icon = ImageHook.getIcon("CatmullClarkLinear.png");
 		return info;
 	}
 

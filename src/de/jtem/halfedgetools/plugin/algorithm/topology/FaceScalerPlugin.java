@@ -46,6 +46,7 @@ import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class FaceScalerPlugin extends HalfedgeAlgorithmPlugin {
@@ -100,15 +101,10 @@ public class FaceScalerPlugin extends HalfedgeAlgorithmPlugin {
 	public String getAlgorithmName() {
 		return "Scale Face";
 	}
-
+	
 	@Override
-	public AlgorithmType getAlgorithmType() {
-		return AlgorithmType.Geometry;
-	}
-
-	@Override
-	public String getCategoryName() {
-		return "Editing";
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Editing;
 	}
 
 	@Override

@@ -31,9 +31,12 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin;
 
+import static javax.swing.JOptionPane.PLAIN_MESSAGE;
+
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 
 import de.jreality.plugin.basic.ViewMenuBar;
 import de.jtem.halfedge.Edge;
@@ -42,15 +45,22 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.plugin.AlgorithmToolbars.EditingCategoryToolbar;
+import de.jtem.halfedgetools.plugin.AlgorithmToolbars.GeometryCategoryToolbar;
+import de.jtem.halfedgetools.plugin.AlgorithmToolbars.SimplificationCategoryToolbar;
+import de.jtem.halfedgetools.plugin.AlgorithmToolbars.SubdivisionCategoryToolbar;
+import de.jtem.halfedgetools.plugin.AlgorithmToolbars.TopologyCategoryToolbar;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.jtem.jrworkspace.plugin.aggregators.ToolBarAggregator;
 
 public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 
 	protected ViewMenuBar
 		viewMenuBar = null;
-	protected HalfedgeToolBar
-		halfedgeToolBar = null;
+	protected ToolBarAggregator
+		toolbar = null;
 	protected HalfedgeInterface
 		hcp = null;
 	protected double
@@ -80,17 +90,10 @@ public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 			try {
 				execute(hcp.get(null), hcp.getCalculators(), hcp);
 			} catch (Exception e1) {
-				e1.printStackTrace();
-//				JOptionPane.showMessageDialog(null, e1.getMessage(), getAlgorithmName(), PLAIN_MESSAGE);
+				JOptionPane.showMessageDialog(null, e1.getMessage(), getAlgorithmName(), PLAIN_MESSAGE);
 			}
 		}
 		
-	}
-	
-	public static enum AlgorithmType {
-		Geometry,
-		Utility,
-		Diagnosis
 	}
 	
 	@Override
@@ -99,21 +102,37 @@ public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 		HalfedgeAction action = new HalfedgeAction();
 		hcp = c.getPlugin(HalfedgeInterface.class);
 		viewMenuBar = c.getPlugin(ViewMenuBar.class);
-		viewMenuBar.addMenuItem(getClass(), actionPriority, action, "Halfedge", getCategoryName());
-		halfedgeToolBar = c.getPlugin(HalfedgeToolBar.class);
-		halfedgeToolBar.addAction(getClass(), actionPriority, action);
+		viewMenuBar.addMenuItem(getClass(), actionPriority, action, "Halfedge", getAlgorithmCategory().toString());
+		switch (getAlgorithmCategory()) {
+		case Editing:
+			toolbar = c.getPlugin(EditingCategoryToolbar.class);
+			break;
+		case Geometry:
+			toolbar = c.getPlugin(GeometryCategoryToolbar.class);
+			break;
+		case Simplification:
+			toolbar = c.getPlugin(SimplificationCategoryToolbar.class);
+			break;
+		case Subdivision:
+			toolbar = c.getPlugin(SubdivisionCategoryToolbar.class);
+			break;
+		case Topology:
+			toolbar = c.getPlugin(TopologyCategoryToolbar.class);
+		default:
+			toolbar = c.getPlugin(HalfedgeToolBar.class); 
+		}
+		toolbar.addAction(getClass(), actionPriority, action);
 	}
 	
 	@Override
 	public void uninstall(Controller c) throws Exception {
 		super.uninstall(c);
 		viewMenuBar.removeAll(getClass());
-		halfedgeToolBar.removeAll(getClass());
+		toolbar.removeAll(getClass());
 	}
 	
-	public abstract AlgorithmType getAlgorithmType();
 	
-	public abstract String getCategoryName();
+	public abstract AlgorithmCategory getAlgorithmCategory();
 	
 	public abstract String getAlgorithmName();
 

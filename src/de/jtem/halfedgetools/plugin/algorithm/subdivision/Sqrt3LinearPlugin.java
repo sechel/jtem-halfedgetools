@@ -46,6 +46,7 @@ import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 import de.jtem.halfedgetools.algorithm.subdivision.Sqrt3Linear;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
@@ -75,18 +76,13 @@ public class Sqrt3LinearPlugin extends HalfedgeAlgorithmPlugin {
 	}
 
 	@Override
-	public de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin.AlgorithmType getAlgorithmType() {
-		return AlgorithmType.Geometry;
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Subdivision;
 	}
 	
 	@Override
-	public String getCategoryName() {
-		return "Linear Subdivision";
-	}
-
-	@Override
 	public String getAlgorithmName() {
-		return "Linear Sqrt3";
+		return "Sqrt3 Linear";
 	}
 	
 	@Override

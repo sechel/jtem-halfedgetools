@@ -13,6 +13,7 @@ import de.jtem.halfedgetools.algorithm.simplification.GarlandHeckbert;
 import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class GarlandHeckbertPlugin extends HalfedgeAlgorithmPlugin {
@@ -43,19 +44,14 @@ public class GarlandHeckbertPlugin extends HalfedgeAlgorithmPlugin {
 
 
 	@Override
-	public String getCategoryName() {
-		return "Simplification";
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Simplification;
 	}
 	
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Garland & Heckbert Algorithm", "Stefan Sechelmann, Kristoffer Josefsson");
 		return info;
-	}
-
-	@Override
-	public AlgorithmType getAlgorithmType() {
-		return AlgorithmType.Geometry;
 	}
 
 }

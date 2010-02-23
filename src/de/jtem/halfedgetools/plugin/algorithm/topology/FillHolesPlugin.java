@@ -42,6 +42,7 @@ import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.alexandrov.SurfaceUtility;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.halfedgetools.util.SurfaceException;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -70,28 +71,20 @@ public class FillHolesPlugin extends HalfedgeAlgorithmPlugin {
 		hcp.update();
 	}
 
-	
-	public AlgorithmType getAlgorithmType() {
-		return AlgorithmType.Geometry;
-	}
-	
-	
-	public String getCategoryName() {
-		return "Editing";
+	@Override
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Editing;
 	}
 	
 	
 	public String getAlgorithmName() {
 		return "Fill Holes";
 	}
-
 	
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Holes Filler", "Kristoffer Josefsson");
 		info.icon = ImageHook.getIcon("fill.png");
 		return info;
 	}
-	
-	
 
 }

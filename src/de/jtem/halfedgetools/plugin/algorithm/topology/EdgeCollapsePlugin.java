@@ -15,6 +15,7 @@ import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class EdgeCollapsePlugin extends HalfedgeAlgorithmPlugin {
@@ -44,17 +45,12 @@ public class EdgeCollapsePlugin extends HalfedgeAlgorithmPlugin {
 
 	@Override
 	public String getAlgorithmName() {
-		return "Colllapse Edge";
+		return "Collapse Edge";
 	}
 
 	@Override
-	public AlgorithmType getAlgorithmType() {
-		return AlgorithmType.Geometry;
-	}
-
-	@Override
-	public String getCategoryName() {
-		return "Editing";
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Editing;
 	}
 	
 	public PluginInfo getPluginInfo() {

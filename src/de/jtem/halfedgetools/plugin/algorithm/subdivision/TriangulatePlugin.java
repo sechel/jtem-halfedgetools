@@ -39,6 +39,7 @@ import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
@@ -48,13 +49,8 @@ public class TriangulatePlugin extends HalfedgeAlgorithmPlugin {
 		triangulator = new Triangulator();
 	
 	@Override
-	public AlgorithmType getAlgorithmType() {
-		return AlgorithmType.Geometry;
-	}
-	
-	@Override
-	public String getCategoryName() {
-		return "Editing";
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Subdivision;
 	}
 	
 	@Override
@@ -66,7 +62,7 @@ public class TriangulatePlugin extends HalfedgeAlgorithmPlugin {
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Triangulator");
-		info.icon = ImageHook.getIcon("triangulate.png");
+		info.icon = ImageHook.getIcon("Triangulate2.png");
 		return info;
 	}
 

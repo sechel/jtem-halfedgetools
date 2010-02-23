@@ -57,6 +57,6 @@ public class JRHalfedgeViewer {
 		v.registerPlugins(AlgorithmFactory.createTopologyPlugins());
 		v.registerPlugins(AlgorithmFactory.createSubdivisionPlugins());
 		v.registerPlugins(AlgorithmFactory.createGeometryPlugins());
-		v.startup();
+		v.startup(); 
 	}
 }

@@ -43,6 +43,7 @@ import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class VertexCollapserPlugin extends HalfedgeAlgorithmPlugin {
@@ -66,16 +67,10 @@ public class VertexCollapserPlugin extends HalfedgeAlgorithmPlugin {
 		hif.update();
 	}
 
-	
-	public AlgorithmType getAlgorithmType() {
-		return AlgorithmType.Geometry;
+	@Override
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Editing;
 	}
-	
-	
-	public String getCategoryName() {
-		return "Editing";
-	}
-	
 	
 	public String getAlgorithmName() {
 		return "Collapse Vertex";
@@ -85,7 +80,5 @@ public class VertexCollapserPlugin extends HalfedgeAlgorithmPlugin {
 	public PluginInfo getPluginInfo() {
 		return new PluginInfo("Vertex Collapser", "Kristoffer Josefsson");
 	}
-	
-	
 
 }

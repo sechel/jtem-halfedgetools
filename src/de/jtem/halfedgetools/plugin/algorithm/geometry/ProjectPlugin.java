@@ -41,6 +41,7 @@ import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class ProjectPlugin extends HalfedgeAlgorithmPlugin {
@@ -65,13 +66,9 @@ public class ProjectPlugin extends HalfedgeAlgorithmPlugin {
 		hcp.update();
 	}
 
-	public AlgorithmType getAlgorithmType() {
-		return AlgorithmType.Geometry;
-	}
-	
-	
-	public String getCategoryName() {
-		return "Editing";
+	@Override
+	public AlgorithmCategory getAlgorithmCategory() {
+		return AlgorithmCategory.Geometry;
 	}
 	
 	
