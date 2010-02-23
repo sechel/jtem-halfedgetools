@@ -37,11 +37,9 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
-import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 import de.jtem.halfedgetools.algorithm.subdivision.StellarLinear;
-import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
@@ -60,13 +58,10 @@ public class StellarLinearPlugin extends HalfedgeAlgorithmPlugin {
 	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
 		HDS hds2 = hcp.createEmpty(hds);
 		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
-		EdgeAverageCalculator ec = c.get(hds.getEdgeClass(), EdgeAverageCalculator.class);
 		FaceBarycenterCalculator fc = c.get(hds.getFaceClass(), FaceBarycenterCalculator.class);
-		if (vc == null || ec == null || fc == null) {
+		if (vc == null || fc == null) {
 			throw new CalculatorException("No Subdivision calculators found for " + hds);
 		}
-		Triangulator t = new Triangulator();
-		t.triangulate(hds);
 		subdivider.execute(hds, hds2, vc, fc);
 		hcp.set(hds2);	
 		
