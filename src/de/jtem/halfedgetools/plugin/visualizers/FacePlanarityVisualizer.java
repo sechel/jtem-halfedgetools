@@ -40,11 +40,14 @@ import static java.lang.Math.abs;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -67,7 +70,7 @@ import de.jtem.halfedgetools.adapter.type.Label;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
 
-public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeListener {
+public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeListener, ActionListener {
 
 	private DecimalFormat
 		format = new DecimalFormat("0.000");
@@ -75,6 +78,9 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 		placesModel = new SpinnerNumberModel(3, 0, 20, 1);
 	private JSpinner	
 		placesSpinner = new JSpinner(placesModel);
+	private JCheckBox	
+		showLabels = new JCheckBox("Labels", false),
+		showColors = new JCheckBox("Colors", true);
 	private JPanel
 		panel = new JPanel();
 	
@@ -91,9 +97,14 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 		gbc2.weightx = 1.0;
 		gbc2.gridwidth = GridBagConstraints.REMAINDER;
 		gbc2.insets = new Insets(2, 2, 2, 2);
+		
+		panel.add(showColors, gbc1);
+		panel.add(showLabels, gbc2);
 		panel.add(new JLabel("Decimal Places"), gbc1);
 		panel.add(placesSpinner, gbc2);
 		
+		showColors.addActionListener(this);
+		showLabels.addActionListener(this);
 		placesSpinner.addChangeListener(this);
 	}
 	
@@ -106,6 +117,11 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 		}
 		format = new DecimalFormat(fs);
 		updateContent();
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		manager.update();
 	}
 	
 
@@ -247,8 +263,12 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 	@Override
 	public Set<? extends Adapter<?>> getAdapters() {
 		Set<Adapter<?>> result = new HashSet<Adapter<?>>();
-		result.add(new PlanarityColorAdapter());
-		result.add(new PlanarityLabelAdapter());
+		if (showColors.isSelected()) {
+			result.add(new PlanarityColorAdapter());
+		}
+		if (showLabels.isSelected()) {
+			result.add(new PlanarityLabelAdapter());
+		}
 		return result;
 	}
 

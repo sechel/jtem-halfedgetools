@@ -200,23 +200,41 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 			}
 			VisualizerPlugin op = visualizers.get(row);
 			setActive(op, !isActive(op));
-			if (isActive(op)) {
-				for (Adapter<?> a : adapterMap.get(op)) {
-					hif.addAdapter(a);
-				}
-			} else {
-				for (Adapter<?> a : adapterMap.get(op)) {
-					hif.removeAdapter(a);
-				}
-			}
-			updateContent();
+			update();
 		}
 		
+	}
+	
+	public void update() {
+		updateAdapters();
+		updateContent();
 	}
 	
 	
 	public void updateContent() {
 		hif.update();		
+	}
+	
+	
+	public void updateAdapters() {
+		for (VisualizerPlugin p : visualizers) {
+			if (adapterMap.containsKey(p)) {
+				for (Adapter<?> a : adapterMap.get(p)) {
+					hif.removeAdapter(a);
+				}
+			}
+			Set<? extends Adapter<?>> adapters = p.getAdapters();
+			adapterMap.put(p, adapters);
+			if (isActive(p)) {
+				for (Adapter<?> a : adapters) {
+					hif.addAdapter(a);
+				}
+			} else {
+				for (Adapter<?> a : adapters) {
+					hif.removeAdapter(a);
+				}
+			}
+		}
 	}
 	
 	
@@ -255,13 +273,12 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	public void addVisualizerPlugin(VisualizerPlugin vp) {
 		visualizers.add(vp);
 		updatePluginTable();
-		adapterMap.put(vp, vp.getAdapters());
+		updateAdapters();
 	}
 	
 	public void removeVisualizerPlugin(VisualizerPlugin vp) {
 		visualizers.remove(vp);
 		updatePluginTable();
-		adapterMap.remove(vp);
 	}
 	
 	
