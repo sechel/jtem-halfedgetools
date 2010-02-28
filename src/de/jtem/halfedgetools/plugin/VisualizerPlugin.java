@@ -35,13 +35,20 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 
+import de.jreality.scene.SceneGraphComponent;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 
 public abstract class VisualizerPlugin extends Plugin {
 
-	public abstract Set<? extends Adapter<?>> getAdapters();
+	public Set<? extends Adapter<?>> getAdapters() {
+		return null;
+	}
+	
+	public SceneGraphComponent getComponent() {
+		return null;
+	}
 	
 	protected VisualizersManager
 		manager = null;
@@ -65,11 +72,9 @@ public abstract class VisualizerPlugin extends Plugin {
 	
 	public abstract String getName();
 	
-	
 	public void updateContent() {
 		manager.updateContent();
 	}
-	
 	
 	@Override
 	public String toString() {

@@ -532,7 +532,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		
 	}
 	
-	protected SceneGraphComponent getActiveComponent() {
+	public SceneGraphComponent getActiveComponent() {
 		return activeComponent;
 	}
 	

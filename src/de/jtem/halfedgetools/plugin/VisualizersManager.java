@@ -57,6 +57,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import de.jreality.plugin.basic.View;
+import de.jreality.scene.SceneGraphComponent;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -76,7 +77,8 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 		pluginTable = new JTable();
 	private Map<VisualizerPlugin, Set<? extends Adapter<?>>>
 		adapterMap = new HashMap<VisualizerPlugin, Set<? extends Adapter<?>>>();
-	
+	private Map<VisualizerPlugin, SceneGraphComponent>
+		componentMap = new HashMap<VisualizerPlugin, SceneGraphComponent>();
 	
 	public VisualizersManager() {
 		shrinkPanel.setTitle("Visualizers");
@@ -207,6 +209,7 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	
 	public void update() {
 		updateAdapters();
+		updateComponents();	
 		updateContent();
 	}
 	
@@ -215,6 +218,23 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 		hif.update();		
 	}
 	
+	public void updateComponents() {
+		SceneGraphComponent content = hif.getActiveComponent();
+		for(VisualizerPlugin p : visualizers) {
+			if (componentMap.containsKey(p)) {
+				content.removeChild(componentMap.get(p));
+			}
+			SceneGraphComponent sgc = p.getComponent();
+			if(sgc != null) {
+				componentMap.put(p, sgc);
+				if (isActive(p)) {
+					content.addChild(sgc);
+				} else {
+					content.removeChild(sgc);
+				}
+			}
+		}
+	}
 	
 	public void updateAdapters() {
 		for (VisualizerPlugin p : visualizers) {
@@ -224,14 +244,16 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 				}
 			}
 			Set<? extends Adapter<?>> adapters = p.getAdapters();
-			adapterMap.put(p, adapters);
-			if (isActive(p)) {
-				for (Adapter<?> a : adapters) {
-					hif.addAdapter(a);
-				}
-			} else {
-				for (Adapter<?> a : adapters) {
-					hif.removeAdapter(a);
+			if(adapters != null) {
+				adapterMap.put(p, adapters);
+				if (isActive(p)) {
+					for (Adapter<?> a : adapters) {
+						hif.addAdapter(a);
+					}
+				} else {
+					for (Adapter<?> a : adapters) {
+						hif.removeAdapter(a);
+					}
 				}
 			}
 		}
@@ -274,6 +296,7 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 		visualizers.add(vp);
 		updatePluginTable();
 		updateAdapters();
+		updateComponents();
 	}
 	
 	public void removeVisualizerPlugin(VisualizerPlugin vp) {
