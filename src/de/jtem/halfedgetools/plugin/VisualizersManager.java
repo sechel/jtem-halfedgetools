@@ -63,7 +63,7 @@ import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
-public class VisualizersManager extends ShrinkPanelPlugin implements ListSelectionListener {
+public class VisualizersManager extends ShrinkPanelPlugin implements ListSelectionListener, HalfedgeListener {
 
 	private HalfedgeInterface
 		hif = null;
@@ -77,8 +77,8 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 		pluginTable = new JTable();
 	private Map<VisualizerPlugin, Set<? extends Adapter<?>>>
 		adapterMap = new HashMap<VisualizerPlugin, Set<? extends Adapter<?>>>();
-	private Map<VisualizerPlugin, SceneGraphComponent>
-		componentMap = new HashMap<VisualizerPlugin, SceneGraphComponent>();
+	private SceneGraphComponent
+		geometryRoot = new SceneGraphComponent("Visualizers Geometry");
 	
 	public VisualizersManager() {
 		shrinkPanel.setTitle("Visualizers");
@@ -208,6 +208,11 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	}
 	
 	public void update() {
+		for (VisualizerPlugin p : visualizers) {
+			if (isActive(p)) {
+				p.initVisualization(hif);
+			}
+		}
 		updateAdapters();
 		updateComponents();	
 		updateContent();
@@ -218,23 +223,22 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 		hif.update();		
 	}
 	
-	public void updateComponents() {
-		SceneGraphComponent content = hif.getActiveComponent();
-			for (VisualizerPlugin p : visualizers) {
-				if (componentMap.containsKey(p)) {
-					content.removeChild(componentMap.get(p));
+	protected void updateComponents() {
+		System.out.println("VisualizersManager.updateComponents()");
+		hif.getAuxComponent().removeChild(geometryRoot);
+		geometryRoot = new SceneGraphComponent("Visualizers Geometry");
+		for (VisualizerPlugin p : visualizers) {
+			if (isActive(p)) {	
+				SceneGraphComponent c = p.getComponent();
+				if (c != null) {
+					geometryRoot.addChild(c);
 				}
-				SceneGraphComponent visualSgc = p.getComponent();
-				if(visualSgc != null) {
-					componentMap.put(p, visualSgc);
-					if (isActive(p)) {
-						content.addChild(visualSgc);
-					}	
-				}
-			}	
+			}
+		}
+		hif.getAuxComponent().addChild(geometryRoot);
 	}
 	
-	public void updateAdapters() {
+	protected void updateAdapters() {
 		for (VisualizerPlugin p : visualizers) {
 			if (adapterMap.containsKey(p)) {
 				for (Adapter<?> a : adapterMap.get(p)) {
@@ -242,16 +246,14 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 				}
 			}
 			Set<? extends Adapter<?>> adapters = p.getAdapters();
-			if(adapters != null) {
-				adapterMap.put(p, adapters);
-				if (isActive(p)) {
-					for (Adapter<?> a : adapters) {
-						hif.addAdapter(a);
-					}
-				} else {
-					for (Adapter<?> a : adapters) {
-						hif.removeAdapter(a);
-					}
+			adapterMap.put(p, adapters);
+			if (isActive(p)) {
+				for (Adapter<?> a : adapters) {
+					hif.addAdapter(a);
+				}
+			} else {
+				for (Adapter<?> a : adapters) {
+					hif.removeAdapter(a);
 				}
 			}
 		}
@@ -280,6 +282,7 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
+		hif.addHalfedgeListener(this);
 	}
 	
 	
@@ -300,6 +303,13 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	public void removeVisualizerPlugin(VisualizerPlugin vp) {
 		visualizers.remove(vp);
 		updatePluginTable();
+	}
+
+
+
+	@Override
+	public void halfedgeChanged(HalfedgeInterface hif) {
+		updateComponents();
 	}
 	
 	

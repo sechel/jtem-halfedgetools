@@ -84,6 +84,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	private Content
 		content = null;
 	private SceneGraphComponent
+		auxGeometry = new SceneGraphComponent("Halfedge Aux"),
 		contentParseRoot = null;
 	private JList	
 		selectionList = new JList(),
@@ -489,7 +490,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		updateStates();
 	}
 	
-	
 	/**
 	 * @author josefsso
 	 * If someone overwrites our content, immediately convert the new IFS to a HDS, then convert back with
@@ -499,6 +499,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		
 		public void contentChanged(ContentChangedEvent cce) {
 			final DefaultListModel model = new DefaultListModel();
+			activeComponent.removeChild(auxGeometry);
 			activeComponent = contentParseRoot;
 			hdsIsDirty = true;
 			if (scene.getContentComponent() == null) {
@@ -525,6 +526,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			if (model.getSize() != 0) {
 				geometryList.setSelectedIndex(0);
 			}
+			activeComponent.addChild(auxGeometry);
 			get(cachedHEDS, new AdapterSet());
 			set(cachedHEDS, cachedAdapters);
 			updateStates();
@@ -534,6 +536,10 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	public SceneGraphComponent getActiveComponent() {
 		return activeComponent;
+	}
+	
+	public SceneGraphComponent getAuxComponent() {
+		return auxGeometry;
 	}
 	
 	protected Map<? extends Edge<?, ?, ?>, Integer> getEdgeMap() {

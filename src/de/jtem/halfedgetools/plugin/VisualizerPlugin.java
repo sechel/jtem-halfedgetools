@@ -31,6 +31,7 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin;
 
+import java.util.Collections;
 import java.util.Set;
 
 import javax.swing.JPanel;
@@ -42,8 +43,12 @@ import de.jtem.jrworkspace.plugin.Plugin;
 
 public abstract class VisualizerPlugin extends Plugin {
 
+	public void initVisualization(HalfedgeInterface hif) {
+		
+	}
+	
 	public Set<? extends Adapter<?>> getAdapters() {
-		return null;
+		return Collections.emptySet();
 	}
 	
 	public SceneGraphComponent getComponent() {
