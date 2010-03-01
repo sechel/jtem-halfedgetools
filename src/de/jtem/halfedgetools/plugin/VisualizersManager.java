@@ -220,20 +220,18 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	
 	public void updateComponents() {
 		SceneGraphComponent content = hif.getActiveComponent();
-		for(VisualizerPlugin p : visualizers) {
-			if (componentMap.containsKey(p)) {
-				content.removeChild(componentMap.get(p));
-			}
-			SceneGraphComponent sgc = p.getComponent();
-			if(sgc != null) {
-				componentMap.put(p, sgc);
-				if (isActive(p)) {
-					content.addChild(sgc);
-				} else {
-					content.removeChild(sgc);
+			for (VisualizerPlugin p : visualizers) {
+				if (componentMap.containsKey(p)) {
+					content.removeChild(componentMap.get(p));
 				}
-			}
-		}
+				SceneGraphComponent visualSgc = p.getComponent();
+				if(visualSgc != null) {
+					componentMap.put(p, visualSgc);
+					if (isActive(p)) {
+						content.addChild(visualSgc);
+					}	
+				}
+			}	
 	}
 	
 	public void updateAdapters() {
