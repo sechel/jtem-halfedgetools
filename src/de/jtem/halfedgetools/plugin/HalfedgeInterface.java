@@ -83,8 +83,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		scene = null;
 	private Content
 		content = null;
-	private SceneGraphComponent
-		auxGeometry = new SceneGraphComponent("Halfedge Aux"),
+	private AuxSceneGraphComponent
+		auxComponent = new AuxSceneGraphComponent();
+	SceneGraphComponent
 		contentParseRoot = null;
 	private JList	
 		selectionList = new JList(),
@@ -146,6 +147,23 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		calculators.add(new JRFaceAreaCalculator());
 		calculators.add(new JRFaceNormalCalculator());
 		calculators.add(new JRSubdivisionCalculator());
+	}
+	
+	
+	public class AuxSceneGraphComponent extends SceneGraphComponent {
+		
+		public AuxSceneGraphComponent() {
+			super("Halfdge Aux");
+		}
+		
+		public void startWriting() {
+			startWriter();
+		}
+		
+		public void finishWriting() {
+			finishWriter();
+		}
+		
 	}
 	
 	
@@ -500,7 +518,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		
 		public void contentChanged(ContentChangedEvent cce) {
 			final DefaultListModel model = new DefaultListModel();
-			activeComponent.removeChild(auxGeometry);
+			activeComponent.removeChild(auxComponent);
 			activeComponent = contentParseRoot;
 			hdsIsDirty = true;
 			if (scene.getContentComponent() == null) {
@@ -527,7 +545,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			if (model.getSize() != 0) {
 				geometryList.setSelectedIndex(0);
 			}
-			activeComponent.addChild(auxGeometry);
+			activeComponent.addChild(auxComponent);
 			get(cachedHEDS, new AdapterSet());
 			set(cachedHEDS, cachedAdapters);
 			updateStates();
@@ -540,7 +558,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	public SceneGraphComponent getAuxComponent() {
-		return auxGeometry;
+		return auxComponent;
 	}
 	
 	protected Map<? extends Edge<?, ?, ?>, Integer> getEdgeMap() {
