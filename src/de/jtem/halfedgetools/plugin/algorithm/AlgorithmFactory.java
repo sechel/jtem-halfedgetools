@@ -47,6 +47,7 @@ import de.jtem.halfedgetools.plugin.algorithm.subdivision.Sqrt3Plugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.StellarLinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.TriangulatePlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.EdgeCollapsePlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.EdgeFlipperPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.EdgeRemoverFillPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.EdgeRemoverPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.EdgeSplitterPlugin;
@@ -75,6 +76,7 @@ public class AlgorithmFactory {
 		hs.add(new EdgeRemoverPlugin());
 		hs.add(new EdgeSplitterPlugin());
 		hs.add(new FillHolesPlugin());
+		hs.add(new EdgeFlipperPlugin());
 		return hs;
 	}
 	
