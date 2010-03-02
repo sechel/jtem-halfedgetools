@@ -24,21 +24,21 @@ public abstract class AbstractAdapter<VAL> extends Adapter<VAL> {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> VAL getV(V v, AdapterSet a) {
-		throw new RuntimeException("getV not supported in this adapter");
+		throw new RuntimeException("getV not supported in this adapter: " + getClass().getSimpleName());
 	}
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> VAL getE(E e, AdapterSet a) {
-		throw new RuntimeException("getE not supported in this adapter");
+		throw new RuntimeException("getE not supported in this adapter: " + getClass().getSimpleName());
 	}	
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> VAL getF(F f, AdapterSet a) {
-		throw new RuntimeException("getF not supported in this adapter");
+		throw new RuntimeException("getF not supported in this adapter: " + getClass().getSimpleName());
 	}
 	
 	public <
@@ -46,21 +46,21 @@ public abstract class AbstractAdapter<VAL> extends Adapter<VAL> {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> void setV(V v, VAL value, AdapterSet a) {
-		throw new RuntimeException("setV not supported in this adapter");
+		throw new RuntimeException("setV not supported in this adapter: " + getClass().getSimpleName());
 	}
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> void setE(E e, VAL value, AdapterSet a) {
-		throw new RuntimeException("setE not supported in this adapter");
+		throw new RuntimeException("setE not supported in this adapter: " + getClass().getSimpleName());
 	}
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> void setF(F f, VAL value, AdapterSet a) {
-		throw new RuntimeException("setF not supported in this adapter");
+		throw new RuntimeException("setF not supported in this adapter: " + getClass().getSimpleName());
 	}
 	
 

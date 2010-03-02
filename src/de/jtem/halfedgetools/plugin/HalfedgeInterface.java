@@ -314,6 +314,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void set(HDS hds, AdapterSet a) {
+		fireHalfedgeConverting(hds);
 		AdapterSet all = new AdapterSet();
 		if (a != null) all.addAll(a);
 		all.addAll(adapters);
@@ -486,7 +487,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		if (adapters != null) {
 			cachedAdapters.addAll(adapters);
 		}
-		fireHalfedgeChanged(this);
+		fireHalfedgeChanged(hds);
 		updateStates();
 	}
 	
@@ -573,9 +574,25 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	
-	protected void fireHalfedgeChanged(HalfedgeInterface hif) {
+	protected < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void fireHalfedgeConverting(HDS hds) {
 		for (HalfedgeListener l : listeners) {
-			l.halfedgeChanged(hif);
+			l.halfedgeConverting(hds, getAdapters(), this);
+		}
+	}
+	
+	protected < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void fireHalfedgeChanged(HDS hds) {
+		for (HalfedgeListener l : listeners) {
+			l.halfedgeChanged(hds, getAdapters(), this);
 		}
 	}
 	

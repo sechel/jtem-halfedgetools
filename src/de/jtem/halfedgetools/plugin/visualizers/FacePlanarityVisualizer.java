@@ -68,6 +68,7 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Color;
 import de.jtem.halfedgetools.adapter.type.Label;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
 
 public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeListener, ActionListener {
@@ -83,6 +84,8 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 		showColors = new JCheckBox("Colors", true);
 	private JPanel
 		panel = new JPanel();
+	private double
+		maxUnevenness = 0.0;
 	
 	
 	public FacePlanarityVisualizer() {
@@ -121,9 +124,18 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		manager.update();
+		manager.updateContent();
 	}
 	
+	
+	public  < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void initVisualization(HDS hds, AdapterSet a, HalfedgeInterface hif) {
+		maxUnevenness = getMaxUnevenness(hds, a);
+	}
 
 	public static <
 		V extends Vertex<V, E, F>,
@@ -245,7 +257,6 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 			E extends Edge<V, E, F>,
 			F extends Face<V, E, F>
 		> double[] getF(F f, AdapterSet a) {
-			double maxUnevenness = getMaxUnevenness(f.getHalfEdgeDataStructure(), a);
 			double col = getRelativeUnevenness(f, a) / maxUnevenness;
 			return new double[]{col, 1 - col, 0};
 		}

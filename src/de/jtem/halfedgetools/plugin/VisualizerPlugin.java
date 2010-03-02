@@ -37,13 +37,23 @@ import java.util.Set;
 import javax.swing.JPanel;
 
 import de.jreality.scene.SceneGraphComponent;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.Adapter;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 
 public abstract class VisualizerPlugin extends Plugin {
 
-	public void initVisualization(HalfedgeInterface hif) {
+	public < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void initVisualization(HDS hds, AdapterSet a, HalfedgeInterface hif) {
 		
 	}
 	

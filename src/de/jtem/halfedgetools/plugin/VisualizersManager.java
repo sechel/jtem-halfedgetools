@@ -58,7 +58,12 @@ import javax.swing.table.DefaultTableModel;
 
 import de.jreality.plugin.basic.View;
 import de.jreality.scene.SceneGraphComponent;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.Adapter;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
@@ -202,29 +207,13 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 			}
 			VisualizerPlugin op = visualizers.get(row);
 			setActive(op, !isActive(op));
-			update();
+			hif.update();	
 		}
 		
 	}
 	
-	public void update() {
-		for (VisualizerPlugin p : visualizers) {
-			if (isActive(p)) {
-				p.initVisualization(hif);
-			}
-		}
-		updateAdapters();
-		updateComponents();	
-		updateContent();
-	}
-	
-	
-	public void updateContent() {
-		hif.update();		
-	}
 	
 	protected void updateComponents() {
-		System.out.println("VisualizersManager.updateComponents()");
 		hif.getAuxComponent().removeChild(geometryRoot);
 		geometryRoot = new SceneGraphComponent("Visualizers Geometry");
 		for (VisualizerPlugin p : visualizers) {
@@ -257,6 +246,10 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 				}
 			}
 		}
+	}
+	
+	public void updateContent() {
+		hif.update();
 	}
 	
 	
@@ -306,10 +299,27 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	}
 
 
-
-	@Override
-	public void halfedgeChanged(HalfedgeInterface hif) {
-		updateComponents();
+	public < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void halfedgeConverting(HDS hds, AdapterSet a, HalfedgeInterface hif) {
+		for (VisualizerPlugin p : visualizers) {
+			if (isActive(p)) {
+				p.initVisualization(hds, hif.getAdapters(), hif);
+			}
+		}
+		updateAdapters();
+	}
+	
+	public < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void halfedgeChanged(HDS hds, AdapterSet a, HalfedgeInterface hif) {
+		updateComponents();	
 	}
 	
 	
