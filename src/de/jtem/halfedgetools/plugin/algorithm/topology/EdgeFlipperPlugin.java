@@ -44,6 +44,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class EdgeFlipperPlugin extends HalfedgeAlgorithmPlugin {
@@ -80,7 +81,9 @@ public class EdgeFlipperPlugin extends HalfedgeAlgorithmPlugin {
 
 	
 	public PluginInfo getPluginInfo() {
-		return new PluginInfo("Edge Flipper", "Kristoffer Josefsson");
+		PluginInfo info = new PluginInfo("Edge Flipper", "Kristoffer Josefsson");
+		info.icon = ImageHook.getIcon("edgeflip.png");
+		return info;
 	}
 	
 	
