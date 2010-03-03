@@ -27,6 +27,11 @@ public class JRPositionAdapter extends Adapter<double[]> {
 	}
 	
 	@Override
+	public double getPriority() {
+		return 0;
+	}
+	
+	@Override
 	public boolean checkType(Class<?> typeClass) {
 		return double[].class.isAssignableFrom(typeClass);
 	}

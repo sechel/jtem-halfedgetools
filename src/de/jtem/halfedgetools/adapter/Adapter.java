@@ -11,7 +11,7 @@ public abstract class Adapter<VAL> implements Comparable<Adapter<VAL>> {
 	private boolean
 		getter = false,
 		setter = false;
-	
+
 	public Adapter(boolean getter, boolean setter) {
 		this.getter = getter;
 		this.setter = setter;
@@ -22,6 +22,8 @@ public abstract class Adapter<VAL> implements Comparable<Adapter<VAL>> {
 	> boolean canAccept(Class<N> nodeClass);
 	
 	public abstract boolean checkType(Class<?> typeClass); 
+	
+	public abstract double getPriority();
 	
 	@SuppressWarnings("unchecked")
 	public <
@@ -100,9 +102,15 @@ public abstract class Adapter<VAL> implements Comparable<Adapter<VAL>> {
 	
 	@Override
 	public int compareTo(Adapter<VAL> o) {
-		String n1 = getClass().getSimpleName();
-		String n2 = o.getClass().getSimpleName();
-		return n1.compareTo(n2);
+		double p1 = getPriority();
+		double p2 = o.getPriority();
+		if (p1 == p2) {
+			String n1 = getClass().getSimpleName();
+			String n2 = o.getClass().getSimpleName();
+			return n1.compareTo(n2);
+		} else {
+			return p1 < p2 ? -1 : 1;
+		}
 	}
 	
 }

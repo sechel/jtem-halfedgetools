@@ -36,13 +36,13 @@ public class HalfedgeSelection {
 	}
 	
 	
-	public Set<? extends Vertex<?,?,?>> getVertices() {
+	public Set<Vertex<?,?,?>> getVertices() {
 		return Collections.unmodifiableSet(vSet);
 	}
-	public Set<? extends Edge<?,?,?>> getEdges() {
+	public Set<Edge<?,?,?>> getEdges() {
 		return Collections.unmodifiableSet(eSet);
 	}
-	public Set<? extends Face<?,?,?>> getFaces() {
+	public Set<Face<?,?,?>> getFaces() {
 		return Collections.unmodifiableSet(fSet);
 	}
 	

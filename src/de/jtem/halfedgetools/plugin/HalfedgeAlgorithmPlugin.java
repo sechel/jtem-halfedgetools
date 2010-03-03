@@ -33,10 +33,12 @@ package de.jtem.halfedgetools.plugin;
 
 import static javax.swing.JOptionPane.PLAIN_MESSAGE;
 
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import de.jreality.plugin.basic.ViewMenuBar;
 import de.jtem.halfedge.Edge;
@@ -91,7 +93,8 @@ public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 				execute(hcp.get(null), hcp.getCalculators(), hcp);
 			} catch (Exception e1) {
 				e1.printStackTrace();
-				JOptionPane.showMessageDialog(null, e1.getMessage(), getAlgorithmName(), PLAIN_MESSAGE);
+				Window w = SwingUtilities.getWindowAncestor(hcp.getShrinkPanel());
+				JOptionPane.showMessageDialog(w, e1.getMessage(), getAlgorithmName(), PLAIN_MESSAGE);
 			}
 		}
 		

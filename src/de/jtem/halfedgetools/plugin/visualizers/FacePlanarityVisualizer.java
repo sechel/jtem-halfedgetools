@@ -228,6 +228,11 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 			return Face.class.isAssignableFrom(nodeClass);
 		}
 		
+		@Override
+		public double getPriority() {
+			return 0;
+		}
+		
 		public <
 			V extends Vertex<V, E, F>,
 			E extends Edge<V, E, F>,
@@ -250,6 +255,11 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 		@Override
 		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
 			return Face.class.isAssignableFrom(nodeClass);
+		}
+		
+		@Override
+		public double getPriority() {
+			return 0;
 		}
 		
 		public <

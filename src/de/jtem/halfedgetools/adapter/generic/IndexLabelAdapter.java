@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.jreality.adapter;
+package de.jtem.halfedgetools.adapter.generic;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -14,7 +14,16 @@ public class IndexLabelAdapter extends AbstractAdapter<String> {
 	public IndexLabelAdapter() {
 		super(String.class, true, false);
 	}
+	
+	public IndexLabelAdapter(Class<? extends String> typeClass, boolean getter, boolean setter) {
+		super(typeClass, getter, setter);
+	}
 
+	@Override
+	public double getPriority() {
+		return 0;
+	}
+	
 	@Override
 	public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
 		return true;

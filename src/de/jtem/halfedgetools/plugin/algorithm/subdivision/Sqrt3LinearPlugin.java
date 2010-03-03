@@ -72,7 +72,6 @@ public class Sqrt3LinearPlugin extends HalfedgeAlgorithmPlugin {
 		Map<F, V> fMap = new HashMap<F, V>();
 		subdivider.subsivide(hds, hds2, vMap, fMap, vc, fc);
 		hcp.set(hds2);	
-		
 	}
 
 	@Override

@@ -25,6 +25,11 @@ public class JRBaryCenterAdapter extends AbstractAdapter<double[]> implements Ca
 		return true;
 	}
 	
+	@Override
+	public double getPriority() {
+		return 0;
+	}
+	
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

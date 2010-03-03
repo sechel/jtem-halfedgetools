@@ -104,6 +104,11 @@ public class DirichletEnergyVisualizer extends VisualizerPlugin implements Chang
 		public EdgeLengthAdapter() {
 			super(String.class, true, false);
 		}
+		
+		@Override
+		public double getPriority() {
+			return 0;
+		}
 
 		public <
 			V extends Vertex<V, E, F>,

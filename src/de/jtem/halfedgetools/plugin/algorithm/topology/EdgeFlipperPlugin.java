@@ -31,12 +31,14 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
+import java.util.List;
 import java.util.Set;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
@@ -61,6 +63,22 @@ public class EdgeFlipperPlugin extends HalfedgeAlgorithmPlugin {
 		if (edges.isEmpty()) return;
 		for (E e : edges) {
 			if (e.isPositive()) continue;
+			boolean canFlip = true;
+			if (e.getLeftFace() != null) {
+				List<E> b = HalfEdgeUtils.boundaryEdges(e.getLeftFace());
+				if (b.size() != 3) {
+					canFlip = false;
+				}
+			}
+			if (e.getRightFace() != null) {
+				List<E> b = HalfEdgeUtils.boundaryEdges(e.getRightFace());
+				if (b.size() != 3) {
+					canFlip = false;
+				}
+			}
+			if (!canFlip) {
+				throw new RuntimeException("Can only flip edges between triangles");
+			}
 			TopologyAlgorithms.flipEdge(e);
 		}
 		hcp.update();

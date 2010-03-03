@@ -57,7 +57,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.jreality.adapter.IndexLabelAdapter;
+import de.jtem.halfedgetools.adapter.generic.IndexLabelAdapter;
 import de.jtem.java2dx.beans.Viewer2DWithInspector;
 import de.jtem.java2dx.modelling.GraphicsModeller2D;
 import de.jtem.java2dx.modelling.SimpleModeller2D;

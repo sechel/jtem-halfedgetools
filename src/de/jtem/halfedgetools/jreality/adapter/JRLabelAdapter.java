@@ -27,6 +27,11 @@ public class JRLabelAdapter extends Adapter<String> {
 	}
 	
 	@Override
+	public double getPriority() {
+		return 0;
+	}
+	
+	@Override
 	public boolean checkType(Class<?> typeClass) {
 		return String.class.equals(typeClass);
 	}

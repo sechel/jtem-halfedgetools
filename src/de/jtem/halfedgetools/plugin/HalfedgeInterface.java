@@ -44,7 +44,7 @@ import de.jreality.plugin.basic.Content.ContentChangedListener;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.SceneGraphVisitor;
-import de.jreality.scene.data.Attribute;
+import de.jreality.ui.AppearanceInspector;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -54,6 +54,7 @@ import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.Calculator;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.adapter.generic.NormalAdapter;
 import de.jtem.halfedgetools.io.HalfedgeIO;
 import de.jtem.halfedgetools.jreality.ConverterHeds2JR;
 import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
@@ -70,6 +71,7 @@ import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
+import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 
 
 public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectionListener, ActionListener {
@@ -78,6 +80,10 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		scene = null;
 	private Content
 		content = null;
+	private SelectionInterface
+		selectionInterface = null;
+	private SelectionVisualizer 
+		selectionVisualizer = null;
 	private AuxSceneGraphComponent
 		auxComponent = new AuxSceneGraphComponent();
 	SceneGraphComponent
@@ -98,9 +104,13 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	private JLabel
 		hdsLabel = new JLabel("No HDS cached");
 	private JCheckBox
-		viewSelectionChecker = new JCheckBox("View Selection");
+		viewSelectionChecker = new JCheckBox("View Selection", true);
 	private JFileChooser 
 		chooser = new JFileChooser();
+	private AppearanceInspector
+		selectionInspector = new AppearanceInspector();
+	private ShrinkPanel
+		selectionAppShrinker = new ShrinkPanel("Selection Appearance");
 	
 	private boolean
 		hdsIsDirty = true;
@@ -132,11 +142,13 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		adapters.add(new JRNormalAdapter());
 		adapters.add(new JRPositionAdapter());
 		adapters.add(new JRTexCoordAdapter());
+		adapters.add(new NormalAdapter());
 		adapters.add(new SelectionAdapter(this));
 		calculators.add(new JRVertexPositionCalculator());
 		calculators.add(new JRFaceAreaCalculator());
 		calculators.add(new JRFaceNormalCalculator());
 		calculators.add(new JRSubdivisionCalculator());
+		auxComponent.setPickable(false);
 	}
 	
 	
@@ -197,8 +209,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		c.weighty = 1.0;
 		shrinkPanel.add(selectionPanel, c);
 		c.weighty = 0.0;
-		shrinkPanel.add(viewSelectionChecker, c);
 		shrinkPanel.add(clearSelectionButton, c);
+		c.weighty = 1.0;
+		selectionAppShrinker.setShrinked(true);
+		selectionAppShrinker.setLayout(new GridLayout());
+		selectionAppShrinker.add(selectionInspector);
+		shrinkPanel.add(selectionAppShrinker, c);
 		
 		File userDir = new File(System.getProperty("user.dir"));
 		chooser.setDialogTitle("Halfedge Files");
@@ -264,6 +280,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		}
 		if (clearSelectionButton == e.getSource()) {
 			selection.clear();
+			selectionVisualizer.update(getSelection());
 		}
 		if(loadHDSButton == e.getSource()) {
 			File file = null;
@@ -330,9 +347,11 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		IndexedFaceSet ifs = converterHeds2JR.heds2ifs(hds, all, edgeMap);
 		this.edgeMap = edgeMap;
 		updateCache(hds, a);
-		if(ifs != null && ifs.getVertexAttributes(Attribute.COORDINATES) != null) {
-			IndexedFaceSetUtility.calculateAndSetNormals(ifs);
+		if(ifs != null) {
 			activeComponent.setGeometry(ifs);
+		}
+		if (selectionInterface != null) {
+			clearSelection();
 		}
 	}
 	
@@ -463,7 +482,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		contentParseRoot = scene.getContentComponent();
 		contentChangedListener.contentChanged(null);
 		geometryList.addListSelectionListener(this);
-		c.getPlugin(SelectionInterface.class);
+		selectionVisualizer = c.getPlugin(SelectionVisualizer.class);
+//		selectionInspector.setAppearance(selectionVisualizer.getSelectionAppearance());
+		selectionInterface = c.getPlugin(SelectionInterface.class);
 	}
 	
 	
@@ -561,12 +582,13 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	public void setSelection(HalfedgeSelection s) {
 		selection = s;
 		updateStates();
+		selectionInterface.fireSelectionChanged(selection);
 	}
 	public void clearSelection() {
 		selection.clear();
 		updateStates();
+		selectionInterface.fireSelectionChanged(selection);
 	}
-	
 	
 	protected HalfEdgeDataStructure<?, ?, ?> getCache() {
 		return cachedHEDS;

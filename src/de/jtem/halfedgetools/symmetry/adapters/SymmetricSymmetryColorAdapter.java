@@ -50,6 +50,11 @@ public class SymmetricSymmetryColorAdapter extends AbstractAdapter<double[]> {
 		return SymmetricEdge.class.isAssignableFrom(nodeClass);
 	}
 	
+	@Override
+	public double getPriority() {
+		return 1;
+	}
+	
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

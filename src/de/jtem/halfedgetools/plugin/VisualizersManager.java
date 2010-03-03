@@ -49,6 +49,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
@@ -80,6 +81,8 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 		optionsPanel = new JPanel();
 	private JTable
 		pluginTable = new JTable();
+	private JScrollPane
+		optionsScroller = new JScrollPane(optionsPanel);
 	private Map<VisualizerPlugin, Set<? extends Adapter<?>>>
 		adapterMap = new HashMap<VisualizerPlugin, Set<? extends Adapter<?>>>();
 	private SceneGraphComponent
@@ -107,7 +110,7 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 		optionsPanel.setBorder(BorderFactory.createTitledBorder("Options"));
 		
 		shrinkPanel.add(pluginTable, gbc2);
-		shrinkPanel.add(optionsPanel, gbc2);
+		shrinkPanel.add(optionsScroller, gbc2);
 	}
 	
 	
@@ -265,11 +268,11 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	}
 	
 	
-	private boolean isActive(VisualizerPlugin op) {
+	protected boolean isActive(VisualizerPlugin op) {
 		return activateSet.contains(op.getName());
 	}
 	
-	private void setActive(VisualizerPlugin op, boolean active) {
+	protected void setActive(VisualizerPlugin op, boolean active) {
 		if (!active) {
 			activateSet.remove(op.getName());
 		} else {
@@ -298,14 +301,14 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	}
 	
 	
-	public void addVisualizerPlugin(VisualizerPlugin vp) {
+	protected void addVisualizerPlugin(VisualizerPlugin vp) {
 		visualizers.add(vp);
 		updatePluginTable();
 		updateAdapters();
 		updateComponents();
 	}
 	
-	public void removeVisualizerPlugin(VisualizerPlugin vp) {
+	protected void removeVisualizerPlugin(VisualizerPlugin vp) {
 		visualizers.remove(vp);
 		updatePluginTable();
 	}

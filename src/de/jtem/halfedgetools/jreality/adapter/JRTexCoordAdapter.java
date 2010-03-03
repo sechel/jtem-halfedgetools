@@ -26,6 +26,11 @@ public class JRTexCoordAdapter extends Adapter<double[]> {
 		return result;
 	}
 	
+	@Override
+	public double getPriority() {
+		return 0;
+	}
+	
 	public boolean checkType(Class<?> typeClass) {
 		return double[].class.isAssignableFrom(typeClass);
 	}

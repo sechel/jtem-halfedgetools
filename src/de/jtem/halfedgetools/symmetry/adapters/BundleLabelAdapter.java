@@ -62,6 +62,10 @@ public class BundleLabelAdapter extends AbstractAdapter<String> {
 		return true;
 	}
 	
+	@Override
+	public double getPriority() {
+		return 1;
+	}
 
 	@SuppressWarnings("unchecked")
 	public <

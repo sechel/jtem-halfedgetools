@@ -28,6 +28,10 @@ public class SelectionInterface extends Plugin implements PointDragListener, Lin
 		hif = null;
 	private DragEventTool
 		tool = new DragEventTool();
+	private List<SelectionListener>
+		listeners = new LinkedList<SelectionListener>();
+	private VisualizersManager
+		visManager = null;
 	
 	public SelectionInterface() {
 		tool.addPointDragListener(this);
@@ -57,6 +61,8 @@ public class SelectionInterface extends Plugin implements PointDragListener, Lin
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
 		hif.addHalfedgeListener(this);
+		visManager = c.getPlugin(VisualizersManager.class);
+		visManager.setActive(c.getPlugin(SelectionVisualizer.class), true);
 		JRViewerUtility.getContentPlugin(c).addContentTool(tool);
 	}
 
@@ -83,6 +89,7 @@ public class SelectionInterface extends Plugin implements PointDragListener, Lin
 		boolean selected = hif.getSelection().isSelected(v);
 		hif.getSelection().setSelected(v, !selected);
 		hif.updateStates();
+		fireSelectionChanged(hif.getSelection());
 	}
 	
 	@Override
@@ -114,6 +121,7 @@ public class SelectionInterface extends Plugin implements PointDragListener, Lin
 			hif.getSelection().setSelected(edge, !selected);
 		}
 		hif.updateStates();
+		fireSelectionChanged(hif.getSelection());
 	}
 	@Override
 	public void lineDragStart(LineDragEvent e) {
@@ -132,12 +140,27 @@ public class SelectionInterface extends Plugin implements PointDragListener, Lin
 		boolean selected = hif.getSelection().isSelected(f);
 		hif.getSelection().setSelected(f, !selected);
 		hif.updateStates();
+		fireSelectionChanged(hif.getSelection());
 	}
 	@Override
 	public void faceDragStart(FaceDragEvent e) {
 	}
 	@Override
 	public void faceDragged(FaceDragEvent e) {
+	}
+	
+	public void addSelectionListener(SelectionListener l) {
+		listeners.add(l);
+	}
+	
+	public void removeSelectionListener(SelectionListener l) {
+		listeners.remove(l);
+	}
+	
+	protected void fireSelectionChanged(HalfedgeSelection s) {
+		for (SelectionListener l : listeners) {
+			l.selectionChanged(s, this);
+		}
 	}
 	
 }

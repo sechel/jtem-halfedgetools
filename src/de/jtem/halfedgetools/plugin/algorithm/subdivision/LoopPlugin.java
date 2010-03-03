@@ -75,7 +75,6 @@ public class LoopPlugin extends HalfedgeAlgorithmPlugin {
 		}
 		subdivider.subdivide(hds, hds2, vc, ec, fc);
 		hcp.set(hds2);
-		
 	}
 
 	@Override

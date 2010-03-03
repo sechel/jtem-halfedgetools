@@ -110,6 +110,11 @@ public class EdgeLengthVisualizer extends VisualizerPlugin implements ChangeList
 			return Edge.class.isAssignableFrom(nodeClass);
 		}
 		
+		@Override
+		public double getPriority() {
+			return 0;
+		}
+		
 		public <
 			V extends Vertex<V, E, F>,
 			E extends Edge<V, E, F>,

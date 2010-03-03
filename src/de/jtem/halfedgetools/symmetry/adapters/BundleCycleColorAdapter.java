@@ -58,6 +58,11 @@ public class BundleCycleColorAdapter extends AbstractAdapter<double[]> {
 		return Edge.class.isAssignableFrom(nodeClass);
 	}
 	
+	@Override
+	public double getPriority() {
+		return 1;
+	}
+	
 
 	@SuppressWarnings("unchecked")
 	public <

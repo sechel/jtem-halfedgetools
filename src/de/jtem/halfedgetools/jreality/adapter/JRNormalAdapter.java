@@ -4,18 +4,18 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.generic.NormalAdapter;
 import de.jtem.halfedgetools.adapter.type.Normal;
 import de.jtem.halfedgetools.jreality.node.JREdge;
 import de.jtem.halfedgetools.jreality.node.JRFace;
 import de.jtem.halfedgetools.jreality.node.JRVertex;
 
 @Normal
-public class JRNormalAdapter extends Adapter<double[]> {
+public class JRNormalAdapter extends NormalAdapter {
 
 	public JRNormalAdapter() {
-		super(true, true);
+		super(double[].class, true, true);
 	}
 	
 	public <T extends Node<?, ?, ?>> boolean canAccept(Class<T> nodeClass) {
@@ -36,7 +36,11 @@ public class JRNormalAdapter extends Adapter<double[]> {
 		F extends Face<V, E, F>
 	> double[] getV(V v, AdapterSet a) {
 		JRVertex<?, ?, ?> jv = (JRVertex<?, ?, ?>)v;
-		return jv.normal;
+		if (jv.normal == null) {
+			return super.getV(v, a);
+		} else {
+			return jv.normal;
+		}
 	}
 	public <
 		V extends Vertex<V, E, F>,
@@ -44,7 +48,11 @@ public class JRNormalAdapter extends Adapter<double[]> {
 		F extends Face<V, E, F>
 	> double[] getE(E e, AdapterSet a) {
 		JREdge<?, ?, ?> je = (JREdge<?, ?, ?>)e;
-		return je.normal;
+		if (je.normal == null) {
+			return super.getE(e, a);
+		} else {
+			return je.normal;
+		}
 	}	
 	public <
 		V extends Vertex<V, E, F>,
@@ -52,7 +60,11 @@ public class JRNormalAdapter extends Adapter<double[]> {
 		F extends Face<V, E, F>
 	> double[] getF(F f, AdapterSet a) {
 		JRFace<?, ?, ?> jf = (JRFace<?, ?, ?>)f; 
-		return jf.normal;
+		if (jf.normal == null) {
+			return super.getF(f, a);
+		} else {
+			return jf.normal;
+		}
 	}
 	
 	public <

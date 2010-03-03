@@ -19,6 +19,10 @@ public class SelectionAdapter extends AbstractAdapter<Boolean> {
 		this.hif = hif;
 	}
 	
+	@Override
+	public double getPriority() {
+		return 0;
+	}
 	
 	@Override
 	public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {

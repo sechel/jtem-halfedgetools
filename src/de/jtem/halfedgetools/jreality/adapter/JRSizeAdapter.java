@@ -26,6 +26,11 @@ public class JRSizeAdapter extends Adapter<Double> {
 		return result;
 	}
 	
+	@Override
+	public double getPriority() {
+		return 0;
+	}
+	
 	public boolean checkType(Class<?> typeClass) {
 		return Double.class.isAssignableFrom(typeClass);
 	}
