@@ -213,6 +213,18 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	}
 	
 	
+	public void update() {
+		for (VisualizerPlugin p : visualizers) {
+			if (isActive(p)) {
+				p.initVisualization(hif.get(), hif.getAdapters(), hif);
+			}
+		}
+		updateComponents();
+		updateAdapters();
+	}
+	
+	
+	
 	protected void updateComponents() {
 		hif.getAuxComponent().removeChild(geometryRoot);
 		geometryRoot = new SceneGraphComponent("Visualizers Geometry");

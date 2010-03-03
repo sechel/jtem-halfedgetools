@@ -57,13 +57,8 @@ import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.io.HalfedgeIO;
 import de.jtem.halfedgetools.jreality.ConverterHeds2JR;
 import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
-import de.jtem.halfedgetools.jreality.adapter.JRBaryCenterAdapter;
-import de.jtem.halfedgetools.jreality.adapter.JRColorAdapter;
-import de.jtem.halfedgetools.jreality.adapter.JRLabelAdapter;
 import de.jtem.halfedgetools.jreality.adapter.JRNormalAdapter;
 import de.jtem.halfedgetools.jreality.adapter.JRPositionAdapter;
-import de.jtem.halfedgetools.jreality.adapter.JRRadiusAdapter;
-import de.jtem.halfedgetools.jreality.adapter.JRSizeAdapter;
 import de.jtem.halfedgetools.jreality.adapter.JRTexCoordAdapter;
 import de.jtem.halfedgetools.jreality.calculator.JRFaceAreaCalculator;
 import de.jtem.halfedgetools.jreality.calculator.JRFaceNormalCalculator;
@@ -134,13 +129,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	public HalfedgeInterface() {
 		makeLayout();
-		adapters.add(new JRBaryCenterAdapter());
-		adapters.add(new JRColorAdapter());
-		adapters.add(new JRLabelAdapter());
 		adapters.add(new JRNormalAdapter());
 		adapters.add(new JRPositionAdapter());
-		adapters.add(new JRRadiusAdapter());
-		adapters.add(new JRSizeAdapter());
 		adapters.add(new JRTexCoordAdapter());
 		adapters.add(new SelectionAdapter(this));
 		calculators.add(new JRVertexPositionCalculator());

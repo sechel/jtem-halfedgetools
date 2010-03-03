@@ -90,6 +90,7 @@ public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 			try {
 				execute(hcp.get(null), hcp.getCalculators(), hcp);
 			} catch (Exception e1) {
+				e1.printStackTrace();
 				JOptionPane.showMessageDialog(null, e1.getMessage(), getAlgorithmName(), PLAIN_MESSAGE);
 			}
 		}
