@@ -44,7 +44,6 @@ import de.jreality.plugin.basic.Content.ContentChangedListener;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.SceneGraphVisitor;
-import de.jreality.ui.AppearanceInspector;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -71,7 +70,6 @@ import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
-import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 
 
 public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectionListener, ActionListener {
@@ -107,10 +105,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		viewSelectionChecker = new JCheckBox("View Selection", true);
 	private JFileChooser 
 		chooser = new JFileChooser();
-	private AppearanceInspector
-		selectionInspector = new AppearanceInspector();
-	private ShrinkPanel
-		selectionAppShrinker = new ShrinkPanel("Selection Appearance");
 	
 	private boolean
 		hdsIsDirty = true;
@@ -210,11 +204,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		shrinkPanel.add(selectionPanel, c);
 		c.weighty = 0.0;
 		shrinkPanel.add(clearSelectionButton, c);
-		c.weighty = 1.0;
-		selectionAppShrinker.setShrinked(true);
-		selectionAppShrinker.setLayout(new GridLayout());
-		selectionAppShrinker.add(selectionInspector);
-		shrinkPanel.add(selectionAppShrinker, c);
 		
 		File userDir = new File(System.getProperty("user.dir"));
 		chooser.setDialogTitle("Halfedge Files");
@@ -338,21 +327,37 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void set(HDS hds, AdapterSet a) {
+	> void set(final HDS hds, final AdapterSet a) {
 		fireHalfedgeConverting(hds);
 		AdapterSet all = new AdapterSet();
 		if (a != null) all.addAll(a);
 		all.addAll(adapters);
 		Map<E, Integer> edgeMap = new HashMap<E, Integer>();
-		IndexedFaceSet ifs = converterHeds2JR.heds2ifs(hds, all, edgeMap);
-		this.edgeMap = edgeMap;
-		updateCache(hds, a);
-		if(ifs != null) {
-			activeComponent.setGeometry(ifs);
-		}
-		if (selectionInterface != null) {
-			clearSelection();
-		}
+		final IndexedFaceSet ifs = converterHeds2JR.heds2ifs(hds, all, edgeMap);
+		HalfedgeInterface.this.edgeMap = edgeMap;
+		try {
+			Runnable r = new Runnable() {
+				@Override
+				public void run() {
+					de.jreality.scene.Scene.executeWriter(activeComponent, new Runnable() {
+						public void run() {
+							updateCache(hds, a);
+							if (ifs != null) {
+								activeComponent.setGeometry(ifs);
+							}
+							if (selectionInterface != null) {
+								clearSelection();
+							}
+						}
+					});
+				}
+			};
+			if (SwingUtilities.isEventDispatchThread()) {
+				r.run();
+			} else {
+				SwingUtilities.invokeAndWait(r);
+			}
+		} catch (Exception e) { }
 	}
 	
 	
@@ -375,7 +380,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> HDS get(HDS hds, AdapterSet a) {
 		if (!(activeComponent.getGeometry() instanceof IndexedFaceSet)) {
-			return (HDS)cachedHEDS;
+			return hds;
 		}
 		if (hds == null) {
 			return (HDS)cachedHEDS;
@@ -483,7 +488,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		contentChangedListener.contentChanged(null);
 		geometryList.addListSelectionListener(this);
 		selectionVisualizer = c.getPlugin(SelectionVisualizer.class);
-//		selectionInspector.setAppearance(selectionVisualizer.getSelectionAppearance());
 		selectionInterface = c.getPlugin(SelectionInterface.class);
 	}
 	
@@ -520,11 +524,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		updateStates();
 	}
 	
-	/**
-	 * @author josefsso
-	 * If someone overwrites our content, immediately convert the new IFS to a HDS, then convert back with
-	 * the adapters to a new IFS and rewrite. Unless skipNextUpdate is called before explicitly.
-	 */
+
 	public class HalfedgeContentListener implements ContentChangedListener {
 		
 		public void contentChanged(ContentChangedEvent cce) {
@@ -542,7 +542,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			root.accept(new SceneGraphVisitor() {
 				@Override
 				public void visit(SceneGraphComponent c) {
-					if (!c.isVisible()) {
+					if (!c.isVisible() || c == auxComponent) {
 						return;
 					}
 					if (c.getGeometry() instanceof IndexedFaceSet) {
