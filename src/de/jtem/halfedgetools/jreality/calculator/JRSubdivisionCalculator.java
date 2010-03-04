@@ -20,6 +20,11 @@ public class JRSubdivisionCalculator implements EdgeAverageCalculator, FaceBaryc
 		alpha = 0.5;
 	
 	@Override
+	public double getPriority() {
+		return 0;
+	}
+	
+	@Override
 	public <
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 

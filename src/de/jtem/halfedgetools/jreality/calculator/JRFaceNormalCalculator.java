@@ -17,6 +17,11 @@ public class JRFaceNormalCalculator implements FaceNormalCalculator {
 	}
 	
 	@Override
+	public double getPriority() {
+		return 0;
+	}
+	
+	@Override
 	public <
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 

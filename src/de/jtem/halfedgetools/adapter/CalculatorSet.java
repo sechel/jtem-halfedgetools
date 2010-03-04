@@ -1,7 +1,11 @@
 package de.jtem.halfedgetools.adapter;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 import de.jtem.halfedge.Node;
 
@@ -24,14 +28,18 @@ public class CalculatorSet extends HashSet<Calculator> {
 		C extends Calculator,
 		N extends Node<?,?,?>
 	> C get(Class<N> nClass, Class<C> cClass) {
-		C result = null;
+		List<C> compatibleList = new LinkedList<C>();
 		for (Calculator c : this) {
 			if (cClass.isAssignableFrom(c.getClass()) && c.canAccept(nClass)) {
-				result = (C)c;
-				break;
+				compatibleList.add((C)c);
 			}
 		}
-		return result;
+		Collections.sort(compatibleList, new CalculatorComparator());
+		if (compatibleList.isEmpty()) {
+			return null;
+		} else {
+			return compatibleList.get(0);
+		}
 	}
 	
 	
@@ -51,6 +59,16 @@ public class CalculatorSet extends HashSet<Calculator> {
 			result &= isAvailable(nClass, c);
 		}
 		return result;
+	}
+	
+	
+	private class CalculatorComparator implements Comparator<Calculator> {
+		
+		@Override
+		public int compare(Calculator o1, Calculator o2) {
+			return o1.getPriority() < o2.getPriority() ? -1 : 1;
+		}
+		
 	}
 	
 

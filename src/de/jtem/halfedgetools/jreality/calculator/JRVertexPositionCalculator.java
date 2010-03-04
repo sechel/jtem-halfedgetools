@@ -8,7 +8,12 @@ import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 import de.jtem.halfedgetools.jreality.node.JRVertex;
 
 public class JRVertexPositionCalculator implements VertexPositionCalculator {
-
+	
+	@Override
+	public double getPriority() {
+		return 0;
+	}
+	
 	@Override
 	public  <
 		V extends Vertex<V, E, F>, 

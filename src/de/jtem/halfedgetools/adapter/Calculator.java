@@ -8,4 +8,6 @@ public interface Calculator {
 		N extends Node<?, ?, ?>
 	> boolean canAccept(Class<N> nodeClass);
 	
+	public double getPriority();
+	
 }

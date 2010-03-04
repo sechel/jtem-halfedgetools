@@ -21,6 +21,11 @@ public class SymmetricSubdivisionCalculator implements EdgeAverageCalculator , V
 		alpha = 0.5;
 	
 	@Override
+	public double getPriority() {
+		return 1;
+	}
+	
+	@Override
 	public <
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 
