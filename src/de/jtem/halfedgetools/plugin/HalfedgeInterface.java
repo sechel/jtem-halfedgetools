@@ -385,7 +385,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		if (hds == null) {
 			return (HDS)cachedHEDS;
 		}
-		if (cachedHEDS.getClass().isAssignableFrom(hds.getClass()) && !hdsIsDirty) {
+		if (hds.getClass().isAssignableFrom(cachedHEDS.getClass()) && !hdsIsDirty) {
 			return (HDS)cachedHEDS;
 		}
 		AdapterSet all = new AdapterSet();
