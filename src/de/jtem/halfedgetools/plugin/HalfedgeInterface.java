@@ -80,8 +80,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		content = null;
 	private SelectionInterface
 		selectionInterface = null;
-	private SelectionVisualizer 
-		selectionVisualizer = null;
 	private AuxSceneGraphComponent
 		auxComponent = new AuxSceneGraphComponent();
 	SceneGraphComponent
@@ -112,8 +110,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		cachedHEDS = new DefaultJRHDS();
 	private Map<? extends Edge<?,?,?>, Integer>
 		edgeMap = new HashMap<Edge<?,?,?>, Integer>();
-	private HalfedgeSelection
-		selection = new HalfedgeSelection();
 	private AdapterSet
 		adapters = new AdapterSet(),
 		cachedAdapters = new AdapterSet();
@@ -137,7 +133,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		adapters.add(new JRPositionAdapter());
 		adapters.add(new JRTexCoordAdapter());
 		adapters.add(new NormalAdapter());
-		adapters.add(new SelectionAdapter(this));
 		calculators.add(new JRVertexPositionCalculator());
 		calculators.add(new JRFaceAreaCalculator());
 		calculators.add(new JRFaceNormalCalculator());
@@ -268,8 +263,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			contentChangedListener.contentChanged(cce);
 		}
 		if (clearSelectionButton == e.getSource()) {
-			selection.clear();
-			selectionVisualizer.update(getSelection());
+			selectionInterface.clearSelection();
 		}
 		if(loadHDSButton == e.getSource()) {
 			File file = null;
@@ -297,17 +291,19 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	public void valueChanged(ListSelectionEvent e) {
 		if (geometryList.getSelectedValue() == null) return;
 		activeComponent = (SceneGraphComponent)geometryList.getSelectedValue();
-		selection.clear();
+		selectionInterface.clearSelection();
 		updateStates();
 	}
 	
 	
 	protected void updateStates() {
-		DefaultListModel model = new DefaultListModel();
-		for (Node<?,?,?> n : selection.getNodes()) {
-			model.addElement(n);
+		if (selectionInterface != null) {
+			DefaultListModel model = new DefaultListModel();
+			for (Node<?,?,?> n : selectionInterface.getSelection().getNodes()) {
+				model.addElement(n);
+			}
+			selectionList.setModel(model);
 		}
-		selectionList.setModel(model);
 		geometryList.setSelectedValue(activeComponent, true);
 		if (cachedHEDS != null) {
 			String text = cachedHEDS.getClass().getSimpleName() + ": ";
@@ -346,7 +342,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 								activeComponent.setGeometry(ifs);
 							}
 							if (selectionInterface != null) {
-								clearSelection();
+								selectionInterface.clearSelection();
 							}
 						}
 					});
@@ -487,8 +483,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		contentParseRoot = scene.getContentComponent();
 		contentChangedListener.contentChanged(null);
 		geometryList.addListSelectionListener(this);
-		selectionVisualizer = c.getPlugin(SelectionVisualizer.class);
 		selectionInterface = c.getPlugin(SelectionInterface.class);
+		adapters.add(new SelectionAdapter(selectionInterface));
 	}
 	
 	
@@ -575,20 +571,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	protected Map<? extends Edge<?, ?, ?>, Integer> getEdgeMap() {
 		return edgeMap;
 	}
-	
-	public HalfedgeSelection getSelection() {
-		return new HalfedgeSelection(selection);
-	}
-	public void setSelection(HalfedgeSelection s) {
-		selection = s;
-		updateStates();
-		selectionInterface.fireSelectionChanged(selection);
-	}
-	public void clearSelection() {
-		selection.clear();
-		updateStates();
-		selectionInterface.fireSelectionChanged(selection);
-	}
+
 	
 	protected HalfEdgeDataStructure<?, ?, ?> getCache() {
 		return cachedHEDS;
@@ -624,6 +607,25 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		for (HalfedgeListener l : listeners) {
 			l.halfedgeChanged(hds, getAdapters(), this);
 		}
+	}
+	
+	
+	public HalfedgeSelection getSelection() {
+		return selectionInterface.getSelection();
+	}
+	public void setSelection(HalfedgeSelection s) {
+		selectionInterface.setSelection(s);
+	}
+	public void clearSelection() {
+		selectionInterface.clearSelection();
+	}
+	
+	public void setSelected(Node<?,?,?> n, boolean selected) {
+		selectionInterface.setSelected(n, selected);
+	}
+	
+	public boolean isSelected(Node<?,?,?> n) {
+		return selectionInterface.isSelected(n);
 	}
 	
 

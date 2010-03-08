@@ -16,6 +16,7 @@ import de.jreality.tools.PointDragListener;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.jrworkspace.plugin.Controller;
@@ -24,6 +25,8 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class SelectionInterface extends Plugin implements PointDragListener, LineDragListener, FaceDragListener, HalfedgeListener {
 
+	private HalfedgeSelection
+		selection = new HalfedgeSelection();
 	private HalfedgeInterface
 		hif = null;
 	private DragEventTool
@@ -53,7 +56,8 @@ public class SelectionInterface extends Plugin implements PointDragListener, Lin
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void halfedgeChanged(HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		hif.getSelection().clear();
+		selection.clear();
+		fireSelectionChanged(selection);
 	}
 	
 	@Override
@@ -86,10 +90,9 @@ public class SelectionInterface extends Plugin implements PointDragListener, Lin
 		if (hds.numVertices() <= e.getIndex()) return;
 		if (e.getIndex() < 0) return;
 		Vertex<?,?,?> v = hds.getVertex(e.getIndex());
-		boolean selected = hif.getSelection().isSelected(v);
-		hif.getSelection().setSelected(v, !selected);
+		boolean selected = isSelected(v);
+		setSelected(v, !selected);
 		hif.updateStates();
-		fireSelectionChanged(hif.getSelection());
 	}
 	
 	@Override
@@ -117,11 +120,11 @@ public class SelectionInterface extends Plugin implements PointDragListener, Lin
 			}
 		}
 		for (Edge<?,?,?> edge : eList) {
-			boolean selected = hif.getSelection().isSelected(edge);
-			hif.getSelection().setSelected(edge, !selected);
+			boolean selected = isSelected(edge);
+			selection.setSelected(edge, !selected);
 		}
+		fireSelectionChanged(selection);
 		hif.updateStates();
-		fireSelectionChanged(hif.getSelection());
 	}
 	@Override
 	public void lineDragStart(LineDragEvent e) {
@@ -137,10 +140,9 @@ public class SelectionInterface extends Plugin implements PointDragListener, Lin
 		if (hds.numFaces() <= e.getIndex()) return;
 		if (e.getIndex() < 0) return;
 		Face<?,?,?> f = hds.getFace(e.getIndex());
-		boolean selected = hif.getSelection().isSelected(f);
-		hif.getSelection().setSelected(f, !selected);
+		boolean selected = isSelected(f);
+		setSelected(f, !selected);
 		hif.updateStates();
-		fireSelectionChanged(hif.getSelection());
 	}
 	@Override
 	public void faceDragStart(FaceDragEvent e) {
@@ -161,6 +163,30 @@ public class SelectionInterface extends Plugin implements PointDragListener, Lin
 		for (SelectionListener l : listeners) {
 			l.selectionChanged(s, this);
 		}
+	}
+	
+	public HalfedgeSelection getSelection() {
+		return new HalfedgeSelection(selection);
+	}
+	public void setSelection(HalfedgeSelection s) {
+		selection = s;
+		hif.updateStates();
+		fireSelectionChanged(selection);
+	}
+	public void clearSelection() {
+		selection.clear();
+		hif.updateStates();
+		fireSelectionChanged(selection);
+	}
+	
+	public void setSelected(Node<?,?,?> n, boolean selected) {
+		selection.setSelected(n, selected);
+		hif.updateStates();
+		fireSelectionChanged(selection);
+	}
+	
+	public boolean isSelected(Node<?,?,?> n) {
+		return selection.isSelected(n);
 	}
 	
 }
