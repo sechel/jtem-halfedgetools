@@ -35,6 +35,12 @@ public class HalfedgeSelection {
 		this(Arrays.asList(nodes));
 	}
 	
+	public HalfedgeSelection(HalfedgeSelection sel) {
+		vSet = new HashSet<Vertex<?,?,?>>(sel.vSet);
+		eSet = new HashSet<Edge<?,?,?>>(sel.eSet);
+		fSet = new HashSet<Face<?,?,?>>(sel.fSet);
+	}
+	
 	
 	public Set<Vertex<?,?,?>> getVertices() {
 		return Collections.unmodifiableSet(vSet);

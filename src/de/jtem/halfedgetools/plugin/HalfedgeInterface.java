@@ -577,7 +577,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	public HalfedgeSelection getSelection() {
-		return selection;
+		return new HalfedgeSelection(selection);
 	}
 	public void setSelection(HalfedgeSelection s) {
 		selection = s;
