@@ -82,6 +82,7 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	private JTable
 		pluginTable = new JTable();
 	private JScrollPane
+		pluginScroller = new JScrollPane(pluginTable),
 		optionsScroller = new JScrollPane(optionsPanel);
 	private Map<VisualizerPlugin, Set<? extends Adapter<?>>>
 		adapterMap = new HashMap<VisualizerPlugin, Set<? extends Adapter<?>>>();
@@ -100,7 +101,8 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 		
 		optionsPanel.setLayout(new GridLayout());
 		
-		pluginTable.setPreferredSize(new Dimension(10, 150));
+		pluginScroller.setPreferredSize(new Dimension(10, 150));
+		pluginTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
 		pluginTable.getDefaultEditor(Boolean.class).addCellEditorListener(new PluginActivationListener());
 		pluginTable.setRowHeight(22);
 		pluginTable.getSelectionModel().addListSelectionListener(this);
@@ -109,7 +111,7 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 		optionsPanel.setPreferredSize(new Dimension(10, 100));
 		optionsPanel.setBorder(BorderFactory.createTitledBorder("Options"));
 		
-		shrinkPanel.add(pluginTable, gbc2);
+		shrinkPanel.add(pluginScroller, gbc2);
 		shrinkPanel.add(optionsScroller, gbc2);
 	}
 	

@@ -185,7 +185,7 @@ public class SelectionVisualizer extends VisualizerPlugin implements SelectionLi
 		}		
 		root.setAppearance(selectionAppearance);
 		updateAppearance();
-		manager.update();
+		manager.updateComponents();
 	}
 	
 	private void updateAppearance() {
