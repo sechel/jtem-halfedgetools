@@ -74,6 +74,7 @@ public abstract class AbstractTypedAdapter<
 	}
 	
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public final <
 		V1 extends Vertex<V1, E1, F1>,
@@ -82,6 +83,7 @@ public abstract class AbstractTypedAdapter<
 	> VAL getV(V1 v, AdapterSet a) {
 		return getVertexValue((V)v, a);
 	}
+	@Override
 	@SuppressWarnings("unchecked")
 	public final <
 		V1 extends Vertex<V1, E1, F1>,
@@ -90,6 +92,7 @@ public abstract class AbstractTypedAdapter<
 	> VAL getE(E1 e, AdapterSet a) {
 		return getEdgeValue((E)e, a);
 	}	
+	@Override
 	@SuppressWarnings("unchecked")
 	public final <
 		V1 extends Vertex<V1, E1, F1>,
@@ -99,6 +102,7 @@ public abstract class AbstractTypedAdapter<
 		return getFaceValue((F)f, a);
 	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public final <
 		V1 extends Vertex<V1, E1, F1>,
@@ -107,6 +111,7 @@ public abstract class AbstractTypedAdapter<
 	> void setV(V1 v, VAL value, AdapterSet a) {
 		setVertexValue((V)v, value, a);
 	}
+	@Override
 	@SuppressWarnings("unchecked")
 	public final <
 		V1 extends Vertex<V1, E1, F1>,
@@ -115,6 +120,7 @@ public abstract class AbstractTypedAdapter<
 	> void setE(E1 e, VAL value, AdapterSet a) {
 		setEdgeValue((E)e, value, a);
 	}
+	@Override
 	@SuppressWarnings("unchecked")
 	public final <
 		V1 extends Vertex<V1, E1, F1>,

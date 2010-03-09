@@ -56,6 +56,7 @@ public class CatmullClarkLinearPlugin extends HalfedgeAlgorithmPlugin {
 	private CatmullClarkLinear
 		subdivider = new CatmullClarkLinear();
 		
+	@Override
 	public < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

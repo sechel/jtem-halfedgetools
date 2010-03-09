@@ -53,6 +53,7 @@ public class CatmullClarkPlugin extends HalfedgeAlgorithmPlugin {
 	private CatmullClark
 		subdivider = new CatmullClark();
 		
+	@Override
 	public < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

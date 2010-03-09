@@ -67,6 +67,7 @@ public class BundleLabelAdapter extends AbstractAdapter<String> {
 		return 1;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <
 		V extends Vertex<V, E, F>,

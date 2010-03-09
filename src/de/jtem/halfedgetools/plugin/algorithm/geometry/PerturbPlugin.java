@@ -78,11 +78,13 @@ public class PerturbPlugin extends HalfedgeAlgorithmPlugin {
 	}
 	
 	
+	@Override
 	public String getAlgorithmName() {
 		return "Perturb Vertices";
 	}
 
 	
+	@Override
 	public PluginInfo getPluginInfo() {
 		return new PluginInfo("Vertex Perturber", "Kristoffer Josefsson");
 	}

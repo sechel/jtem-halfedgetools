@@ -21,6 +21,7 @@ public class JRBaryCenterAdapter extends AbstractAdapter<double[]> implements Ca
 		super(double[].class, true, false);
 	}
 	
+	@Override
 	public <T extends Node<?, ?, ?>> boolean canAccept(Class<T> nodeClass) {
 		return true;
 	}
@@ -30,6 +31,7 @@ public class JRBaryCenterAdapter extends AbstractAdapter<double[]> implements Ca
 		return 0;
 	}
 	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -37,6 +39,7 @@ public class JRBaryCenterAdapter extends AbstractAdapter<double[]> implements Ca
 	> double[] getV(V v, AdapterSet a) {
 		return a.getDefault(Position.class, v, new double[] {0, 0, 0});
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -46,6 +49,7 @@ public class JRBaryCenterAdapter extends AbstractAdapter<double[]> implements Ca
 		double[] t = a.getDefault(Position.class, e.getTargetVertex(), new double[] {0, 0, 0});
 		return Rn.linearCombination(null, 0.5, t, 0.5, s);
 	}	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

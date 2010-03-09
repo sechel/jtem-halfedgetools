@@ -93,11 +93,13 @@ public class EdgeFlipperPlugin extends HalfedgeAlgorithmPlugin {
 	}
 	
 	
+	@Override
 	public String getAlgorithmName() {
 		return "Flip Edge";
 	}
 
 	
+	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Edge Flipper", "Kristoffer Josefsson");
 		info.icon = ImageHook.getIcon("edgeflip.png");

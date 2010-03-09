@@ -59,6 +59,7 @@ public class SymmetricSymmetryFaceColorAdapter extends AbstractAdapter<double[]>
 		return 1;
 	}
 	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

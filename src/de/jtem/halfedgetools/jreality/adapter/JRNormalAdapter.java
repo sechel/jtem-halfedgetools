@@ -18,6 +18,7 @@ public class JRNormalAdapter extends NormalAdapter {
 		super(double[].class, true, true);
 	}
 	
+	@Override
 	public <T extends Node<?, ?, ?>> boolean canAccept(Class<T> nodeClass) {
 		boolean result = false;
 		result |= JRVertex.class.isAssignableFrom(nodeClass);
@@ -26,10 +27,12 @@ public class JRNormalAdapter extends NormalAdapter {
 		return result;
 	}
 	
+	@Override
 	public boolean checkType(Class<?> typeClass) {
 		return double[].class.isAssignableFrom(typeClass);
 	}
 
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -42,6 +45,7 @@ public class JRNormalAdapter extends NormalAdapter {
 			return jv.normal;
 		}
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -54,6 +58,7 @@ public class JRNormalAdapter extends NormalAdapter {
 			return je.normal;
 		}
 	}	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -67,6 +72,7 @@ public class JRNormalAdapter extends NormalAdapter {
 		}
 	}
 	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -75,6 +81,7 @@ public class JRNormalAdapter extends NormalAdapter {
 		JRVertex<?, ?, ?> jv = (JRVertex<?, ?, ?>)v;
 		jv.normal = value;
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -83,6 +90,7 @@ public class JRNormalAdapter extends NormalAdapter {
 		JREdge<?, ?, ?> je = (JREdge<?, ?, ?>)e;
 		je.normal = value;
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

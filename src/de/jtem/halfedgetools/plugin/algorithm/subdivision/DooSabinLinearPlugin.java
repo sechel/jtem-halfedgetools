@@ -56,6 +56,7 @@ public class DooSabinLinearPlugin extends HalfedgeAlgorithmPlugin {
 	private DooSabinLinear
 		subdivider = new DooSabinLinear();
 		
+	@Override
 	public < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

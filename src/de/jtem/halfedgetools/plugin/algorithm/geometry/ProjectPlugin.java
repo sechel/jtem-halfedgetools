@@ -72,11 +72,13 @@ public class ProjectPlugin extends HalfedgeAlgorithmPlugin {
 	}
 	
 	
+	@Override
 	public String getAlgorithmName() {
 		return "Project To Sphere";
 	}
 
 	
+	@Override
 	public PluginInfo getPluginInfo() {
 		return new PluginInfo("Project To Sphere");
 	}

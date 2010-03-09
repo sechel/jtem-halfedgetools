@@ -53,6 +53,7 @@ public class EdgeCollapsePlugin extends HalfedgeAlgorithmPlugin {
 		return AlgorithmCategory.Editing;
 	}
 	
+	@Override
 	public PluginInfo getPluginInfo() {
 		return new PluginInfo("Edge Collapser", "Kristoffer Josefsson");
 	}

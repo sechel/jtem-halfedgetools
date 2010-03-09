@@ -77,10 +77,12 @@ public class FillHolesPlugin extends HalfedgeAlgorithmPlugin {
 	}
 	
 	
+	@Override
 	public String getAlgorithmName() {
 		return "Fill Holes";
 	}
 	
+	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Holes Filler", "Kristoffer Josefsson");
 		info.icon = ImageHook.getIcon("fill.png");

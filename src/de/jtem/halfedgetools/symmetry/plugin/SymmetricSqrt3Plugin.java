@@ -71,6 +71,7 @@ public class SymmetricSqrt3Plugin extends HalfedgeAlgorithmPlugin {
 	}
 	
 	
+	@Override
 	public < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

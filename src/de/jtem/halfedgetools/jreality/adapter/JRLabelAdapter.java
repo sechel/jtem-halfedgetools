@@ -18,6 +18,7 @@ public class JRLabelAdapter extends Adapter<String> {
 		super(true, true);
 	}
 	
+	@Override
 	public <T extends Node<?, ?, ?>> boolean canAccept(Class<T> nodeClass) {
 		boolean result = false;
 		result |= JRVertex.class.isAssignableFrom(nodeClass);
@@ -36,6 +37,7 @@ public class JRLabelAdapter extends Adapter<String> {
 		return String.class.equals(typeClass);
 	}
 
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -44,6 +46,7 @@ public class JRLabelAdapter extends Adapter<String> {
 		JRVertex<?, ?, ?> jv = (JRVertex<?, ?, ?>)v;
 		return jv.label;
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -52,6 +55,7 @@ public class JRLabelAdapter extends Adapter<String> {
 		JREdge<?, ?, ?> je = (JREdge<?, ?, ?>)e;
 		return je.label;
 	}	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -61,6 +65,7 @@ public class JRLabelAdapter extends Adapter<String> {
 		return jf.label;
 	}
 	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -69,6 +74,7 @@ public class JRLabelAdapter extends Adapter<String> {
 		JRVertex<?, ?, ?> jv = (JRVertex<?, ?, ?>)v;
 		jv.label = value;
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -77,6 +83,7 @@ public class JRLabelAdapter extends Adapter<String> {
 		JREdge<?, ?, ?> je = (JREdge<?, ?, ?>)e;
 		je.label = value;
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

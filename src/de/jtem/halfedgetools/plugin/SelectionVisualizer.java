@@ -170,7 +170,7 @@ public class SelectionVisualizer extends VisualizerPlugin implements SelectionLi
 				vList.addAll(fvList);
 				vIndex += fvList.size();
 			}
-			faceVerts = (double[][])vList.toArray(new double[][] {});
+			faceVerts = vList.toArray(new double[][] {});
 			IndexedFaceSetFactory fsf = new IndexedFaceSetFactory();
 			fsf.setVertexCount(faceVerts.length);
 			fsf.setFaceCount(faceIndices.length);

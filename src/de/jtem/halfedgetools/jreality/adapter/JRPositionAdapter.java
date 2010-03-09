@@ -18,6 +18,7 @@ public class JRPositionAdapter extends Adapter<double[]> {
 		super(true, true);
 	}
 	
+	@Override
 	public <T extends Node<?, ?, ?>> boolean canAccept(Class<T> nodeClass) {
 		boolean result = false;
 		result |= JRVertex.class.isAssignableFrom(nodeClass);
@@ -36,6 +37,7 @@ public class JRPositionAdapter extends Adapter<double[]> {
 		return double[].class.isAssignableFrom(typeClass);
 	}
 
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -44,6 +46,7 @@ public class JRPositionAdapter extends Adapter<double[]> {
 		JRVertex<?, ?, ?> jv = (JRVertex<?, ?, ?>)v;
 		return jv.position;
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -52,6 +55,7 @@ public class JRPositionAdapter extends Adapter<double[]> {
 		JREdge<?, ?, ?> je = (JREdge<?, ?, ?>)e;
 		return je.position;
 	}	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -61,6 +65,7 @@ public class JRPositionAdapter extends Adapter<double[]> {
 		return jf.position;
 	}
 	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -69,6 +74,7 @@ public class JRPositionAdapter extends Adapter<double[]> {
 		JRVertex<?, ?, ?> jv = (JRVertex<?, ?, ?>)v;
 		jv.position = value;
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -77,6 +83,7 @@ public class JRPositionAdapter extends Adapter<double[]> {
 		JREdge<?, ?, ?> je = (JREdge<?, ?, ?>)e;
 		je.position = value;
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

@@ -30,6 +30,7 @@ public class NormalAdapter extends AbstractAdapter<double[]>  {
 		return 0;
 	}
 
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -47,6 +48,7 @@ public class NormalAdapter extends AbstractAdapter<double[]>  {
 		return Rn.times(normal, 1.0 / numFaces, normal);
 	}
 
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -69,6 +71,7 @@ public class NormalAdapter extends AbstractAdapter<double[]>  {
 	}	
 	
 	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

@@ -128,21 +128,21 @@ public class HalfedgeSelection {
 			if (selected) {
 				vSet.add((Vertex<?,?,?>)n);
 			} else {
-				vSet.remove((Vertex<?,?,?>)n);
+				vSet.remove(n);
 			}
 		}
 		if (n instanceof Edge<?,?,?>) {
 			if (selected) {
 				eSet.add((Edge<?,?,?>)n);
 			} else {
-				eSet.remove((Edge<?,?,?>)n);
+				eSet.remove(n);
 			}
 		}
 		if (n instanceof Face<?,?,?>) {
 			if (selected) {
 				fSet.add((Face<?,?,?>)n);
 			} else {
-				fSet.remove((Face<?,?,?>)n);
+				fSet.remove(n);
 			}
 		}
 	}
@@ -162,13 +162,13 @@ public class HalfedgeSelection {
 	
 	public void remove(Node<?,?,?> n) {
 		if (n instanceof Vertex<?,?,?>) {
-			vSet.remove((Vertex<?,?,?>)n);
+			vSet.remove(n);
 		}
 		if (n instanceof Edge<?,?,?>) {
-			eSet.remove((Edge<?,?,?>)n);
+			eSet.remove(n);
 		}
 		if (n instanceof Face<?,?,?>) {
-			fSet.remove((Face<?,?,?>)n);
+			fSet.remove(n);
 		}
 	}
 	

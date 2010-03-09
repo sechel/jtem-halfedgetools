@@ -106,6 +106,7 @@ public class EdgeLengthVisualizer extends VisualizerPlugin implements ChangeList
 			super(String.class, true, false);
 		}
 		
+		@Override
 		public <T extends Node<?, ?, ?>> boolean canAccept(Class<T> nodeClass) {
 			return Edge.class.isAssignableFrom(nodeClass);
 		}
@@ -115,6 +116,7 @@ public class EdgeLengthVisualizer extends VisualizerPlugin implements ChangeList
 			return 0;
 		}
 		
+		@Override
 		public <
 			V extends Vertex<V, E, F>,
 			E extends Edge<V, E, F>,

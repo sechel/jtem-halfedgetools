@@ -29,6 +29,7 @@ public class IndexLabelAdapter extends AbstractAdapter<String> {
 		return true;
 	}
 	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

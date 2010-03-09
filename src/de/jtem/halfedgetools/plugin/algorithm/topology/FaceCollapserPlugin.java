@@ -87,11 +87,13 @@ public class FaceCollapserPlugin extends HalfedgeAlgorithmPlugin {
 		return AlgorithmCategory.Editing;
 	}
 	
+	@Override
 	public String getAlgorithmName() {
 		return "Colllapse face";
 	}
 
 	
+	@Override
 	public PluginInfo getPluginInfo() {
 		return new PluginInfo("Face collapser", "Kristoffer Josefsson");
 	}

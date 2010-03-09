@@ -72,11 +72,13 @@ public class VertexCollapserPlugin extends HalfedgeAlgorithmPlugin {
 		return AlgorithmCategory.Editing;
 	}
 	
+	@Override
 	public String getAlgorithmName() {
 		return "Collapse Vertex";
 	}
 
 	
+	@Override
 	public PluginInfo getPluginInfo() {
 		return new PluginInfo("Vertex Collapser", "Kristoffer Josefsson");
 	}

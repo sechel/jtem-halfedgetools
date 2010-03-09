@@ -679,7 +679,7 @@ public class FaceCycleSubdivider {
 	 */
 	private void splitFaceTwice(int face){
 		short firstSide=findNextBadEdge(face, (short)0);
-		short seccondSide=findNextBadEdge(face, (short)firstSide);
+		short seccondSide=findNextBadEdge(face, firstSide);
 		if(next(firstSide)!=seccondSide){
 			short temp=firstSide;
 			firstSide=seccondSide;
@@ -1265,6 +1265,7 @@ public class FaceCycleSubdivider {
 			if(a<=b) { l=a; h=b; }
 			else     { h=a; l=b; }
 		}
+		@Override
 		public boolean equals(Object obj) {
 			if(this==obj) return true;
 			try {
@@ -1274,6 +1275,7 @@ public class FaceCycleSubdivider {
 				return false;
 			}
 		}
+		@Override
 		public int hashCode() {
 			return (l<<16)^h;
 		}

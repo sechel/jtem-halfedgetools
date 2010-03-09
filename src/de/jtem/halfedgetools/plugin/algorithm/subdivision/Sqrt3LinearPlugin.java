@@ -55,6 +55,7 @@ public class Sqrt3LinearPlugin extends HalfedgeAlgorithmPlugin {
 	private Sqrt3Linear
 		subdivider = new Sqrt3Linear();
 
+	@Override
 	public < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

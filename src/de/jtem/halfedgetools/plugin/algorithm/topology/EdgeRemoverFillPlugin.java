@@ -75,11 +75,13 @@ public class EdgeRemoverFillPlugin extends HalfedgeAlgorithmPlugin {
 	}
 	
 	
+	@Override
 	public String getAlgorithmName() {
 		return "Remove Edge And Fill";
 	}
 
 	
+	@Override
 	public PluginInfo getPluginInfo() {
 		return new PluginInfo("Edge Remover And Filler", "Kristoffer Josefsson");
 	}

@@ -18,6 +18,7 @@ public class JRTexCoordAdapter extends Adapter<double[]> {
 		super(true, true);
 	}
 	
+	@Override
 	public <T extends Node<?, ?, ?>> boolean canAccept(Class<T> nodeClass) {
 		boolean result = false;
 		result |= JRVertex.class.isAssignableFrom(nodeClass);
@@ -31,10 +32,12 @@ public class JRTexCoordAdapter extends Adapter<double[]> {
 		return 0;
 	}
 	
+	@Override
 	public boolean checkType(Class<?> typeClass) {
 		return double[].class.isAssignableFrom(typeClass);
 	}
 
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -43,6 +46,7 @@ public class JRTexCoordAdapter extends Adapter<double[]> {
 		JRVertex<?, ?, ?> jv = (JRVertex<?, ?, ?>)v;
 		return jv.textCoord;
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -51,6 +55,7 @@ public class JRTexCoordAdapter extends Adapter<double[]> {
 		JREdge<?, ?, ?> je = (JREdge<?, ?, ?>)e;
 		return je.textCoord;
 	}	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -60,6 +65,7 @@ public class JRTexCoordAdapter extends Adapter<double[]> {
 		return jf.textCoord;
 	}
 	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -68,6 +74,7 @@ public class JRTexCoordAdapter extends Adapter<double[]> {
 		JRVertex<?, ?, ?> jv = (JRVertex<?, ?, ?>)v;
 		jv.textCoord = value;
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -76,6 +83,7 @@ public class JRTexCoordAdapter extends Adapter<double[]> {
 		JREdge<?, ?, ?> je = (JREdge<?, ?, ?>)e;
 		je.textCoord = value;
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

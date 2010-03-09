@@ -18,6 +18,7 @@ public class JRSizeAdapter extends Adapter<Double> {
 		super(true, true);
 	}
 	
+	@Override
 	public <T extends Node<?, ?, ?>> boolean canAccept(Class<T> nodeClass) {
 		boolean result = false;
 		result |= JRVertex.class.isAssignableFrom(nodeClass);
@@ -31,10 +32,12 @@ public class JRSizeAdapter extends Adapter<Double> {
 		return 0;
 	}
 	
+	@Override
 	public boolean checkType(Class<?> typeClass) {
 		return Double.class.isAssignableFrom(typeClass);
 	}
 
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -43,6 +46,7 @@ public class JRSizeAdapter extends Adapter<Double> {
 		JRVertex<?, ?, ?> jv = (JRVertex<?, ?, ?>)v;
 		return jv.pointSize;
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -51,6 +55,7 @@ public class JRSizeAdapter extends Adapter<Double> {
 		JREdge<?, ?, ?> je = (JREdge<?, ?, ?>)e;
 		return je.pointSize;
 	}	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -60,6 +65,7 @@ public class JRSizeAdapter extends Adapter<Double> {
 		return jf.pointSize;
 	}
 	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -68,6 +74,7 @@ public class JRSizeAdapter extends Adapter<Double> {
 		JRVertex<?, ?, ?> jv = (JRVertex<?, ?, ?>)v;
 		jv.pointSize = value;
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -76,6 +83,7 @@ public class JRSizeAdapter extends Adapter<Double> {
 		JREdge<?, ?, ?> je = (JREdge<?, ?, ?>)e;
 		je.pointSize = value;
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

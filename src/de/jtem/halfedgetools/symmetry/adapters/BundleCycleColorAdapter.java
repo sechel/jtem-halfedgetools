@@ -64,6 +64,7 @@ public class BundleCycleColorAdapter extends AbstractAdapter<double[]> {
 	}
 	
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <
 		V extends Vertex<V, E, F>,

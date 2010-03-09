@@ -51,6 +51,7 @@ public class StellarLinearPlugin extends HalfedgeAlgorithmPlugin {
 	private StellarLinear
 		subdivider = new StellarLinear();
 
+	@Override
 	public < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

@@ -38,6 +38,7 @@ import de.jtem.jrworkspace.plugin.flavor.PerspectiveFlavor;
 
 public class HalfedgeToolBar extends ToolBarAggregator {
 
+	@Override
 	public PluginInfo getPluginInfo() {
 		return new PluginInfo("Halfedge Edit Toolbar");
 	}
@@ -46,6 +47,7 @@ public class HalfedgeToolBar extends ToolBarAggregator {
 		return View.class;
 	}
 	
+	@Override
 	public double getToolBarPriority() {
 		return 100.0;
 	}

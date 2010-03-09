@@ -128,6 +128,7 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 	}
 	
 	
+	@Override
 	public  < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -233,6 +234,7 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 			return 0;
 		}
 		
+		@Override
 		public <
 			V extends Vertex<V, E, F>,
 			E extends Edge<V, E, F>,
@@ -262,6 +264,7 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 			return 0;
 		}
 		
+		@Override
 		public <
 			V extends Vertex<V, E, F>,
 			E extends Edge<V, E, F>,

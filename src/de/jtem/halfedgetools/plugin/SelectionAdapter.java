@@ -34,6 +34,7 @@ public class SelectionAdapter extends AbstractAdapter<Boolean> {
 		return Boolean.class == typeClass;
 	}
 
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -41,6 +42,7 @@ public class SelectionAdapter extends AbstractAdapter<Boolean> {
 	> Boolean getV(V v, AdapterSet a) {
 		return hif.isSelected(v);
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -48,6 +50,7 @@ public class SelectionAdapter extends AbstractAdapter<Boolean> {
 	> Boolean getE(E e, AdapterSet a) {
 		return hif.isSelected(e);
 	}	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -56,6 +59,7 @@ public class SelectionAdapter extends AbstractAdapter<Boolean> {
 		return hif.isSelected(f);
 	}
 	
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -63,6 +67,7 @@ public class SelectionAdapter extends AbstractAdapter<Boolean> {
 	> void setV(V v, Boolean value, AdapterSet a) {
 		hif.setSelected(v, value);
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -70,6 +75,7 @@ public class SelectionAdapter extends AbstractAdapter<Boolean> {
 	> void setE(E e, Boolean value, AdapterSet a) {
 		hif.setSelected(e, value);
 	}
+	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

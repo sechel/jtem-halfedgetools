@@ -81,11 +81,13 @@ public class EdgeSplitterPlugin extends HalfedgeAlgorithmPlugin {
 		return AlgorithmCategory.Editing;
 	}
 	
+	@Override
 	public String getAlgorithmName() {
 		return "Split edge";
 	}
 
 	
+	@Override
 	public PluginInfo getPluginInfo() {
 		return new PluginInfo("Edge splitter", "Kristoffer Josefsson");
 	}

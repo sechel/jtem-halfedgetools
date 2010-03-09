@@ -907,7 +907,7 @@ public class Subdivider<
 		}
 		for(V v: heds.getVertices()){
 			if(!boundary[v.getIndex()]){
-				double val=(double)valence[v.getIndex()];
+				double val=valence[v.getIndex()];
 				double alpha=(4.0-2.0*Math.cos(2.0*Math.PI/val))/9;
 //				v.newCoords=Calculator.linearCombination(
 //						(1.0-alpha), v.position, 

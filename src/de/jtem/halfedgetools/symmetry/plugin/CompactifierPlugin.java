@@ -203,11 +203,13 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 	}
 	
 	
+	@Override
 	public Class<? extends SideContainerPerspective> getPerspectivePluginClass() {
 		return View.class;
 	}
 
 	
+	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo();
 		info.name = "Compactifier";
@@ -222,6 +224,7 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 	}
 	
 	
+	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		shrinkPanel.setHeaderColor(Color.orange);
@@ -281,6 +284,7 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 	}
 
 	
+	@Override
 	public void uninstall(Controller c) throws Exception {
 		super.uninstall(c);
 		content.removeContentTool(tl);
@@ -469,7 +473,7 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 			System.err.println(Rn.matrixToJavaString(gen.getMatrix().getArray()));
 			
 			gen.setWord(DiscreteGroupUtility.genNames[generators.size()]);
-			DiscreteGroupElement genInv = (DiscreteGroupElement) gen.getInverse();
+			DiscreteGroupElement genInv = gen.getInverse();
 			
 			generators.add(gen);
 			generators.add(genInv);
