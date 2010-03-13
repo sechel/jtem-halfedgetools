@@ -135,8 +135,6 @@ public class Sqrt3 {
 			newEs.add(e1);
 			newEs.add(e2);			
 			oldEtoNewEs.put(oldE, newEs);
-			
-			flip(newHeds, flipE);
 		}
 		
 		//flip edges

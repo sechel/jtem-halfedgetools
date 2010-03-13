@@ -41,6 +41,8 @@ import de.jtem.halfedgetools.symmetry.adapters.SymmetricPositionAdapter;
 import de.jtem.halfedgetools.symmetry.calculators.SymmetricSubdivisionCalculator;
 import de.jtem.halfedgetools.symmetry.plugin.CompactifierPlugin;
 import de.jtem.halfedgetools.symmetry.plugin.SymmetricCatmullClarkPlugin;
+import de.jtem.halfedgetools.symmetry.plugin.SymmetricLoopPlugin;
+import de.jtem.halfedgetools.symmetry.plugin.SymmetricSqrt3Plugin;
 
 public class SymmetricSubdivisionTutorial {
 
@@ -64,17 +66,9 @@ public class SymmetricSubdivisionTutorial {
 		viewer.registerPlugin(new SymmetricCatmullClarkPlugin());
 		viewer.registerPlugin(new TriangulatePlugin());
 
-//		viewer.registerPlugin(new SymmetricLoopPlugin<SVertex,SEdge,SFace,SHDS>(
-//				new SymmetricSubdivisionAdapter(),
-//				new SSubdivisionAdapters.SSubdivisionEA(),
-//				new SSubdivisionAdapters.SSubdivisionFA()
-//				));
-//		
-//		viewer.registerPlugin(new SymmetricSqrt3Plugin<SVertex,SEdge,SFace,SHDS>(
-//				new SymmetricSubdivisionAdapter(),
-//				new SSubdivisionAdapters.SSubdivisionEA(),
-//				new SSubdivisionAdapters.SSubdivisionFA()
-//		));
+		viewer.registerPlugin(new SymmetricLoopPlugin());
+		
+		viewer.registerPlugin(new SymmetricSqrt3Plugin());
 		
 		viewer.registerPlugin(new CompactifierPlugin());
 		
