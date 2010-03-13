@@ -109,7 +109,7 @@ public class SymmetricSqrt3Plugin extends HalfedgeAlgorithmPlugin {
 
 	@Override
 	public PluginInfo getPluginInfo() {
-		PluginInfo info = new PluginInfo("Symmetric Catmull Clark Subdivision");
+		PluginInfo info = new PluginInfo("Symmetric Root3 Subdivision");
 		return info;
 	}
 

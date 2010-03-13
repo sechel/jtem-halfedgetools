@@ -65,8 +65,8 @@ public class Sqrt3 {
 		EdgeAverageCalculator ec,
 		FaceBarycenterCalculator fc
 	) {
-		Map<V,F> newVtoOldF = new HashMap<V,F>();;
-		Map<V, double[]> oldVtoPos = new HashMap<V, double[]>();;
+		Map<V,F> newVtoOldF = new HashMap<V,F>();
+		Map<V, double[]> oldVtoPos = new HashMap<V, double[]>();
 		Map<F, double[]> oldFtoPos = new HashMap<F, double[]>();
 		Map<E, Set<E>> oldEtoNewEs = new HashMap<E,Set<E>>();
 		// TODO
@@ -122,15 +122,31 @@ public class Sqrt3 {
 			
 			oldVtoPos.put(v, newpos);			
 		}
+				
+		trian(oldHeds, newHeds, newVtoOldF);
 		
-		
+		//mark symmetry-edges for the adapters, 
+		//ATTENTION: after trian/before flip!
 		for(E oldE : oldHeds.getEdges()) {
 			Set<E> newEs = new HashSet<E>();
-			newEs.add(newHeds.getEdge(oldE.getIndex()));
+			E flipE = newHeds.getEdge(oldE.getIndex());
+			E e1 = flipE.getOppositeEdge().getNextEdge();
+			E e2 = e1.getNextEdge();
+			newEs.add(e1);
+			newEs.add(e2);			
 			oldEtoNewEs.put(oldE, newEs);
+			
+			flip(newHeds, flipE);
 		}
 		
-		trian(oldHeds, newHeds, newVtoOldF);
+		//flip edges
+		for(E oldE : oldHeds.getEdges()) {
+			E flipE = newHeds.getEdge(oldE.getIndex());
+			if (flipE.isPositive()){
+				flip(newHeds, flipE);
+			}
+		}
+
 		
 		//set coordinates for the old points
 		for(V ov : oldVtoPos.keySet()) {
@@ -157,24 +173,24 @@ public class Sqrt3 {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void trian (
-		HDS alt, 
-		HDS neu,
+		HDS oldh, 
+		HDS newh,
 		Map<V,F> newVtoOldF
 	){
-		alt.createCombinatoriallyEquivalentCopy(neu);
+		oldh.createCombinatoriallyEquivalentCopy(newh);
 		
-		for(F of : alt.getFaces()){
-			V mv = neu.addNewVertex();
+		for(F of : oldh.getFaces()){
+			V mv = newh.addNewVertex();
 			newVtoOldF.put(mv,of);
 			
-			F f1 = neu.getFace(of.getIndex());		
+			F f1 = newh.getFace(of.getIndex());		
 			E e1 = f1.getBoundaryEdge();
 			E e2 = e1.getNextEdge();
 			E e3 = e2.getNextEdge();
 			
 			//first triangle
-			E en1 = neu.addNewEdge();
-			E enn1 = neu.addNewEdge();
+			E en1 = newh.addNewEdge();
+			E enn1 = newh.addNewEdge();
 			V sv = e1.getStartVertex();
 			e1.linkNextEdge(en1);
 			en1.setTargetVertex(mv);
@@ -185,9 +201,9 @@ public class Sqrt3 {
 			enn1.setLeftFace(f1);
 			
 			//second triangle
-			F f2 = neu.addNewFace();
-			E en2 = neu.addNewEdge();
-			E enn2 = neu.addNewEdge();
+			F f2 = newh.addNewFace();
+			E en2 = newh.addNewEdge();
+			E enn2 = newh.addNewEdge();
 			sv = e2.getStartVertex();
 			e2.linkNextEdge(en2);
 			e2.setLeftFace(f2);
@@ -199,9 +215,9 @@ public class Sqrt3 {
 			enn2.setLeftFace(f2);
 			
 			//third triangle
-			F f3 = neu.addNewFace();
-			E en3 = neu.addNewEdge();
-			E enn3 = neu.addNewEdge();
+			F f3 = newh.addNewFace();
+			E en3 = newh.addNewEdge();
+			E enn3 = newh.addNewEdge();
 			sv = e3.getStartVertex();
 			e3.linkNextEdge(en3);
 			e3.setLeftFace(f3);
@@ -219,161 +235,38 @@ public class Sqrt3 {
 		}
 	}
 	
-	/*// return new HEDS triangulated , edge flipped
-	public HEDS trianflip (HEDS alt, HEDS neu){
-	
-		alt.createCombinatoriallyEquivalentCopy(neu);
-		
-		//koordinaten der alten punkte uebernehmen
-		for(int i=0;i<alt.numVertices();i++){
-			neu.getVertex(i).position = alt.getVertex(i).position.clone();
-		};		
-
-		List <V> vlist= neu.addNewVertices(neu.numFaces());
-		
-		int i = 0;
-		for (V v : vlist) {
-			F oldFace = neu.getFace(i);
-			v.position = midpoint(oldFace);
-
-			List <E> elist = HalfEdgeUtils.boundaryEdges(neu.getFace(i));
-			int l = elist.size();
-			int k = 1;
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	>void flip (HDS newheds, E e){
+			//edges
+			E e1 = e.getNextEdge();
+			E e2 = e1.getNextEdge();
+			E oe = e.getOppositeEdge();
+			E oe1 = oe.getNextEdge();
+			E oe2 = oe1.getNextEdge();
+			//faces
+			F f = e.getLeftFace();
+			F of = oe.getLeftFace();
+			//vertices
+			V vs = oe1.getTargetVertex();
+			V vt = e1.getTargetVertex();
 			
-			E efirst = neu.addNewEdge();
-			E elast = null;
+			//face f
+			oe1.setLeftFace(f);
+			e.setTargetVertex(vt);
+			e.linkNextEdge(e2);
+			e2.linkNextEdge(oe1);
+			oe1.linkNextEdge(e);
 			
-			for(E e : elist){
-								
-				F fn  = neu.addNewFace();
-				E en = neu.addNewEdge();
-				if (k==l) {
-					neu.removeEdge(en);
-					en = efirst;
-				};
-				
-				E en2 = neu.addNewEdge();				
-				V se = e.getStartVertex();
-				
-				en.setTargetVertex(v);
-				en.setLeftFace(fn);
-				en.linkNextEdge(en2);
-
-				e.linkNextEdge(en);
-				e.setLeftFace(fn);
-				//e.setTargetVertex(bleibt);
-				
-				en2.setTargetVertex(se);
-				en2.linkNextEdge(e);
-				en2.setLeftFace(fn);
-				
-				if (k==1) {
-					en2.linkOppositeEdge(efirst);
-				}
-				else{
-					en2.linkOppositeEdge(elast);
-				}
-				k++;
-				elast = en;
-			}
-			
-		neu.removeFace(oldFace);
-		}
-		
-//		flip edges
-		boolean[] done = new boolean[(alt.getEdges().size())];
-		for(int j =0;j<alt.getEdges().size();j++){
-				done[j]=false;
-		}
-		for(E oe : alt.getEdges()){
-			E e= neu.getEdge(oe.getIndex());
-			
-			if (done[e.getIndex()]==false){
-				V u=e.getStartVertex();
-				V w=e.getTargetVertex();
-				V a=e.getNextEdge().getTargetVertex();
-				V b=e.getOppositeEdge().getNextEdge().getTargetVertex();
-				E ope=e.getOppositeEdge();
-				E wa =e.getNextEdge();
-				E au =wa.getNextEdge();
-				E ub =ope.getNextEdge();
-				E bw =ub.getNextEdge();
-				F fb =e.getLeftFace();
-				F fa =ope.getLeftFace();
-				
-				e.linkNextEdge(au);
-				e.setTargetVertex(a);
-				ub.linkNextEdge(e);
-				ub.setLeftFace(fb);
-				au.linkNextEdge(ub);
-				
-				ope.linkNextEdge(bw);
-				ope.setTargetVertex(b);
-				wa.linkNextEdge(ope);
-				wa.setLeftFace(fa);
-				bw.linkNextEdge(wa);
-														
-				done[ope.getIndex()]=true;
-				done[e.getIndex()]=true;
-			}
-		}
-		
-		return neu;
-	}*/
-
-	
-	
-	/*// return face midpoint position
-	private static double[] midpoint(F f){
-	
-		List<E> b = HalfEdgeUtils.boundaryEdges(f);
-		double[] mid = new double[3];
-		for (E e : b) {
-			double[] pos = e.getTargetVertex().position.clone();
-			Rn.add(mid, pos, mid);
-		}
-		return Rn.times(mid, 1.0 / b.size(), mid);
-	}*/
-
-
-	/*//return HEDS neu with vertices from oldheds moved towards 'average'
-	private HEDS moveOldVert(V oldv, HEDS neu, double alpha){
-			
-		//alte nachbarn bestimmen
-			List <V> nbs = HalfEdgeUtils.neighboringVertices(oldv);				
-		//deren mittelwert berechnen
-			double[] mid = new double[]{0,0,0};
-			for (V nb : nbs){
-				Rn.add(mid, nb.position, mid); 
-			};
-			Rn.times(mid, 1.0 / nbs.size(), mid);	
-		//neue position berechnen
-			double[] newpos = new double[3];			
-			Rn.linearCombination(newpos, 1 - alpha, oldv.position, alpha, mid);
-		//position in neuer heds zuweisen
-			neu.getVertex(oldv.getIndex()).position=newpos;
-			
-		return neu;
-	}*/
-	
-	
-	/*//return new HEDS subdivided using trian & Kobbelt scheme
-	public HEDS root3 (HEDS oldheds){
-		
-		//struktur kopieren
-		HEDS neu = oldheds.createCombinatoriallyEquivalentCopy(new HEDS());
-		for(int i=0;i<oldheds.numVertices();i++){
-			neu.getVertex(i).position = oldheds.getVertex(i).position.clone();
-		};
-
-		neu = trianflip(neu);		
-		for (V v : oldheds.getVertices()){
-			neu = moveOldVert(v,neu, alphaKobbelt(v,HalfEdgeUtils.neighboringVertices(v).size()));	
-			}
-						
-		return neu;
-		
-	};*/
-	
+			//face of
+			e1.setLeftFace(of);
+			oe.setTargetVertex(vs);
+			oe.linkNextEdge(oe2);
+			oe2.linkNextEdge(e1);
+			e1.linkNextEdge(oe);
+	}
 
  }
