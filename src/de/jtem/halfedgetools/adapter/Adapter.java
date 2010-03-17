@@ -102,15 +102,21 @@ public abstract class Adapter<VAL> implements Comparable<Adapter<VAL>> {
 	
 	@Override
 	public int compareTo(Adapter<VAL> o) {
+		if (this == o) return 0;
 		double p1 = getPriority();
 		double p2 = o.getPriority();
 		if (p1 == p2) {
-			String n1 = getClass().getSimpleName();
-			String n2 = o.getClass().getSimpleName();
+			String n1 = getClass().getName();
+			String n2 = o.getClass().getName();
 			return n1.compareTo(n2);
 		} else {
 			return p1 < p2 ? -1 : 1;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 	
 }
