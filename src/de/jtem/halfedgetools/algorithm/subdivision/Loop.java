@@ -95,7 +95,8 @@ public class Loop {
 		
 		//just an idea for a map to locate the n-gon 
 		// (in this case triangle) of the grid
-		//maybe in use later!
+		//maybe we can use this later to locate the symmetry cycle
+		
 //		for (E e: oldHeds.getEdges()){
 //			Set<E> oldEs = new HashSet<E>();
 //			E tmp = e.getNextEdge();
