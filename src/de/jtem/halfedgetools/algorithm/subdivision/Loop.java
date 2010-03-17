@@ -70,6 +70,7 @@ public class Loop {
 		Map<V, double[]> oldVtoPos = new HashMap<V, double[]>();
 		Map<V,E> newVtoOldE = new HashMap<V,E>();
 		Map<E, Set<E>> oldEtoNewEs = new HashMap<E,Set<E>>();
+		Map<E,Set<E>> oldEtoOldEs = new HashMap<E,Set<E>>();
 		
 		int maxDeg = 0;
 		for(V v : oldHeds.getVertices()) {
@@ -91,6 +92,19 @@ public class Loop {
 		}
 		
 		// Verschiebung der neuen Punkte p_neu = 1/8*(3*a+3*b+1*c+1*d)
+		
+		//just an idea for a map to locate the n-gon 
+		// (in this case triangle) of the grid
+		//maybe in use later!
+//		for (E e: oldHeds.getEdges()){
+//			Set<E> oldEs = new HashSet<E>();
+//			E tmp = e.getNextEdge();
+//			while (tmp != e){
+//				oldEs.add(tmp);
+//				tmp.getNextEdge();
+//			}			
+//			oldEtoOldEs.put(e, oldEs);
+//		}
 		
 //		Set<E> checkE = new HashSet<E>();
 		for(E e : oldHeds.getPositiveEdges()) {
