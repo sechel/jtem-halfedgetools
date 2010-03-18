@@ -240,7 +240,8 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 			E extends Edge<V, E, F>,
 			F extends Face<V, E, F>
 		> String getF(F f, AdapterSet a) {
-			return format.format(getRelativeUnevenness(f, a) * 100) + "%";
+			double u = getRelativeUnevenness(f, a) * 100;
+			return format.format(u) + "%";
 		}
 		
 	}
@@ -249,6 +250,9 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 	
 	@Color
 	private class PlanarityColorAdapter extends AbstractAdapter<double[]> {
+		
+		private final double[]
+		    colorGreen = {0, 1, 0};
 		
 		public PlanarityColorAdapter() {
 			super(double[].class, true, false);
@@ -270,8 +274,11 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 			E extends Edge<V, E, F>,
 			F extends Face<V, E, F>
 		> double[] getF(F f, AdapterSet a) {
+			if (maxUnevenness == 0) {
+				return colorGreen;
+			}
 			double col = getRelativeUnevenness(f, a) / maxUnevenness;
-			return new double[]{col, 1 - col, 0};
+			return new double[] {col, 1 - col, 0};
 		}
 		
 	}
