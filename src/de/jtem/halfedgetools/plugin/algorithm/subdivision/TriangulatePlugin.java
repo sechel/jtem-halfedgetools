@@ -31,6 +31,8 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.subdivision;
 
+import java.util.Set;
+
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -73,8 +75,14 @@ public class TriangulatePlugin extends HalfedgeAlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) {
-		triangulator.triangulate(hds);
+		Set<F> faces = hcp.getSelection().getFaces(hds);
+		if(faces.size() == 0) {
+			triangulator.triangulate(hds);
+		} else {
+			for(F f: faces) {
+				triangulator.triangulateFace(f,hds);
+			}
+		}
 		hcp.set(hds, null);
 	}
-
 }
