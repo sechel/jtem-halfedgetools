@@ -143,7 +143,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	public class AuxSceneGraphComponent extends SceneGraphComponent {
 		
 		public AuxSceneGraphComponent() {
-			super("Halfdge Aux");
+			super("Halfedge Aux");
 		}
 		
 		public void startWriting() {
