@@ -16,7 +16,6 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
 import de.jtem.halfedgetools.symmetry.node.SHDS;
-import de.jtem.halfedgetools.symmetry.node.SymmetricHDS;
 import de.jtem.jrworkspace.plugin.Controller;
 
 /**

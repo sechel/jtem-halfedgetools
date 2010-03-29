@@ -44,7 +44,6 @@ import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
-import de.jtem.halfedgetools.algorithm.subdivision.CatmullClark;
 import de.jtem.halfedgetools.algorithm.subdivision.DooSabin;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
