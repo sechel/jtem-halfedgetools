@@ -11,8 +11,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
-import de.jtem.halfedgetools.symmetry.node.SEdge;
-import de.jtem.halfedgetools.symmetry.node.SHDS;
+import de.jtem.halfedgetools.util.SurfaceException;
 
 public class DooSabin {
 

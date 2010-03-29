@@ -70,7 +70,7 @@ public class Loop {
 		Map<V, double[]> oldVtoPos = new HashMap<V, double[]>();
 		Map<V,E> newVtoOldE = new HashMap<V,E>();
 		Map<E, Set<E>> oldEtoNewEs = new HashMap<E,Set<E>>();
-		Map<E,Set<E>> oldEtoOldEs = new HashMap<E,Set<E>>();
+//		Map<E,Set<E>> oldEtoOldEs = new HashMap<E,Set<E>>();
 		
 		int maxDeg = 0;
 		for(V v : oldHeds.getVertices()) {

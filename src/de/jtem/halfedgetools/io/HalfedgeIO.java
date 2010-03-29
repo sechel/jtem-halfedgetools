@@ -37,11 +37,9 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Map;
 
 import com.thoughtworks.xstream.XStream;
 
-import de.jreality.scene.SceneGraphComponent;
 import de.jreality.writer.WriterOBJ;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
