@@ -32,13 +32,23 @@ OF SUCH DAMAGE.
 package de.jtem.halfedgetools.io;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
 
 import com.thoughtworks.xstream.XStream;
 
+import de.jreality.scene.SceneGraphComponent;
+import de.jreality.writer.WriterOBJ;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.jreality.ConverterHeds2JR;
 
 
 public class HalfedgeIO {
@@ -91,6 +101,23 @@ public class HalfedgeIO {
 		} catch (IOException e) {
 			System.err.println("Could not write to file " + filename);
 			e.printStackTrace();
+		}
+		
+	}
+
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	>void writeOBJ(HDS hds, AdapterSet adapters, String file) {
+		try {
+			ConverterHeds2JR converter = new ConverterHeds2JR();
+			WriterOBJ.write(converter.heds2ifs(hds, adapters,null),
+					new FileOutputStream(file));
+		} catch (FileNotFoundException e1) {
+			System.err.println("Could not write to file " + file);
+			e1.printStackTrace();
 		}
 		
 	}

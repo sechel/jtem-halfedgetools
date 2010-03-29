@@ -125,7 +125,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		converterHeds2JR = new ConverterHeds2JR();
 	private ConverterJR2Heds
 		converterJR2Heds = new ConverterJR2Heds();
-
 	
 	public HalfedgeInterface() {
 		makeLayout();
@@ -206,6 +205,20 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		chooser.setAcceptAllFileFilterUsed(false);
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		chooser.setMultiSelectionEnabled(false);
+		chooser.addChoosableFileFilter(new FileFilter(){
+
+			@Override
+			public boolean accept(File f) {
+				return f.isDirectory() || f.getName().toLowerCase().endsWith(".obj");
+			}
+
+			@Override
+			public String getDescription() {
+				return "Wavefront OBJ (*.obj)";
+			}
+			
+		});
+		
 		chooser.setFileFilter(new FileFilter() {
 			@Override
 			public String getDescription() {
@@ -216,7 +229,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				return f.isDirectory() || f.getName().toLowerCase().endsWith(".heml");
 			}
 		});
-		
 		
 		rescanButton.addActionListener(this);
 		clearSelectionButton.addActionListener(this);
@@ -281,7 +293,11 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				file = chooser.getSelectedFile();
 			}
 			if (file != null) {
-				HalfedgeIO.writeHDS(cachedHEDS, file.getAbsolutePath());
+				if(file.getName().toLowerCase().endsWith(".heml")) {
+					HalfedgeIO.writeHDS(cachedHEDS, file.getAbsolutePath());
+				} else if(file.getName().toLowerCase().endsWith(".obj")) {
+					HalfedgeIO.writeOBJ(cachedHEDS,adapters,file.getAbsolutePath());
+				}
 			}
 		}
 		updateStates();
