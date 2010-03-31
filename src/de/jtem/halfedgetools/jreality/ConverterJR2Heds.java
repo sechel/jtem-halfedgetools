@@ -272,6 +272,9 @@ public class ConverterJR2Heds {
 					oppEdge = heds.addNewEdge();
 					oppEdge.setTargetVertex(heds.getVertex(s));
 					vertexEdgeMap.put(t, s, oppEdge);
+					if (edgeMap != null) {
+						edgeMap.put(oppEdge, edgeMap.get(faceEdge));
+					}
 				}
 				E nextEdge = vertexEdgeMap.get(t, next);
 				faceEdge.linkOppositeEdge(oppEdge);
