@@ -81,7 +81,7 @@ public class ConverterJR2Heds {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F> 
 	> void ifs2heds(IndexedFaceSet ifs, HalfEdgeDataStructure<V, E, F> heds, AdapterSet adapters, Map<E, Integer> edgeMap) {
-		int initialVertices = heds.numVertices();
+		heds.clear();
 		AdapterSet vAdapters = adapters.query(heds.getVertexClass(), double[].class);
 		AdapterSet eAdapters = adapters.query(heds.getEdgeClass(), double[].class);
 		AdapterSet fAdapters = adapters.query(heds.getFaceClass(), double[].class);
@@ -187,8 +187,8 @@ public class ConverterJR2Heds {
 		for (int i = 0; i < numF; i++){
 			int[] f = indices[2][i];
 			for (int j = 0; j < f.length; j++){
-				Integer s=f[j] + initialVertices;
-				Integer t=f[(j + 1) % f.length] + initialVertices;
+				Integer s=f[j];
+				Integer t=f[(j + 1) % f.length];
 				if (vertexEdgeMap.containsKey(s,t)) {
 					throw new RuntimeException("Inconsistently oriented face found in ifs2HEDS, discontinued!");
 				}
@@ -211,14 +211,17 @@ public class ConverterJR2Heds {
 			for (int j = 0; j < e.length-1; j++){
 //				V s = heds.getVertex(e[j]);
 //				V t = heds.getVertex(e[(j + 1)]);
-				Integer s=e[j]+initialVertices;
-				Integer t=e[(j + 1)]+initialVertices;
+				Integer s=e[j];
+				Integer t=e[(j + 1)];
 				if (vertexEdgeMap.containsKey(s, t) || vertexEdgeMap.containsKey(t, s)){
 					if (edgeMap == null) continue;
 					if (vertexEdgeMap.containsKey(s, t)) {
-						edgeMap.put(vertexEdgeMap.get(s, t), i);
-					} else {
-						edgeMap.put(vertexEdgeMap.get(t, s), i);
+						E edge = vertexEdgeMap.get(s, t);
+						edgeMap.put(edge, i);
+					} 
+					if (vertexEdgeMap.containsKey(t, s)) {
+						E edge = vertexEdgeMap.get(t, s);
+						edgeMap.put(edge, i);
 					}
 				} else {
 					E ed = heds.addNewEdge();
@@ -258,11 +261,11 @@ public class ConverterJR2Heds {
 			for (int j = 0; j < face.length; j++){
 //				V s = heds.getVertex(face[j]);
 //				V t = heds.getVertex(face[(j + 1) % face.length]);
-				Integer s=face[j]+initialVertices;
-				Integer t=face[(j + 1) % face.length]+initialVertices;
+				Integer s=face[j];
+				Integer t=face[(j + 1) % face.length];
 
 //				V next = heds.getVertex(face[(j + 2) % face.length]);
-				Integer next=face[(j + 2) % face.length]+initialVertices;
+				Integer next=face[(j + 2) % face.length];
 				E faceEdge = vertexEdgeMap.get(s, t);
 				E oppEdge = vertexEdgeMap.get(t, s);
 				if (oppEdge == null){
