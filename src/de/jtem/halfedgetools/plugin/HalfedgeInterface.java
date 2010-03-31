@@ -105,6 +105,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		chooser = new JFileChooser();
 	
 	private boolean
+		automaticConversion = true,
 		hdsIsDirty = true;
 	private HalfEdgeDataStructure<?, ?, ?> 
 		cachedHEDS = new DefaultJRHDS();
@@ -569,8 +570,10 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				geometryList.setSelectedIndex(0);
 			}
 			activeComponent.addChild(auxComponent);
-			get(cachedHEDS, new AdapterSet());
-			set(cachedHEDS, cachedAdapters);
+			get(createEmpty(cachedHEDS), new AdapterSet());
+			if (automaticConversion) {
+				set(cachedHEDS, cachedAdapters);
+			}
 			updateStates();
 		}
 		
@@ -644,5 +647,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		return selectionInterface.isSelected(n);
 	}
 	
+	
+	public boolean isAutomaticConversion() {
+		return automaticConversion;
+	}
+	public void setAutomaticConversion(boolean automaticConversion) {
+		this.automaticConversion = automaticConversion;
+	}
 
 }
