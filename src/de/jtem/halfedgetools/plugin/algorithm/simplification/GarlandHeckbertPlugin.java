@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.plugin.algorithm.subdivision;
+package de.jtem.halfedgetools.plugin.algorithm.simplification;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -28,8 +28,14 @@ public class GarlandHeckbertPlugin extends HalfedgeAlgorithmPlugin {
 		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
 		FaceNormalCalculator fnc = c.get(hds.getFaceClass(), FaceNormalCalculator.class);
 		FaceAreaCalculator fac = c.get(hds.getFaceClass(), FaceAreaCalculator.class);
-		if (vc == null || fnc == null || fac == null) {
-			throw new CalculatorException("No Subdivision calculators found for " + hds);
+		if (vc == null) {
+			throw new CalculatorException("VertexPositionCalculator not found for " + hds);
+		}
+		if (fnc == null)  {
+			throw new CalculatorException("FaceNormalCalculator not found for " + hds);
+		}
+		if (fac == null) {
+			throw new CalculatorException("FaceAreaCalculator not found for " + hds);
 		}
 		Triangulator t = new Triangulator();
 		t.triangulate(hds);

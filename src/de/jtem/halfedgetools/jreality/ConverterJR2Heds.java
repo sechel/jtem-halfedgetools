@@ -27,54 +27,14 @@ import de.jtem.halfedgetools.adapter.type.TexCoordinate;
 
 public class ConverterJR2Heds {
 
-	/** 
-	 * can convert an IndexedFaceSet(jreality) 
-	 * to a HalfEdgeDataStructure
-	 */
-	public ConverterJR2Heds() {
-	}
-
-	private int getTypNum(Class<? extends Node<?,?,?>> nodeClass){
-		if(Vertex.class.isAssignableFrom(nodeClass)) {
-			return 0;
-		}
-		if(Edge.class.isAssignableFrom(nodeClass)) {
-			return 1;
-		}
-		return 2;
-	}
-	private DataListSet getDataListOfTyp(Class<? extends Node<?,?,?>> nodeClass, IndexedFaceSet ifs){
-		if(Vertex.class.isAssignableFrom(nodeClass)) {
-			return ifs.getVertexAttributes();
-		}
-		if(Edge.class.isAssignableFrom(nodeClass)) {
-			return ifs.getEdgeAttributes();
-		}
-		return ifs.getFaceAttributes();
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F> 
+	> void ifs2heds(IndexedFaceSet ifs, HalfEdgeDataStructure<V, E, F> heds, AdapterSet adapters) {
+		ifs2heds(ifs, heds, adapters, null);
 	}
 	
-	
-	/**
-	 * this converts a given IndexedFaceSet to a H.E.D.S.
-	 * 
-	 * remark:Adapters are nescecary to access the Data of the H.E.D.S.
-	 *  you can use adapters as subtypes of the following types:
-	 *  ColorAdapter2Heds			CoordinateAdapter2Heds 
-	 *  LabelAdapter2Heds			NormalAdapter2Heds
-	 *  PointSizeAdapter2Heds		RelRadiusAdapter2Heds
-	 *  TextCoordsAdapter2Heds
-	 *  
-	 * remark:every adapter supports only one geometry part:
-	 *   Vertices, Edges or Faces
-	 *    
-	 * if there is no adapter for an attribute of a geometry part, 
-	 *  then this attribute will not be written 
-	 *  under this geometry part
-	 *  
-	 * @param heds the resulting Halfedge Datastructure
-	 * @param adapters (a CoordinateAdapter2Ifs for Vertices must be given)
-	 * @throws IllegalArgumentException
-	 */
 	@SuppressWarnings("unchecked")
 	public <
 		V extends Vertex<V, E, F>,
@@ -305,6 +265,26 @@ public class ConverterJR2Heds {
 		
 	}
 
+
+	private int getTypNum(Class<? extends Node<?,?,?>> nodeClass){
+		if(Vertex.class.isAssignableFrom(nodeClass)) {
+			return 0;
+		}
+		if(Edge.class.isAssignableFrom(nodeClass)) {
+			return 1;
+		}
+		return 2;
+	}
+	private DataListSet getDataListOfTyp(Class<? extends Node<?,?,?>> nodeClass, IndexedFaceSet ifs){
+		if(Vertex.class.isAssignableFrom(nodeClass)) {
+			return ifs.getVertexAttributes();
+		}
+		if(Edge.class.isAssignableFrom(nodeClass)) {
+			return ifs.getEdgeAttributes();
+		}
+		return ifs.getFaceAttributes();
+	}
+	
 	
 	private static class DualHashMap<K1, K2, V> implements Cloneable{
 

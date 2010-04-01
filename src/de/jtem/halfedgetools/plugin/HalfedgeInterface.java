@@ -271,9 +271,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	public void actionPerformed(ActionEvent e) {
 		Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
 		if (rescanButton == e.getSource()) {
-			ContentChangedEvent cce = new ContentChangedEvent(ChangeEventType.ContentChanged);
-			cce.node = contentParseRoot;
-			contentChangedListener.contentChanged(cce);
+			rescan();
 		}
 		if (clearSelectionButton == e.getSource()) {
 			selectionInterface.clearSelection();
@@ -303,6 +301,14 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		}
 		updateStates();
 	}
+
+	
+	public void rescan() {
+		ContentChangedEvent cce = new ContentChangedEvent(ChangeEventType.ContentChanged);
+		cce.node = contentParseRoot;
+		contentChangedListener.contentChanged(cce);
+	}
+	
 	
 	@Override
 	public void valueChanged(ListSelectionEvent e) {

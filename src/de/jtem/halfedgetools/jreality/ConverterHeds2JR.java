@@ -31,53 +31,36 @@ import de.jtem.halfedgetools.adapter.type.TexCoordinate;
 
 
 public class ConverterHeds2JR {
-	protected List<double[]> coordinates=null;
-	protected List<double[]> colors=null;
-	protected List<double[]> normals=null;
-	protected List<double[]> textCoords=null;
-	protected List<String> labels=null;
-	protected List<Double> radius=null;
-	protected List<Double> pointSize=null;
+	
+	protected List<double[]> 
+		coordinates = null,
+		colors = null,
+		normals = null,
+		textCoords = null;
+	protected List<String> 
+		labels = null;
+	protected List<Double> 
+		radius = null,
+		pointSize = null;
 
-	public IndexedFaceSet ifs;
-	/** 
-	 * can convert a HalfEdgeDataStructure 
-	 * to an IndexedFaceSet(JReality) 
-	 * 
-	 * the H.E.D.S. must be parametrised
-	 * with the same classes as the converter
-	 */
-	public ConverterHeds2JR() {
-	}
-
-	/**
-	 * this converts a given H.E.D.S to an IndexedFaceSet
-	 * 
-	 * remark:Adapters are nescecary to access the Data of the H.E.D.S.
-	 *  you can use adapters as subtypes of the following types:
-	 *  ColorAdapter2Ifs			CoordinateAdapter2Ifs 
-	 *  LabelAdapter2Ifs			NormalAdapter2Ifs
-	 *  PointSizeAdapter2Ifs		RelRadiusAdapter2Ifs
-	 *  TextCoordsAdapter2Ifs
-	 *  
-	 * remark:every adapter supports only one geometry part:
-	 *   Vertices, Edges or Faces
-	 *    
-	 * if there is no adapter for an attribute of a geometry part, 
-	 *  then this attribute will not appear in the result under this 
-	 *  geometry part
-	 *  
-	 * @param heds
-	 * @param adapters (a CoordinateAdapter2Ifs for Vertices must be given)
-	 * @return converted heds as IndexedFaceSet
-	 * @throws IllegalArgumentException
-	 */
+	
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F> 
-	> IndexedFaceSet heds2ifs(HalfEdgeDataStructure<V, E, F> heds, AdapterSet adapters, Map<E, Integer> edgeMap) throws AdapterException {
-		if (!adapters.isAvailable(Position.class, heds.getVertexClass(), double[].class)) {
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> IndexedFaceSet heds2ifs(HDS heds, AdapterSet adapters) throws AdapterException {
+		return heds2ifs(heds, adapters, null);
+	}
+
+	
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> IndexedFaceSet heds2ifs(HDS hds, AdapterSet adapters, Map<E, Integer> edgeMap) throws AdapterException {
+		if (!adapters.isAvailable(Position.class, hds.getVertexClass(), double[].class)) {
 			throw new AdapterException("No vertex position adapter found in ConverterHeds2Jr.heds2ifs");
 		}
 		// seperate adapters
@@ -85,20 +68,20 @@ public class ConverterHeds2JR {
 			edgeMap.clear();
 		}
 		// some facts
-		int numV =heds.numVertices();	
+		int numV =hds.numVertices();	
 		if (numV==0) {
 			return null; 
 		}
-		int numHE =heds.numEdges();
+		int numHE =hds.numEdges();
 		int numE =numHE/2;
-		int numF =heds.numFaces();
+		int numF =hds.numFaces();
 		IndexedFaceSet ifs = new IndexedFaceSet();
 		ifs.setNumPoints(numV);
 		ifs.setNumEdges(numE);
 		ifs.setNumFaces(numF);
 		// Vertices
 		resetData();
-		for (V v : heds.getVertices()){
+		for (V v : hds.getVertices()){
 			readOutData(adapters, v);
 		}
 		ifs.setVertexAttributes(Attribute.COORDINATES, getdoubleArrayArray(coordinates));
@@ -113,7 +96,7 @@ public class ConverterHeds2JR {
 		int[][] edgeIndis= new int[numE][2];
 		
 		int k = 0;
-		for (E e : heds.getPositiveEdges()) {
+		for (E e : hds.getPositiveEdges()) {
 			if (edgeMap != null) {
 				edgeMap.put(e, k);
 				edgeMap.put(e.getOppositeEdge(), k);
@@ -136,7 +119,7 @@ public class ConverterHeds2JR {
 		resetData();
 		int[][] faceIndices = new int[numF][];
 		int i = 0;
-		for (F f : heds.getFaces()) {
+		for (F f : hds.getFaces()) {
 			List<E> b = HalfEdgeUtils.boundaryEdges(f);
 			int[] face = new int[b.size()];
 			int j = 0;
@@ -276,4 +259,5 @@ public class ConverterHeds2JR {
 		radius=new LinkedList<Double>();
 		pointSize=new LinkedList<Double>();
 	}
+	
 }

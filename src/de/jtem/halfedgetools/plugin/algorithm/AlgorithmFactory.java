@@ -36,10 +36,10 @@ import java.util.Set;
 
 import de.jtem.halfedgetools.plugin.algorithm.geometry.PerturbPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.ProjectPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.simplification.GarlandHeckbertPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkLinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.DooSabinLinearPlugin;
-import de.jtem.halfedgetools.plugin.algorithm.subdivision.GarlandHeckbertPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.LoopPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.QuadGraphLinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.Sqrt3LinearPlugin;
