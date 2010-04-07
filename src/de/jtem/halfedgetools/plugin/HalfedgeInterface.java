@@ -398,17 +398,21 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> HDS get(HDS hds, AdapterSet a) {
+		if (a == null) a = new AdapterSet();
 		if (!(activeComponent.getGeometry() instanceof IndexedFaceSet)) {
 			return hds;
 		}
 		if (hds == null) {
 			return (HDS)cachedHEDS;
 		}
-		if (hds.getClass().isAssignableFrom(cachedHEDS.getClass()) && !hdsIsDirty) {
+		if (hds.getClass().isAssignableFrom(cachedHEDS.getClass()) && 
+			!hdsIsDirty && 
+			a.isEmpty()
+		) {
 			return (HDS)cachedHEDS;
 		}
 		AdapterSet all = new AdapterSet();
-		if (a != null) all.addAll(a);
+		all.addAll(a);
 		all.addAll(adapters);
 		hds.clear();
 		IndexedFaceSet ifs = (IndexedFaceSet)activeComponent.getGeometry();
