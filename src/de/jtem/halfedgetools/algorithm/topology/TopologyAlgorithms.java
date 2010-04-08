@@ -722,8 +722,9 @@ public class TopologyAlgorithms {
 		List<E> boundary = null;
 		try {
 			boundary  = HalfEdgeUtilsExtra.getBoundary(face);
-			for (E e : boundary)
+			for (E e : boundary) {
 				e.setLeftFace(null);
+			}
 		} catch (Exception e) {}
 		graph.removeFace(face);
 	}
