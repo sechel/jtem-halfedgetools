@@ -31,6 +31,7 @@ public class SymmetryVisualizer extends VisualizerPlugin implements ChangeListen
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
 	public < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -48,6 +49,7 @@ public class SymmetryVisualizer extends VisualizerPlugin implements ChangeListen
 		return "Symmetry visualizer";
 	}
 	
+	@Override
 	public SceneGraphComponent getComponent() {
 		return body;
 	}
