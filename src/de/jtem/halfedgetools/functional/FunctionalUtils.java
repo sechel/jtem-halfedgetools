@@ -19,7 +19,15 @@ public class FunctionalUtils {
 		pos[2] = x.get(v.getIndex() * 3 + 2);
 	}
 	
-	
+	public static double[] getHomogPosition(DomainValue x, Vertex<?,?,?> v) {
+		double[] pos = new double[4];
+		pos[0] = x.get(v.getIndex() * 3 + 0);
+		pos[1] = x.get(v.getIndex() * 3 + 1);
+		pos[2] = x.get(v.getIndex() * 3 + 2);
+		pos[3] = 1.0;
+		return pos;
+	}
+
 	public  static void addVectorToGradient(Gradient G, int startIndex, double[] d) {
 		for (int i = 0; i < d.length; i++) {
 			G.add(startIndex+i, d[i]);
