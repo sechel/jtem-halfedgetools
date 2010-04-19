@@ -19,6 +19,7 @@ import java.util.Set;
 import de.jreality.geometry.IndexedFaceSetFactory;
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.PointSetFactory;
+import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.plugin.basic.Scene;
 import de.jreality.scene.Appearance;
@@ -149,14 +150,25 @@ public class SelectionVisualizer extends VisualizerPlugin implements SelectionLi
 					double[] s1 = a.get(Position.class, b.getStartVertex(), double[].class);
 					double[] s2 = a.get(Position.class, b.getNextEdge().getTargetVertex(), double[].class);
 					double[] t = a.get(Position.class, b.getTargetVertex(), double[].class);
+					if (s1.length > 3) {
+						Pn.dehomogenize(s1, s1);
+						Pn.dehomogenize(s2, s2);
+						Pn.dehomogenize(t, t);
+					}
 					double[] vec1 = Rn.subtract(null, s1, t);
 					double[] vec2 = Rn.subtract(null, s2, t);
 					double[] n = Rn.crossProduct(null, vec1, vec2);
 					Rn.normalize(n, n);
 					double[] offset1 = Rn.times(null, dist / 100, n);
 					double[] offset2 = Rn.times(null, -1, offset1);
-					fvList.add(Rn.add(null, t, offset1));
-					fvList.add(Rn.add(null, t, offset2));
+					double[] vert1 = Rn.add(null, t, offset1);
+					double[] vert2 = Rn.add(null, t, offset2);
+					if (vert1.length > 3) {
+						vert1[3] = 1.0;
+						vert2[3] = 1.0;
+					}
+					fvList.add(vert1);
+					fvList.add(vert2);
 					b = b.getNextEdge();
 				} while (b != b0);
 				int[] indices1 = new int[fvList.size() / 2];
