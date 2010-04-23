@@ -7,6 +7,7 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Window;
@@ -28,6 +29,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -82,8 +85,16 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		selectionInterface = null;
 	private AuxSceneGraphComponent
 		auxComponent = new AuxSceneGraphComponent();
-	SceneGraphComponent
+	private SceneGraphComponent
 		contentParseRoot = null;
+	private SpinnerNumberModel
+		selectIndexModel = new SpinnerNumberModel(0, 0, 10000000, 1);
+	private JSpinner
+		selectSpinner = new JSpinner(selectIndexModel);
+	private JButton
+		selectVertexButton = new JButton("V"),
+		selectEdgeButton = new JButton("E"),
+		selectFaceButton = new JButton("F");
 	private JList	
 		selectionList = new JList(),
 		geometryList = new JList();
@@ -191,13 +202,23 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		
 		selectionScroller.setMinimumSize(new Dimension(30, 70));
 		JPanel selectionPanel = new JPanel();
-		selectionPanel.setLayout(new GridLayout());
-		selectionPanel.add(selectionScroller);
+		selectionPanel.setLayout(new GridBagLayout());
+		c.weighty = 1.0;
+		c.gridwidth = GridBagConstraints.REMAINDER;
+		selectionPanel.add(selectionScroller, c);
 		selectionPanel.setBorder(BorderFactory.createTitledBorder("Selection"));
+		c.weightx = 1.0;
+		c.gridwidth = 1;
+		selectionPanel.add(selectSpinner, c);
+		c.weightx = 0.0;
+		selectionPanel.add(selectVertexButton, c);
+		selectionPanel.add(selectEdgeButton, c);
+		c.gridwidth = GridBagConstraints.REMAINDER;
+		selectionPanel.add(selectFaceButton, c);
 		
 		c.weighty = 1.0;
 		shrinkPanel.add(selectionPanel, c);
-		c.weighty = 0.0;
+		c.weightx = 1.0;
 		shrinkPanel.add(clearSelectionButton, c);
 		
 		File userDir = new File(System.getProperty("user.dir"));
@@ -231,6 +252,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			}
 		});
 		
+		selectVertexButton.addActionListener(this);
+		selectEdgeButton.addActionListener(this);
+		selectFaceButton.addActionListener(this);
 		rescanButton.addActionListener(this);
 		clearSelectionButton.addActionListener(this);
 		viewSelectionChecker.addActionListener(this);
@@ -298,6 +322,27 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 					HalfedgeIO.writeOBJ(cachedHEDS,adapters,file.getAbsolutePath());
 				}
 			}
+		}
+		if (selectVertexButton == e.getSource()) {
+			int index = selectIndexModel.getNumber().intValue();
+			if (cachedHEDS == null || index >= cachedHEDS.numVertices()) return;
+			Vertex<?,?,?> n = cachedHEDS.getVertex(index);
+			boolean selected = selectionInterface.isSelected(n);
+			selectionInterface.setSelected(n, !selected);
+		}
+		if (selectEdgeButton == e.getSource()) {
+			int index = selectIndexModel.getNumber().intValue();
+			if (cachedHEDS == null || index >= cachedHEDS.numEdges()) return;
+			Edge<?,?,?> n = cachedHEDS.getEdge(index);
+			boolean selected = selectionInterface.isSelected(n);
+			selectionInterface.setSelected(n, !selected);
+		}
+		if (selectFaceButton == e.getSource()) {
+			int index = selectIndexModel.getNumber().intValue();
+			if (cachedHEDS == null || index >= cachedHEDS.numFaces()) return;
+			Face<?,?,?> n = cachedHEDS.getFace(index);
+			boolean selected = selectionInterface.isSelected(n);
+			selectionInterface.setSelected(n, !selected);
 		}
 		updateStates();
 	}

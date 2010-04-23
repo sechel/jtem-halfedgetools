@@ -8,6 +8,8 @@ import static de.jreality.shader.CommonAttributes.POINT_RADIUS;
 import static de.jreality.shader.CommonAttributes.POINT_SHADER;
 import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
 import static de.jreality.shader.CommonAttributes.RADII_WORLD_COORDINATES;
+import static de.jreality.shader.CommonAttributes.TRANSPARENCY;
+import static de.jreality.shader.CommonAttributes.TRANSPARENCY_ENABLED;
 import static de.jreality.shader.CommonAttributes.TUBE_RADIUS;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 
@@ -61,6 +63,8 @@ public class SelectionVisualizer extends VisualizerPlugin implements SelectionLi
 		selectionAppearance.setAttribute(POINT_SHADER + "." + DIFFUSE_COLOR, Color.RED);
 		selectionAppearance.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR, Color.RED);
 		selectionAppearance.setAttribute(POLYGON_SHADER + "." + DIFFUSE_COLOR, Color.RED);
+		selectionAppearance.setAttribute(TRANSPARENCY_ENABLED, true);
+		selectionAppearance.setAttribute(TRANSPARENCY, 0.3);
 		edgeAppearance.setAttribute(VERTEX_DRAW, false);
 		faceAppearance.setAttribute(VERTEX_DRAW, false);
 	}
