@@ -232,7 +232,8 @@ public class Loop {
 			eo2.setTargetVertex(es);
 			
 			Set<E> newEs = new HashSet<E>();
-			newEs.add(e); newEs.add(e2);
+			newEs.add(e); 
+			newEs.add(e2);
 			
 			oldEtoNewEs.put(oe, newEs);
 

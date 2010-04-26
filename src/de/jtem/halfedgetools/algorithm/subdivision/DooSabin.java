@@ -1,6 +1,7 @@
 package de.jtem.halfedgetools.algorithm.subdivision;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,6 +29,9 @@ public class DooSabin {
 	 * @throws SurfaceException
 	 * TODO write it as symmetric
 	 */
+	
+	private double alpha = 0.5;
+	
 	public <	
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -40,13 +44,43 @@ public class DooSabin {
 			EdgeAverageCalculator ec,
 			FaceBarycenterCalculator fc
 	) {
-		Map<V, Set<V>> oldVtoNewVs = new HashMap<V,Set<V>>();
+		Map<V, F> oldVnewFMap = new HashMap<V,F>();
+		Map<F, F> oldFnewFMap = new HashMap<F, F>();
+		Map<E, F> oldpEnewFMap = new HashMap<E, F>();
+		Map<E, V> oldEnewVMap = new HashMap<E, V>();
 		
 		
 		
-		for (V v : oldHeds.getVertices()){
-			
+		//faces
+		// create new faces for old faces
+		for (F f : oldHeds.getFaces()){
+			F newFace = newHeds.addNewFace();
+			oldFnewFMap.put(f, newFace);
 		}
+		
+		// create new faces for old vertices	
+		for (V v : oldHeds.getVertices()){
+			F newFace = newHeds.addNewFace();
+			oldVnewFMap.put(v, newFace);
+		}
+		
+		// create new faces for old positiv edges
+		for (E e : oldHeds.getEdges()){
+			if (e.isPositive()){
+				F newFace = newHeds.addNewFace();
+				oldpEnewFMap.put(e, newFace);
+			}
+		}
+		
+		//vertices
+		// create new vertices for old edge 		
+		for (E e : oldHeds.getEdges()){
+			V newVert = newHeds.addNewVertex();
+			oldEnewVMap.put(e, newVert);
+		}
+		
+		//edges
+		
 		
 		
 //		eA.setAlpha(0.5);
