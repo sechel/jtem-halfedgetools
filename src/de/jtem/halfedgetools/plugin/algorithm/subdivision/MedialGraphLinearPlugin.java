@@ -43,7 +43,7 @@ import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
-import de.jtem.halfedgetools.algorithm.subdivision.DooSabinLinear;
+import de.jtem.halfedgetools.algorithm.subdivision.MedialGraphLinear;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -51,10 +51,10 @@ import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 
-public class DooSabinLinearPlugin extends HalfedgeAlgorithmPlugin {
+public class MedialGraphLinearPlugin extends HalfedgeAlgorithmPlugin {
 
-	private DooSabinLinear
-		subdivider = new DooSabinLinear();
+	private MedialGraphLinear
+		subdivider = new MedialGraphLinear();
 		
 	@Override
 	public < 
@@ -85,13 +85,13 @@ public class DooSabinLinearPlugin extends HalfedgeAlgorithmPlugin {
 	
 	@Override
 	public String getAlgorithmName() {
-		return "DooSabin Linear";
+		return "Medial-Graph Linear";
 	}
 	
 	@Override
 	public PluginInfo getPluginInfo() {
-		PluginInfo info = new PluginInfo("Linear DooSabin Subdivision");
-		info.icon = ImageHook.getIcon("DooSabinLinear.png");
+		PluginInfo info = new PluginInfo("Linear Medial-Graph Subdivision");
+		info.icon = ImageHook.getIcon("MedialLinear.png");
 		return info;
 	}
 

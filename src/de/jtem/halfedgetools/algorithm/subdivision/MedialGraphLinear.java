@@ -10,7 +10,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 
-public class DooSabinLinear {
+public class MedialGraphLinear {
 
 	/**
 	 * Doo-Sabin
