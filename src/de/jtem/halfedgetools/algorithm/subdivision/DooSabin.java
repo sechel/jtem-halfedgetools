@@ -1,7 +1,9 @@
 package de.jtem.halfedgetools.algorithm.subdivision;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,8 +50,8 @@ public class DooSabin {
 		Map<F, F> oldFnewFMap = new HashMap<F, F>();
 		Map<E, F> oldpEnewFMap = new HashMap<E, F>();
 		Map<E, V> oldEnewVMap = new HashMap<E, V>();
-		
-		
+		Map<E, Set<E>> oldEtonewEsMap = new HashMap<E, Set<E>>();
+		Set<E> newEdges = new HashSet<E>();
 		
 		//faces
 		// create new faces for old faces
@@ -65,6 +67,8 @@ public class DooSabin {
 		}
 		
 		// create new faces for old positiv edges
+		// TODO: test ispositive 
+		// not sure what positiv edges are!!
 		for (E e : oldHeds.getEdges()){
 			if (e.isPositive()){
 				F newFace = newHeds.addNewFace();
@@ -79,7 +83,96 @@ public class DooSabin {
 			oldEnewVMap.put(e, newVert);
 		}
 		
-		//edges
+		//combinatorics for oldFnewFMap
+		for (F of : oldHeds.getFaces()){
+			List <E> edges = new ArrayList<E>();
+			E e = of.getBoundaryEdge();
+			edges.add(e);
+			E nextE = e.getNextEdge();
+			while (nextE != e) {
+				edges.add(nextE);
+				nextE.getNextEdge();
+			}
+			//add new edges for new-face-old-face-map
+			//set targetvertex
+			List<E> newEs = new ArrayList<E>();
+			for (E ed : edges){
+				E newE = newHeds.addNewEdge();
+				newEs.add(newE);
+				newE.setTargetVertex(oldEnewVMap.get(ed));
+			}
+			//links nextEdge and face
+			for (int i =0; i< newEs.size(); i++){
+				E newE = newEs.get(i);
+				newE.setLeftFace(oldFnewFMap.get(of));
+				E nexted = newEs.get((i+1)%newEdges.size());
+				newE.linkNextEdge(nexted);
+			}
+		}
+		
+		//combinatorics for oldVnewFMap
+		for (V ov : oldHeds.getVertices())	{
+			List <E> edges = new ArrayList<E>();
+			E e = ov.getIncomingEdge();
+			edges.add(e);
+			E nextE = e.getNextEdge();
+			E oppE = nextE.getOppositeEdge();
+			while (oppE != e) {
+				edges.add(oppE);
+				nextE = oppE.getNextEdge();
+				oppE = nextE.getOppositeEdge();
+			}
+			//add new edges for old-vertex-new-face-map
+			//link faces
+			List<E> newEs = new ArrayList<E>();
+			for (E ed : edges){
+				E newE = newHeds.addNewEdge();
+				newEs.add(newE);
+				newE.setTargetVertex(oldEnewVMap.get(ed));
+			}
+			//links nextEdge and face
+			for (int i =0; i< newEs.size(); i++){
+				E newE = newEs.get(i);
+				newE.setLeftFace(oldVnewFMap.get(ov));
+				E nexted = newEs.get((i+1)%newEdges.size());
+				newE.linkNextEdge(nexted);
+			}
+			
+		}
+		
+		//combinatorics for oldEnewFMap
+		for (E olde : oldHeds.getPositiveEdges())	{
+			E polde = olde.getPreviousEdge();
+			E oolde = olde.getOppositeEdge();
+			E poolde = oolde.getPreviousEdge();
+			
+			//add new edges
+			E e1 = newHeds.addNewEdge();
+			E e2 = newHeds.addNewEdge();
+			E e3 = newHeds.addNewEdge();
+			E e4 = newHeds.addNewEdge();
+			
+			// link edge
+			e1.linkNextEdge(e2);
+			e2.linkNextEdge(e3);
+			e3.linkNextEdge(e4);
+			e4.linkNextEdge(e1);
+			
+			//set face
+			F f = oldpEnewFMap.get(olde);
+			e1.setLeftFace(f);
+			e2.setLeftFace(f);
+			e3.setLeftFace(f);
+			e4.setLeftFace(f);
+			
+			//set targetvertex;
+			e1.setTargetVertex(oldEnewVMap.get(olde));
+			e2.setTargetVertex(oldEnewVMap.get(polde));
+			e3.setTargetVertex(oldEnewVMap.get(oolde));
+			e4.setTargetVertex(oldEnewVMap.get(poolde));
+		}
+		// TODO: opposite edges!!!
+		
 		
 		
 		
