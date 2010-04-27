@@ -77,16 +77,18 @@ public class NormalAdapter extends AbstractAdapter<double[]>  {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> double[] getF(F f, AdapterSet a) {
-		E b1 = f.getBoundaryEdge();
-		E b2 = b1.getPreviousEdge().getOppositeEdge();
-		double[] s1 = a.get(Position.class, b1.getTargetVertex(), double[].class);
-		double[] s2 = a.get(Position.class, b2.getTargetVertex(), double[].class);
-		double[] t = a.get(Position.class, b1.getStartVertex(), double[].class);
-		double[] v1 = Rn.subtract(null, s1, t);
-		double[] v2 = Rn.subtract(null, s2, t);
-		double[] n = Rn.crossProduct(null, v1, v2);
-		Rn.normalize(n, n);
-		return n;
+		double[] n = new double[3];
+		for (E b1 : HalfEdgeUtils.boundaryEdges(f)) {
+			E b2 = b1.getPreviousEdge().getOppositeEdge();
+			double[] s1 = a.get(Position.class, b1.getTargetVertex(), double[].class);
+			double[] s2 = a.get(Position.class, b2.getTargetVertex(), double[].class);
+			double[] t = a.get(Position.class, b1.getStartVertex(), double[].class);
+			double[] v1 = Rn.subtract(null, s1, t);
+			double[] v2 = Rn.subtract(null, s2, t);
+			double[] nf = Rn.crossProduct(null, v1, v2);
+			Rn.add(n, n, nf);
+		}
+		return Rn.normalize(n, n);
 	}
 	
 	@Override
