@@ -32,7 +32,7 @@ public class DooSabin {
 	 * TODO write it as symmetric
 	 */
 	
-	private double alpha = 0.5;
+//	private double alpha = 0.5;
 	
 	public <	
 		V extends Vertex<V, E, F>,
@@ -50,7 +50,7 @@ public class DooSabin {
 		Map<F, F> oldFnewFMap = new HashMap<F, F>();
 		Map<E, F> oldpEnewFMap = new HashMap<E, F>();
 		Map<E, V> oldEnewVMap = new HashMap<E, V>();
-		Map<E, Set<E>> oldEtonewEsMap = new HashMap<E, Set<E>>();
+//		Map<E, Set<E>> oldEtonewEsMap = new HashMap<E, Set<E>>();
 		Set<E> newEdges = new HashSet<E>();
 		
 		//faces

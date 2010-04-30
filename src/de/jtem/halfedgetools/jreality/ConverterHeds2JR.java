@@ -82,7 +82,11 @@ public class ConverterHeds2JR {
 		// Vertices
 		resetData();
 		for (V v : hds.getVertices()){
-			readOutData(adapters, v);
+			try {
+				readOutData(adapters, v);
+			} catch (Exception e) {
+				System.err.println("Error reading vertex data: " + e.getLocalizedMessage());
+			}
 		}
 		ifs.setVertexAttributes(Attribute.COORDINATES, getdoubleArrayArray(coordinates));
 		if(colors.size() > 0) ifs.setVertexAttributes(Attribute.COLORS, getdoubleArrayArray(colors)); 
@@ -103,7 +107,11 @@ public class ConverterHeds2JR {
 			}
 			edgeIndis[k][0]=e.getOppositeEdge().getTargetVertex().getIndex();
 			edgeIndis[k][1]=e.getTargetVertex().getIndex();
-			readOutData(adapters, e);
+			try {
+				readOutData(adapters, e);
+			} catch (Exception ex) {
+				System.err.println("Error reading edge data: " + ex.getLocalizedMessage());
+			}
 			k++;
 		}
 		ifs.setEdgeAttributes(Attribute.INDICES, new IntArrayArray.Array(edgeIndis)); 
@@ -126,7 +134,11 @@ public class ConverterHeds2JR {
 			for (E e : b) {
 				face[j++] = e.getTargetVertex().getIndex();
 			}
-			readOutData(adapters, f);
+			try {
+				readOutData(adapters, f);
+			} catch (Exception e) {
+				System.err.println("Error reading face data: " + e.getLocalizedMessage());
+			}
 			faceIndices[i++] = face;
 		}
 		ifs.setFaceAttributes(Attribute.INDICES,new IntArrayArray.Array(faceIndices)); 

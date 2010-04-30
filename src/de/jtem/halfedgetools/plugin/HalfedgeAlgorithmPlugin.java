@@ -31,7 +31,7 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin;
 
-import static javax.swing.JOptionPane.PLAIN_MESSAGE;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
 
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -94,7 +94,8 @@ public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 			} catch (Exception e1) {
 				e1.printStackTrace();
 				Window w = SwingUtilities.getWindowAncestor(hcp.getShrinkPanel());
-				JOptionPane.showMessageDialog(w, e1.getMessage(), getAlgorithmName(), PLAIN_MESSAGE);
+				String msg = e1.getClass().getSimpleName() + ": " + e1.getLocalizedMessage();
+				JOptionPane.showMessageDialog(w, msg, "Error: " + getAlgorithmName(), ERROR_MESSAGE);
 			}
 		}
 		
