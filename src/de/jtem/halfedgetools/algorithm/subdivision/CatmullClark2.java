@@ -184,14 +184,6 @@ public class CatmullClark2 {
 		Map<E, Set<E>> oldEtoNewEs
 	){
 		
-		/*newh.addNewEdges(2*oldh.getEdges().size());
-		for (V oldV: oldh.getVertices()){
-			List<E> star = HalfEdgeUtils.incomingEdges(oldV);
-			int deg = star.size();
-			newh.addNewEdges(2*deg);
-			newh.addNewFaces(deg);
-		}*/
-		
 		//add new edges for old egde
 		for(E oe : oldh.getEdges()){
 			Set<E> newEs = new HashSet<E>();
@@ -231,15 +223,28 @@ public class CatmullClark2 {
 		}
 		
 		for(F of : oldh.getFaces()){
+			List <E> newEdges = new ArrayList<E>();
+			for(E e : boundaryEdges(of)){
+				newEdges.add(newh.addNewEdge());
+				newEdges.add(newh.addNewEdge());
+			}
+			int i= 0;
 			
 			for (E e : boundaryEdges(of)) {
 				Set<E> es = oldEtoNewEs.get(e);
 				Set<E> pes = oldEtoNewEs.get(e.getPreviousEdge());
 				List<E> edges = new ArrayList<E>();
 				List<E> pedges= new ArrayList<E>();
+				for(E ed: es)
+					edges.add(ed);
+				for(E ed: pes)
+					pedges.add(ed);
+				
 				E e0 = edges.get(0); 
-				E e1 = newh.addNewEdge();
-				E e2 = newh.addNewEdge();
+				E e1 = newEdges.get(i);
+				i++;
+				E e2 = newEdges.get(i);
+				i++;
 				E e3 = pedges.get(1);
 			
 				//link edges
@@ -252,8 +257,21 @@ public class CatmullClark2 {
 				e1.setTargetVertex(oldFnewVMap.get(of));
 				e2.setTargetVertex(oldEnewVMap.get(e.getPreviousEdge()));
 				
-				//set opposite edges
+				//link face
+				F f = newh.addNewFace();
+				e0.setLeftFace(f);
+				e1.setLeftFace(f);
+				e2.setLeftFace(f);
+				e3.setLeftFace(f);
 			}
+			//opposite edges
+			for(int j=0;j<newEdges.size();j+=2){
+				int k=j+3%newEdges.size();
+				E e = newEdges.get(j);
+				E oe = newEdges.get(k);
+				e.linkOppositeEdge(oe);
+			}
+			
 		}
 		
 		
