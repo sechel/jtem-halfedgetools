@@ -195,27 +195,27 @@ public class Loop {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void dyadicSubdiv(
-		HDS alt, 
-		HDS neu,
+		HDS oldh, 
+		HDS newh,
 		Map<V,E> newVtoOldE,
 		Map<E, Set<E>> oldEtoNewEs
 	){
 		//struktur kopieren
-		alt.createCombinatoriallyEquivalentCopy(neu);
+		oldh.createCombinatoriallyEquivalentCopy(newh);
 
 		
-		for(E oe : alt.getPositiveEdges()){
-			E e = neu.getEdge(oe.getIndex());	
+		for(E oe : oldh.getPositiveEdges()){
+			E e = newh.getEdge(oe.getIndex());	
 
-			V mv = neu.addNewVertex();
+			V mv = newh.addNewVertex();
 			newVtoOldE.put(mv, oe);
 			
 			V et = e.getTargetVertex();
 			V es = e.getStartVertex();
 			E eo = e.getOppositeEdge();
 			
-			E e2 = neu.addNewEdge();
-			E eo2 = neu.addNewEdge();	
+			E e2 = newh.addNewEdge();
+			E eo2 = newh.addNewEdge();	
 			E en = e.getNextEdge();
 			E eon = eo.getNextEdge();		
 			
@@ -243,11 +243,11 @@ public class Loop {
 	//	end : edge cut
 		
 	//	rearrange interior
-		for(F of : alt.getFaces()){
-			F f = neu.getFace(of.getIndex());
+		for(F of : oldh.getFaces()){
+			F f = newh.getFace(of.getIndex());
 			List<E> e = new ArrayList<E>(0);
 			List<E> eb = new ArrayList<E>(0);
-			List<F> fn = neu.addNewFaces(3);
+			List<F> fn = newh.addNewFaces(3);
 			
 			e.add(f.getBoundaryEdge());
 
@@ -257,8 +257,8 @@ public class Loop {
 			e.add(eb.get(1).getNextEdge());
 			eb.add(e.get(2).getNextEdge());
 			
-			List<E> inner = neu.addNewEdges(3);
-			List<E> outer = neu.addNewEdges(3);
+			List<E> inner = newh.addNewEdges(3);
+			List<E> outer = newh.addNewEdges(3);
 			
 			for (int i=0 ; i<3; i++){
 				inner.get(i).setLeftFace(f);
