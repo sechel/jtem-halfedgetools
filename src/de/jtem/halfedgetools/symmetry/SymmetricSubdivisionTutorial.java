@@ -38,11 +38,14 @@ import de.jtem.halfedgetools.plugin.algorithm.subdivision.TriangulatePlugin;
 import de.jtem.halfedgetools.symmetry.adapters.BundleCycleColorAdapter;
 import de.jtem.halfedgetools.symmetry.adapters.BundleLabelAdapter;
 import de.jtem.halfedgetools.symmetry.adapters.SymmetricPositionAdapter;
+import de.jtem.halfedgetools.symmetry.adapters.SymmetricSymmetryColorAdapter;
+import de.jtem.halfedgetools.symmetry.adapters.SymmetricSymmetryFaceColorAdapter;
 import de.jtem.halfedgetools.symmetry.calculators.SymmetricSubdivisionCalculator;
 import de.jtem.halfedgetools.symmetry.plugin.CompactifierPlugin;
 import de.jtem.halfedgetools.symmetry.plugin.SymmetricCatmullClarkPlugin;
 import de.jtem.halfedgetools.symmetry.plugin.SymmetricLoopPlugin;
 import de.jtem.halfedgetools.symmetry.plugin.SymmetricSqrt3Plugin;
+import de.jtem.halfedgetools.symmetry.plugin.visualizer.SymmetryVisualizer;
 
 public class SymmetricSubdivisionTutorial {
 
@@ -55,12 +58,13 @@ public class SymmetricSubdivisionTutorial {
 		viewer.addContentSupport(ContentType.CenteredAndScaled);
 		viewer.setShowPanelSlots(true, false, false, false);
 		viewer.setShowToolBar(true);
-		viewer.setPropertiesFile("test.jrw");
 		
 		HalfedgeInterface hif = new HalfedgeInterface();
 		hif.addAdapter(new SymmetricPositionAdapter());
-		hif.addAdapter(new BundleLabelAdapter());
-		hif.addAdapter(new BundleCycleColorAdapter());
+		hif.addAdapter(new SymmetricSymmetryColorAdapter());
+		hif.addAdapter(new SymmetricSymmetryFaceColorAdapter());
+	//	hif.addAdapter(new BundleLabelAdapter());
+	//	hif.addAdapter(new BundleCycleColorAdapter());
 		hif.addCalculator(new SymmetricSubdivisionCalculator());
 		viewer.registerPlugin(hif);
 		viewer.registerPlugin(new SymmetricCatmullClarkPlugin());
@@ -72,16 +76,9 @@ public class SymmetricSubdivisionTutorial {
 		
 		viewer.registerPlugin(new CompactifierPlugin());
 		
-//		viewer.registerPlugin(new EdgeFlipperPlugin<SVertex,SEdge,SFace,SHDS>());
-//		viewer.registerPlugin(new TriangulatePlugin<SVertex,SEdge,SFace,SHDS>());
-//		viewer.registerPlugins(TopologyOperations.topologicalEditing(
-//				new SymmetricSubdivisionAdapter(),
-//				new SSubdivisionAdapters.SSubdivisionEA(),
-//				new SSubdivisionAdapters.SSubdivisionFA()
-//		));
-		
-//		viewer.registerPlugin(new HalfedgeDebuggerPlugin<SVertex,SEdge,SFace,SHDS>());
-		
+		viewer.registerPlugin(new SymmetryVisualizer());
+
 		viewer.startup();
+		
 	}
 }

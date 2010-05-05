@@ -56,7 +56,7 @@ public class SymmetricSymmetryFaceColorAdapter extends AbstractAdapter<double[]>
 	
 	@Override
 	public double getPriority() {
-		return 1;
+		return 10;
 	}
 	
 	@Override
@@ -71,7 +71,7 @@ public class SymmetricSymmetryFaceColorAdapter extends AbstractAdapter<double[]>
 				return new double[] {0, 1,0,0};
 			}
 		}
-		return new double[]{0.8,0.8,0.8,1};
+		return new double[]{1,0,0,1};
 	}
 
 }

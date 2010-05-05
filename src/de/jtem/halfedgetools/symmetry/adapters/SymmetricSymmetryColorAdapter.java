@@ -37,8 +37,11 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Color;
 import de.jtem.halfedgetools.symmetry.node.SymmetricEdge;
+import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 
+@Color
 public class SymmetricSymmetryColorAdapter extends AbstractAdapter<double[]> {
 
 	public SymmetricSymmetryColorAdapter() {
@@ -52,7 +55,7 @@ public class SymmetricSymmetryColorAdapter extends AbstractAdapter<double[]> {
 	
 	@Override
 	public double getPriority() {
-		return 1;
+		return 10;
 	}
 	
 	@Override
@@ -63,11 +66,12 @@ public class SymmetricSymmetryColorAdapter extends AbstractAdapter<double[]> {
 	> double[] getE(E e, AdapterSet a) {
 		SymmetricEdge<?,?,?> se = (SymmetricEdge<?,?,?>)e;
 		if (se.isRightOfSymmetryCycle() != null) {
-			return new double[]{1,0,0,1};
+			return new double[]{0,1,0,0};
 		} else {
-			return new double[] {1,1,1,1};
+			return new double[] {0,0,1,1};
 		}
 	}
+
 
 }
 

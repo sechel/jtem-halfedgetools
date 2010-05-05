@@ -19,6 +19,8 @@ public class SymmetricSubdivisionCalculator implements EdgeAverageCalculator , V
 
 	private double
 		alpha = 0.5;
+	private boolean 
+		ignore = false;
 	
 	@Override
 	public double getPriority() {
@@ -32,9 +34,10 @@ public class SymmetricSubdivisionCalculator implements EdgeAverageCalculator , V
 		F extends Face<V, E, F>
 	> double[] get(E e) {
 		SymmetricEdge<?, ?, ?> je = (SymmetricEdge<?, ?, ?>)e;
-		double[] s = je.getStartVertex().getEmbedding();
-		double[] t = je.getTargetVertex().getEmbedding();
-		return Rn.linearCombination(null, alpha, t, 1 - alpha, s);
+//		double[] s = je.getStartVertex().getEmbedding();
+//		double[] t = je.getTargetVertex().getEmbedding();
+//		return Rn.linearCombination(null, alpha, t, 1 - alpha, s);
+		return je.getEmbeddingOnEdge(alpha,ignore);
 	}
 
 	@Override
@@ -88,6 +91,7 @@ public class SymmetricSubdivisionCalculator implements EdgeAverageCalculator , V
 
 	@Override
 	public void setIgnore(boolean ignore) {
+		this.ignore = ignore;
 	}
 
 }
