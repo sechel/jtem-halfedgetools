@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import de.jreality.math.Rn;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.data.Attribute;
 import de.jreality.scene.data.DataList;
@@ -207,12 +206,14 @@ public class ConverterHeds2JR {
 			}
 		}
 		if (!cols.isEmpty()) {
-			double[] c = {0, 0, 0};
+			double[] c = {1, 1, 1, 1};
 			boolean colorValid = false;
 			for (Adapter<double[]> color : cols) {
 				double[] colorArr = color.get(n, adapters);
 				if (colorArr == null) continue;
-				Rn.add(c, c, colorArr);
+				for (int i = 0; i < Math.min(4, colorArr.length); i++) {
+					c[i] = c[i] * colorArr[i];
+				}
 				colorValid = true;
 			}
 			if (colorValid) {
