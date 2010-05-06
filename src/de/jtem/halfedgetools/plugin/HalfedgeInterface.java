@@ -52,6 +52,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.Calculator;
@@ -94,7 +95,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	private JButton
 		selectVertexButton = new JButton("V"),
 		selectEdgeButton = new JButton("E"),
-		selectFaceButton = new JButton("F");
+		selectFaceButton = new JButton("F"),
+		selectBoundaryButton = new JButton("bd");
 	private JList	
 		selectionList = new JList(),
 		geometryList = new JList();
@@ -207,14 +209,16 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		selectionPanel.add(selectionScroller, c);
 		selectionPanel.setBorder(BorderFactory.createTitledBorder("Selection"));
-		c.weightx = 1.0;
+		c.weightx = 0.0;
 		c.gridwidth = 1;
+		selectSpinner.setPreferredSize(new Dimension(100,20));
 		selectionPanel.add(selectSpinner, c);
 		c.weightx = 0.0;
 		selectionPanel.add(selectVertexButton, c);
 		selectionPanel.add(selectEdgeButton, c);
-		c.gridwidth = GridBagConstraints.REMAINDER;
 		selectionPanel.add(selectFaceButton, c);
+		c.gridwidth = GridBagConstraints.REMAINDER;
+		selectionPanel.add(selectBoundaryButton,c);
 		
 		c.weighty = 1.0;
 		shrinkPanel.add(selectionPanel, c);
@@ -255,6 +259,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		selectVertexButton.addActionListener(this);
 		selectEdgeButton.addActionListener(this);
 		selectFaceButton.addActionListener(this);
+		selectBoundaryButton.addActionListener(this);
 		rescanButton.addActionListener(this);
 		clearSelectionButton.addActionListener(this);
 		viewSelectionChecker.addActionListener(this);
@@ -343,6 +348,13 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			Face<?,?,?> n = cachedHEDS.getFace(index);
 			boolean selected = selectionInterface.isSelected(n);
 			selectionInterface.setSelected(n, !selected);
+		}
+		if (selectBoundaryButton == e.getSource()) {
+			int index = selectIndexModel.getNumber().intValue();
+			if (cachedHEDS == null || index >= cachedHEDS.numVertices()) return;
+			for(Vertex<?,?,?> v : HalfEdgeUtils.boundaryVertices(cachedHEDS)){
+				selectionInterface.setSelected(v,true);
+			}
 		}
 		updateStates();
 	}
