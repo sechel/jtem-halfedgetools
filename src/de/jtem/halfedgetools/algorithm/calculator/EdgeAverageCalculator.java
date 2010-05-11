@@ -13,7 +13,7 @@ public interface EdgeAverageCalculator extends Calculator {
 		F extends Face<V, E, F>
 	> double[] get(E e);
 	
-	public void setAlpha(double alpha);
-	public void setIgnore(boolean ignore);
+	public void setEdgeAlpha(double alpha);
+	public void setEdgeIgnore(boolean ignore);
 	
 }

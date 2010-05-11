@@ -124,7 +124,7 @@ F extends SymmetricFace<V, E, F>
 		
 		if(trans != null) {
 
-			System.err.println("we are on right of cycle");
+		//	System.err.println("we are on right of cycle");
 
 			s = trans.getMatrix().multiplyVector(s);
 
@@ -154,6 +154,18 @@ F extends SymmetricFace<V, E, F>
 		DiscreteGroupElement trans = isRightOfSymmetryCycle();
 		if(trans != null) {
 			s = trans.getMatrix().multiplyVector(s);
+		} 
+		return Rn.subtract(null, t, s);
+	}
+	
+	public double[] getOppositeDirection() {
+		
+		double[] t = getTargetVertex().getEmbedding();
+		double[] s = getStartVertex().getEmbedding();
+		
+		DiscreteGroupElement trans = isRightOfSymmetryCycle();
+		if(trans != null) {
+			s = trans.getMatrix().getInverse().multiplyVector(s);
 		} 
 		return Rn.subtract(null, t, s);
 	}
@@ -265,6 +277,25 @@ F extends SymmetricFace<V, E, F>
 		for(Set<E> cycle : ci.paths.keySet()) {
 						
 			if(cycle.contains(getOppositeEdge()) || cycle.contains(this)) {
+				return true;
+			}
+		}
+		
+		return false;
+
+	}
+	
+	@Bundle(dimension=1, type=BundleType.Value, display=DisplayType.Label, name="sc")
+	public boolean isSymmetryHalfEdge() {
+		CuttingInfo<V,E,F> ci = getSymmetryCycleInfo();
+		if(ci == null) {
+			System.err.println("symmetry cycle info not set, defaulting to true");
+			return false;
+		}
+		
+		for(Set<E> cycle : ci.paths.keySet()) {
+						
+			if(cycle.contains(this)) {
 				return true;
 			}
 		}

@@ -60,12 +60,23 @@ public class JRSubdivisionCalculator implements EdgeAverageCalculator, FaceBaryc
 	}
 
 	@Override
-	public void setAlpha(double alpha) {
+	public void setEdgeAlpha(double alpha) {
 		this.alpha = alpha;
 	}
 
 	@Override
-	public void setIgnore(boolean ignore) {
+	public void setEdgeIgnore(boolean ignore) {
+	}
+
+	@Override
+	public 
+	<
+	V extends Vertex<V, E, F>, 
+	E extends Edge<V, E, F>, 
+	F extends Face<V, E, F>
+	> double[] get(
+			F f, E e) {
+		return get(f);
 	}
 
 }

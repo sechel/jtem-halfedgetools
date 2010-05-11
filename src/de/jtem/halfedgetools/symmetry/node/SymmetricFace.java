@@ -60,7 +60,7 @@ F extends SymmetricFace<V, E, F>
 	}
 
 	// TODO fix for n>3
-	public double[] getEmbeddingOnBoundary(double t) {
+	public double[] getEmbeddingOnBoundary(double t, boolean ignore) {
 		F f = getBoundaryEdge().getLeftFace(); // should not be necessary
 		List<E> boundary = HalfEdgeUtils.boundaryEdges(f);
 		E e = boundary.get(0);
@@ -75,9 +75,18 @@ F extends SymmetricFace<V, E, F>
 		
 		double[][] coords = new double[n][];
 		
-		coords[0] = Rn.add(null, e.getStartVertex().getEmbedding(), e.getDirection());
-		coords[1] = Rn.add(null, coords[0], e.getNextEdge().getDirection());
-		coords[2] = Rn.add(null, coords[1], e.getPreviousEdge().getDirection());
+
+		
+		if(ignore == false){
+			coords[0] = Rn.add(null, e.getStartVertex().getEmbedding(), e.getDirection());
+			coords[1] = Rn.add(null, coords[0], e.getNextEdge().getDirection());
+			coords[2] = Rn.add(null, coords[1], e.getPreviousEdge().getDirection());
+		} else {
+			e = e.getOppositeEdge();
+			coords[0] = Rn.add(null, e.getStartVertex().getEmbedding(), e.getDirection());
+			coords[1] = Rn.add(null, coords[0], e.getNextEdge().getDirection());
+			coords[2] = Rn.add(null, coords[1], e.getPreviousEdge().getDirection());
+		}
 		
 		int sel = ((int)Math.floor(t)) % n;
 		

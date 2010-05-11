@@ -1,7 +1,6 @@
 package de.jtem.halfedgetools.symmetry.calculators;
 
 import java.util.List;
-
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -18,9 +17,9 @@ import de.jtem.halfedgetools.symmetry.node.SymmetricVertex;
 public class SymmetricSubdivisionCalculator implements EdgeAverageCalculator , VertexPositionCalculator, FaceBarycenterCalculator {
 
 	private double
-		alpha = 0.5;
+		edgeAlpha = 0.5;
 	private boolean 
-		ignore = false;
+		edgeIgnore = false;
 	
 	@Override
 	public double getPriority() {
@@ -34,12 +33,10 @@ public class SymmetricSubdivisionCalculator implements EdgeAverageCalculator , V
 		F extends Face<V, E, F>
 	> double[] get(E e) {
 		SymmetricEdge<?, ?, ?> je = (SymmetricEdge<?, ?, ?>)e;
-//		double[] s = je.getStartVertex().getEmbedding();
-//		double[] t = je.getTargetVertex().getEmbedding();
-//		return Rn.linearCombination(null, alpha, t, 1 - alpha, s);
-		return je.getEmbeddingOnEdge(alpha,ignore);
+		return je.getEmbeddingOnEdge(edgeAlpha,edgeIgnore);
 	}
 
+	//TODO: Check method with getEmbeddingOnEdge
 	@Override
 	public  <
 		V extends Vertex<V, E, F>, 
@@ -68,9 +65,65 @@ public class SymmetricSubdivisionCalculator implements EdgeAverageCalculator , V
 	> double[] get(F f) {
 		double[] pos = new double[3];
 		List<E> b = HalfEdgeUtils.boundaryEdges(f);
-		for (E e : b) {
-			SymmetricVertex<?, ?, ?> jv = (SymmetricVertex<?, ?, ?>)e.getTargetVertex();
-			Rn.add(pos, pos, jv.getEmbedding());
+		
+		SymmetricFace<?, ?, ?> sf = (SymmetricFace<?, ?, ?>)f;
+		for(int i = 0; i < b.size(); i++){
+			Rn.add(pos, pos, sf.getEmbeddingOnBoundary(i,false));
+		}
+		return Rn.times(pos, 1.0 / b.size(), pos);
+	}
+	
+	@Override
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>
+	> double[] get(
+			F f, E e) {
+		
+		boolean faceIgnore = false;
+		
+//		List<E> edgeBoundary = new LinkedList<E>();
+//		edgeBoundary.addAll(HalfEdgeUtils.boundaryEdges(e.getLeftFace()));
+//		edgeBoundary.addAll(HalfEdgeUtils.boundaryEdges(e.getRightFace()));
+//		edgeBoundary.remove(e);
+//		edgeBoundary.remove(e.getOppositeEdge());
+
+//		int nrOnCycle = 0;
+//		
+//		boolean isOn = false;
+//		for(E ee : edgeBoundary){
+//			SymmetricEdge<?,?,?> se = (SymmetricEdge<?,?,?>)ee;
+//			if(se.isRightIncomingOfSymmetryCycle() != null){
+//				isOn = true;
+//			}
+//		}
+//		
+//		if(!isOn){
+//			for(E ee : edgeBoundary){
+//				SymmetricVertex<?,?,?> sv = (SymmetricVertex<?,?,?> )ee.getTargetVertex();
+//				if(sv.isSymmetryVertex()) {
+//					nrOnCycle++;
+//				}
+//			}
+//		}
+//		
+//		if(nrOnCycle == 1){
+//			System.err.println("on");
+//			faceIgnore = true;
+//		}
+		
+		SymmetricEdge<?,?,?> se = (SymmetricEdge<?,?,?>)e;
+		if(se.isSymmetryHalfEdge()){
+			faceIgnore = true;
+		}
+		
+		double[] pos = new double[3];
+		List<E> b = HalfEdgeUtils.boundaryEdges(f);
+		
+		SymmetricFace<?, ?, ?> sf = (SymmetricFace<?, ?, ?>)f;
+		for(int i = 0; i < b.size(); i++){
+			Rn.add(pos, pos, sf.getEmbeddingOnBoundary(i,faceIgnore));
 		}
 		return Rn.times(pos, 1.0 / b.size(), pos);
 	}
@@ -85,13 +138,12 @@ public class SymmetricSubdivisionCalculator implements EdgeAverageCalculator , V
 	}
 
 	@Override
-	public void setAlpha(double alpha) {
-		this.alpha = alpha;
+	public void setEdgeAlpha(double alpha) {
+		this.edgeAlpha = alpha;
 	}
 
 	@Override
-	public void setIgnore(boolean ignore) {
-		this.ignore = ignore;
+	public void setEdgeIgnore(boolean ignore) {
+		this.edgeIgnore = ignore;
 	}
-
 }

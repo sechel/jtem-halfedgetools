@@ -58,6 +58,15 @@ F extends SymmetricFace<V, E, F>
 		return false;
 	}
 	
+	public boolean isSymmetryVertex() {
+		for(Set<E> p : getIncomingEdge().getSymmetryCycleInfo().paths.keySet()) {
+			if(PathUtility.getUnorderedVerticesOnPath(p).contains(this)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	@Bundle(dimension=1, type=BundleType.Value, display=DisplayType.Label, name="cone?")
 	public boolean isConeVertex() {
 		E in = getIncomingEdge();

@@ -44,4 +44,11 @@ public interface FaceBarycenterCalculator extends Calculator {
 		F extends Face<V, E, F>
 	> double[] get(F f);
 	
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	> double[] get(F f, E e);
+
+	
 }

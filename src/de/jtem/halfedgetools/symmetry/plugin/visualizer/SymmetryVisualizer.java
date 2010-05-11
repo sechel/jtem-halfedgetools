@@ -3,19 +3,15 @@
  */
 package de.jtem.halfedgetools.symmetry.plugin.visualizer;
 
-import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import de.jreality.geometry.GeometryMergeFactory;
 import de.jreality.geometry.IndexedFaceSetFactory;
 import de.jreality.geometry.IndexedFaceSetUtility;
@@ -97,9 +93,9 @@ public class SymmetryVisualizer extends VisualizerPlugin implements ChangeListen
 				int j = 0;
 				for(SFace f : sFaces) {
 					
-					extraCoords[j] = f.getEmbeddingOnBoundary(0);
-					extraCoords[j+1] = f.getEmbeddingOnBoundary(1);
-					extraCoords[j+2] = f.getEmbeddingOnBoundary(2);
+					extraCoords[j] = f.getEmbeddingOnBoundary(0, false);
+					extraCoords[j+1] = f.getEmbeddingOnBoundary(1, false);
+					extraCoords[j+2] = f.getEmbeddingOnBoundary(2, false);
 					
 					extraColors[j/3] = new double[] {0.3,0.8,0.8,0.5};
 					
@@ -137,8 +133,8 @@ public class SymmetryVisualizer extends VisualizerPlugin implements ChangeListen
 					SFace f = e.getLeftFace();
 			//		extraCoords2[k] = e.getEmbeddingOnEdge(0);
 			//		extraCoords2[k+1] = e.getEmbeddingOnEdge(1);
-					extraCoords2[k] = f.getEmbeddingOnBoundary(n + 1);
-					extraCoords2[k+1] = f.getEmbeddingOnBoundary(n + 2);
+					extraCoords2[k] = f.getEmbeddingOnBoundary(n + 1, false);
+					extraCoords2[k+1] = f.getEmbeddingOnBoundary(n + 2, false);
 					
 					extraColors2[k/2] = new double[] {1,0,1,1};
 					

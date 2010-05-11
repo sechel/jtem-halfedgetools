@@ -60,7 +60,7 @@ public class BundleCycleColorAdapter extends AbstractAdapter<double[]> {
 	
 	@Override
 	public double getPriority() {
-		return 1;
+		return 100;
 	}
 	
 
@@ -72,7 +72,7 @@ public class BundleCycleColorAdapter extends AbstractAdapter<double[]> {
 		F extends Face<V, E, F>,
 		N extends Node<V, E, F>
 	> double[] get(N node, AdapterSet a) {
-		double[] color = {1,1,1,1};
+		double[] color = {1,0,1,1};
 		Class c = node.getClass();
 		
 		for(Method m : c.getMethods()) {
@@ -99,7 +99,7 @@ public class BundleCycleColorAdapter extends AbstractAdapter<double[]> {
 						color = new double[] {rnd.nextDouble(), rnd.nextDouble(), rnd.nextDouble(),1};
 						
 					} else {
-						color = new double[] {1,1,1,1};
+						color = new double[] {1,0,1,1};
 					}
 				}
 			}

@@ -37,7 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -111,16 +110,19 @@ public class Loop {
 		for(E e : oldHeds.getPositiveEdges()) {
 
 			double[] pos = new double[] {0,0,0};
+			
 			// calc with edge midpoint
-			eA.setAlpha(0.5);
-			eA.setIgnore(true);
-			pos = eA.get(e);
+//			eA.setAlpha(0.5);
+//			eA.setIgnore(true);
+//			pos = eA.get(e);
 			
 			// calc with original scheme
-//			double[] a = eA.getData(e.getPreviousEdge(),1.0,true);
-//			double[] b = eA.getData(e.getOppositeEdge().getPreviousEdge(),1.0,true);
-//			double[] c = eA.getData(e.getOppositeEdge().getNextEdge(),1.0,true);
-//			double[] d = eA.getData(e.getNextEdge().getOppositeEdge(),1.0,true);
+//			eA.setIgnore(true);
+//			eA.setAlpha(1.0);
+//			double[] a = eA.get(e.getPreviousEdge());
+//			double[] b = eA.get(e.getOppositeEdge().getPreviousEdge());
+//			double[] c = eA.get(e.getOppositeEdge().getNextEdge());
+//			double[] d = eA.get(e.getNextEdge().getOppositeEdge());
 //			
 //			Rn.times(a,3.0,a);
 //			Rn.times(b,3.0,b);
@@ -130,16 +132,19 @@ public class Loop {
 //			Rn.times(pos, 1.0/8.0, pos);
 			
 			// calc with mid of barycenters and edge midpoint
-//			double[] b1 = fA.getData(e.getLeftFace());
-//			double[] b2 = fA.getData(e.getRightFace());
-//			double[] m = eA.getData(e, 0.5, true);
-//			
-//			Rn.times(b1, 3.0/8.0, b1);
-//			Rn.times(b2, 3.0/8.0, b2);
-//			Rn.times(m, 1.0/4.0, m);
-//			
-//			Rn.add(pos, b1, b2);
-//			Rn.add(pos, m, pos);
+		
+			double[] b1 = fA.get(e.getLeftFace(),e);
+			double[] b2 = fA.get(e.getRightFace(),e);
+			eA.setEdgeAlpha(0.5);
+			eA.setEdgeIgnore(true);
+			double[] m = eA.get(e);
+			
+			Rn.times(b1, 3.0/8.0, b1);
+			Rn.times(b2, 3.0/8.0, b2);
+			Rn.times(m, 1.0/4.0, m);
+			
+			Rn.add(pos, b1, b2);
+			Rn.add(pos, m, pos);
 			
 			oldEtoPos.put(e, pos);
 			
@@ -155,8 +160,8 @@ public class Loop {
 			
 			double[] mid = new double[]{0,0,0};
 			for(E e : star) {
-				eA.setAlpha(0.0);
-				eA.setIgnore(false);
+				eA.setEdgeAlpha(0.0);
+				eA.setEdgeIgnore(false);
 				Rn.add(mid, eA.get(e), mid);
 			}
 			Rn.times(mid, 1.0 / deg, mid);	

@@ -316,9 +316,9 @@ public class SHDS2IFSConverter {
 			int j = 0;
 			for(SFace f : sFaces) {
 				
-				extraCoords[j] = f.getEmbeddingOnBoundary(0);
-				extraCoords[j+1] = f.getEmbeddingOnBoundary(1);
-				extraCoords[j+2] = f.getEmbeddingOnBoundary(2);
+				extraCoords[j] = f.getEmbeddingOnBoundary(0, false);
+				extraCoords[j+1] = f.getEmbeddingOnBoundary(1, false);
+				extraCoords[j+2] = f.getEmbeddingOnBoundary(2, false);
 				
 //				SEdge e = HalfEdgeUtils.boundaryEdges(f).get(0);
 //				if(e.isRightIncomingOfSymmetryCycle() == null)
@@ -354,8 +354,8 @@ public class SHDS2IFSConverter {
 				
 				int n = e.getNr();
 				SFace f = e.getLeftFace();
-				extraCoords2[k] = f.getEmbeddingOnBoundary(n + 0);
-				extraCoords2[k+1] = f.getEmbeddingOnBoundary(n + 1);
+				extraCoords2[k] = f.getEmbeddingOnBoundary(n + 0, false);
+				extraCoords2[k+1] = f.getEmbeddingOnBoundary(n + 1, false);
 				
 //				extraCoords2[k] = e.getEmbeddingOnEdge(0);
 //				extraCoords2[k+1] = e.getEmbeddingOnEdge(1);
