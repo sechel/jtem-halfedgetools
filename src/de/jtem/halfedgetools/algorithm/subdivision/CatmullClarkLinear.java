@@ -33,8 +33,8 @@ public class CatmullClarkLinear {
 		FaceBarycenterCalculator fc
 	) {
 		// vertices
-		ec.setAlpha(0.5);
-		ec.setIgnore(true);
+		ec.setEdgeAlpha(0.5);
+		ec.setEdgeIgnore(true);
 		for (V v : graph.getVertices()){
 			V newVertex = quad.addNewVertex();
 			vc.set(newVertex, vc.get(v));

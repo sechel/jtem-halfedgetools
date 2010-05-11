@@ -39,8 +39,8 @@ public class MedialGraphLinear {
 		VertexPositionCalculator vA,
 		EdgeAverageCalculator eA
 	) {
-		eA.setAlpha(0.5);
-		eA.setIgnore(true);
+		eA.setEdgeAlpha(0.5);
+		eA.setEdgeIgnore(true);
 		vertexFaceMap.clear();
 		edgeVertexMap.clear();
 		faceFaceMap.clear();
