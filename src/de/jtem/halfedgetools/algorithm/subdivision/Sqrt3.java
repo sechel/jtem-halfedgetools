@@ -109,8 +109,8 @@ public class Sqrt3 {
 			
 			double[] mid = new double[]{0,0,0};
 			for(E e : star) {
-				ec.setAlpha(0.0);
-				ec.setIgnore(false);
+				ec.setEdgeAlpha(0.0);
+				ec.setEdgeIgnore(false);
 				Rn.add(mid, ec.get(e), mid);
 			}
 			Rn.times(mid, 1.0 / deg, mid);	
@@ -132,16 +132,18 @@ public class Sqrt3 {
 			E flipE = newHeds.getEdge(oldE.getIndex());
 			E e1 = flipE.getOppositeEdge().getNextEdge();
 			E e2 = e1.getNextEdge();
-			newEs.add(e1);
-			newEs.add(e2);			
+			// TODO check getOpposite
+			newEs.add(e1.getOppositeEdge());
+			newEs.add(e2.getOppositeEdge());			
 			oldEtoNewEs.put(oldE, newEs);
 		}
 		
+		// TODO: enable flip
 		//flip edges
 		for(E oldE : oldHeds.getEdges()) {
 			E flipE = newHeds.getEdge(oldE.getIndex());
 			if (flipE.isPositive()){
-				flip(newHeds, flipE);
+				//flip(newHeds, flipE);
 			}
 		}
 
@@ -159,7 +161,7 @@ public class Sqrt3 {
 			double[] pos = oldFtoPos.get(of);
 			vc.set(nv, pos);
 		}		
-	
+			
 		return oldEtoNewEs;
 	}
 
