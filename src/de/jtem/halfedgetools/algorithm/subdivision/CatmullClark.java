@@ -67,8 +67,8 @@ public class CatmullClark {
 	/**
 	 * Subdivides a given surface with the Catmull-Clark rule
 	 * @param <HDS> 
-	 * @param hds the input surface
-	 * @param r the output surface will be overwritten
+	 * @param oldHeds the input surface
+	 * @param newHeds the output surface will be overwritten
 	 * @param vc a coordinates adapter
 	 */
 	public <
@@ -77,22 +77,24 @@ public class CatmullClark {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> Map<E, Set<E>> subdivide(
-		HDS hds, 
-		HDS r, 
+		HDS oldHeds, 
+		HDS newHeds, 
 		VertexPositionCalculator vc,
 		EdgeAverageCalculator ec,
 		FaceBarycenterCalculator fc
 	) {
+		Map<F, V> oldFnewVMap = new HashMap<F, V>();
+		Map<E, V> oldEnewVMap = new HashMap<E, V>();
+		Map<V, V> oldVnewVMap = new HashMap<V, V>();
 		
-		
-		HalfEdgeUtilsExtra.clear(r);
+		HalfEdgeUtilsExtra.clear(newHeds);
 		// face vertices
-		Map<F, V> fvMap = new HashMap<F, V>();
-		for (F f : hds.getFaces()) {
-			V v = r.addNewVertex();
-			fvMap.put(f, v);
+
+		for (F f : oldHeds.getFaces()) {
+			V v = newHeds.addNewVertex();
+			oldFnewVMap.put(f, v);
 			
-			double[] sum = {0, 0, 0};
+			double[] sum = new double[3];
 //			List<E> b = boundaryEdges(f);
 //			int size = 0;
 //			for (E e : b) {
@@ -107,14 +109,13 @@ public class CatmullClark {
 		}
 		
 		// edge vertices
-		Map<E, V> evMap = new HashMap<E, V>();
-		for (E e : hds.getPositiveEdges()) {
+		for (E e : oldHeds.getPositiveEdges()) {
 			if (!isInteriorEdge(e)) {
 				continue;
 			}
-			V v = r.addNewVertex();
-			evMap.put(e, v);
-			evMap.put(e.getOppositeEdge(), v);
+			V v = newHeds.addNewVertex();
+			oldEnewVMap.put(e, v);
+			oldEnewVMap.put(e.getOppositeEdge(), v);
 			
 //			V leftV = fvMap.get(e.getLeftFace());
 //			V rightV = fvMap.get(e.getRightFace());
@@ -127,19 +128,19 @@ public class CatmullClark {
 		}
 	
 		// vertex vertices
-		Map<V, V> vvMap = new HashMap<V, V>();
-		for (V v : hds.getVertices()) {
+
+		for (V v : oldHeds.getVertices()) {
 			if (isBoundaryVertex(v)) {
 				continue;
 			}
-			V nv = r.addNewVertex();
-			vvMap.put(v, nv);
+			V nv = newHeds.addNewVertex();
+			oldVnewVMap.put(v, nv);
 			
 			List<E> star = incomingEdges(v);
 			List<F> fStar = facesIncidentWithVertex(v);
 			double[] faceSum = {0, 0, 0};
 			for (F f : fStar) {
-				V fv = fvMap.get(f);
+				V fv = oldFnewVMap.get(f);
 				add(faceSum, faceSum, vc.get(fv));
 			}
 			times(faceSum, 1.0 / fStar.size(), faceSum);
@@ -161,19 +162,19 @@ public class CatmullClark {
 
 		// face vertex connections and linkage
 		Map<E, E> edgeMap = new HashMap<E, E>();
-		for (F f : hds.getFaces()) {
-			V fv = fvMap.get(f);
+		for (F f : oldHeds.getFaces()) {
+			V fv = oldFnewVMap.get(f);
 			E lastOut = null;
 			E firstIn = null;
 			F lastFace = null;
 			for (E e : boundaryEdges(f)) {
-				V ev = evMap.get(e);
+				V ev = oldEnewVMap.get(e);
 				if (ev == null) { // at the boundary
 					lastFace = null;
 					continue;
 				}
-				E in = r.addNewEdge();
-				E out = r.addNewEdge();
+				E in = newHeds.addNewEdge();
+				E out = newHeds.addNewEdge();
 				in.linkOppositeEdge(out);
 				in.setTargetVertex(fv);
 				out.setTargetVertex(ev);
@@ -191,7 +192,7 @@ public class CatmullClark {
 					in.setLeftFace(lastFace);
 				}
 				if (!isBoundaryVertex(e.getTargetVertex())) {
-					lastFace = r.addNewFace();
+					lastFace = newHeds.addNewFace();
 					out.setLeftFace(lastFace);
 				} else {
 					lastFace = null;
@@ -208,17 +209,17 @@ public class CatmullClark {
 		
 		Map<E, E> tempEmap = new HashMap<E, E>();
 		// vertex vertex connections and linkage
-		for (V v : hds.getVertices()) {
+		for (V v : oldHeds.getVertices()) {
 			if (isBoundaryVertex(v)) {
 				continue;
 			}
-			V vv = vvMap.get(v);
+			V vv = oldVnewVMap.get(v);
 			E lastIn = null;
 			E firstOut = null;
 			for (E e : incomingEdges(v)) {
-				V ev = evMap.get(e);
-				E in = r.addNewEdge();
-				E out = r.addNewEdge();
+				V ev = oldEnewVMap.get(e);
+				E in = newHeds.addNewEdge();
+				E out = newHeds.addNewEdge();
 				in.linkOppositeEdge(out);
 				in.setTargetVertex(vv);
 				out.setTargetVertex(ev);
@@ -248,7 +249,7 @@ public class CatmullClark {
 			}
 		}
 		
-		for(E e : hds.getEdges()) {
+		for(E e : oldHeds.getEdges()) {
 			Set<E> newEs = new HashSet<E>();
 			newEs.add(tempEmap.get(e));
 			if (tempEmap.get(e.getOppositeEdge()) != null) {
@@ -257,7 +258,7 @@ public class CatmullClark {
 			oldEtoSubDivEs.put(e, newEs);
 		}
 
-		HalfEdgeUtils.isValidSurface(r, true);
+		HalfEdgeUtils.isValidSurface(newHeds, true);
 		
 		return oldEtoSubDivEs;
 	}
