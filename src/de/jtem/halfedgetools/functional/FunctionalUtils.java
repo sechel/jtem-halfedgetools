@@ -37,6 +37,7 @@ public class FunctionalUtils {
 		return Math.atan2(Rn.euclideanNorm(Rn.crossProduct(null, a, b)),Rn.innerProduct(a, b));
 	}
 	
+	// Calculate the angle at vj spanned by vi-vj and vk-vj
 	public static double angle(double[] vi, double[] vj, double[] vk) {
 		return angle(Rn.subtract(null, vi, vj), Rn.subtract(null, vk, vj) );
 	}
