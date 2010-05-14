@@ -47,6 +47,8 @@ public class JRHalfedgeViewer {
 	
 	public static void main(String[] args) {
 		JRViewer v = new JRViewer();
+		v.setPropertiesFile("JRHalfedgeViewer.xml");
+		v.setPropertiesResource(JRHalfedgeViewer.class, "JRHalfedgeViewer.xml");
 		v.addContentUI();
 		v.addBasicUI();
 		v.addContentSupport(ContentType.CenteredAndScaled);
