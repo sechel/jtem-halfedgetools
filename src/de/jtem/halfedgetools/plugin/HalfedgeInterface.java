@@ -14,6 +14,8 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +37,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
 import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.plugin.JRViewerUtility;
@@ -96,7 +101,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		selectVertexButton = new JButton("V"),
 		selectEdgeButton = new JButton("E"),
 		selectFaceButton = new JButton("F"),
-		selectBoundaryButton = new JButton("bd");
+		selectBoundaryButton = new JButton("Boundary Vertices");
 	private JList	
 		selectionList = new JList(),
 		geometryList = new JList();
@@ -108,6 +113,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	private JButton
 		saveHDSButton = new JButton(ImageHook.getIcon("disk.png")),
 		loadHDSButton = new JButton(ImageHook.getIcon("folder.png")),
+		saveSelectionButton = new JButton(ImageHook.getIcon("disk.png")),
+		loadSelectionButton = new JButton(ImageHook.getIcon("folder.png")),
 		clearSelectionButton = new JButton("Clean Selection"),
 		rescanButton = new JButton("Rescan");
 	private JLabel
@@ -115,7 +122,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	private JCheckBox
 		viewSelectionChecker = new JCheckBox("View Selection", true);
 	private JFileChooser 
-		chooser = new JFileChooser();
+		chooser = new JFileChooser(),
+		selChooser = new JFileChooser();
 	
 	private boolean
 		automaticConversion = true,
@@ -139,6 +147,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		converterHeds2JR = new ConverterHeds2JR();
 	private ConverterJR2Heds
 		converterJR2Heds = new ConverterJR2Heds();
+	private XStream 
+		xstream = new XStream(new PureJavaReflectionProvider());
 	
 	public HalfedgeInterface() {
 		makeLayout();
@@ -216,9 +226,14 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		c.weightx = 0.0;
 		selectionPanel.add(selectVertexButton, c);
 		selectionPanel.add(selectEdgeButton, c);
-		selectionPanel.add(selectFaceButton, c);
 		c.gridwidth = GridBagConstraints.REMAINDER;
-		selectionPanel.add(selectBoundaryButton,c);
+		selectionPanel.add(selectFaceButton, c);
+		selectionPanel.add(selectBoundaryButton, c);
+		c.gridwidth = GridBagConstraints.RELATIVE;
+		selectionPanel.add(saveSelectionButton, c);
+		selectionPanel.add(loadSelectionButton, c);
+		c.gridwidth = GridBagConstraints.REMAINDER;
+		selectionPanel.add(new JPanel(), c);
 		
 		c.weighty = 1.0;
 		shrinkPanel.add(selectionPanel, c);
@@ -226,13 +241,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		shrinkPanel.add(clearSelectionButton, c);
 		
 		File userDir = new File(System.getProperty("user.dir"));
-		chooser.setDialogTitle("Halfedge Files");
+		chooser.setDialogTitle("Halfedge Export");
 		chooser.setCurrentDirectory(userDir);
 		chooser.setAcceptAllFileFilterUsed(false);
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		chooser.setMultiSelectionEnabled(false);
 		chooser.addChoosableFileFilter(new FileFilter(){
-
 			@Override
 			public boolean accept(File f) {
 				return f.isDirectory() || f.getName().toLowerCase().endsWith(".obj");
@@ -242,7 +256,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			public String getDescription() {
 				return "Wavefront OBJ (*.obj)";
 			}
-			
 		});
 		
 		chooser.setFileFilter(new FileFilter() {
@@ -256,6 +269,23 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			}
 		});
 		
+		selChooser.setDialogTitle("Halfedge Selection");
+		selChooser.setCurrentDirectory(userDir);
+		selChooser.setAcceptAllFileFilterUsed(false);
+		selChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		selChooser.setMultiSelectionEnabled(false);
+		selChooser.setFileFilter(new FileFilter(){
+			@Override
+			public boolean accept(File f) {
+				return f.isDirectory() || f.getName().toLowerCase().endsWith(".sml");
+			}
+
+			@Override
+			public String getDescription() {
+				return "Selection XML (*.sml)";
+			}
+		});
+		
 		selectVertexButton.addActionListener(this);
 		selectEdgeButton.addActionListener(this);
 		selectFaceButton.addActionListener(this);
@@ -265,6 +295,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		viewSelectionChecker.addActionListener(this);
 		saveHDSButton.addActionListener(this);
 		loadHDSButton.addActionListener(this);
+		saveSelectionButton.addActionListener(this);
+		loadSelectionButton.addActionListener(this);
 	}
 	
 	
@@ -353,7 +385,72 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			int index = selectIndexModel.getNumber().intValue();
 			if (cachedHEDS == null || index >= cachedHEDS.numVertices()) return;
 			for(Vertex<?,?,?> v : HalfEdgeUtils.boundaryVertices(cachedHEDS)){
-				selectionInterface.setSelected(v,true);
+				boolean sel = selectionInterface.isSelected(v);
+				selectionInterface.setSelected(v, !sel);
+			}
+		}
+		if (saveSelectionButton == e.getSource()) {
+			if (selChooser.showSaveDialog(w) != JFileChooser.APPROVE_OPTION) {
+				return;
+			}
+			File file = selChooser.getSelectedFile();
+			HalfedgeSelection sel = getSelection();
+			int[] vIndices = new int[sel.getVertices().size()];
+			int[] eIndices = new int[sel.getEdges().size()];
+			int[] fIndices = new int[sel.getFaces().size()];
+			int i = 0;
+			for (Vertex<?,?,?> vertex : sel.getVertices()) {
+				vIndices[i++] = vertex.getIndex();
+			}
+			i = 0;
+			for (Edge<?,?,?> edge : sel.getEdges()) {
+				eIndices[i++] = edge.getIndex();
+			}
+			i = 0;
+			for (Face<?,?,?> face : sel.getFaces()) {
+				fIndices[i++] = face.getIndex();
+			}
+			int[][] indices = {vIndices, eIndices, fIndices};
+			String selXML = xstream.toXML(indices);
+			try {
+				FileWriter fw = new FileWriter(file);
+				fw.write(selXML);
+				fw.close();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		if (loadSelectionButton == e.getSource()) {
+			if (selChooser.showOpenDialog(w) != JFileChooser.APPROVE_OPTION) {
+				return;
+			}
+			File file = selChooser.getSelectedFile();
+			try {
+				selectionInterface.clearSelection();
+				HalfedgeSelection sel = new HalfedgeSelection();
+				FileReader fr = new FileReader(file);
+				int[][] indices = (int[][])xstream.fromXML(fr);
+				for (int vi : indices[0]) {
+					if (vi < cachedHEDS.numVertices()) {
+						Vertex<?,?,?> vertex = cachedHEDS.getVertex(vi);
+						sel.setSelected(vertex, true);
+					}
+				}
+				for (int ei : indices[1]) {
+					if (ei < cachedHEDS.numEdges()) {
+						Edge<?,?,?> edge = cachedHEDS.getEdge(ei);
+						sel.setSelected(edge, true);
+					}
+				}
+				for (int fi : indices[2]) {
+					if (fi < cachedHEDS.numFaces()) {
+						Face<?,?,?> face = cachedHEDS.getFace(fi);
+						sel.setSelected(face, true);
+					}
+				}
+				selectionInterface.setSelection(sel);
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
 		}
 		updateStates();
