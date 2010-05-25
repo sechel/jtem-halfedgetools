@@ -130,6 +130,13 @@ public class Sqrt3 {
 		for(E oldE : oldHeds.getEdges()) {
 			Set<E> newEs = new HashSet<E>();
 			E flipE = newHeds.getEdge(oldE.getIndex());
+			// TODO check getOpposite
+			newEs.add(flipE);
+			oldEtoNewEs.put(oldE, newEs);
+		}
+		/*for(E oldE : oldHeds.getEdges()) {
+			Set<E> newEs = new HashSet<E>();
+			E flipE = newHeds.getEdge(oldE.getIndex());
 			E e1 = flipE.getOppositeEdge().getNextEdge();
 			E e2 = e1.getNextEdge();
 			// TODO check getOpposite
@@ -143,9 +150,9 @@ public class Sqrt3 {
 		for(E oldE : oldHeds.getEdges()) {
 			E flipE = newHeds.getEdge(oldE.getIndex());
 			if (flipE.isPositive()){
-				//flip(newHeds, flipE);
+				flip(newHeds, flipE);
 			}
-		}
+		}*/
 
 		
 		//set coordinates for the old points
