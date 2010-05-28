@@ -66,7 +66,7 @@ F extends SymmetricFace<V, E, F>
 		E e = boundary.get(0);
 		
 		int n = boundary.size();
-		if (n > 3) return new double[] {0,0,0,0};
+		//if (n > 3) return new double[] {0,0,0,0};
 		
 		if(e.isRightIncomingOfSymmetryCycle() == null)
 			e = e.getNextEdge();
@@ -76,17 +76,41 @@ F extends SymmetricFace<V, E, F>
 		double[][] coords = new double[n][];
 		
 
-		
-		if(ignore == false){
-			coords[0] = Rn.add(null, e.getStartVertex().getEmbedding(), e.getDirection());
-			coords[1] = Rn.add(null, coords[0], e.getNextEdge().getDirection());
-			coords[2] = Rn.add(null, coords[1], e.getPreviousEdge().getDirection());
+		if (n==3){
+			if(ignore == false){
+				coords[0] = Rn.add(null, e.getStartVertex().getEmbedding(), e.getDirection());
+				coords[1] = Rn.add(null, coords[0], e.getNextEdge().getDirection());
+				coords[2] = Rn.add(null, coords[1], e.getPreviousEdge().getDirection());
+			} else {
+				e = e.getOppositeEdge();
+				coords[0] = Rn.add(null, e.getStartVertex().getEmbedding(), e.getDirection());
+				coords[1] = Rn.add(null, coords[0], e.getNextEdge().getDirection());
+				coords[2] = Rn.add(null, coords[1], e.getPreviousEdge().getDirection());
+			}
 		} else {
-			e = e.getOppositeEdge();
-			coords[0] = Rn.add(null, e.getStartVertex().getEmbedding(), e.getDirection());
-			coords[1] = Rn.add(null, coords[0], e.getNextEdge().getDirection());
-			coords[2] = Rn.add(null, coords[1], e.getPreviousEdge().getDirection());
+		// TODO fix it, seems already buggy
+			if(ignore == false){
+				for (int i=0;i<n;i++){
+					if (i==0){
+						coords[i] = Rn.add(null, e.getStartVertex().getEmbedding(), e.getDirection());
+					} else {
+						coords[i] = Rn.add(null, coords[i-1], e.getDirection());
+					}
+					e= e.getNextEdge();					
+				}
+			} else {
+				e = e.getOppositeEdge();
+				for (int i=0;i<n;i++){
+					if (i==0){
+						coords[i] = Rn.add(null, e.getStartVertex().getEmbedding(), e.getDirection());
+					} else {
+						coords[i] = Rn.add(null, coords[i-1], e.getDirection());
+					}
+					e= e.getNextEdge();					
+				}
+			}
 		}
+
 		
 		int sel = ((int)Math.floor(t)) % n;
 		

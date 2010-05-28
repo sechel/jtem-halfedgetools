@@ -44,7 +44,7 @@ import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 import de.jtem.halfedgetools.algorithm.subdivision.CatmullClark;
-import de.jtem.halfedgetools.algorithm.subdivision.CatmullClark2;
+import de.jtem.halfedgetools.algorithm.subdivision.CatmullClark3;
 import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -57,8 +57,8 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class SymmetricCatmullClarkPlugin extends HalfedgeAlgorithmPlugin {
 	
-	private CatmullClark
-		subdivider = new CatmullClark();
+	private CatmullClark3
+		subdivider = new CatmullClark3();
 	
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
