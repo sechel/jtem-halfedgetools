@@ -120,8 +120,10 @@ public class CatmullClark {
 //			V leftV = fvMap.get(e.getLeftFace());
 //			V rightV = fvMap.get(e.getRightFace());
 			double[][] coords = new double[4][];
-			coords[0] = fc.get(e.getLeftFace());
-			coords[1] = fc.get(e.getRightFace());
+			coords[0] = fc.get(e.getLeftFace(),e);
+			coords[1] = fc.get(e.getRightFace(),e);
+			ec.setEdgeAlpha(1.0);
+			ec.setEdgeIgnore(true);
 			coords[2] = ec.get(e);
 			coords[3] = ec.get(e.getOppositeEdge());
 			vc.set(v, average(null, coords));
@@ -138,16 +140,18 @@ public class CatmullClark {
 			
 			List<E> star = incomingEdges(v);
 			List<F> fStar = facesIncidentWithVertex(v);
-			double[] faceSum = {0, 0, 0};
+			double[] faceSum = new double[3];
 			for (F f : fStar) {
 				V fv = oldFnewVMap.get(f);
 				add(faceSum, faceSum, vc.get(fv));
 			}
 			times(faceSum, 1.0 / fStar.size(), faceSum);
-			double[] edgeSum = {0, 0, 0};
+			double[] edgeSum = new double[3];
 			for (E e : star) {
 //				add(edgeSum, coord.getCoord(e.getTargetVertex()), edgeSum);
 //				add(edgeSum, coord.getCoord(e.getStartVertex()), edgeSum);
+				ec.setEdgeIgnore(true);
+				ec.setEdgeAlpha(1.0);
 				add(edgeSum, ec.get(e), edgeSum);
 				add(edgeSum, ec.get(e.getOppositeEdge()), edgeSum);
 			}

@@ -57,14 +57,14 @@ import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
  * @param <E> Edge class
  * @param <F> Face class
  */
-public class CatmullClark2 {
+public class CatmullClark3 {
 	
 	/**
 	 * Subdivides a given surface with the Catmull-Clark rule
 	 * @param <HDS> 
 	 * @param oldHeds the input surface
 	 * @param newHeds the output surface will be overwritten
-	 * @param vc a coordinates adapter
+	 * @param vA a coordinates adapter
 	 */
 	public <
 		V extends Vertex<V, E, F>,
@@ -74,9 +74,9 @@ public class CatmullClark2 {
 	> Map<E, Set<E>> subdivide(
 		HDS oldHeds, 
 		HDS newHeds, 
-		VertexPositionCalculator vc,
-		EdgeAverageCalculator ec,
-		FaceBarycenterCalculator fc
+		VertexPositionCalculator vA,
+		EdgeAverageCalculator eA,
+		FaceBarycenterCalculator fA
 	) {
 		Map<F, V> oldFnewVMap = new HashMap<F, V>();
 		Map<E, V> oldEnewVMap = new HashMap<E, V>();
@@ -89,92 +89,95 @@ public class CatmullClark2 {
 		HalfEdgeUtilsExtra.clear(newHeds);
 		
 		//calc coordinates for the new points at the "old point"
+		// F = average of the facebarycenters
+		// R = average of the edgemidpoints
+		// P = oldpoint; N = newpoint
+		// deg = star.size
+		// N = (F + 2*R + (deg-3)*P)/deg
+		//source: http://www.idi.ntnu.no/~fredrior/files/Catmull-Clark%201978%20Recursively%20generated%20surfaces.pdf
 		for (V oldV: oldHeds.getVertices()){
+			
 			List<E> star = HalfEdgeUtils.incomingEdges(oldV);
 			int deg = star.size();
-			double[] pos = new double[]{0,0,0};
+			double[] posF = new double[3];
+			double[] posE = new double[3];
+			double[] pos = new double [3];
 			for (E e : star){
-				F f = e.getLeftFace();
-				Rn.add(pos, pos, fc.get(f));
+				eA.setEdgeAlpha(.5);
+				eA.setEdgeIgnore(false);
+				Rn.add(posE, eA.get(e), posE);
+				Rn.add(posF, fA.get(e.getLeftFace(),e),posF);
 			}
+			eA.setEdgeAlpha(1.0);
+			eA.setEdgeIgnore(true);
+			pos = eA.get(star.get(0));
+			Rn.times(pos, (deg-3.0), pos);
+			//Rn.times(pos, (deg-3.0)/deg, pos);
+			Rn.times(posE, 2.0/deg, posE);
+			Rn.times(posF, 1./deg, posF);
+			
+			Rn.add(pos, posE, pos);
+			Rn.add(pos, posF, pos);
+			
 			Rn.times(pos, 1.0/deg, pos);
-			V nv = newHeds.addNewVertex();
-			oldVnewVMap.put(oldV, nv);
+
 			oldVtoPos.put(oldV, pos);
-			vc.set(nv, pos);
 		}
 		
 		//calc coordinates for the new points at "face-barycenter"
 		for(F oldF : oldHeds.getFaces()) {
-			oldFtoPos.put(oldF, fc.get(oldF));
-			V nv = newHeds.addNewVertex();
-			oldFnewVMap.put(oldF, nv);
-			//System.out.println(fc.get(oldF));
-			vc.set(nv, fc.get(oldF));
-		}
-
-		//calc coordinates for the new points at "edge-midpoint" 
-		for(E oldPosE : oldHeds.getPositiveEdges()) {
-
-			double[] pos = new double[]{0,0,0};
-			// calc with edge midpoint
-			ec.setEdgeAlpha(.5);
-			ec.setEdgeIgnore(true);
-			pos = ec.get(oldPosE);
-			F fl = oldPosE.getLeftFace();
-			F fr = oldPosE.getOppositeEdge().getLeftFace();
-			double[] posfl = fc.get(fl);
-			double[] posfr = fc.get(fr);
-			
-			Rn.add(pos, pos, posfl);
-			Rn.add(pos, pos, posfr);
-			Rn.times(pos, 1.0/3.0 , pos);
-			
-			oldEtoPos.put(oldPosE, pos);
-			V nv = newHeds.addNewVertex();
-			oldEnewVMap.put(oldPosE, nv);
-			vc.set(nv, pos);
+			double [] pos = fA.get(oldF);
+			oldFtoPos.put(oldF, pos);
 		}
 		
-		System.out.println("ois guad");
+		//calc coordinates for the new points at "edge-midpoint" 
+		for(E oldPosE : oldHeds.getPositiveEdges()) {
+			double[] pos = new double[3];
+			double[] pos1 = new double[3];
+			// calc with edge midpoint
+			eA.setEdgeAlpha(1);
+			eA.setEdgeIgnore(false);
+			pos = eA.get(oldPosE);
+			pos1= eA.get(oldPosE.getOppositeEdge());
+			F fl = oldPosE.getLeftFace();
+			F fr = oldPosE.getOppositeEdge().getLeftFace();
+			double[] posfl = fA.get(fl,oldPosE);
+			double[] posfr = fA.get(fr,oldPosE.getOppositeEdge());
+			
+			Rn.add(pos, pos1, pos);
+			Rn.add(pos, pos, posfl);
+			Rn.add(pos, pos, posfr);
+			Rn.times(pos, 1.0/4.0 , pos);
+
+			oldEtoPos.put(oldPosE, pos);
+		}
+		
 		ccSubdiv(oldHeds, newHeds, oldVnewVMap, oldEnewVMap, oldFnewVMap, oldEtoNewEsMap);
-		System.out.println("ois guad 2");
+		
 		//set coordinates for the new points <-> old points
 		for(V oV : oldVnewVMap.keySet()) {
 			V nV = oldVnewVMap.get(oV);
 			double[] pos = oldVtoPos.get(oV);
-			System.out.println(pos[0]);
-			vc.set(nV, pos);
+			vA.set(nV, pos);
 		}
-		System.out.println("");
 		
 		//set coordinates for the new points <-> old faces
 		for(F oF : oldFnewVMap.keySet()) {
 			V nV = oldFnewVMap.get(oF);
 			double[] pos = oldFtoPos.get(oF);
-			System.out.println(pos[0]);
-			vc.set(nV, pos);
+			vA.set(nV, pos);
 		}
-		System.out.println("");
 		
 		//set coordinates for the new points <-> old edges
 		for(E oE : oldEnewVMap.keySet()){
 			V nV = oldEnewVMap.get(oE);
 			double[] pos = oldEtoPos.get(oE);
-			System.out.println(pos[0]);
-			vc.set(nV, pos);
+			vA.set(nV, pos);
 		}
-		
-		System.out.println(oldHeds.getEdges().size());
-		System.out.println(newHeds.getEdges().size());
-		System.out.println(oldHeds.getVertices().size());
-		System.out.println(newHeds.getVertices().size());
-		System.out.println(oldHeds.getFaces().size());
-		System.out.println(newHeds.getFaces().size());
 		
 		boolean validSurface = newHeds.isValidSurface();
 		System.out.println(validSurface);
-		System.err.println("catmullclark2-algo returns nothing yet! still under contruction");
+		
 		return oldEtoNewEsMap;
 			
 		
@@ -194,146 +197,125 @@ public class CatmullClark2 {
 		Map<F,V> oldFnewVMap,
 		Map<E, Set<E>> oldEtoNewEs
 	){
+		//struktur kopieren
+		oldh.createCombinatoriallyEquivalentCopy(newh);
 		
-		//add new edges for old egde
-		for(E oldE : oldh.getEdges()){
-			Set<E> newEs = new HashSet<E>();
-			E e = newh.addNewEdge();
-			newEs.add(e);
-			E e1 = newh.addNewEdge();
-			newEs.add(e1);
-			oldEtoNewEs.put(oldE, newEs);
+		for (V oldV : oldh.getVertices()){
+			V v = newh.getVertex(oldV.getIndex());
+			oldVnewVMap.put(oldV, v);
 		}
-		// link opposite edges and target vertices
+		
 		for(E oldPosE: oldh.getPositiveEdges()){
-			Set<E> posEdges = oldEtoNewEs.get(oldPosE);
-			Set<E> negEdges = oldEtoNewEs.get(oldPosE.getOppositeEdge());
-			List<E> pe = new ArrayList<E>();
-			List<E> ne = new ArrayList<E>();
-			for(E e: posEdges){
-				pe.add(e);
-			}
-			for(E e: negEdges){
-				ne.add(e);
-			}
+			E e = newh.getEdge(oldPosE.getIndex());
 			
-			E e0 = pe.get(0);
-			System.out.println("E0: " + e0);
-			E e1 = pe.get(1);
-			System.out.println("E1: " + e1);
-			E oe0 = ne.get(0);
-			System.out.println("oE0: " + oe0);
-			E oe1 = ne.get(1);
-			System.out.println("oE1: " + oe1);
+			V mv = newh.addNewVertex();
+			oldEnewVMap.put(oldPosE,mv);
 			
-			//opposite (Attention to the HashSet-order)
-			if (e0.getIndex()>e1.getIndex()){
-				if (oe0.getIndex()>oe1.getIndex()){
-					e0.linkOppositeEdge(oe0);
-					e1.linkOppositeEdge(oe1);
-				} else {
-					e0.linkOppositeEdge(oe1);
-					e1.linkOppositeEdge(oe0);
-				}
-			} else {
-				if (oe0.getIndex()>oe1.getIndex()){
-					e0.linkOppositeEdge(oe1);
-					e1.linkOppositeEdge(oe0);
-				} else {
-					e0.linkOppositeEdge(oe0);
-					e1.linkOppositeEdge(oe1);
-				}
-			}
+			V et = e.getTargetVertex();
+			V es = e.getStartVertex();
+			E eo = e.getOppositeEdge();
 			
-			//targetvertex (Attention to the HashSet-order)
-			V tv = oldVnewVMap.get(oldPosE.getTargetVertex());
-			V sv = oldVnewVMap.get(oldPosE.getOppositeEdge().getTargetVertex());
-			V nv = oldEnewVMap.get(oldPosE);
-			if(e0.getIndex()>e1.getIndex()){
-				e0.setTargetVertex(nv);
-				e1.setTargetVertex(tv);
-			} else {
-				e0.setTargetVertex(tv);
-				e1.setTargetVertex(nv);
-			}
-			if(oe0.getIndex()>oe1.getIndex()){
-				oe0.setTargetVertex(nv);
-				oe1.setTargetVertex(sv);
-			} else {
-				oe0.setTargetVertex(sv);
-				oe1.setTargetVertex(nv);
-			}
-		}
-		
-		for(F of : oldh.getFaces()){
-			List <E> newEdges = new ArrayList<E>();
-			for(E e : boundaryEdges(of)){
-				newEdges.add(newh.addNewEdge());
-				newEdges.add(newh.addNewEdge());
-			}
-			int i= 0;
+			E e2 = newh.addNewEdge();
+			E eo2 = newh.addNewEdge();	
+			E en = e.getNextEdge();
+			E eon = eo.getNextEdge();		
 			
-			for (E e : boundaryEdges(of)) {
-				Set<E> es = oldEtoNewEs.get(e);
-				Set<E> pes = oldEtoNewEs.get(e.getPreviousEdge());
-				List<E> edges = new ArrayList<E>();
-				List<E> pedges= new ArrayList<E>();
-				for(E ed: es){
-					edges.add(ed);
-					}
-				for(E ed: pes){
-					pedges.add(ed);
-				}
-				//keep Attention to Hashset-order
-				E e0 = edges.get(0);
-				E e1 = edges.get(1);
-				E e2 = pedges.get(0);
-				E e3 = pedges.get(1);
-				
-				if (e0.getIndex()<e1.getIndex()){
-					e0 = edges.get(1);
-				}
-				if (e2.getIndex()>e3.getIndex()){
-					e3 = pedges.get(1);
-				}
-				e1 = newEdges.get(i);
-				i++;
-				e2 = newEdges.get(i);
-				i++;
+			//re-link edges	
+			e.setTargetVertex(mv);
+			e.linkNextEdge(e2);
+			e.linkOppositeEdge(eo2);
+			e2.linkNextEdge(en);
+			e2.setTargetVertex(et);
+			eo.setTargetVertex(mv);
+			eo.linkNextEdge(eo2);
+			eo.linkOppositeEdge(e2);
+			eo2.linkNextEdge(eon);
+			eo2.setTargetVertex(es);
+			
+			//temporary faces linked
+			e2.setLeftFace(e.getLeftFace());
+			eo2.setLeftFace(eo.getLeftFace());
+			
+			Set<E> newEs = new HashSet<E>();
+			newEs.add(e); 
+			newEs.add(e2);
+			
+			oldEtoNewEs.put(oldPosE, newEs);
 
-			
-				//link edges
-				e0.linkNextEdge(e1);
-				e1.linkNextEdge(e2);
-				e2.linkNextEdge(e3);
-				e3.linkNextEdge(e0);
-				
-				//set target vertex
-				e1.setTargetVertex(oldFnewVMap.get(of));
-				if(e.getPreviousEdge().isPositive()){
-					e2.setTargetVertex(oldEnewVMap.get(e.getPreviousEdge()));
-				}
-				e2.setTargetVertex(oldEnewVMap.get(e.getPreviousEdge().getOppositeEdge()));
-				
-				//link face
-				F f = newh.addNewFace();
-				e0.setLeftFace(f);
-				e1.setLeftFace(f);
-				e2.setLeftFace(f);
-				e3.setLeftFace(f);
-			}
-			//opposite edges
-			for(int j=0;j<newEdges.size();j+=2){
-				int k=(j+3)%newEdges.size();
-				E e = newEdges.get(j);
-				E oe = newEdges.get(k);
-				e.linkOppositeEdge(oe);
-			}
-			
 		}
 		
-		
+		for (F oldF : oldh.getFaces()){
+			V mv = newh.addNewVertex();
+			oldFnewVMap.put(oldF, mv);
+			
+			F f = newh.getFace(oldF.getIndex());
+			E e = f.getBoundaryEdge();
+			e= e.getNextEdge();
+			
+			E prevOldE= e.getPreviousEdge().getPreviousEdge();
+			E nextOldE = e.getNextEdge().getNextEdge();
+			
+			//first quad
+			E ep = e.getPreviousEdge();
+			E en = newh.addNewEdge();
+			E enn = newh.addNewEdge();
+			V tv = ep.getStartVertex();
+			
+			e.linkNextEdge(en);
+			en.setTargetVertex(mv);
+			en.linkNextEdge(enn);
+			en.setLeftFace(f);
+			enn.setTargetVertex(tv);
+			enn.linkNextEdge(ep);
+			enn.setLeftFace(f);
+			
+			//opposite
+			E fOppE = en;
+			E lOppE = enn;
+			while (nextOldE!= prevOldE){
+				E tempE = nextOldE;
+				nextOldE = tempE.getNextEdge().getNextEdge();
+				ep = tempE.getPreviousEdge();
+				en = newh.addNewEdge();
+				enn = newh.addNewEdge();
+				tv = ep.getStartVertex();
+				F nf = newh.addNewFace(); 
+				
+				ep.setLeftFace(nf);
+				tempE.setLeftFace(nf);
+				
+				tempE.linkNextEdge(en);
+				en.setTargetVertex(mv);
+				en.linkNextEdge(enn);
+				en.setLeftFace(nf);
+				enn.setTargetVertex(tv);
+				enn.linkNextEdge(ep);
+				enn.setLeftFace(nf);
+				
+				//link opposites
+				enn.linkOppositeEdge(fOppE);
+				fOppE = en;				
+			}
+			
+			ep = prevOldE.getPreviousEdge();
+			en = newh.addNewEdge();
+			enn = newh.addNewEdge();
+			tv = ep.getStartVertex();
+			F nf = newh.addNewFace(); 
+			
+			ep.setLeftFace(nf);
+			prevOldE.setLeftFace(nf);
+			
+			prevOldE.linkNextEdge(en);
+			en.setTargetVertex(mv);
+			en.linkNextEdge(enn);
+			en.setLeftFace(nf);
+			enn.setTargetVertex(tv);
+			enn.linkNextEdge(ep);
+			enn.setLeftFace(nf);
+			
+			enn.linkOppositeEdge(fOppE);			
+			lOppE.linkOppositeEdge(en);
+		}
 	}
-	
-	
 }

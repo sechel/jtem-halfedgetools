@@ -90,12 +90,9 @@ public class Loop {
 			alphaMap.put(i, alpha);
 		}
 		
-		// Verschiebung der neuen Punkte p_neu = 1/8*(3*a+3*b+1*c+1*d)
-		
 		//just an idea for a map to locate the n-gon 
 		// (in this case triangle) of the grid
 		//maybe we can use this later to locate the symmetry cycle
-		
 //		for (E e: oldHeds.getEdges()){
 //			Set<E> oldEs = new HashSet<E>();
 //			E tmp = e.getNextEdge();
@@ -105,22 +102,24 @@ public class Loop {
 //			}			
 //			oldEtoOldEs.put(e, oldEs);
 //		}
-		
 //		Set<E> checkE = new HashSet<E>();
+		
 		for(E e : oldHeds.getPositiveEdges()) {
 
-			double[] pos = new double[] {0,0,0};
+			double[] pos = new double[3];
 			
 			// calc with edge midpoint
-//			eA.setAlpha(0.5);
-//			eA.setIgnore(true);
+//			eA.setEdgeAlpha(0.5);
+//			eA.setEdgeIgnore(true);
 //			pos = eA.get(e);
 			
 			// calc with original scheme
-//			eA.setIgnore(true);
-//			eA.setAlpha(1.0);
+			// Verschiebung der neuen Punkte p_neu = 1/8*(3*a+3*b+1*c+1*d)
+//			eA.setEdgeIgnore(true);
+//			eA.setEdgeAlpha(1.0);
 //			double[] a = eA.get(e.getPreviousEdge());
 //			double[] b = eA.get(e.getOppositeEdge().getPreviousEdge());
+//			eA.setEdgeIgnore(false);
 //			double[] c = eA.get(e.getOppositeEdge().getNextEdge());
 //			double[] d = eA.get(e.getNextEdge().getOppositeEdge());
 //			
@@ -158,7 +157,7 @@ public class Loop {
 			List<E> star = HalfEdgeUtils.incomingEdges(v);
 			int deg = star.size();
 			
-			double[] mid = new double[]{0,0,0};
+			double[] mid = new double[3];
 			for(E e : star) {
 				eA.setEdgeAlpha(0.0);
 				eA.setEdgeIgnore(false);
@@ -166,7 +165,7 @@ public class Loop {
 			}
 			Rn.times(mid, 1.0 / deg, mid);	
 			
-			double[] newpos = new double[] {0,0,0};
+			double[] newpos = new double[3];
 			double alpha = alphaMap.get(deg);
 			
 			Rn.linearCombination(newpos, 1.0 - alpha, vA.get(v), alpha, mid);
