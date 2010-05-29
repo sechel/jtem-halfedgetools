@@ -58,7 +58,7 @@ public class Sqrt3 {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> Map<E, Set<E>> subdivide(
+	> Map<E, E> subdivide(
 		HDS oldHeds, 
 		HDS newHeds, 
 		VertexPositionCalculator vc,
@@ -68,7 +68,7 @@ public class Sqrt3 {
 		Map<V,F> newVtoOldF = new HashMap<V,F>();
 		Map<V, double[]> oldVtoPos = new HashMap<V, double[]>();
 		Map<F, double[]> oldFtoPos = new HashMap<F, double[]>();
-		Map<E, Set<E>> oldEtoNewEs = new HashMap<E,Set<E>>();
+		Map<E, E> oldEtoNewE = new HashMap<E,E>();
 		// TODO
 		// 1 calc new coordinates into maps
 		// 2 create/change combinatorics of the new heds (including flips i.e. e.flip()	
@@ -128,12 +128,14 @@ public class Sqrt3 {
 		//mark symmetry-edges for the adapters, 
 		//ATTENTION: after trian/before flip!
 		for(E oldE : oldHeds.getEdges()) {
-			Set<E> newEs = new HashSet<E>();
+			//Set<E> newEs = new HashSet<E>();
 			E flipE = newHeds.getEdge(oldE.getIndex());
 			// TODO check getOpposite
-			newEs.add(flipE);
-			oldEtoNewEs.put(oldE, newEs);
+			//newEs.add(flipE);
+			oldEtoNewE.put(oldE, flipE);
 		}
+		
+		
 		/*for(E oldE : oldHeds.getEdges()) {
 			Set<E> newEs = new HashSet<E>();
 			E flipE = newHeds.getEdge(oldE.getIndex());
@@ -169,7 +171,8 @@ public class Sqrt3 {
 			vc.set(nv, pos);
 		}		
 			
-		return oldEtoNewEs;
+		return oldEtoNewE;
+		
 	}
 
 

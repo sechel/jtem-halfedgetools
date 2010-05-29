@@ -52,6 +52,7 @@ import de.jtem.halfedgetools.symmetry.node.SEdge;
 import de.jtem.halfedgetools.symmetry.node.SFace;
 import de.jtem.halfedgetools.symmetry.node.SHDS;
 import de.jtem.halfedgetools.symmetry.node.SVertex;
+import de.jtem.halfedgetools.util.TriangulationException;
 import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
@@ -86,7 +87,7 @@ public class SymmetricSqrt3Plugin extends HalfedgeAlgorithmPlugin {
 		if (vc == null || ec == null || fc == null) {
 			throw new CalculatorException("No Subdivision calculators found for " + hds);
 		}
-		Map<SEdge, Set<SEdge>> oldToDoubleNew = subdivider.subdivide(shds, result, vc, ec, fc);
+		Map<SEdge, SEdge> oldToDoubleNew = subdivider.subdivide(shds, result, vc, ec, fc);
 		CuttingInfo<SVertex, SEdge, SFace> symmCopy = new CuttingInfo<SVertex, SEdge, SFace>(); 
 		CuttingInfo<SVertex, SEdge, SFace> symmOld = shds.getSymmetryCycles();
 		if (symmOld != null) {
@@ -94,15 +95,26 @@ public class SymmetricSqrt3Plugin extends HalfedgeAlgorithmPlugin {
 				Set<SEdge> newPath = new HashSet<SEdge>();
 				for(SEdge e : es) {
 					if (!oldToDoubleNew.containsKey(e)) continue;
-					for(SEdge ee : oldToDoubleNew.get(e)) {
-						newPath.add(ee);
-					}
+					newPath.add(oldToDoubleNew.get(e));
 				}
 				symmCopy.paths.put(newPath, symmOld.paths.get(es));
 			}
 			result.setSymmetryCycles(symmCopy);
 			result.setGroup(shds.getGroup());
 		}
+		
+		//flip
+		for (SEdge e : oldToDoubleNew.keySet()){
+			if (e.isPositive()){
+				SEdge flip = result.getEdge(e.getIndex());
+				try {
+					flip.flip();
+				} catch (TriangulationException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+	
 		hcp.set(result);
 	}
 	
