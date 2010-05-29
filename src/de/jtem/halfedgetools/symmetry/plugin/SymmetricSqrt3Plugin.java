@@ -104,6 +104,7 @@ public class SymmetricSqrt3Plugin extends HalfedgeAlgorithmPlugin {
 		}
 		
 		//flip
+		//TODO: the third subdivision is buggy
 		for (SEdge e : oldToDoubleNew.keySet()){
 			if (e.isPositive()){
 				SEdge flip = result.getEdge(e.getIndex());
@@ -115,6 +116,50 @@ public class SymmetricSqrt3Plugin extends HalfedgeAlgorithmPlugin {
 			}
 		}
 	
+		symmOld = result.getSymmetryCycles();
+		symmCopy = new CuttingInfo<SVertex, SEdge, SFace>();
+		
+		if (symmOld != null) {
+			for (Set<SEdge> es: symmOld.paths.keySet()) {
+				Set<SEdge> path = new HashSet<SEdge>();
+				Set<SEdge> newPath = new HashSet<SEdge>();
+				for(SEdge e : es) {
+					path.add(e);
+					newPath.add(e);
+				}
+				for (SEdge e : path){
+					SEdge oe = e.getOppositeEdge();
+					SFace of = e.getOppositeEdge().getLeftFace();
+					for (SEdge en: path){
+						if (en.getIndex() != e.getIndex()){
+							SEdge oen = en.getOppositeEdge();
+							SFace ofn = en.getOppositeEdge().getLeftFace();
+							if (of.getIndex()==ofn.getIndex()){
+								SEdge tmp = e.getOppositeEdge().getNextEdge();
+								if (tmp.getIndex() != oe.getIndex() 
+										&& tmp.getIndex() != oen.getIndex()){
+									SVertex v = e.getTargetVertex();
+									//TODO: dirty hack!
+									v.setEmbedding(e.getNextEdge().getDirection());
+									newPath.add(tmp);
+									newPath.remove(e);
+									newPath.remove(en);
+								} else {
+									break;
+								}//end if
+							}//end if
+						}// end if
+					}//end for
+				}//end for
+				
+				
+				
+				symmCopy.paths.put(newPath, symmOld.paths.get(es));
+			}
+			
+			result.setSymmetryCycles(symmCopy);
+		}
+		
 		hcp.set(result);
 	}
 	
