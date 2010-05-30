@@ -35,6 +35,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import de.jreality.math.Rn;
+import de.jtem.discretegroup.core.DiscreteGroupElement;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -140,10 +142,13 @@ public class SymmetricSqrt3Plugin extends HalfedgeAlgorithmPlugin {
 										&& tmp.getIndex() != oen.getIndex()){
 									SVertex v = e.getTargetVertex();
 									//TODO: dirty hack!
-									v.setEmbedding(e.getNextEdge().getDirection());
-									newPath.add(tmp);
+									DiscreteGroupElement trans = e.getNextEdge().isRightOfSymmetryCycle();
+									double[] s = e.getNextEdge().getStartVertex().getEmbedding();
+									s = trans.getMatrix().multiplyVector(s);
+									v.setEmbedding(s);
 									newPath.remove(e);
 									newPath.remove(en);
+									newPath.add(tmp);
 								} else {
 									break;
 								}//end if
