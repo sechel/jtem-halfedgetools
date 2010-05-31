@@ -97,7 +97,7 @@ public class SymmetryVisualizer extends VisualizerPlugin implements ChangeListen
 					extraCoords[j+1] = f.getEmbeddingOnBoundary(1, false);
 					extraCoords[j+2] = f.getEmbeddingOnBoundary(2, false);
 					
-					extraColors[j/3] = new double[] {0.3,0.8,0.8,0.5};
+					extraColors[j/3] = new double[] {0.7,0.7,0.7,1};
 					
 					extraIndices[j/3] = new int[] {j,j+1,j+2};
 					
@@ -131,12 +131,10 @@ public class SymmetryVisualizer extends VisualizerPlugin implements ChangeListen
 					
 					int n = e.getNr();
 					SFace f = e.getLeftFace();
-			//		extraCoords2[k] = e.getEmbeddingOnEdge(0);
-			//		extraCoords2[k+1] = e.getEmbeddingOnEdge(1);
 					extraCoords2[k] = f.getEmbeddingOnBoundary(n + 1, false);
 					extraCoords2[k+1] = f.getEmbeddingOnBoundary(n + 2, false);
 					
-					extraColors2[k/2] = new double[] {1,0,1,1};
+			//		extraColors2[k/2] = new double[] {0,0,0,1};
 					
 					extraIndices2[k/2] = new int[] {k,k+1};
 					
@@ -149,7 +147,7 @@ public class SymmetryVisualizer extends VisualizerPlugin implements ChangeListen
 				ilsextra.setVertexCoordinates(extraCoords2);
 				ilsextra.setEdgeCount(extraIndices2.length);
 				ilsextra.setEdgeIndices(extraIndices2);
-				ilsextra.setEdgeColors(extraColors2);
+			//	ilsextra.setEdgeColors(extraColors2);
 				ilsextra.update();
 				if(edgesBox.isSelected()) {
 					eilse = ilsextra.getIndexedLineSet(); 
