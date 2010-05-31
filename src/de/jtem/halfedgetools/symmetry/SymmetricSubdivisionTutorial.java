@@ -33,15 +33,13 @@ package de.jtem.halfedgetools.symmetry;
 
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
-import de.jtem.halfedgetools.adapter.generic.IndexLabelAdapter;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.PerturbPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.TriangulatePlugin;
 import de.jtem.halfedgetools.symmetry.adapters.BundleCycleColorAdapter;
-import de.jtem.halfedgetools.symmetry.adapters.BundleLabelAdapter;
 import de.jtem.halfedgetools.symmetry.adapters.SymmetricPositionAdapter;
-import de.jtem.halfedgetools.symmetry.adapters.SymmetricSymmetryColorAdapter;
-import de.jtem.halfedgetools.symmetry.adapters.SymmetricSymmetryFaceColorAdapter;
+import de.jtem.halfedgetools.symmetry.adapters.SymmetryEdgeColorAdapter;
+import de.jtem.halfedgetools.symmetry.adapters.SymmetryFaceColorAdapter;
 import de.jtem.halfedgetools.symmetry.calculators.SymmetricSubdivisionCalculator;
 import de.jtem.halfedgetools.symmetry.plugin.CompactifierPlugin;
 import de.jtem.halfedgetools.symmetry.plugin.SymmetricCatmullClarkPlugin;
@@ -64,16 +62,14 @@ public class SymmetricSubdivisionTutorial {
 		
 		HalfedgeInterface hif = new HalfedgeInterface();
 		hif.addAdapter(new SymmetricPositionAdapter());
-		hif.addAdapter(new SymmetricSymmetryColorAdapter());
-		hif.addAdapter(new SymmetricSymmetryFaceColorAdapter());
-		//hif.addAdapter(new IndexLabelAdapter());
-	//	hif.addAdapter(new BundleLabelAdapter());
+		hif.addAdapter(new SymmetryEdgeColorAdapter());
+		hif.addAdapter(new SymmetryFaceColorAdapter());
 		hif.addAdapter(new BundleCycleColorAdapter());
 		hif.addCalculator(new SymmetricSubdivisionCalculator());
 		viewer.registerPlugin(hif);
 		viewer.registerPlugin(new SymmetricCatmullClarkPlugin());
 		viewer.registerPlugin(new TriangulatePlugin());
-		//viewer.registerPlugin(new PerturbPlugin());
+		viewer.registerPlugin(new PerturbPlugin());
 
 		viewer.registerPlugin(new SymmetricLoopPlugin());
 		
