@@ -58,7 +58,7 @@ import de.jtem.halfedgetools.util.TriangulationException;
 import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class SymmetricSqrt3Plugin extends HalfedgeAlgorithmPlugin {
+public class SymmetricSqrt3wFlipPlugin extends HalfedgeAlgorithmPlugin {
 	
 	private Sqrt3 	
 		subdivider = new Sqrt3();
@@ -70,7 +70,7 @@ public class SymmetricSqrt3Plugin extends HalfedgeAlgorithmPlugin {
 	
 	@Override
 	public String getAlgorithmName() {
-		return "Symmetric Sqrt3";
+		return "Symmetric FlipSqrt3";
 	}
 	
 	
@@ -103,7 +103,68 @@ public class SymmetricSqrt3Plugin extends HalfedgeAlgorithmPlugin {
 			}
 			result.setSymmetryCycles(symmCopy);
 			result.setGroup(shds.getGroup());
-		}		
+		}
+		
+		//flip
+		//TODO: the third subdivision is buggy
+		for (SEdge e : oldToDoubleNew.keySet()){
+			if (e.isPositive()){
+				SEdge flip = result.getEdge(e.getIndex());
+				try {
+					flip.flip();
+				} catch (TriangulationException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+	
+		symmOld = result.getSymmetryCycles();
+		symmCopy = new CuttingInfo<SVertex, SEdge, SFace>();
+		
+		if (symmOld != null) {
+			for (Set<SEdge> es: symmOld.paths.keySet()) {
+				Set<SEdge> path = new HashSet<SEdge>();
+				Set<SEdge> newPath = new HashSet<SEdge>();
+				for(SEdge e : es) {
+					path.add(e);
+					newPath.add(e);
+				}
+				for (SEdge e : path){
+					SEdge oe = e.getOppositeEdge();
+					SFace of = e.getOppositeEdge().getLeftFace();
+					for (SEdge en: path){
+						if (en.getIndex() != e.getIndex()){
+							SEdge oen = en.getOppositeEdge();
+							SFace ofn = en.getOppositeEdge().getLeftFace();
+							if (of.getIndex()==ofn.getIndex()){
+								SEdge tmp = e.getOppositeEdge().getNextEdge();
+								if (tmp.getIndex() != oe.getIndex() 
+										&& tmp.getIndex() != oen.getIndex()){
+									SVertex v = e.getTargetVertex();
+									//TODO: dirty hack!
+									DiscreteGroupElement trans = e.getNextEdge().isRightOfSymmetryCycle();
+									double[] s = e.getNextEdge().getStartVertex().getEmbedding();
+									s = trans.getMatrix().multiplyVector(s);
+									v.setEmbedding(s);
+									newPath.remove(e);
+									newPath.remove(en);
+									newPath.add(tmp);
+								} else {
+									break;
+								}//end if
+							}//end if
+						}// end if
+					}//end for
+				}//end for
+				
+				
+				
+				symmCopy.paths.put(newPath, symmOld.paths.get(es));
+			}
+			
+			result.setSymmetryCycles(symmCopy);
+		}
+		
 		hcp.set(result);
 	}
 	

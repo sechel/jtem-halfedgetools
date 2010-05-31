@@ -47,6 +47,7 @@ import de.jtem.halfedgetools.symmetry.plugin.CompactifierPlugin;
 import de.jtem.halfedgetools.symmetry.plugin.SymmetricCatmullClarkPlugin;
 import de.jtem.halfedgetools.symmetry.plugin.SymmetricLoopPlugin;
 import de.jtem.halfedgetools.symmetry.plugin.SymmetricSqrt3Plugin;
+import de.jtem.halfedgetools.symmetry.plugin.SymmetricSqrt3wFlipPlugin;
 import de.jtem.halfedgetools.symmetry.plugin.visualizer.SymmetryVisualizer;
 
 public class SymmetricSubdivisionTutorial {
@@ -77,7 +78,7 @@ public class SymmetricSubdivisionTutorial {
 		viewer.registerPlugin(new SymmetricLoopPlugin());
 		
 		viewer.registerPlugin(new SymmetricSqrt3Plugin());
-		
+		viewer.registerPlugin(new SymmetricSqrt3wFlipPlugin());
 		viewer.registerPlugin(new CompactifierPlugin());
 		
 		viewer.registerPlugin(new SymmetryVisualizer());
