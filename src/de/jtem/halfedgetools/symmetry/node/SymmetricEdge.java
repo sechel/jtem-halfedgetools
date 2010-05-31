@@ -170,8 +170,6 @@ F extends SymmetricFace<V, E, F>
 		return Rn.subtract(null, t, s);
 	}
 	
-	
-
 	@Bundle(dimension=1, type=BundleType.Value, display=DisplayType.List, name="boundary")
 	public boolean isBoundaryEdge() {
 		
