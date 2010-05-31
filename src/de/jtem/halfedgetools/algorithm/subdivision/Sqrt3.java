@@ -128,34 +128,9 @@ public class Sqrt3 {
 		//mark symmetry-edges for the adapters, 
 		//ATTENTION: after trian/before flip!
 		for(E oldE : oldHeds.getEdges()) {
-			//Set<E> newEs = new HashSet<E>();
 			E flipE = newHeds.getEdge(oldE.getIndex());
-			// TODO check getOpposite
-			//newEs.add(flipE);
 			oldEtoNewE.put(oldE, flipE);
 		}
-		
-		
-		/*for(E oldE : oldHeds.getEdges()) {
-			Set<E> newEs = new HashSet<E>();
-			E flipE = newHeds.getEdge(oldE.getIndex());
-			E e1 = flipE.getOppositeEdge().getNextEdge();
-			E e2 = e1.getNextEdge();
-			// TODO check getOpposite
-			newEs.add(e1.getOppositeEdge());
-			newEs.add(e2.getOppositeEdge());			
-			oldEtoNewEs.put(oldE, newEs);
-		}
-		
-		// TODO: enable flip
-		//flip edges
-		for(E oldE : oldHeds.getEdges()) {
-			E flipE = newHeds.getEdge(oldE.getIndex());
-			if (flipE.isPositive()){
-				flip(newHeds, flipE);
-			}
-		}*/
-
 		
 		//set coordinates for the old points
 		for(V ov : oldVtoPos.keySet()) {

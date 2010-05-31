@@ -68,15 +68,15 @@ F extends SymmetricFace<V, E, F>
 		int n = boundary.size();
 		//if (n > 3) return new double[] {0,0,0,0};
 		
-		if(e.isRightIncomingOfSymmetryCycle() == null)
-			e = e.getNextEdge();
-		if(e.isRightIncomingOfSymmetryCycle() == null)
-			e = e.getNextEdge();
-		
 		double[][] coords = new double[n][];
 		
 
 		if (n==3){
+			if(e.isRightIncomingOfSymmetryCycle() == null)
+				e = e.getNextEdge();
+			if(e.isRightIncomingOfSymmetryCycle() == null)
+				e = e.getNextEdge();
+			
 			if(ignore == false){
 				coords[0] = Rn.add(null, e.getStartVertex().getEmbedding(), e.getDirection());
 				coords[1] = Rn.add(null, coords[0], e.getNextEdge().getDirection());
@@ -87,8 +87,66 @@ F extends SymmetricFace<V, E, F>
 				coords[1] = Rn.add(null, coords[0], e.getNextEdge().getDirection());
 				coords[2] = Rn.add(null, coords[1], e.getPreviousEdge().getDirection());
 			}
+		} else if (n==4){
+			//TODO still buggy
+			if(e.isRightIncomingOfSymmetryCycle() == null)
+				e = e.getNextEdge();
+			if(e.isRightIncomingOfSymmetryCycle() == null)
+				e = e.getNextEdge();
+			if(e.isRightIncomingOfSymmetryCycle() == null)
+				e = e.getNextEdge();
+			if(ignore == false){
+				int count =0;
+				int count2 = 0;
+				boolean help = false;
+				for (E tmp : boundary){
+					if (tmp.isRightOfSymmetryCycle()!=null) {
+						count++;
+						help = true;
+					}
+					if (tmp.isRightIncomingOfSymmetryCycle()!=null){
+						count2++;
+					}
+				}
+				System.out.println("count: " + count);
+				System.out.println("count2: " + count2);
+				if (count ==2 && help){
+					coords[0] = Rn.add(null, e.getStartVertex().getEmbedding(), e.getDirection());
+					coords[1] = Rn.add(null, coords[0], e.getNextEdge().getDirection());
+					coords[2] = Rn.add(null, coords[1], e.getPreviousEdge().getDirection());
+					DiscreteGroupElement trans = e.isRightOfSymmetryCycle();
+					System.out.println(e.isRightOfSymmetryCycle());
+					double[] s = e.getNextEdge().getNextEdge().getStartVertex().getEmbedding();
+					double[] ta = e.getNextEdge().getNextEdge().getTargetVertex().getEmbedding();
+					ta = trans.getMatrix().multiplyVector(ta);
+					s = trans.getMatrix().multiplyVector(s);
+					coords[3] = Rn.add(null, coords[2], Rn.subtract(null, ta, s));
+					coords[3] = Rn.add(null, coords[2], e.getNextEdge().getNextEdge().getDirection());
+					System.out.println("here");
+				} else {
+					coords[0] = Rn.add(null, e.getStartVertex().getEmbedding(), e.getDirection());
+					coords[1] = Rn.add(null, coords[0], e.getNextEdge().getDirection());
+					coords[2] = Rn.add(null, coords[1], e.getPreviousEdge().getDirection());
+					coords[3] = Rn.add(null, coords[2], e.getNextEdge().getNextEdge().getDirection());
+				}
+			} else {
+				System.out.println("autsch");
+				e = e.getOppositeEdge();
+				coords[0] = Rn.add(null, e.getStartVertex().getEmbedding(), e.getDirection());
+				coords[1] = Rn.add(null, coords[0], e.getNextEdge().getDirection());
+				coords[2] = Rn.add(null, coords[1], e.getPreviousEdge().getDirection());
+				DiscreteGroupElement trans = e.isRightOfSymmetryCycle();
+				double[] s = e.getNextEdge().getNextEdge().getStartVertex().getEmbedding();
+				double[] ta = e.getNextEdge().getNextEdge().getTargetVertex().getEmbedding();
+				ta = trans.getMatrix().multiplyVector(ta);
+				s = trans.getMatrix().multiplyVector(s);
+				coords[3] = Rn.add(null, coords[2], Rn.subtract(null, ta, s));
+				//coords[3] = Rn.add(null, coords[2], e.getNextEdge().getNextEdge().getDirection());
+				System.out.println("or here");
+			}
 		} else {
-		// TODO fix it, seems already buggy
+			System.out.println("foo");
+			// TODO fix it, seems already buggy
 			if(ignore == false){
 				for (int i=0;i<n;i++){
 					if (i==0){
