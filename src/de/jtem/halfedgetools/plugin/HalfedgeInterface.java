@@ -41,6 +41,7 @@ import javax.swing.filechooser.FileFilter;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 
+import de.jreality.geometry.GeometryMergeFactory;
 import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.plugin.JRViewerUtility;
 import de.jreality.plugin.basic.Content;
@@ -52,6 +53,9 @@ import de.jreality.plugin.basic.Content.ContentChangedListener;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.SceneGraphVisitor;
+import de.jtem.discretegroup.core.DiscreteGroup;
+import de.jtem.discretegroup.core.DiscreteGroupSceneGraphRepresentation;
+import de.jtem.discretegroup.core.DiscreteGroupSimpleConstraint;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -75,6 +79,7 @@ import de.jtem.halfedgetools.jreality.calculator.JRSubdivisionCalculator;
 import de.jtem.halfedgetools.jreality.calculator.JRVertexPositionCalculator;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.symmetry.node.SHDS;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -516,7 +521,28 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 						public void run() {
 							updateCache(hds, a);
 							if (ifs != null) {
-								activeComponent.setGeometry(ifs);
+								
+								if(SHDS.class.isAssignableFrom(hds.getClass())) {
+									SHDS shds = (SHDS)hds;
+									DiscreteGroup dg = shds.getGroup();
+
+									DiscreteGroupSimpleConstraint dgsc = new DiscreteGroupSimpleConstraint(-1,-1,3+(int)Math.round(Math.pow(dg.getGenerators().length/2,2.0)));
+									dgsc.setManhattan(true);
+									dg.setConstraint(dgsc);
+									DiscreteGroupSceneGraphRepresentation repn = new DiscreteGroupSceneGraphRepresentation(dg, true);
+
+									activeComponent.setGeometry(ifs);
+									repn.setWorldNode(activeComponent);
+
+									repn.update();
+									
+									SceneGraphComponent ss = repn.getRepresentationRoot(); 
+
+									GeometryMergeFactory gmf2 = new GeometryMergeFactory();
+									activeComponent.setGeometry(gmf2.mergeIndexedFaceSets(ss));
+								} else {
+									activeComponent.setGeometry(ifs);
+								}
 							}
 							if (selectionInterface != null) {
 								selectionInterface.clearSelection();
