@@ -40,7 +40,7 @@ public class GarlandHeckbertPlugin extends HalfedgeAlgorithmPlugin {
 		Triangulator t = new Triangulator();
 		t.triangulate(hds);
 		GarlandHeckbert<V, E, F, HDS> gh = new GarlandHeckbert<V, E, F, HDS>(hds, vc, fnc, fac);
-		gh.simplify(5);
+		gh.simplify(500);
 		hcp.set(hds);
 	}
 
