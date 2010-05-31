@@ -134,7 +134,7 @@ public class SymmetryVisualizer extends VisualizerPlugin implements ChangeListen
 					extraCoords2[k] = f.getEmbeddingOnBoundary(n + 1, false);
 					extraCoords2[k+1] = f.getEmbeddingOnBoundary(n + 2, false);
 					
-			//		extraColors2[k/2] = new double[] {0,0,0,1};
+					extraColors2[k/2] = new double[] {1,1,1,1};
 					
 					extraIndices2[k/2] = new int[] {k,k+1};
 					
@@ -147,7 +147,7 @@ public class SymmetryVisualizer extends VisualizerPlugin implements ChangeListen
 				ilsextra.setVertexCoordinates(extraCoords2);
 				ilsextra.setEdgeCount(extraIndices2.length);
 				ilsextra.setEdgeIndices(extraIndices2);
-			//	ilsextra.setEdgeColors(extraColors2);
+				ilsextra.setEdgeColors(extraColors2);
 				ilsextra.update();
 				if(edgesBox.isSelected()) {
 					eilse = ilsextra.getIndexedLineSet(); 
