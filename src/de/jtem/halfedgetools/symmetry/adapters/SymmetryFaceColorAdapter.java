@@ -39,18 +39,19 @@ import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Color;
 import de.jtem.halfedgetools.symmetry.node.SymmetricEdge;
+import de.jtem.halfedgetools.symmetry.node.SymmetricFace;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 
 @Color
-public class SymmetricSymmetryColorAdapter extends AbstractAdapter<double[]> {
+public class SymmetryFaceColorAdapter extends AbstractAdapter<double[]> {
 
-	public SymmetricSymmetryColorAdapter() {
+	public SymmetryFaceColorAdapter() {
 		super(double[].class, true, false);
 	}
 	
 	@Override
 	public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
-		return SymmetricEdge.class.isAssignableFrom(nodeClass);
+		return SymmetricFace.class.isAssignableFrom(nodeClass);
 	}
 	
 	@Override
@@ -63,15 +64,16 @@ public class SymmetricSymmetryColorAdapter extends AbstractAdapter<double[]> {
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
-	> double[] getE(E e, AdapterSet a) {
-		SymmetricEdge<?,?,?> se = (SymmetricEdge<?,?,?>)e;
-		if (se.isRightOfSymmetryCycle() != null) {
-			return new double[]{0,1,0,0};
-		} else {
-			return new double[] {0,0,1,1};
+	> double[] getF(F f, AdapterSet a) {
+		
+		for(E e : HalfEdgeUtilsExtra.getBoundary(f)) {
+			SymmetricEdge<?,?,?> se = (SymmetricEdge<?,?,?>)e;
+			if (se.isRightOfSymmetryCycle() != null) {
+				return new double[] {0,0,0,0};
+			}
 		}
+		return new double[]{0.7,0.7,0.7,1};
 	}
-
 
 }
 
