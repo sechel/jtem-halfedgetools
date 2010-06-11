@@ -160,10 +160,46 @@ public class TopologyAlgorithms {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> F collapseVertex(V vertex) {
-		E e = vertex.getIncomingEdge().getPreviousEdge();
-		removeVertex(vertex);
-		return HalfEdgeUtils.fillHole(e);
-		
+		F f = null;
+		if(HalfEdgeUtils.isBoundaryVertex(vertex)) {
+			E be = null;
+			for(E e : HalfEdgeUtils.incomingEdges(vertex)) {
+				if(e.getLeftFace() == null) {
+					be = e;
+					break;
+				}
+			}
+			V v1 = be.getStartVertex();
+			V v2 = be.getNextEdge().getTargetVertex();
+			E e1int = be.getOppositeEdge().getNextEdge();
+			E e2int = be.getNextEdge().getOppositeEdge().getPreviousEdge();
+			E e1bd = be.getPreviousEdge();
+			E e2bd = be.getNextEdge().getNextEdge();
+			
+			HalfEdgeDataStructure<V, E, F> hds = be.getHalfEdgeDataStructure();
+
+			removeVertex(vertex);
+
+			E e12 = hds.addNewEdge();
+			E e21 = hds.addNewEdge();
+			
+			e12.linkOppositeEdge(e21);
+			
+			e21.linkNextEdge(e1int);
+			e21.linkPreviousEdge(e2int);
+			e21.setTargetVertex(v1);
+			
+			e12.linkNextEdge(e2bd);
+			e12.linkPreviousEdge(e1bd);
+			e12.setTargetVertex(v2);
+			
+			f = HalfEdgeUtils.fillHole(e21);
+		} else {
+			E e = vertex.getIncomingEdge().getPreviousEdge();
+			removeVertex(vertex);
+			f = HalfEdgeUtils.fillHole(e);
+		}
+		return f;
 	}
 	
 
