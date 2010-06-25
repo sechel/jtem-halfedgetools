@@ -87,5 +87,16 @@ public class FunctionalUtils {
 	public static void outerProduct(double[] v, double[][] M) {
 		outerProduct(v,v,M);
 	}
+	
+
+	public static double[] getVectorFromGradient(Gradient g, int i) {
+		return new double[]{g.get(i),g.get(i+1),g.get(i+2)};
+	}
+
+	public static void setVectorToGradient(Gradient g, int startIndex, double[] vg) {
+		for (int i = 0; i < vg.length; i++) {
+			g.set(startIndex+i, vg[i]);
+		}		
+	}
 
 }

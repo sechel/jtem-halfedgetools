@@ -31,6 +31,8 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.subdivision;
 
+import java.util.Set;
+
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -64,8 +66,17 @@ public class StellarLinearPlugin extends HalfedgeAlgorithmPlugin {
 		if (vc == null || fc == null) {
 			throw new CalculatorException("No Subdivision calculators found for " + hds);
 		}
-		subdivider.execute(hds, hds2, vc, fc);
-		hcp.set(hds2);	
+		Set<F> faces = hcp.getSelection().getFaces(hds);
+		if(faces.size() == 0) {
+			subdivider.execute(hds, hds2, vc, fc);
+			hcp.set(hds2);	
+		} else {
+			for(F f: faces) {
+				subdivider.subdivideFace(hds,vc,fc,f);
+			}
+			hcp.set(hds);	
+		}
+		
 		
 	}
 

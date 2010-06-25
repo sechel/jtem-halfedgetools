@@ -65,12 +65,14 @@ public class EdgeSplitterPlugin extends HalfedgeAlgorithmPlugin {
 			throw new CalculatorException("No vertex position calculators found for " + this);
 		}
 		HalfedgeSelection s = new HalfedgeSelection();
-			for (E e : edges) {
-			double[] p1 = vc.get(e.getTargetVertex());
-			double[] p2 = vc.get(e.getStartVertex());
-			V v = TopologyAlgorithms.splitEdge(e);
-			vc.set(v, Rn.linearCombination(null, 0.5, p1, 0.5, p2));
-			s.setSelected(v, true);
+		for (E e : edges) {
+			if(e.isPositive()){ 
+				double[] p1 = vc.get(e.getTargetVertex());
+				double[] p2 = vc.get(e.getStartVertex());
+				V v = TopologyAlgorithms.splitEdge(e);
+				vc.set(v, Rn.linearCombination(null, 0.5, p1, 0.5, p2));
+				s.setSelected(v, true);
+			}
 		}
 		hif.setSelection(s);
 		hif.update();

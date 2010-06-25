@@ -35,44 +35,58 @@ public class StellarLinear {
 		}
 		List<F> fList = new LinkedList<F>(newHeds.getFaces());
 		for(F f : fList) {
-			Set<F> newFaces = new HashSet<F>();
-			
-			V v = newHeds.addNewVertex();
-			vA.set(v, fA.get(f));
-			
-			E se = f.getBoundaryEdge(); //startEdge
-			E be = se;
-			E 	ne = null,
-				e1 = null,
-				e2 = null;
-			do {
-				ne = be.getNextEdge();
-				F nf = newHeds.addNewFace();
-				be.setLeftFace(nf);
-				newFaces.add(nf);
-				e2 = newHeds.addNewEdge();
-				e2.setTargetVertex(be.getStartVertex());
-				if(e1 != null) {
-					e2.linkOppositeEdge(e1);
-				}
-				e1 = newHeds.addNewEdge();
-				e1.setTargetVertex(v);
-				be.linkNextEdge(e1);
-				e1.linkNextEdge(e2);
-				e2.linkNextEdge(be);
-				
-				e1.setLeftFace(nf);
-				e2.setLeftFace(nf);
-				
-				be = ne;
-			} while (be != null);
-			e1.linkOppositeEdge(se.getPreviousEdge());
-			
-			newHeds.removeFace(f);
+			Set<F> newFaces = subdivideFace(newHeds, vA, fA, f);
 			
 			oldFtoNewFs.put(f, newFaces);
 		}
 		return oldFtoNewFs;
 	}
-	
+
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HEDS extends HalfEdgeDataStructure<V, E, F>
+	> Set<F> subdivideFace(
+			HEDS newHeds,
+			VertexPositionCalculator vA, 
+			FaceBarycenterCalculator fA, 
+			F f) 
+	{
+		Set<F> newFaces = new HashSet<F>();
+		
+		V v = newHeds.addNewVertex();
+		vA.set(v, fA.get(f));
+		
+		E se = f.getBoundaryEdge(); //startEdge
+		E be = se;
+		E 	ne = null,
+			e1 = null,
+			e2 = null;
+		do {
+			ne = be.getNextEdge();
+			F nf = newHeds.addNewFace();
+			be.setLeftFace(nf);
+			newFaces.add(nf);
+			e2 = newHeds.addNewEdge();
+			e2.setTargetVertex(be.getStartVertex());
+			if(e1 != null) {
+				e2.linkOppositeEdge(e1);
+			}
+			e1 = newHeds.addNewEdge();
+			e1.setTargetVertex(v);
+			be.linkNextEdge(e1);
+			e1.linkNextEdge(e2);
+			e2.linkNextEdge(be);
+			
+			e1.setLeftFace(nf);
+			e2.setLeftFace(nf);
+			
+			be = ne;
+		} while (be != null);
+		e1.linkOppositeEdge(se.getPreviousEdge());
+		
+		newHeds.removeFace(f);
+		return newFaces;
+	}
 }
