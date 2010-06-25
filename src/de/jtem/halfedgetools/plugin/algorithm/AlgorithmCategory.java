@@ -6,6 +6,7 @@ public enum AlgorithmCategory {
 	Simplification,
 	Editing,
 	Topology,
-	Geometry
+	Geometry,
+	Custom
 	
 }
