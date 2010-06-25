@@ -271,6 +271,20 @@ public class TopologyAlgorithms {
 		return nv;
 	}
 
+	public static <
+		V extends Vertex<V,E,F>,
+		E extends Edge<V,E,F>,
+		F extends Face<V,E,F>
+	> V barycentricSubdFace(F f) {
+		for(E e : HalfEdgeUtils.boundaryEdges(f)) {
+			splitEdge(e);
+		}
+		V nv = splitFace(f);
+		return nv;
+	}
+
+	
+	
 	// TODO UNTESTED
 	public static <
 		V extends Vertex<V, E, F>,
