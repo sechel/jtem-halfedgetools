@@ -110,6 +110,7 @@ public class GarlandHeckbert<
 			this.location = location;
 		}
 
+		@Override
 		public int compareTo(EdgePQItem item) {
 			return Double.compare(this.error, item.error);
 		}

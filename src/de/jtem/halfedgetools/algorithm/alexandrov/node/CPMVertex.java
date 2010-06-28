@@ -64,10 +64,12 @@ public class CPMVertex extends Vertex<CPMVertex, CPMEdge, CPMFace> implements Ha
 //	private Boolean curvature = true;
 //	
 
+	@Override
 	public Boolean hasCurvature() {
 		return true;
 	}
 	
+	@Override
 	public void setCurvature(Boolean c) {
 //		curvature = c;
 	}
@@ -77,28 +79,34 @@ public class CPMVertex extends Vertex<CPMVertex, CPMEdge, CPMFace> implements Ha
 		return this;
 	}
 	
+	@Override
 	public Point4d getXYZW() {
 		return pos4d;
 	}
 
+	@Override
 	public void setXYZW(Point4d p) {
 		pos4d.set(p);
 	}
 
+	@Override
 	public void setXY(Point2d p) {
 		pos2d.set(p);
 	}
 
+	@Override
 	public Point2d getXY() {
 		return pos2d;
 	}
 
+	@Override
 	public Double getRadius() {
 		if (radius == null)
 			radius = 100.0;
 		return radius;
 	}
 
+	@Override
 	public void setRadius(Double radius) {
 		this.radius = radius;
 	}

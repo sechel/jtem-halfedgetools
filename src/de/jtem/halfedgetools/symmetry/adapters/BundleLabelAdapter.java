@@ -68,7 +68,6 @@ public class BundleLabelAdapter extends AbstractAdapter<String> {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -76,8 +75,7 @@ public class BundleLabelAdapter extends AbstractAdapter<String> {
 		N extends Node<V, E, F>
 	> String get(N node, AdapterSet a) {
 		String s = "";
-		Class c = node.getClass();
-		
+		Class<?> c = node.getClass();
 		for(Method m : c.getMethods()) {
 			if(m.isAnnotationPresent(Bundle.class)) {
 				if(m.getAnnotation(Bundle.class).display() == DisplayType.Label) {

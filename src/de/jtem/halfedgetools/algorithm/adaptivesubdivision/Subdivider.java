@@ -1151,6 +1151,7 @@ public class Subdivider<
 	
 	private class EdgeLengthComparator implements Comparator<E> {
 
+		@Override
 		public int compare(E e1, E e2) {
 			if(e1.getLengthSquared() < e2.getLengthSquared())
 				return -1;

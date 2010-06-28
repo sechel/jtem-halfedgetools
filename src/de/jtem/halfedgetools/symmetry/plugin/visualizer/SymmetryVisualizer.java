@@ -41,7 +41,6 @@ import de.jtem.jrworkspace.plugin.Controller;
 public class SymmetryVisualizer extends VisualizerPlugin implements ChangeListener{
 
 	private final SceneGraphComponent body = SceneGraphUtility.createFullSceneGraphComponent("body");
-	private HalfedgeInterface hif;
 	private JPanel panel = new JPanel();
 	
 	private JCheckBox edgesBox = new JCheckBox("Edges", true);

@@ -91,7 +91,7 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 
 	public <
 		O
-	> TypedAdapterSet<O> query(Class<O> out) throws AdapterException {
+	> TypedAdapterSet<O> querySet(Class<O> out) throws AdapterException {
 		TypedAdapterSet<O> set = new TypedAdapterSet<O>(out);
 		for (Adapter<?> a : this) {
 			if (a.checkType(out)) {
@@ -104,7 +104,7 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 	public <
 		N extends Node<?, ?, ?>,
 		O
-	> TypedAdapterSet<O> query(Class<N> noteType, Class<O> out) throws AdapterException {
+	> TypedAdapterSet<O> querySet(Class<N> noteType, Class<O> out) throws AdapterException {
 		TypedAdapterSet<O> set = new TypedAdapterSet<O>(out);
 		for (Adapter<?> a : this) {
 			if (a.canAccept(noteType) && a.checkType(out)) {

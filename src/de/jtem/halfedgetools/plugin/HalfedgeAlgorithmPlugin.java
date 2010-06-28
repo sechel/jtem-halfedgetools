@@ -88,6 +88,7 @@ public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 			putValue(SMALL_ICON, getPluginInfo().icon);
 		}
 		
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			try {
 				execute(hcp.get(null), hcp.getCalculators(), hcp);

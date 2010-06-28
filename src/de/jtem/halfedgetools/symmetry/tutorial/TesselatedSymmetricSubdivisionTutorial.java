@@ -31,7 +31,6 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.symmetry.tutorial;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,7 +39,6 @@ import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jtem.discretegroup.core.DiscreteGroup;
-import de.jtem.discretegroup.core.Platycosm;
 import de.jtem.discretegroup.core.TriangleGroup;
 import de.jtem.discretegroup.plugin.TessellatedContent;
 import de.jtem.halfedge.Edge;
@@ -49,13 +47,11 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.generic.IndexLabelAdapter;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.PerturbPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.TriangulatePlugin;
 import de.jtem.halfedgetools.symmetry.adapters.BundleCycleColorAdapter;
-import de.jtem.halfedgetools.symmetry.adapters.BundleLabelAdapter;
 import de.jtem.halfedgetools.symmetry.adapters.SymmetricPositionAdapter;
 import de.jtem.halfedgetools.symmetry.adapters.SymmetryEdgeColorAdapter;
 import de.jtem.halfedgetools.symmetry.adapters.SymmetryFaceColorAdapter;

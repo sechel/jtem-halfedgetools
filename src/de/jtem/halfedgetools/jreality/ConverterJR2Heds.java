@@ -42,9 +42,9 @@ public class ConverterJR2Heds {
 		F extends Face<V, E, F> 
 	> void ifs2heds(IndexedFaceSet ifs, HalfEdgeDataStructure<V, E, F> heds, AdapterSet adapters, Map<E, Integer> edgeMap) {
 		heds.clear();
-		AdapterSet vAdapters = adapters.query(heds.getVertexClass(), double[].class);
-		AdapterSet eAdapters = adapters.query(heds.getEdgeClass(), double[].class);
-		AdapterSet fAdapters = adapters.query(heds.getFaceClass(), double[].class);
+		AdapterSet vAdapters = adapters.querySet(heds.getVertexClass(), double[].class);
+		AdapterSet eAdapters = adapters.querySet(heds.getEdgeClass(), double[].class);
+		AdapterSet fAdapters = adapters.querySet(heds.getFaceClass(), double[].class);
 		
 		double[][][] coords=new double[3][][];		
 		int[][][] indices=new int[3][][];

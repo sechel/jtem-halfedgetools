@@ -37,6 +37,7 @@ public interface RnRmFunktion {
 	 *  @author Bernd Gonska
 	 */
 	public static class SphereProjector implements RnRmFunktion{
+		@Override
 		public double[] map(double[] param) {
 			double[] ret=new double[param.length];
 			double lenSq=0;
@@ -57,6 +58,7 @@ public interface RnRmFunktion {
 	 *  @author Bernd Gonska
 	 */
 	public static class Identity implements RnRmFunktion{
+		@Override
 		public double[] map(double[] param) {
 			double[] ret=new double[param.length];
 			for (int i = 0; i < ret.length; i++) 

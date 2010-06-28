@@ -31,11 +31,8 @@ OF SUCH DAMAGE.
 package de.jtem.halfedgetools.algorithm.subdivision;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;

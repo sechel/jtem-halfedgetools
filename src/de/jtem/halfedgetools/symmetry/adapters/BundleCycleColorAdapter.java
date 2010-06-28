@@ -65,7 +65,6 @@ public class BundleCycleColorAdapter extends AbstractAdapter<double[]> {
 	
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -73,8 +72,7 @@ public class BundleCycleColorAdapter extends AbstractAdapter<double[]> {
 		N extends Node<V, E, F>
 	> double[] get(N node, AdapterSet a) {
 		double[] color = {1,1,1,1};
-		Class c = node.getClass();
-		
+		Class<?> c = node.getClass();
 		for(Method m : c.getMethods()) {
 			if(m.isAnnotationPresent(Bundle.class)) {
 				if(m.getAnnotation(Bundle.class).display() == DisplayType.Geometry) {

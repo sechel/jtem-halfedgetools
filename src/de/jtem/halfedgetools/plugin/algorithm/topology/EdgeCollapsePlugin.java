@@ -32,7 +32,7 @@ public class EdgeCollapsePlugin extends HalfedgeAlgorithmPlugin {
 		HalfedgeSelection s = new HalfedgeSelection();
 		for (E e : edges) {
 			if (e.isPositive()) continue;
-			TypedAdapterSet<double[]> a = hcp.getAdapters().query(double[].class);
+			TypedAdapterSet<double[]> a = hcp.getAdapters().querySet(double[].class);
 			double[] p1 = a.get(Position.class, e.getTargetVertex());
 			double[] p2 = a.get(Position.class, e.getStartVertex());
 			V v = TopologyAlgorithms.collapseEdge(e);

@@ -43,6 +43,7 @@ public class HalfedgeToolBar extends ToolBarAggregator {
 		return new PluginInfo("Halfedge Edit Toolbar");
 	}
 
+	@Override
 	public Class<? extends PerspectiveFlavor> getPerspective() {
 		return View.class;
 	}

@@ -114,6 +114,7 @@ public class FaceCycleSubdivider {
 	public void setMapper(RnRmFunktion mapper) {this.mapper = mapper;}
 	public RnRmFunktion getMapper() {	return mapper;}
 	private TwoPointInterpolator pointInterp=	new TwoPointInterpolator(){
+		@Override
 		public double[] interpolate(double[] a, double[] b) {
 			return Calculator.linearCombination(.5, a, .5, b);
 		}

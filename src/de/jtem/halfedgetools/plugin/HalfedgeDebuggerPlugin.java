@@ -177,6 +177,7 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 	}
 	
 	
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object s = e.getSource();
 		if (getGeometryButton == s) {
@@ -196,6 +197,7 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 		}
 	}
 	
+	@Override
 	public void stateChanged(ChangeEvent e) {
 		Object s = e.getSource();
 		if (vertexSpinner == s) {
@@ -215,6 +217,7 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 			return;
 		}
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				continueButton.setEnabled(true);
 			}
@@ -227,6 +230,7 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 			}
 		} catch (InterruptedException e) {}
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				continueButton.setEnabled(false);
 			}
@@ -360,6 +364,7 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 	
 	private void updateSceneOnEventThread() {
 		Runnable updater = new Runnable() {
+			@Override
 			public void run() {
 				viewer.encompass(viewer.getBounds2D());
 			}

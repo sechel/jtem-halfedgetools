@@ -57,26 +57,26 @@ F extends SymmetricFace<V, E, F>
 	protected int	flipCount = 0;
 	
 	
-	@SuppressWarnings("unchecked")
 	public CuttingInfo<V, E, F> getBoundaryCycleInfo() {
-		return ((SymmetricHDS)getHalfEdgeDataStructure()).getBoundaryCycles();
+		return ((SymmetricHDS<V, E, F>)getHalfEdgeDataStructure()).getBoundaryCycles();
 	}
 	
 
-	@SuppressWarnings("unchecked")
 	public CuttingInfo<V, E, F> getSymmetryCycleInfo() {
-		return ((SymmetricHDS)getHalfEdgeDataStructure()).getSymmetryCycles();
+		return ((SymmetricHDS<V, E, F>)getHalfEdgeDataStructure()).getSymmetryCycles();
 	}
 	
 	public void setFlipCount(int n) {
 		flipCount = n;
 	}
 	
+	@Override
 	@Bundle(dimension=1,type=BundleType.Value, display=DisplayType.List, name="flip")
 	public int getFlipCount() {
 		return flipCount;
 	}
 
+	@Override
 	public void resetFlipCount() {
 		flipCount = 0;
 	}
@@ -322,6 +322,7 @@ F extends SymmetricFace<V, E, F>
 	
 	
 	
+	@Override
 	public void flip() throws TriangulationException{
 //		if (!ConsistencyCheck.isValidSurface(getHalfEdgeDataStructure()))
 //			System.err.println("No valid surface before flip()");

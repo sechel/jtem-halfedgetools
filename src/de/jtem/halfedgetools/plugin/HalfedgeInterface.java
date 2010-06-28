@@ -334,6 +334,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
 		if (rescanButton == e.getSource()) {
@@ -518,6 +519,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				@Override
 				public void run() {
 					de.jreality.scene.Scene.executeWriter(activeComponent, new Runnable() {
+						@Override
 						public void run() {
 							updateCache(hds, a);
 							if (ifs != null) {
@@ -730,6 +732,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 
 	public class HalfedgeContentListener implements ContentChangedListener {
 		
+		@Override
 		public void contentChanged(ContentChangedEvent cce) {
 			final DefaultListModel model = new DefaultListModel();
 			activeComponent.removeChild(auxComponent);

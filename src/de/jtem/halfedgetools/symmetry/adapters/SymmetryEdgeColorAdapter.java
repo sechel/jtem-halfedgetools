@@ -39,7 +39,6 @@ import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Color;
 import de.jtem.halfedgetools.symmetry.node.SymmetricEdge;
-import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 
 @Color
 public class SymmetryEdgeColorAdapter extends AbstractAdapter<double[]> {

@@ -80,6 +80,7 @@ public class CPEuclideanFunctional <
 	}
 		
 		
+	@Override
 	public <
 		HDS extends HalfEdgeDataStructure<V,E,F>
 	> void evaluate(
@@ -100,6 +101,7 @@ public class CPEuclideanFunctional <
 	};
 	
 	
+	@Override
 	public <
 		HDS extends HalfEdgeDataStructure<V,E,F>
 	> int getDimension(HDS hds) {
@@ -107,6 +109,7 @@ public class CPEuclideanFunctional <
 	};
 	
 	
+	@Override
 	public <
 		HDS extends HalfEdgeDataStructure<V,E,F>
 	> int[][] getNonZeroPattern(HDS hds) {

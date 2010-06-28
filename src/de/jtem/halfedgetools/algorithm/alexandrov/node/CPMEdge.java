@@ -67,10 +67,12 @@ public class CPMEdge extends Edge<CPMVertex, CPMEdge, CPMFace> implements HasAng
 		return this;
 	}
 
+	@Override
 	public Double getLength() {
 		return length;
 	}
 
+	@Override
 	public void setLength(Double length) {
 		this.length = length;
 	}
@@ -80,15 +82,18 @@ public class CPMEdge extends Edge<CPMVertex, CPMEdge, CPMFace> implements HasAng
 		return super.toString() + " length = " + length + "S: " + getStartVertex() + " T: " + getTargetVertex(); 
 	}
 
+	@Override
 	public Double getAngle() {
 		return gamma;
 	}
 
+	@Override
 	public void setAngle(Double angle) {
 		gamma = angle;
 	}
 
 
+	@Override
 	public void flip() throws TriangulationException{
 //		if (!ConsistencyCheck.isValidSurface(getHalfEdgeDataStructure()))
 //			System.err.println("No valid surface before flip()");
@@ -152,26 +157,32 @@ public class CPMEdge extends Edge<CPMVertex, CPMEdge, CPMFace> implements HasAng
 //			System.err.println("surface corrupted after flip()");
 	}
 
+	@Override
 	public int getFlipCount() {
 		return flipCount;
 	}
 
+	@Override
 	public void resetFlipCount() {
 		flipCount = 0;
 	}
 
+	@Override
 	public Boolean isBoundary() {
 		return border;
 	}
 
+	@Override
 	public void setBoundary(Boolean border) {
 		this.border = border;
 	}
 
+	@Override
 	public Boolean isHidden() {
 		return isHidden;
 	}
 	
+	@Override
 	public void setHidden(Boolean hide){
 		isHidden = hide;
 	}

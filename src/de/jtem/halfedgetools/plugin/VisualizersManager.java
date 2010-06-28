@@ -316,6 +316,7 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	}
 
 
+	@Override
 	public < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -330,6 +331,7 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 		updateAdapters();
 	}
 	
+	@Override
 	public < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

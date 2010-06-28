@@ -218,6 +218,7 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 	}
 
 	
+	@Override
 	public void setStatusListener(StatusChangedListener scl) {
 		statusChangedListener = scl;
 		
@@ -235,21 +236,27 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 
 		tl.setDescription("identifying 1");
 	    tl.addFaceDragListener(new FaceDragListener() {
-	      public void faceDragStart(FaceDragEvent e) { 
+	      @Override
+		public void faceDragStart(FaceDragEvent e) { 
 	      }
-	      public void faceDragged(FaceDragEvent e) {
+	      @Override
+		public void faceDragged(FaceDragEvent e) {
 	      };
-	      public void faceDragEnd(FaceDragEvent e) {
+	      @Override
+		public void faceDragEnd(FaceDragEvent e) {
 	    	  statusChangedListener.statusChanged("Marked for + indentifying face nr. "+e.getIndex());
 	    	  leftIndexSpinner.setValue(e.getIndex());
 	      } 
 	    });
 	    tl.addPointDragListener(new PointDragListener() {
-		      public void pointDragStart(PointDragEvent e) { 
+		      @Override
+			public void pointDragStart(PointDragEvent e) { 
 		      }
-		      public void pointDragged(PointDragEvent e) {
+		      @Override
+			public void pointDragged(PointDragEvent e) {
 		      };
-		      public void pointDragEnd(PointDragEvent e) {
+		      @Override
+			public void pointDragEnd(PointDragEvent e) {
 		    	  statusChangedListener.statusChanged("Marked for + indentifying vertex nr. " + e.getIndex());
 		    	  leftIndexVertexSpinner.setValue(e.getIndex());
 		      } 
@@ -259,21 +266,27 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 
 		tr.setDescription("identifying 2");
 	    tr.addFaceDragListener(new FaceDragListener() {
-	      public void faceDragStart(FaceDragEvent e) { 
+	      @Override
+		public void faceDragStart(FaceDragEvent e) { 
 	      }
-	      public void faceDragged(FaceDragEvent e) {
+	      @Override
+		public void faceDragged(FaceDragEvent e) {
 	      };
-	      public void faceDragEnd(FaceDragEvent e) {
+	      @Override
+		public void faceDragEnd(FaceDragEvent e) {
 	    	  statusChangedListener.statusChanged("Marked for - indentifying face nr. "+e.getIndex());
 	    	  rightIndexSpinner.setValue(e.getIndex());
 	      } 
 	    });
 	    tr.addPointDragListener(new PointDragListener() {
-		      public void pointDragStart(PointDragEvent e) { 
+		      @Override
+			public void pointDragStart(PointDragEvent e) { 
 		      }
-		      public void pointDragged(PointDragEvent e) {
+		      @Override
+			public void pointDragged(PointDragEvent e) {
 		      };
-		      public void pointDragEnd(PointDragEvent e) {
+		      @Override
+			public void pointDragEnd(PointDragEvent e) {
 		    	  statusChangedListener.statusChanged("Marked for - indentifying vertex nr. "+e.getIndex());
 		    	  rightIndexVertexSpinner.setValue(e.getIndex());
 		      } 
@@ -313,6 +326,7 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 	}
 	
 	
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		
 		if(e.getSource() == resetButton) {

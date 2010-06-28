@@ -177,6 +177,7 @@ public class SurfaceUtility {
 			this.center = center.getXY();
 		}
 		
+		@Override
 		public int compare(E e1, E e2) {
 			Point2d v1 = e1.getOppositeEdge().getTargetVertex().getXY();
 			Point2d v2 = e2.getOppositeEdge().getTargetVertex().getXY();
@@ -196,6 +197,7 @@ public class SurfaceUtility {
 		E extends Edge<?,?,?> & HasLength
 	> implements Comparator<E>{
 
+		@Override
 		public int compare(E e1, E e2) {
 	
 			Double l = e1.getLength() - e2.getLength();
@@ -215,6 +217,7 @@ public class SurfaceUtility {
 		E extends HasAngle
 	> implements Comparator<E>{
 
+		@Override
 		public int compare(E e1, E e2) {
 			Double check = e1.getAngle() - e2.getAngle();
 			if (check < 0)
@@ -232,6 +235,7 @@ public class SurfaceUtility {
 	>
 	implements Comparator<V>{
 
+		@Override
 		public int compare(V v1, V v2) {
 			int check = v1.getIndex() - v2.getIndex();
 			if (check < 0)
@@ -251,6 +255,7 @@ public class SurfaceUtility {
 		F extends Face<V, E, F>
 	> implements Comparator<V>{
 
+		@Override
 		public int compare(V v1, V v2) {
 			double check = v1.getXY().x - v2.getXY().x;
 			if (check < 0)
@@ -372,6 +377,7 @@ public class SurfaceUtility {
 			this.referenceEdge = referenceEdge;
 		}
 		
+		@Override
 		public int compare(E e1, E e2) {
 			Point2d c = referenceEdge.getTargetVertex().getXY();
 			Point2d p0 = referenceEdge.getOppositeEdge().getTargetVertex().getXY();

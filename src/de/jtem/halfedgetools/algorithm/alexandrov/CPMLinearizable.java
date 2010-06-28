@@ -73,6 +73,7 @@ public class CPMLinearizable
 	}
 	
 	
+	@Override
 	public void evaluate(Vector x, Vector fx, Vector offset) throws FunctionNotDefinedException{
 		for (int i = 0; i < graph.numVertices(); i++)
 			graph.getVertex(i).setRadius(x.get(i));
@@ -83,6 +84,7 @@ public class CPMLinearizable
 		}
 	}
 
+	@Override
 	public void evaluate(Vector x, Vector fx, Vector offset, Matrix jacobian) throws FunctionNotDefinedException{
 		evaluate(x, fx, offset);
 		try {
@@ -92,6 +94,7 @@ public class CPMLinearizable
 		}
 	}
 
+	@Override
 	public void evaluate(Vector x, Matrix jacobian) throws FunctionNotDefinedException{
 		for (int i = 0; i < graph.numVertices(); i++)
 			graph.getVertex(i).setRadius(x.get(i));
@@ -102,10 +105,12 @@ public class CPMLinearizable
 		}
 	}
 
+	@Override
 	public Integer getDomainDimension() {
 		return graph.numVertices();
 	}
 
+	@Override
 	public Integer getCoDomainDimension() {
 		return graph.numVertices();
 	}

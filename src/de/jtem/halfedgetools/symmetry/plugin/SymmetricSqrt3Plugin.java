@@ -35,8 +35,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import de.jreality.math.Rn;
-import de.jtem.discretegroup.core.DiscreteGroupElement;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -54,7 +52,6 @@ import de.jtem.halfedgetools.symmetry.node.SEdge;
 import de.jtem.halfedgetools.symmetry.node.SFace;
 import de.jtem.halfedgetools.symmetry.node.SHDS;
 import de.jtem.halfedgetools.symmetry.node.SVertex;
-import de.jtem.halfedgetools.util.TriangulationException;
 import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 

@@ -35,7 +35,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import de.jreality.math.Rn;
 import de.jtem.discretegroup.core.DiscreteGroupElement;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;

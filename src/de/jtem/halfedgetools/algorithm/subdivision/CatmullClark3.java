@@ -31,8 +31,6 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.algorithm.subdivision;
 
-import static de.jtem.halfedge.util.HalfEdgeUtils.boundaryEdges;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -175,12 +173,10 @@ public class CatmullClark3 {
 			vA.set(nV, pos);
 		}
 		
-		boolean validSurface = newHeds.isValidSurface();
+		boolean validSurface = HalfEdgeUtils.isValidSurface(newHeds);
 		System.out.println(validSurface);
 		
 		return oldEtoNewEsMap;
-			
-		
 	}
 	
 	//return new HEDS subdivided
