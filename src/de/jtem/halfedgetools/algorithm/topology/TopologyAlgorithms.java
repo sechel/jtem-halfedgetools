@@ -169,6 +169,7 @@ public class TopologyAlgorithms {
 					break;
 				}
 			}
+			assert be != null;
 			V v1 = be.getStartVertex();
 			V v2 = be.getNextEdge().getTargetVertex();
 			E e1int = be.getOppositeEdge().getNextEdge();

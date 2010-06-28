@@ -113,7 +113,8 @@ public abstract class FunctionalTest <
 			Assert.fail("No HalfEdgedatastructure has been set");
 		}
 		if (xGrad == null) {
-			Assert.fail("No gradient domain value has been set");
+			System.out.println("No gradient test point set in " + getClass().getSimpleName());
+			return;
 		}
 		int n = f.getDimension(hds);
 		DenseVector G = new DenseVector(n);
@@ -160,7 +161,8 @@ public abstract class FunctionalTest <
 			Assert.fail("No HalfEdgedatastructure has been set");
 		}
 		if (xHess == null) {
-			Assert.fail("No hessian domain value has been set");
+			System.out.println("No hessian test point set in " + getClass().getSimpleName());
+			return;
 		}
 		int n = f.getDimension(hds);
 		int[][] nz = f.getNonZeroPattern(hds);
