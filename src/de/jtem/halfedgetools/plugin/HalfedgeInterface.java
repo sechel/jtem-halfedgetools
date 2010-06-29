@@ -523,7 +523,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 						public void run() {
 							updateCache(hds, a);
 							if (ifs != null) {
-								
 								if(SHDS.class.isAssignableFrom(hds.getClass())) {
 									SHDS shds = (SHDS)hds;
 									DiscreteGroup dg = shds.getGroup();
