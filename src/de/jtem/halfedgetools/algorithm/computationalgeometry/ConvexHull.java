@@ -89,7 +89,7 @@ public class ConvexHull {
 						L.add(e);
 						e.setLeftFace(null);
 						Set<V> conflicts = new HashSet<V>();
-						conflicts.addAll(getConflictVertices(e.getRightFace(), fMap));
+						conflicts.addAll(getConflictVertices(e.getLeftFace(), fMap));
 						conflicts.addAll(getConflictVertices(e.getRightFace(), fMap));
 						PconflictMap.put(e, conflicts);
 					} else {
