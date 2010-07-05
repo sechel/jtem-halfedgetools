@@ -20,7 +20,6 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
-import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 
 /**
  * Implements the ConvexHull algorithm from 
@@ -43,7 +42,7 @@ public class ConvexHull {
 		HDS hds,
 		VertexPositionCalculator vp,
 		double tolerance
-	) {
+	) { 
 		if (hds.numFaces() > 0) {
 			new IllegalArgumentException("HDS cannot have faces in convexHull()");
 		}
@@ -75,6 +74,7 @@ public class ConvexHull {
 		
 		Set<V> randomSet = new HashSet<V>(hds.getVertices());
 		randomSet.removeAll(initVertices);
+		int i = 0;
 		for (V pr : randomSet) {
 			Set<F> Fconflict = getConflictFaces(pr, pMap);
 			if (Fconflict.isEmpty()) {
@@ -116,9 +116,10 @@ public class ConvexHull {
 			}
 			assert horizon != null;
 
-			E firstHorizon = horizon;
+			E lastHorizon = horizon.getPreviousEdge();
 			E firstEdge = null;
 			E lastEdge = null;
+			
 			do {
 				E next = horizon.getNextEdge();
 				V vs = horizon.getStartVertex();
@@ -138,34 +139,48 @@ public class ConvexHull {
 				if (firstEdge == null) {
 					firstEdge = e3;
 				}
-				if (horizon == firstHorizon) {
+				if (horizon == lastHorizon) {
 					e2.linkOppositeEdge(firstEdge);
 				}
 				e2.setTargetVertex(pr);
 				e3.setTargetVertex(vs);
 				
 				
-				Plane p1 = getPlaneForFace(f, planeMap, vp);
-				Plane p2 = getPlaneForFace(horizon.getRightFace(), planeMap, vp);
-				if (Rn.equals(p1.n, p2.n, tolerance)) {
-					Set<V> Pconflicts = getConflictVertices(horizon.getRightFace(), fMap);
-					f = TopologyAlgorithms.removeEdgeFill(horizon);
-					fMap.put(f, Pconflicts); // :TODO fix me here
-				} else {
+//				Plane p1 = getPlaneForFace(f, planeMap, vp);
+//				Plane p2 = getPlaneForFace(horizon.getRightFace(), planeMap, vp);
+//				if (Rn.equals(p1.n, p2.n, tolerance)) {
+//					Set<V> Pconflicts = getConflictVertices(horizon.getRightFace(), fMap);
+//					f = TopologyAlgorithms.removeEdgeFill(horizon);
+//					fMap.put(f, Pconflicts); // :TODO fix me here
+//				} else {
 					for (V v : PconflictMap.get(horizon)) {
 						if (isFaceVisibleFrom(f, v, planeMap, vp)) {
 							getConflictFaces(v, pMap).add(f);
 							getConflictVertices(f, fMap).add(v);
 						}
 					}
-				}
+//				}
 				horizon = next;
-			} while (horizon != firstHorizon);
+			} while (horizon != null);
+			
 			pMap.remove(pr);
+			for (V v : pMap.keySet()) {
+				Set<F> faces = pMap.get(v);
+				faces.removeAll(Fconflict);
+			}
+			for (F f : Fconflict) {
+				fMap.remove(f);
+			}
+			for (F f : fMap.keySet()) {
+				Set<V> vertices = fMap.get(f);
+				vertices.remove(pr);
+			}
+		}
+		if (i++ > 1) {
+			return;
 		}
 	}
 
-	
 	
 	private static <
 		V extends Vertex<V, E, F>,
@@ -207,7 +222,7 @@ public class ConvexHull {
 		VertexPositionCalculator vp
 	) {
 		if (!planeMap.containsKey(f)) {
-			V v1 = f.getBoundaryEdge().getStartVertex();
+			V v1 = f.getBoundaryEdge().getPreviousEdge().getTargetVertex();
 			V v2 = f.getBoundaryEdge().getTargetVertex();
 			V v3 = f.getBoundaryEdge().getNextEdge().getTargetVertex();
 			Plane result = new Plane(vp.get(v1), vp.get(v2), vp.get(v3));
@@ -314,10 +329,10 @@ public class ConvexHull {
 		
 		public Plane(double[] p1, double[] p2, double[] p3) {
 			double[] xy = subtract(null, p2, p1);
-			double[] xz = subtract(null, p3, p1);
+			double[] xz = subtract(null, p2, p3);
 			double[] n = crossProduct(null, xy, xz);
 			normalize(n, n);
-			double d = -Rn.innerProduct(n, p1);
+			double d = -Rn.innerProduct(n, p2);
 			this.n = n;
 			this.d = d;
 		}
