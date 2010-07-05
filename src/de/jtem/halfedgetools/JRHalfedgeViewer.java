@@ -41,6 +41,7 @@ import de.jtem.halfedgetools.plugin.algorithm.AlgorithmFactory;
 import de.jtem.halfedgetools.plugin.visualizers.DirichletEnergyVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.EdgeLengthVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.FacePlanarityVisualizer;
+import de.jtem.halfedgetools.plugin.visualizers.NodeIndexVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.NormalVisualizer;
 
 public class JRHalfedgeViewer {
@@ -60,6 +61,7 @@ public class JRHalfedgeViewer {
 		v.registerPlugin(new FacePlanarityVisualizer());
 		v.registerPlugin(new EdgeLengthVisualizer());
 		v.registerPlugin(new NormalVisualizer());
+		v.registerPlugin(new NodeIndexVisualizer());
 		v.registerPlugins(AlgorithmFactory.createTopologyPlugins());
 		v.registerPlugins(AlgorithmFactory.createSubdivisionPlugins());
 		v.registerPlugins(AlgorithmFactory.createGeometryPlugins());

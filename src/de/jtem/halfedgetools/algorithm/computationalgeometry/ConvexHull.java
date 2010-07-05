@@ -71,11 +71,12 @@ public class ConvexHull {
 				}
 			}
 		}
-		
+
 		Set<V> randomSet = new HashSet<V>(hds.getVertices());
 		randomSet.removeAll(initVertices);
 		int i = 0;
 		for (V pr : randomSet) {
+			System.out.println("pr = " + pr);
 			Set<F> Fconflict = getConflictFaces(pr, pMap);
 			if (Fconflict.isEmpty()) {
 				continue;
@@ -175,9 +176,7 @@ public class ConvexHull {
 				Set<V> vertices = fMap.get(f);
 				vertices.remove(pr);
 			}
-			if (i++ >= 1) {
-				return;
-			}
+			if (i++ >= 0) return;
 		}
 	}
 
@@ -260,7 +259,7 @@ public class ConvexHull {
 		double tolerance
 	) {
 		 Set<V> result = new HashSet<V>();
-		 V v1 = hds.getVertex(rnd.nextInt(hds.numVertices()));
+		 V v1 = hds.getVertex(0);//rnd.nextInt(hds.numVertices()));
 		 double[] v1p = pos.get(v1);
 		 V v2 = null;
 		 double[] v2p = null;
@@ -275,37 +274,24 @@ public class ConvexHull {
 		 if (v2 == null || v2p == null) {
 			 throw new IllegalArgumentException("All points are the same in convexHull()");
 		 }
-		 double[] lvec = Rn.subtract(null, v1p, v2p);
-		 Rn.normalize(lvec, lvec);
 		 V v3 = null;
-		 double[] v3p = null;
-		 for (V v : hds.getVertices()) {
-			 double[] vp = pos.get(v);
-			 double[] vpvec = Rn.subtract(null, v1p, vp);
-			 Rn.normalize(vpvec, vpvec);
-			 double dot = Rn.innerProduct(lvec, vpvec);
-			 if (Math.abs(dot - 1) > tolerance) {
-				 v3 = v;
-				 v3p = vp;
-				 break;
-			 }
-		 }
-		 if (v3 == null || v3p == null) {
-			 throw new IllegalArgumentException("All points lie on a line in convexHull()");
-		 }
 		 V v4 = null;
 		 for (V v : hds.getVertices()) {
 			 double[] vp = pos.get(v);
-			 double[][] m = {
-				{v1p[0], v1p[1], v1p[2], 1}, 
-				{v2p[0], v2p[1], v2p[2], 1}, 
-				{v3p[0], v3p[1], v3p[2], 1},
-				{vp[0], vp[1], vp[2], 1}
-			};
-			 double det = Rn.determinant(m);
-			 if (det*det > tolerance) {
-				 v4 = v;
-				 break;
+			 for (V vv : hds.getVertices()) {
+				 double[] vvp = pos.get(vv);
+				 double[][] m = {
+					{v1p[0], v1p[1], v1p[2], 1}, 
+					{v2p[0], v2p[1], v2p[2], 1}, 
+					{vp[0],  vp[1],  vp[2], 1},
+					{vvp[0], vvp[1], vvp[2], 1}
+				};
+				 double det = Rn.determinant(m);
+				 if (det < -tolerance) {
+					 v3 = v;
+					 v4 = vv;
+					 break;
+				 }
 			 }
 		 }
 		 if (v4 == null) {
@@ -353,7 +339,7 @@ public class ConvexHull {
 		}
 		
 		public boolean isAbove(double[] p){
-			return Rn.innerProduct(n, p) <= -d;
+			return Rn.innerProduct(n, p) >= -d;
 		}
 		
 		@Override
