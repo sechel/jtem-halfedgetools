@@ -175,9 +175,9 @@ public class ConvexHull {
 				Set<V> vertices = fMap.get(f);
 				vertices.remove(pr);
 			}
-		}
-		if (i++ > 1) {
-			return;
+			if (i++ >= 1) {
+				return;
+			}
 		}
 	}
 
@@ -275,12 +275,16 @@ public class ConvexHull {
 		 if (v2 == null || v2p == null) {
 			 throw new IllegalArgumentException("All points are the same in convexHull()");
 		 }
+		 double[] lvec = Rn.subtract(null, v1p, v2p);
+		 Rn.normalize(lvec, lvec);
 		 V v3 = null;
 		 double[] v3p = null;
 		 for (V v : hds.getVertices()) {
 			 double[] vp = pos.get(v);
-			 double[][] m = {v1p, v2p, vp};
-			 if (Rn.determinant(m) > tolerance) {
+			 double[] vpvec = Rn.subtract(null, v1p, vp);
+			 Rn.normalize(vpvec, vpvec);
+			 double dot = Rn.innerProduct(lvec, vpvec);
+			 if (Math.abs(dot - 1) > tolerance) {
 				 v3 = v;
 				 v3p = vp;
 				 break;
@@ -298,7 +302,8 @@ public class ConvexHull {
 				{v3p[0], v3p[1], v3p[2], 1},
 				{vp[0], vp[1], vp[2], 1}
 			};
-			 if (Rn.determinant(m) > tolerance) {
+			 double det = Rn.determinant(m);
+			 if (det*det > tolerance) {
 				 v4 = v;
 				 break;
 			 }
@@ -328,8 +333,8 @@ public class ConvexHull {
 		
 		
 		public Plane(double[] p1, double[] p2, double[] p3) {
-			double[] xy = subtract(null, p2, p1);
-			double[] xz = subtract(null, p2, p3);
+			double[] xy = subtract(null, p1, p2);
+			double[] xz = subtract(null, p3, p2);
 			double[] n = crossProduct(null, xy, xz);
 			normalize(n, n);
 			double d = -Rn.innerProduct(n, p2);
@@ -348,7 +353,7 @@ public class ConvexHull {
 		}
 		
 		public boolean isAbove(double[] p){
-			return Rn.innerProduct(n, p) >= -d;
+			return Rn.innerProduct(n, p) <= -d;
 		}
 		
 		@Override
