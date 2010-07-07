@@ -29,7 +29,7 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.plugin.algorithm;
+package de.jtem.halfedgetools.plugin;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -59,9 +59,15 @@ import de.jtem.halfedgetools.plugin.algorithm.topology.FaceSplitterPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.FillHolesPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.VertexCollapserPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.VertexRemoverPlugin;
+import de.jtem.halfedgetools.plugin.generator.RandomSphereGenerator;
+import de.jtem.halfedgetools.plugin.visualizers.DirichletEnergyVisualizer;
+import de.jtem.halfedgetools.plugin.visualizers.EdgeLengthVisualizer;
+import de.jtem.halfedgetools.plugin.visualizers.FacePlanarityVisualizer;
+import de.jtem.halfedgetools.plugin.visualizers.NodeIndexVisualizer;
+import de.jtem.halfedgetools.plugin.visualizers.NormalVisualizer;
 import de.jtem.jrworkspace.plugin.Plugin;
 
-public class AlgorithmFactory {
+public class HalfedgePluginFactory {
 
 
 	public static Set<Plugin> createTopologyPlugins() {
@@ -102,6 +108,23 @@ public class AlgorithmFactory {
 		s.add(new Sqrt3Plugin());
 		s.add(new StellarLinearPlugin());
 		s.add(new TriangulatePlugin());
+		return s;
+	}
+	
+	
+	public static Set<Plugin> createGeneratorPlugins() {
+		Set<Plugin> s = new HashSet<Plugin>();
+		s.add(new RandomSphereGenerator());
+		return s;
+	}
+	
+	public static Set<Plugin> createVisualizerPlugins() {
+		Set<Plugin> s = new HashSet<Plugin>();
+		s.add(new NodeIndexVisualizer());
+		s.add(new EdgeLengthVisualizer());
+		s.add(new NormalVisualizer());
+		s.add(new FacePlanarityVisualizer());
+		s.add(new DirichletEnergyVisualizer());
 		return s;
 	}
 	

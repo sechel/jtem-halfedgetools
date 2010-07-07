@@ -24,6 +24,7 @@ import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 /**
  * Implements the ConvexHull algorithm from 
  * de Berg et. Al Computational Geometry
+ * It always produces a triangulation
  * @author Stefan Sechelmann
  * @see {@link http://www.cs.uu.nl/geobook/}
  */
@@ -74,9 +75,7 @@ public class ConvexHull {
 
 		Set<V> randomSet = new HashSet<V>(hds.getVertices());
 		randomSet.removeAll(initVertices);
-		int i = 0;
 		for (V pr : randomSet) {
-			System.out.println("pr = " + pr);
 			Set<F> Fconflict = getConflictFaces(pr, pMap);
 			if (Fconflict.isEmpty()) {
 				continue;
@@ -88,10 +87,10 @@ public class ConvexHull {
 				for (E e : HalfEdgeUtils.boundaryEdges(f)) {
 					if (!Fconflict.contains(e.getRightFace())) {
 						L.add(e);
-						e.setLeftFace(null);
 						Set<V> conflicts = new HashSet<V>();
 						conflicts.addAll(getConflictVertices(e.getLeftFace(), fMap));
 						conflicts.addAll(getConflictVertices(e.getRightFace(), fMap));
+						conflicts.remove(pr);
 						PconflictMap.put(e, conflicts);
 					} else {
 						deleteMe.add(e);
@@ -101,7 +100,8 @@ public class ConvexHull {
 			for (F f : Fconflict) {
 				hds.removeFace(f);
 			}
-			for (E e : deleteMe) { 
+			for (E e : deleteMe) {
+				e.setLeftFace(null);
 				hds.removeEdge(e);
 			}
 			
@@ -176,7 +176,11 @@ public class ConvexHull {
 				Set<V> vertices = fMap.get(f);
 				vertices.remove(pr);
 			}
-			if (i++ >= 0) return;
+		}
+		for (V v : new HashSet<V>(hds.getVertices())) {
+			if (v.getIncomingEdge() == null) {
+				hds.removeVertex(v);				
+			}
 		}
 	}
 
@@ -259,7 +263,7 @@ public class ConvexHull {
 		double tolerance
 	) {
 		 Set<V> result = new HashSet<V>();
-		 V v1 = hds.getVertex(0);//rnd.nextInt(hds.numVertices()));
+		 V v1 = hds.getVertex(rnd.nextInt(hds.numVertices()));
 		 double[] v1p = pos.get(v1);
 		 V v2 = null;
 		 double[] v2p = null;

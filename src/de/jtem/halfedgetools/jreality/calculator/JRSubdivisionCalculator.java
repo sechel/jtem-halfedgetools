@@ -50,7 +50,7 @@ public class JRSubdivisionCalculator implements EdgeAverageCalculator, FaceBaryc
 		}
 		return Rn.times(pos, 1.0 / b.size(), pos);
 	}
-
+	
 	@Override
 	public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
 		boolean result = false;
@@ -69,13 +69,11 @@ public class JRSubdivisionCalculator implements EdgeAverageCalculator, FaceBaryc
 	}
 
 	@Override
-	public 
-	<
-	V extends Vertex<V, E, F>, 
-	E extends Edge<V, E, F>, 
-	F extends Face<V, E, F>
-	> double[] get(
-			F f, E e) {
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>
+	> double[] get( F f, E e) {
 		return get(f);
 	}
 
