@@ -99,4 +99,11 @@ public class FunctionalUtils {
 		}		
 	}
 
+	public static void setVectorToDomainValue(DomainValue x, int startIndex, double[] vg) {
+		for (int i = 0; i < vg.length; i++) {
+			x.set(startIndex+i, vg[i]);
+		}
+		
+	}
+
 }
