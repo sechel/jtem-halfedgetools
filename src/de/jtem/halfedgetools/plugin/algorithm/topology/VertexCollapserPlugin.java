@@ -82,7 +82,7 @@ public class VertexCollapserPlugin extends HalfedgeAlgorithmPlugin {
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Vertex Collapser", "Kristoffer Josefsson");
-		info.icon = ImageHook.getIcon("collapseVertex.png");
+		info.icon = ImageHook.getIcon("collapseVertex.png", 16, 16);
 		return info;
 	}
 

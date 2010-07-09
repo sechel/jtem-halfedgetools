@@ -91,7 +91,7 @@ public class MedialGraphLinearPlugin extends HalfedgeAlgorithmPlugin {
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Linear Medial-Graph Subdivision");
-		info.icon = ImageHook.getIcon("MedialLinear.png");
+		info.icon = ImageHook.getIcon("MedialLinear.png", 16, 16);
 		return info;
 	}
 

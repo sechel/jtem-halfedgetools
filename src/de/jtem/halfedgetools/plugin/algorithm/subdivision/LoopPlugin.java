@@ -90,7 +90,7 @@ public class LoopPlugin extends HalfedgeAlgorithmPlugin {
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Loop Subdivision");
-		info.icon = ImageHook.getIcon("loop.png");
+		info.icon = ImageHook.getIcon("loop.png", 16, 16);
 		return info;
 	}
 

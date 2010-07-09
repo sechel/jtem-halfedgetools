@@ -64,7 +64,7 @@ public class TriangulatePlugin extends HalfedgeAlgorithmPlugin {
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Triangulator");
-		info.icon = ImageHook.getIcon("Triangulate2.png");
+		info.icon = ImageHook.getIcon("Triangulate2.png", 16, 16);
 		return info;
 	}
 

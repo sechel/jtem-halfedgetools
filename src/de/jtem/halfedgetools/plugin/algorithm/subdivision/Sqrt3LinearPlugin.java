@@ -88,7 +88,7 @@ public class Sqrt3LinearPlugin extends HalfedgeAlgorithmPlugin {
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Linear Sqrt3 Subdivision");
-		info.icon = ImageHook.getIcon("rootThree.png");
+		info.icon = ImageHook.getIcon("rootThree.png", 16, 16);
 		return info;
 	}
 

@@ -84,7 +84,7 @@ public class CatmullClarkPlugin extends HalfedgeAlgorithmPlugin {
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Catmull Clark Subdivision");
-		info.icon = ImageHook.getIcon("CatmullClark.png");
+		info.icon = ImageHook.getIcon("CatmullClark.png", 16, 16);
 		return info;
 	}
 

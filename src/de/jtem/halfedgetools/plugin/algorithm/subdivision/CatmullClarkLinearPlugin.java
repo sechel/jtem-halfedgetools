@@ -90,7 +90,7 @@ public class CatmullClarkLinearPlugin extends HalfedgeAlgorithmPlugin {
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Linear Catmull Clark Subdivision");
-		info.icon = ImageHook.getIcon("CatmullClarkLinear.png");
+		info.icon = ImageHook.getIcon("CatmullClarkLinear.png", 16, 16);
 		return info;
 	}
 

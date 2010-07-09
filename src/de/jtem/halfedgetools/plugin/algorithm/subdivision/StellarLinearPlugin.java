@@ -93,7 +93,7 @@ public class StellarLinearPlugin extends HalfedgeAlgorithmPlugin {
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Linear Stellar Subdivision", "Thilo Roerig");
-		info.icon = ImageHook.getIcon("stellar.png");
+		info.icon = ImageHook.getIcon("stellar.png", 16, 16);
 		return info;
 	}
 
