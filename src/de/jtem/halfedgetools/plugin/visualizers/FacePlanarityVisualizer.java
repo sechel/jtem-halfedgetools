@@ -70,6 +70,7 @@ import de.jtem.halfedgetools.adapter.type.Label;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
+import de.jtem.jrworkspace.plugin.Controller;
 
 public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeListener, ActionListener {
 
@@ -113,6 +114,22 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 	
 	
 	@Override
+	public void storeStates(Controller c) throws Exception {
+		super.storeStates(c);
+		c.storeProperty(getClass(), "showLabels", showLabels.isSelected());
+		c.storeProperty(getClass(), "showColors", showColors.isSelected());
+		c.storeProperty(getClass(), "decimalPlaces", placesModel.getNumber().intValue());
+	}
+	
+	@Override
+	public void restoreStates(Controller c) throws Exception {
+		super.restoreStates(c);
+		showLabels.setSelected(c.getProperty(getClass(), "showLabels", showLabels.isSelected()));
+		showColors.setSelected(c.getProperty(getClass(), "showColors", showColors.isSelected()));
+		placesModel.setValue(c.getProperty(getClass(), "decimalPlaces", placesModel.getNumber().intValue()));
+	}
+	
+	@Override
 	public void stateChanged(ChangeEvent e) {
 		String fs = "0.";
 		for (int i = 0; i < placesModel.getNumber().intValue(); i++) {
@@ -124,7 +141,7 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		manager.updateContent();
+		updateContent();
 	}
 	
 	

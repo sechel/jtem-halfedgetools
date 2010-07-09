@@ -88,7 +88,9 @@ public abstract class VisualizerPlugin extends Plugin {
 	public abstract String getName();
 	
 	public void updateContent() {
-		manager.updateContent();
+		if (manager != null) {
+			manager.updateContent();
+		}
 	}
 	
 	@Override

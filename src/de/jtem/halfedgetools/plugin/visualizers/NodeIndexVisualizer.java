@@ -18,6 +18,7 @@ import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Label;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
+import de.jtem.jrworkspace.plugin.Controller;
 
 public class NodeIndexVisualizer extends VisualizerPlugin implements ActionListener {
 
@@ -42,8 +43,25 @@ public class NodeIndexVisualizer extends VisualizerPlugin implements ActionListe
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			manager.updateContent();
+			updateContent();
 		}
+		
+		@Override
+		public void storeStates(Controller c) throws Exception {
+			super.storeStates(c);
+			c.storeProperty(getClass(), "showVertices", showVertices.isSelected());
+			c.storeProperty(getClass(), "showEdges", showEdges.isSelected());
+			c.storeProperty(getClass(), "showFaces", showFaces.isSelected());
+		}
+		
+		@Override
+		public void restoreStates(Controller c) throws Exception {
+			super.restoreStates(c);
+			showVertices.setSelected(c.getProperty(getClass(), "showVertices", showVertices.isSelected()));
+			showEdges.setSelected(c.getProperty(getClass(), "showEdges", showEdges.isSelected()));
+			showFaces.setSelected(c.getProperty(getClass(), "showFaces", showFaces.isSelected()));
+		}
+		
 		
 
 		@Label
