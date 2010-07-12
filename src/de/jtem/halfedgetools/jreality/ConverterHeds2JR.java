@@ -202,6 +202,7 @@ public class ConverterHeds2JR {
 		if (pos != null) {
 			double[] posArr = pos.get(n, adapters);
 			if (posArr != null) {
+				removeNaN(posArr);
 				coordinates.add(posArr);
 			}
 		}
@@ -210,6 +211,7 @@ public class ConverterHeds2JR {
 			boolean colorValid = false;
 			for (Adapter<double[]> color : cols) {
 				double[] colorArr = color.get(n, adapters);
+				removeNaN(colorArr);
 				if (colorArr == null) continue;
 				for (int i = 0; i < Math.min(4, colorArr.length); i++) {
 					c[i] = c[i] * colorArr[i];
@@ -223,12 +225,14 @@ public class ConverterHeds2JR {
 		if (normal != null) {
 			double[] normalArr = normal.get(n, adapters);
 			if (normalArr != null) {
+				removeNaN(normalArr);
 				normals.add(normalArr);
 			}
 		}
 		if (texCoord != null) {
 			double[] texArr = texCoord.get(n, adapters);
 			if (texArr != null) {
+				removeNaN(texArr);
 				textCoords.add(texArr);
 			}
 		}
@@ -252,16 +256,33 @@ public class ConverterHeds2JR {
 		if (rad != null) {
 			Double radObj = rad.get(n, adapters);
 			if (radObj != null) {
+				if (radObj.isNaN()) {
+					radObj = 0.0;
+				}
 				radius.add(radObj);
 			}
 		}
 		if (size != null) {
 			Double sizeObj = size.get(n, adapters);
 			if (sizeObj != null) {
+				if (sizeObj.isNaN()) {
+					sizeObj = 0.0;
+				}
 				pointSize.add(sizeObj);
 			}
 		}
 	}
+	
+	
+	private void removeNaN(double[] c) {
+		for (int i = 0; i < c.length; i++) {
+			if (Double.isNaN(c[i])) {
+				c[i] = 0;
+			}
+		}
+	}
+	
+	
 	
 	private void resetData(){
 		coordinates=new LinkedList<double[]>();
