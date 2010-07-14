@@ -2,6 +2,8 @@ package de.jtem.halfedgetools.plugin.generator;
 
 import java.util.Random;
 
+import javax.swing.JOptionPane;
+
 import de.jreality.math.Rn;
 import de.jreality.plugin.basic.Content;
 import de.jtem.halfedgetools.algorithm.computationalgeometry.ConvexHull;
@@ -18,8 +20,11 @@ public class RandomSphereGenerator extends GeneratorPlugin {
 	
 	@Override
 	protected void generate(Content content, HalfedgeInterface hif) {
+		String numString = JOptionPane.showInputDialog("Number of points", 20);
+		if (numString == null) return;
+		int extraPoints = Integer.parseInt(numString);
 		DefaultJRHDS hds = new DefaultJRHDS();
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < extraPoints; i++) {
 			double[] pos = {rnd.nextGaussian(), rnd.nextGaussian(), rnd.nextGaussian()};
 			Rn.normalize(pos, pos);
 			DefaultJRVertex v = hds.addNewVertex();
