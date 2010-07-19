@@ -120,14 +120,26 @@ public class TopologyAlgorithms {
 		
 	}
 	
-	// TODO untested
+	// TODO a little tested :-)
 	public static <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> V collapseEdge(E e) {
-		
+		V vToKeep = e.getTargetVertex();
+		return collapseEdge(e,vToKeep);	
+	}
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	> V collapseEdge(E e, V keep) {
 		HalfEdgeDataStructure<V,E,F> graph = e.getHalfEdgeDataStructure();
+
+		if(keep != e.getTargetVertex()) {
+			e = e.getOppositeEdge();
+		}
 		
 		E en = e.getNextEdge();
 		E ep = e.getPreviousEdge();
@@ -135,31 +147,30 @@ public class TopologyAlgorithms {
 		E eo = e.getOppositeEdge();
 		E eon = eo.getNextEdge();
 		E eop = eo.getPreviousEdge();
-		E eono = eon.getOppositeEdge();
+//		E eono = eon.getOppositeEdge();
 		
-		V vToKeep = e.getTargetVertex();
 		V vToRemove = e.getStartVertex();
+		
+		for(E ie : HalfEdgeUtils.incomingEdges(vToRemove)) {
+			ie.setTargetVertex(keep);
+		}
 		
 		ep.linkNextEdge(en);
 		eop.linkNextEdge(eon);
-		
-		ep.setTargetVertex(vToKeep);
-		eono.setTargetVertex(vToKeep);
 		
 		graph.removeEdge(e);
 		graph.removeEdge(eo);
 	
 		graph.removeVertex(vToRemove);
 		
-		return vToKeep;
-		
+		return keep;	
 	}
 	
 	public static <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
-	> F collapseVertex(V vertex) {
+	> F removeVertexFill(V vertex) {
 		F f = null;
 		if(HalfEdgeUtils.isBoundaryVertex(vertex)) {
 			E be = null;
@@ -842,6 +853,9 @@ public class TopologyAlgorithms {
 		F extends Face<V, E, F>
 	> F removeEdgeFill(E e){
 		E en = e.getNextEdge();
+		if(en == e.getOppositeEdge()) {
+			en = en.getNextEdge();
+		}
 		removeEdge(e);
 		return HalfEdgeUtils.fillHole(en);
 	}

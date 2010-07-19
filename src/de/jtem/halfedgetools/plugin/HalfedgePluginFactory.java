@@ -57,7 +57,7 @@ import de.jtem.halfedgetools.plugin.algorithm.topology.FaceRemoverPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.FaceScalerPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.FaceSplitterPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.FillHolesPlugin;
-import de.jtem.halfedgetools.plugin.algorithm.topology.VertexCollapserPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.RemoveVertexFillPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.VertexRemoverPlugin;
 import de.jtem.halfedgetools.plugin.generator.RandomSphereGenerator;
 import de.jtem.halfedgetools.plugin.visualizers.DirichletEnergyVisualizer;
@@ -73,7 +73,7 @@ public class HalfedgePluginFactory {
 	public static Set<Plugin> createTopologyPlugins() {
 		Set<Plugin> hs = new HashSet<Plugin>();
 		hs.add(new VertexRemoverPlugin());
-		hs.add(new VertexCollapserPlugin());
+		hs.add(new RemoveVertexFillPlugin());
 		hs.add(new FaceRemoverPlugin());
 		hs.add(new FaceCollapserPlugin());
 		hs.add(new FaceScalerPlugin());

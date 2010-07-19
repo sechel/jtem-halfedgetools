@@ -47,7 +47,7 @@ import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class VertexCollapserPlugin extends HalfedgeAlgorithmPlugin {
+public class RemoveVertexFillPlugin extends HalfedgeAlgorithmPlugin {
 
 
 	@Override
@@ -61,7 +61,7 @@ public class VertexCollapserPlugin extends HalfedgeAlgorithmPlugin {
 		if (vertices.isEmpty()) return;
 		HalfedgeSelection s = new HalfedgeSelection();
 		for (V v : vertices) {
-			F f = TopologyAlgorithms.collapseVertex(v);
+			F f = TopologyAlgorithms.removeVertexFill(v);
 			s.setSelected(f, true);
 		}
 		hif.setSelection(s);
