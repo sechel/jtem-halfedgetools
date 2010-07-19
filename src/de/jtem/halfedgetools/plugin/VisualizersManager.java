@@ -270,11 +270,11 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	}
 	
 	
-	protected boolean isActive(VisualizerPlugin op) {
+	public boolean isActive(VisualizerPlugin op) {
 		return activateSet.contains(op.getName());
 	}
 	
-	protected void setActive(VisualizerPlugin op, boolean active) {
+	public void setActive(VisualizerPlugin op, boolean active) {
 		if (!active) {
 			activateSet.remove(op.getName());
 		} else {
