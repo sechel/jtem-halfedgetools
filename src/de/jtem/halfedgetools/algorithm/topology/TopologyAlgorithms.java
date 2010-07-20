@@ -774,8 +774,7 @@ public class TopologyAlgorithms {
 		}
 	}
 
-	public static 	
-	<
+	public static <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
@@ -791,41 +790,48 @@ public class TopologyAlgorithms {
 		graph.removeFace(face);
 	}
 
-	public static 	
-		<
-			V extends Vertex<V, E, F>,
-			E extends Edge<V, E, F>,
-			F extends Face<V, E, F>
-		>  void removeVertex(V vertex){
-		
-			try{
-				HalfEdgeDataStructure<V, E, F> graph = vertex.getHalfEdgeDataStructure();
-				List<E> edgeStar = HalfEdgeUtilsExtra.getEdgeStar(vertex);
-				for (E e : edgeStar){
-					E borderPre = e.getOppositeEdge().getNextEdge();
-					E borderPost = e.getPreviousEdge();
-					borderPost.linkNextEdge(borderPre);
-					borderPost.setTargetVertex(e.getStartVertex());
-					
-					if (e.getLeftFace() != null) {
-						graph.removeFace(e.getLeftFace());
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	>  void removeVertex(V vertex){
+		try{
+			HalfEdgeDataStructure<V, E, F> graph = vertex.getHalfEdgeDataStructure();
+			List<E> edgeStar = HalfEdgeUtilsExtra.getEdgeStar(vertex);
+			for (E e : edgeStar){
+				if (e.getLeftFace() != null) {
+					F f = e.getLeftFace();
+					for (E be : HalfEdgeUtils.boundaryEdges(f)) {
+						be.setLeftFace(null);
 					}
-					if (e.getRightFace() != null) {
-						graph.removeFace(e.getRightFace());
-					}
-
-					// remove the vertex
-					graph.removeEdge(e.getOppositeEdge());
-					graph.removeEdge(e);	
+					graph.removeFace(f);
 				}
-				graph.removeVertex(vertex);
-			} catch (Exception e){
-				e.printStackTrace();
-			}
-		}
+				if (e.getRightFace() != null) {
+					F f = e.getRightFace();
+					for (E be : HalfEdgeUtils.boundaryEdges(f)) {
+						be.setLeftFace(null);
+					}
+					graph.removeFace(f);
+				}
+				
+				E borderPre = e.getOppositeEdge().getNextEdge();
+				E borderPost = e.getPreviousEdge();
+				borderPost.linkNextEdge(borderPre);
+				borderPost.setTargetVertex(e.getStartVertex());
 
-	public static 	
-	<
+				// remove the vertex
+				graph.removeEdge(e.getOppositeEdge());
+				graph.removeEdge(e);	
+			}
+			graph.removeVertex(vertex);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	
+	public static <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>

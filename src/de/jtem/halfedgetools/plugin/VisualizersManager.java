@@ -212,7 +212,7 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 			}
 			VisualizerPlugin op = visualizers.get(row);
 			setActive(op, !isActive(op));
-			hif.update();	
+			updateContent();
 		}
 		
 	}
@@ -266,7 +266,9 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	}
 	
 	public void updateContent() {
+		HalfedgeSelection sel = hif.getSelection();
 		hif.update();
+		hif.setSelection(sel);
 	}
 	
 	
