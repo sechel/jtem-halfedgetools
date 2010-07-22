@@ -43,7 +43,7 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 
 public class Triangulator {
 
-	public <
+	public static <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
@@ -57,7 +57,7 @@ public class Triangulator {
 		return newEdges;
 	}
 	
-	public <
+	public static <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
