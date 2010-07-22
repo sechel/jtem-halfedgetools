@@ -184,7 +184,7 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		if (a != null && a.isGetter()) {
 			return a.get(n, this);
 		} else {
-			return null;
+			return defaultValue;
 		}
 	}
 	

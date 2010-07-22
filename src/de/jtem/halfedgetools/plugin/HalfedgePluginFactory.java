@@ -34,6 +34,7 @@ package de.jtem.halfedgetools.plugin;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.jtem.halfedgetools.algorithm.triangulation.Delaunay;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.PerturbPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.ProjectPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.simplification.GarlandHeckbertPlugin;
@@ -47,6 +48,7 @@ import de.jtem.halfedgetools.plugin.algorithm.subdivision.Sqrt3LinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.Sqrt3Plugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.StellarLinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.TriangulatePlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.DelaunayPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.EdgeCollapsePlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.EdgeFlipperPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.EdgeRemoverFillPlugin;
@@ -84,6 +86,7 @@ public class HalfedgePluginFactory {
 		hs.add(new EdgeSplitterPlugin());
 		hs.add(new FillHolesPlugin());
 		hs.add(new EdgeFlipperPlugin());
+		hs.add(new DelaunayPlugin());
 		return hs;
 	}
 	
