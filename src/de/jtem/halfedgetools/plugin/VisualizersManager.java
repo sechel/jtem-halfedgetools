@@ -65,6 +65,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.plugin.swing.IconCellRenderer;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
@@ -301,6 +302,7 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	private void updatePluginTable() {
 		pluginTable.setModel(new PluginTableModel());
 		pluginTable.getColumnModel().getColumn(0).setMaxWidth(30);
+		pluginTable.getColumnModel().getColumn(0).setCellRenderer(new IconCellRenderer());
 		pluginTable.getColumnModel().getColumn(1).setMaxWidth(30);
 	}
 	
