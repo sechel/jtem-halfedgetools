@@ -307,41 +307,33 @@ public class TopologyAlgorithms {
 		HalfEdgeDataStructure<V,E,F> graph = e.getHalfEdgeDataStructure();
 		
 		V newV = graph.addNewVertex();
-		E en = graph.addNewEdge();
-		E eon = graph.addNewEdge();
+		E enew = graph.addNewEdge();
+		E eonew = graph.addNewEdge();
 		
 		E eo = e.getOppositeEdge();
-		V et = e.getTargetVertex();
-		V es = e.getStartVertex();
+		V tv = e.getTargetVertex();
 		
-		E enn = e.getNextEdge();
-		E eonn = eo.getNextEdge();
-		E ep = e.getPreviousEdge();
+		E en = e.getNextEdge();
 		E eop = eo.getPreviousEdge();
 		
-		F fl = e.getLeftFace();
-		F fr = eo.getLeftFace();
+		F ef = e.getLeftFace();
+		F eof = eo.getLeftFace();
 		
-		e.linkNextEdge(en);
-		en.linkNextEdge(enn);
-		ep.linkNextEdge(e);
-		eo.linkNextEdge(eon);
-		eon.linkNextEdge(eonn);
-		eop.linkNextEdge(eo);
+		e.linkNextEdge(enew);
+		eonew.linkNextEdge(eo);
+		enew.linkNextEdge(en);
+		eop.linkNextEdge(eonew);
 		
+		enew.setTargetVertex(tv);
 		e.setTargetVertex(newV);
-		eo.setTargetVertex(newV);
-		en.setTargetVertex(et);
-		eon.setTargetVertex(es);
+		eonew.setTargetVertex(newV);
+		eop.setTargetVertex(tv);
 		
-		e.linkOppositeEdge(eon);
-		eo.linkOppositeEdge(en);
+		enew.linkOppositeEdge(eonew);
+		eonew.linkOppositeEdge(enew);
 		
-		e.setLeftFace(fl);
-		en.setLeftFace(fl);
-		eo.setLeftFace(fr);
-		eon.setLeftFace(fr);
-		
+		enew.setLeftFace(ef);
+		eonew.setLeftFace(eof);
 		
 		return newV;
 	}
