@@ -16,9 +16,11 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -77,7 +79,10 @@ import de.jtem.halfedgetools.jreality.calculator.JRFaceAreaCalculator;
 import de.jtem.halfedgetools.jreality.calculator.JRFaceNormalCalculator;
 import de.jtem.halfedgetools.jreality.calculator.JRSubdivisionCalculator;
 import de.jtem.halfedgetools.jreality.calculator.JRVertexPositionCalculator;
+import de.jtem.halfedgetools.jreality.node.DefaultJREdge;
+import de.jtem.halfedgetools.jreality.node.DefaultJRFace;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
+import de.jtem.halfedgetools.jreality.node.DefaultJRVertex;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.halfedgetools.symmetry.node.SHDS;
 import de.jtem.jrworkspace.plugin.Controller;
@@ -121,7 +126,10 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		saveSelectionButton = new JButton(ImageHook.getIcon("disk.png")),
 		loadSelectionButton = new JButton(ImageHook.getIcon("folder.png")),
 		clearSelectionButton = new JButton("Clean Selection"),
-		rescanButton = new JButton("Rescan");
+		rescanButton = new JButton("Rescan"),
+		undoButton = new JButton(ImageHook.getIcon("book_previous.png")),
+		redoButton = new JButton(ImageHook.getIcon("book_next.png"));
+	
 	private JLabel
 		hdsLabel = new JLabel("No HDS cached");
 	private JCheckBox
@@ -133,13 +141,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	private boolean
 		automaticConversion = true,
 		hdsIsDirty = true;
-	private HalfEdgeDataStructure<?, ?, ?> 
+	private HalfEdgeDataStructure<?,?,?> 
 		cachedHEDS = new DefaultJRHDS();
 	private Map<? extends Edge<?,?,?>, Integer>
 		edgeMap = new HashMap<Edge<?,?,?>, Integer>();
 	private AdapterSet
-		adapters = new AdapterSet(),
-		cachedAdapters = new AdapterSet();
+		adapters = new AdapterSet();
 	private CalculatorSet
 		calculators = new CalculatorSet();
 	
@@ -154,6 +161,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		converterJR2Heds = new ConverterJR2Heds();
 	private XStream 
 		xstream = new XStream(new PureJavaReflectionProvider());
+	
+	private LinkedList<IndexedFaceSet> undoStack = new LinkedList<IndexedFaceSet>();
+	
+	private ListIterator<IndexedFaceSet> undoIterator = undoStack.listIterator();
+	
+	private int undoSize = 10;
 	
 	public HalfedgeInterface() {
 		makeLayout();
@@ -205,6 +218,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		shrinkPanel.add(hdsLabel, c);
 		c.gridwidth = 1;
 		c.weightx = 0.0;
+		shrinkPanel.add(undoButton);
+		shrinkPanel.add(redoButton);
 		shrinkPanel.add(loadHDSButton, c);
 		c.gridwidth = GridBagConstraints.RELATIVE;
 		shrinkPanel.add(saveHDSButton, c);
@@ -298,6 +313,10 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		rescanButton.addActionListener(this);
 		clearSelectionButton.addActionListener(this);
 		viewSelectionChecker.addActionListener(this);
+		undoButton.addActionListener(this);
+		undoButton.setEnabled(false);
+		redoButton.addActionListener(this);
+		redoButton.setEnabled(false);
 		saveHDSButton.addActionListener(this);
 		loadHDSButton.addActionListener(this);
 		saveSelectionButton.addActionListener(this);
@@ -334,16 +353,18 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
-		if (rescanButton == e.getSource()) {
+		Object source = e.getSource();
+		if (rescanButton == source) {
 			rescan();
 		}
-		if (clearSelectionButton == e.getSource()) {
+		if (clearSelectionButton == source) {
 			selectionInterface.clearSelection();
 		}
-		if(loadHDSButton == e.getSource()) {
+		if(loadHDSButton == source) {
 			File file = null;
 			if (chooser.showOpenDialog(w) == JFileChooser.APPROVE_OPTION) {
 				file = chooser.getSelectedFile();
@@ -353,7 +374,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				set(hds, getAdapters());
 			}
 		}
-		if(saveHDSButton == e.getSource()) {
+		if(saveHDSButton == source) {
 			File file = null;
 			if (chooser.showSaveDialog(w) == JFileChooser.APPROVE_OPTION) {
 				file = chooser.getSelectedFile();
@@ -366,28 +387,28 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				}
 			}
 		}
-		if (selectVertexButton == e.getSource()) {
+		if (selectVertexButton == source) {
 			int index = selectIndexModel.getNumber().intValue();
 			if (cachedHEDS == null || index >= cachedHEDS.numVertices()) return;
 			Vertex<?,?,?> n = cachedHEDS.getVertex(index);
 			boolean selected = selectionInterface.isSelected(n);
 			selectionInterface.setSelected(n, !selected);
 		}
-		if (selectEdgeButton == e.getSource()) {
+		if (selectEdgeButton == source) {
 			int index = selectIndexModel.getNumber().intValue();
 			if (cachedHEDS == null || index >= cachedHEDS.numEdges()) return;
 			Edge<?,?,?> n = cachedHEDS.getEdge(index);
 			boolean selected = selectionInterface.isSelected(n);
 			selectionInterface.setSelected(n, !selected);
 		}
-		if (selectFaceButton == e.getSource()) {
+		if (selectFaceButton == source) {
 			int index = selectIndexModel.getNumber().intValue();
 			if (cachedHEDS == null || index >= cachedHEDS.numFaces()) return;
 			Face<?,?,?> n = cachedHEDS.getFace(index);
 			boolean selected = selectionInterface.isSelected(n);
 			selectionInterface.setSelected(n, !selected);
 		}
-		if (selectBoundaryButton == e.getSource()) {
+		if (selectBoundaryButton == source) {
 			int index = selectIndexModel.getNumber().intValue();
 			if (cachedHEDS == null || index >= cachedHEDS.numVertices()) return;
 			for(Vertex<?,?,?> v : HalfEdgeUtils.boundaryVertices(cachedHEDS)){
@@ -395,7 +416,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				selectionInterface.setSelected(v, !sel);
 			}
 		}
-		if (saveSelectionButton == e.getSource()) {
+		if (saveSelectionButton == source) {
 			if (selChooser.showSaveDialog(w) != JFileChooser.APPROVE_OPTION) {
 				return;
 			}
@@ -426,7 +447,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				ex.printStackTrace();
 			}
 		}
-		if (loadSelectionButton == e.getSource()) {
+		if (loadSelectionButton == source) {
 			if (selChooser.showOpenDialog(w) != JFileChooser.APPROVE_OPTION) {
 				return;
 			}
@@ -459,10 +480,55 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				ex.printStackTrace();
 			}
 		}
+		if(undoButton == source) {
+			if(!undoIterator.hasPrevious()) {
+				undoButton.setEnabled(false);
+				return;
+			}
+			IndexedFaceSet ifs = undoIterator.previous();
+			if(undoIterator.hasPrevious()) {
+				ifs = undoIterator.previous();
+			}
+			if(!undoIterator.hasPrevious()) {
+				undoButton.setEnabled(false);
+			}
+			undoIterator.next();
+			activeComponent.setGeometry(ifs);
+			try {
+				cachedHEDS = cachedHEDS.getClass().newInstance();
+			} catch (Exception ex) {
+				cachedHEDS = new DefaultJRHDS();
+			}
+			Map<DefaultJREdge, Integer> edgeMap = new HashMap<DefaultJREdge, Integer>();
+			converterJR2Heds.ifs2heds(ifs, (HalfEdgeDataStructure<DefaultJRVertex, DefaultJREdge, DefaultJRFace>)cachedHEDS, adapters, edgeMap);
+			HalfedgeInterface.this.edgeMap = edgeMap;
+			updateCache(cachedHEDS);
+			redoButton.setEnabled(true);
+		}
+		if(redoButton == source) {
+			if(!undoIterator.hasNext()) {
+				redoButton.setEnabled(false);
+				return;
+			}
+			IndexedFaceSet ifs = undoIterator.next();
+			activeComponent.setGeometry(ifs);
+			try {
+				cachedHEDS = cachedHEDS.getClass().newInstance();
+			} catch (Exception ex) {
+				cachedHEDS = new DefaultJRHDS();
+			}
+			Map<DefaultJREdge, Integer> edgeMap = new HashMap<DefaultJREdge, Integer>();
+			converterJR2Heds.ifs2heds(ifs, (HalfEdgeDataStructure<DefaultJRVertex, DefaultJREdge, DefaultJRFace>)cachedHEDS, adapters, edgeMap);
+			HalfedgeInterface.this.edgeMap = edgeMap;
+			updateCache(cachedHEDS);
+			if(!undoIterator.hasNext()) {
+				redoButton.setEnabled(false);
+			}
+			undoButton.setEnabled(true);
+		}
 		updateStates();
 	}
 
-	
 	public void rescan() {
 		ContentChangedEvent cce = new ContentChangedEvent(ChangeEventType.ContentChanged);
 		cce.node = contentParseRoot;
@@ -513,51 +579,84 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		all.addAll(adapters);
 		Map<E, Integer> edgeMap = new HashMap<E, Integer>();
 		final IndexedFaceSet ifs = converterHeds2JR.heds2ifs(hds, all, edgeMap);
+		while(undoIterator.hasNext()) {
+			undoIterator.next();
+			undoIterator.remove();
+		}
+		if(ifs != null) {
+			undoIterator.add(ifs);
+		}
+		if(undoStack.size() > undoSize) {
+			while(undoIterator.hasPrevious()) {
+				undoIterator.previous();
+			}
+			undoIterator.remove();
+			while(undoIterator.hasNext()) {
+				undoIterator.next();
+			}
+		}
+		if(undoStack.size() > 1) {
+			undoButton.setEnabled(true);
+			redoButton.setEnabled(false);
+		}
 		HalfedgeInterface.this.edgeMap = edgeMap;
 		try {
-			Runnable r = new Runnable() {
-				@Override
-				public void run() {
-					de.jreality.scene.Scene.executeWriter(activeComponent, new Runnable() {
-						@Override
-						public void run() {
-							updateCache(hds, a);
-							if (ifs != null) {
-								if(SHDS.class.isAssignableFrom(hds.getClass())) {
-									SHDS shds = (SHDS)hds;
-									DiscreteGroup dg = shds.getGroup();
+			setGeometry(hds, a, ifs);
+		} catch (Exception e) { }
+	}
 
-									DiscreteGroupSimpleConstraint dgsc = new DiscreteGroupSimpleConstraint(-1,-1,3+(int)Math.round(Math.pow(dg.getGenerators().length/2,2.0)));
-									dgsc.setManhattan(true);
-									dg.setConstraint(dgsc);
-									DiscreteGroupSceneGraphRepresentation repn = new DiscreteGroupSceneGraphRepresentation(dg, true);
 
-									activeComponent.setGeometry(ifs);
-									repn.setWorldNode(activeComponent);
+	private <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void setGeometry(final HDS hds, final AdapterSet a, final IndexedFaceSet ifs) 
+		throws InterruptedException, InvocationTargetException
+	{
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				de.jreality.scene.Scene.executeWriter(activeComponent, new Runnable() {
+					@Override
+					public void run() {
+						updateCache(hds);
+						
+						if (ifs != null) {
+							if(SHDS.class.isAssignableFrom(hds.getClass())) {
+								SHDS shds = (SHDS)hds;
+								DiscreteGroup dg = shds.getGroup();
 
-									repn.update();
-									
-									SceneGraphComponent ss = repn.getRepresentationRoot(); 
+								DiscreteGroupSimpleConstraint dgsc = new DiscreteGroupSimpleConstraint(-1,-1,3+(int)Math.round(Math.pow(dg.getGenerators().length/2,2.0)));
+								dgsc.setManhattan(true);
+								dg.setConstraint(dgsc);
+								DiscreteGroupSceneGraphRepresentation repn = new DiscreteGroupSceneGraphRepresentation(dg, true);
 
-									GeometryMergeFactory gmf2 = new GeometryMergeFactory();
-									activeComponent.setGeometry(gmf2.mergeIndexedFaceSets(ss));
-								} else {
-									activeComponent.setGeometry(ifs);
-								}
-							}
-							if (selectionInterface != null) {
-								selectionInterface.clearSelection();
+								activeComponent.setGeometry(ifs);
+								repn.setWorldNode(activeComponent);
+
+								repn.update();
+								
+								SceneGraphComponent ss = repn.getRepresentationRoot(); 
+
+								GeometryMergeFactory gmf2 = new GeometryMergeFactory();
+								activeComponent.setGeometry(gmf2.mergeIndexedFaceSets(ss));
+							} else {
+								activeComponent.setGeometry(ifs);
 							}
 						}
-					});
-				}
-			};
-			if (SwingUtilities.isEventDispatchThread()) {
-				r.run();
-			} else {
-				SwingUtilities.invokeAndWait(r);
+						if (selectionInterface != null) {
+							selectionInterface.clearSelection();
+						}
+					}
+				});
 			}
-		} catch (Exception e) { }
+		};
+		if (SwingUtilities.isEventDispatchThread()) {
+			r.run();
+		} else {
+			SwingUtilities.invokeAndWait(r);
+		}
 	}
 	
 	
@@ -604,7 +703,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		Map<E, Integer> edgeMap = new HashMap<E, Integer>();
 		converterJR2Heds.ifs2heds(ifs, hds, all, edgeMap);
 		this.edgeMap = edgeMap;
-		updateCache(hds, a);
+		updateCache(hds);
 		return hds;
 	}
 	
@@ -645,7 +744,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	
 	public void update() {
-		set(cachedHEDS, cachedAdapters);
+		set(cachedHEDS, adapters);
 	}
 	
 	
@@ -655,7 +754,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	 */
 	public AdapterSet getAdapters() {
 		AdapterSet result = new AdapterSet();
-		result.addAll(cachedAdapters);
 		result.addAll(adapters);
 		return result;
 	}
@@ -717,13 +815,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 
-	private void updateCache(HalfEdgeDataStructure<?, ?, ?> hds, AdapterSet adapters) {
+	private void updateCache(HalfEdgeDataStructure<?, ?, ?> hds) {
 		hdsIsDirty = false;
 		cachedHEDS = hds;
-		cachedAdapters.clear();
-		if (adapters != null) {
-			cachedAdapters.addAll(adapters);
-		}
 		fireHalfedgeChanged(hds);
 		updateStates();
 	}
@@ -763,13 +857,25 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			}
 			activeComponent.addChild(auxComponent);
 			get(createEmpty(cachedHEDS), new AdapterSet());
+			restartUndo((IndexedFaceSet)activeComponent.getGeometry());
 			if (automaticConversion) {
-				set(cachedHEDS, cachedAdapters);
+				set(cachedHEDS, adapters);
 			}
 			updateStates();
 		}
-		
+
 	}
+	
+	private void restartUndo(IndexedFaceSet ifs) {
+		undoStack.clear();
+		undoIterator = undoStack.listIterator();
+		if(ifs != null) {
+			undoIterator.add(ifs);
+		}
+		undoButton.setEnabled(false);
+		redoButton.setEnabled(false);	
+	}
+	
 	
 	public SceneGraphComponent getActiveComponent() {
 		return activeComponent;
