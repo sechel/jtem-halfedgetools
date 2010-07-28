@@ -31,7 +31,10 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
+import java.awt.event.InputEvent;
 import java.util.Set;
+
+import javax.swing.KeyStroke;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -74,6 +77,10 @@ public class EdgeRemoverFillPlugin extends HalfedgeAlgorithmPlugin {
 		return AlgorithmCategory.Editing;
 	}
 	
+	@Override
+	public KeyStroke getKeyboardShortcut() {
+		return KeyStroke.getKeyStroke('E', InputEvent.SHIFT_DOWN_MASK);
+	}
 	
 	@Override
 	public String getAlgorithmName() {

@@ -38,6 +38,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import de.jreality.plugin.basic.ViewMenuBar;
@@ -86,6 +87,9 @@ public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 			putValue(NAME, getAlgorithmName());
 			putValue(SHORT_DESCRIPTION, getAlgorithmName());
 			putValue(SMALL_ICON, getPluginInfo().icon);
+			if (getKeyboardShortcut() != null) {
+				putValue(ACCELERATOR_KEY, getKeyboardShortcut());
+			}
 		}
 		
 		@Override
@@ -137,6 +141,9 @@ public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 		toolbar.removeAll(getClass());
 	}
 	
+	public KeyStroke getKeyboardShortcut() {
+		return null;
+	}
 	
 	public abstract AlgorithmCategory getAlgorithmCategory();
 	

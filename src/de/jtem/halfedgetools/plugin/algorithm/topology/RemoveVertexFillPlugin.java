@@ -31,7 +31,10 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
+import java.awt.event.InputEvent;
 import java.util.Set;
+
+import javax.swing.KeyStroke;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -75,13 +78,17 @@ public class RemoveVertexFillPlugin extends HalfedgeAlgorithmPlugin {
 	
 	@Override
 	public String getAlgorithmName() {
-		return "Collapse Vertex";
+		return "Remove Vertex And Fill";
 	}
 
+	@Override
+	public KeyStroke getKeyboardShortcut() {
+		return KeyStroke.getKeyStroke('V', InputEvent.SHIFT_DOWN_MASK);
+	}
 	
 	@Override
 	public PluginInfo getPluginInfo() {
-		PluginInfo info = new PluginInfo("Vertex Collapser", "Kristoffer Josefsson");
+		PluginInfo info = new PluginInfo("Remove Vertex And Fill", "Kristoffer Josefsson");
 		info.icon = ImageHook.getIcon("collapseVertex.png", 16, 16);
 		return info;
 	}

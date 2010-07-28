@@ -31,7 +31,10 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
+import java.awt.event.InputEvent;
 import java.util.Set;
+
+import javax.swing.KeyStroke;
 
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
@@ -83,6 +86,11 @@ public class FaceSplitterPlugin extends HalfedgeAlgorithmPlugin {
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
 		return AlgorithmCategory.Editing;
+	}
+	
+	@Override
+	public KeyStroke getKeyboardShortcut() {
+		return KeyStroke.getKeyStroke('F', InputEvent.ALT_DOWN_MASK);
 	}
 	
 	@Override

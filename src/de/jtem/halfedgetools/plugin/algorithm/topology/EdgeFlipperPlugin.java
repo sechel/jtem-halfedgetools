@@ -31,8 +31,11 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
+import java.awt.event.InputEvent;
 import java.util.List;
 import java.util.Set;
+
+import javax.swing.KeyStroke;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -98,6 +101,11 @@ public class EdgeFlipperPlugin extends HalfedgeAlgorithmPlugin {
 		return "Flip Edge";
 	}
 
+	@Override
+	public KeyStroke getKeyboardShortcut() {
+		return KeyStroke.getKeyStroke('E', InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK);
+	}
+	
 	
 	@Override
 	public PluginInfo getPluginInfo() {

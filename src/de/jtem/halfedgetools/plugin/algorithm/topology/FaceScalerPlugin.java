@@ -31,7 +31,10 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
+import java.awt.event.InputEvent;
 import java.util.Set;
+
+import javax.swing.KeyStroke;
 
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
@@ -100,6 +103,11 @@ public class FaceScalerPlugin extends HalfedgeAlgorithmPlugin {
 	@Override
 	public String getAlgorithmName() {
 		return "Scale Face";
+	}
+	
+	@Override
+	public KeyStroke getKeyboardShortcut() {
+		return KeyStroke.getKeyStroke('F', InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK);
 	}
 	
 	@Override

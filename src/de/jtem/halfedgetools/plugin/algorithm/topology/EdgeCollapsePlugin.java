@@ -1,6 +1,9 @@
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
+import java.awt.event.InputEvent;
 import java.util.Set;
+
+import javax.swing.KeyStroke;
 
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
@@ -46,6 +49,11 @@ public class EdgeCollapsePlugin extends HalfedgeAlgorithmPlugin {
 	@Override
 	public String getAlgorithmName() {
 		return "Collapse Edge";
+	}
+	
+	@Override
+	public KeyStroke getKeyboardShortcut() {
+		return KeyStroke.getKeyStroke('E', InputEvent.CTRL_DOWN_MASK);
 	}
 
 	@Override

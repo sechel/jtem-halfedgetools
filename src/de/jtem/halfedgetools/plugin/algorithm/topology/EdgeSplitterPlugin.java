@@ -31,7 +31,10 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
+import java.awt.event.InputEvent;
 import java.util.Set;
+
+import javax.swing.KeyStroke;
 
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
@@ -84,8 +87,13 @@ public class EdgeSplitterPlugin extends HalfedgeAlgorithmPlugin {
 	}
 	
 	@Override
+	public KeyStroke getKeyboardShortcut() {
+		return KeyStroke.getKeyStroke('E', InputEvent.ALT_DOWN_MASK);
+	}
+	
+	@Override
 	public String getAlgorithmName() {
-		return "Split edge";
+		return "Split Edge";
 	}
 
 	

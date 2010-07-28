@@ -105,7 +105,7 @@ public class DelaunayPlugin extends HalfedgeAlgorithmPlugin {
 	
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
-		return AlgorithmCategory.Editing;
+		return AlgorithmCategory.Geometry;
 	}
 	
 	
