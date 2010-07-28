@@ -43,14 +43,14 @@ import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.algorithm.calculator.EdgeLengthCalculator;
 import de.jtem.halfedgetools.algorithm.triangulation.Delaunay;
-import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.util.ConsistencyCheck;
 import de.jtem.halfedgetools.util.TriangulationException;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class DelaunayPlugin extends HalfedgeAlgorithmPlugin {
+public class DelaunayPlugin extends AlgorithmPlugin {
 
 	private class EdgeLengthFromCoordinatesCalculator extends EdgeLengthCalculator {
 

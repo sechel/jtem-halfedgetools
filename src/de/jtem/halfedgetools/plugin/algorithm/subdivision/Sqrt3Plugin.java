@@ -41,13 +41,13 @@ import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 import de.jtem.halfedgetools.algorithm.subdivision.Sqrt3;
-import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class Sqrt3Plugin extends HalfedgeAlgorithmPlugin {
+public class Sqrt3Plugin extends AlgorithmPlugin {
 
 	private Sqrt3
 		subdivider = new Sqrt3();

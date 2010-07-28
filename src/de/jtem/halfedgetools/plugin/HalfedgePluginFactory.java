@@ -34,8 +34,18 @@ package de.jtem.halfedgetools.plugin;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.jtem.halfedgetools.plugin.algorithm.generator.RandomSphereGenerator;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.PerturbPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.ProjectPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.selection.BoundaryEdgeSelection;
+import de.jtem.halfedgetools.plugin.algorithm.selection.BoundaryFaceSelection;
+import de.jtem.halfedgetools.plugin.algorithm.selection.BoundaryVertexSelection;
+import de.jtem.halfedgetools.plugin.algorithm.selection.ClearSelection;
+import de.jtem.halfedgetools.plugin.algorithm.selection.ExportSelection;
+import de.jtem.halfedgetools.plugin.algorithm.selection.ImportSelection;
+import de.jtem.halfedgetools.plugin.algorithm.selection.InvertEdgeSelection;
+import de.jtem.halfedgetools.plugin.algorithm.selection.InvertFaceSelection;
+import de.jtem.halfedgetools.plugin.algorithm.selection.InvertVertexSelection;
 import de.jtem.halfedgetools.plugin.algorithm.simplification.GarlandHeckbertPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkLinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkPlugin;
@@ -60,7 +70,6 @@ import de.jtem.halfedgetools.plugin.algorithm.topology.FaceSplitterPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.FillHolesPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.RemoveVertexFillPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.VertexRemoverPlugin;
-import de.jtem.halfedgetools.plugin.generator.RandomSphereGenerator;
 import de.jtem.halfedgetools.plugin.visualizers.DirichletEnergyVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.EdgeLengthVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.FacePlanarityVisualizer;
@@ -120,6 +129,20 @@ public class HalfedgePluginFactory {
 		return s;
 	}
 	
+	public static Set<Plugin> createSelectionPlugins() {
+		Set<Plugin> s = new HashSet<Plugin>();
+		s.add(new BoundaryVertexSelection());
+		s.add(new BoundaryEdgeSelection());
+		s.add(new BoundaryFaceSelection());
+		s.add(new InvertVertexSelection());
+		s.add(new InvertEdgeSelection());
+		s.add(new InvertFaceSelection());
+		s.add(new ClearSelection());
+		s.add(new ExportSelection());
+		s.add(new ImportSelection());
+		return s;
+	}
+	
 	public static Set<Plugin> createVisualizerPlugins() {
 		Set<Plugin> s = new HashSet<Plugin>();
 		s.add(new NodeIndexVisualizer());
@@ -127,6 +150,17 @@ public class HalfedgePluginFactory {
 		s.add(new NormalVisualizer());
 		s.add(new FacePlanarityVisualizer());
 		s.add(new DirichletEnergyVisualizer());
+		return s;
+	}
+	
+	public static Set<Plugin> createPlugins() {
+		Set<Plugin> s = new HashSet<Plugin>();
+		s.addAll(createGeneratorPlugins());
+		s.addAll(createGeometryPlugins());
+		s.addAll(createSelectionPlugins());
+		s.addAll(createSubdivisionPlugins());
+		s.addAll(createTopologyPlugins());
+		s.addAll(createVisualizerPlugins());
 		return s;
 	}
 	

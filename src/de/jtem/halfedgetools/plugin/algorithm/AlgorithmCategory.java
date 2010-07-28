@@ -5,6 +5,9 @@ public enum AlgorithmCategory {
 	Subdivision,
 	Simplification,
 	Editing,
+	Generator,
+	File,
+	Selection,
 	Topology,
 	Geometry,
 	Custom

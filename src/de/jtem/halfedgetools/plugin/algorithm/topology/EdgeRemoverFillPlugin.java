@@ -43,13 +43,13 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
-import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class EdgeRemoverFillPlugin extends HalfedgeAlgorithmPlugin {
+public class EdgeRemoverFillPlugin extends AlgorithmPlugin {
 
 	
 	@Override
@@ -62,7 +62,6 @@ public class EdgeRemoverFillPlugin extends HalfedgeAlgorithmPlugin {
 		HalfedgeSelection s = new HalfedgeSelection(hif.getSelection());
 		Set<E> edges = s.getEdges(hds);
 		if (edges.isEmpty()) return;
-		
 		for (E e : edges) {
 			if (e.isPositive()) continue;
 			TopologyAlgorithms.removeEdgeFill(e);
@@ -70,7 +69,6 @@ public class EdgeRemoverFillPlugin extends HalfedgeAlgorithmPlugin {
 		s.removeAll(edges);
 		hif.update();
 		hif.setSelection(s);
-		
 	}
 
 	@Override

@@ -11,12 +11,12 @@ import de.jtem.halfedgetools.algorithm.calculator.FaceNormalCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 import de.jtem.halfedgetools.algorithm.simplification.GarlandHeckbert;
 import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
-import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class GarlandHeckbertPlugin extends HalfedgeAlgorithmPlugin {
+public class GarlandHeckbertPlugin extends AlgorithmPlugin {
 
 	@Override
 	public < 

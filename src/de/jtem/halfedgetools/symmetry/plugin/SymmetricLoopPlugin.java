@@ -45,9 +45,9 @@ import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 import de.jtem.halfedgetools.algorithm.subdivision.Loop;
-import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.symmetry.node.SEdge;
 import de.jtem.halfedgetools.symmetry.node.SFace;
 import de.jtem.halfedgetools.symmetry.node.SHDS;
@@ -55,7 +55,7 @@ import de.jtem.halfedgetools.symmetry.node.SVertex;
 import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class SymmetricLoopPlugin extends HalfedgeAlgorithmPlugin {
+public class SymmetricLoopPlugin extends AlgorithmPlugin {
 	
 
 	private Loop 

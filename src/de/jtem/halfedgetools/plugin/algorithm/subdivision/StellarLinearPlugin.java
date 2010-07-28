@@ -42,13 +42,13 @@ import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 import de.jtem.halfedgetools.algorithm.subdivision.StellarLinear;
-import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class StellarLinearPlugin extends HalfedgeAlgorithmPlugin {
+public class StellarLinearPlugin extends AlgorithmPlugin {
 
 	private StellarLinear
 		subdivider = new StellarLinear();

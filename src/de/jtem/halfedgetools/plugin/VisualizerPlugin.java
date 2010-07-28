@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import de.jreality.scene.SceneGraphComponent;
 import de.jtem.halfedge.Edge;
@@ -45,8 +46,9 @@ import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
 
-public abstract class VisualizerPlugin extends Plugin {
+public abstract class VisualizerPlugin extends Plugin implements UIFlavor {
 
 	public < 
 		V extends Vertex<V, E, F>,
@@ -96,6 +98,14 @@ public abstract class VisualizerPlugin extends Plugin {
 	@Override
 	public String toString() {
 		return getName();
+	}
+	
+	
+	@Override
+	public void mainUIChanged(String uiClass) {
+		if (getOptionPanel() != null) {
+			SwingUtilities.updateComponentTreeUI(getOptionPanel());
+		}
 	}
 	
 }

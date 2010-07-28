@@ -29,7 +29,7 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.plugin;
+package de.jtem.halfedgetools.plugin.algorithm;
 
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 
@@ -49,16 +49,20 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.plugin.AlgorithmToolbars.EditingCategoryToolbar;
+import de.jtem.halfedgetools.plugin.AlgorithmToolbars.FileCategoryToolbar;
+import de.jtem.halfedgetools.plugin.AlgorithmToolbars.GeneratorCategoryToolbar;
 import de.jtem.halfedgetools.plugin.AlgorithmToolbars.GeometryCategoryToolbar;
+import de.jtem.halfedgetools.plugin.AlgorithmToolbars.SelectionCategoryToolbar;
 import de.jtem.halfedgetools.plugin.AlgorithmToolbars.SimplificationCategoryToolbar;
 import de.jtem.halfedgetools.plugin.AlgorithmToolbars.SubdivisionCategoryToolbar;
 import de.jtem.halfedgetools.plugin.AlgorithmToolbars.TopologyCategoryToolbar;
-import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeToolBar;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.aggregators.ToolBarAggregator;
 
-public abstract class HalfedgeAlgorithmPlugin extends Plugin {
+public abstract class AlgorithmPlugin extends Plugin {
 
 	protected ViewMenuBar
 		viewMenuBar = null;
@@ -66,17 +70,9 @@ public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 		toolbar = null;
 	protected HalfedgeInterface
 		hcp = null;
-	protected double
-		actionPriority = 1.0;
 	
-	public HalfedgeAlgorithmPlugin() {
-		this(1.0);
+	public AlgorithmPlugin() {
 	}
-	
-	public HalfedgeAlgorithmPlugin(double priority) {
-		this.actionPriority = priority;
-	}
-	
 	
 	private class HalfedgeAction extends AbstractAction {
 		
@@ -112,7 +108,7 @@ public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 		HalfedgeAction action = new HalfedgeAction();
 		hcp = c.getPlugin(HalfedgeInterface.class);
 		viewMenuBar = c.getPlugin(ViewMenuBar.class);
-		viewMenuBar.addMenuItem(getClass(), actionPriority, action, "Halfedge", getAlgorithmCategory().toString());
+		viewMenuBar.addMenuItem(getClass(), getPriority(), action, "Halfedge", getAlgorithmCategory().toString());
 		switch (getAlgorithmCategory()) {
 		case Editing:
 			toolbar = c.getPlugin(EditingCategoryToolbar.class);
@@ -128,10 +124,20 @@ public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 			break;
 		case Topology:
 			toolbar = c.getPlugin(TopologyCategoryToolbar.class);
+			break;
+		case File:
+			toolbar = c.getPlugin(FileCategoryToolbar.class);
+			break;
+		case Generator:
+			toolbar = c.getPlugin(GeneratorCategoryToolbar.class);
+			break;
+		case Selection:
+			toolbar = c.getPlugin(SelectionCategoryToolbar.class);
+			break;
 		default:
 			toolbar = c.getPlugin(HalfedgeToolBar.class); 
 		}
-		toolbar.addAction(getClass(), actionPriority, action);
+		toolbar.addAction(getClass(), getPriority(), action);
 	}
 	
 	@Override
@@ -149,6 +155,10 @@ public abstract class HalfedgeAlgorithmPlugin extends Plugin {
 	
 	public abstract String getAlgorithmName();
 
+	public double getPriority() {
+		return 0;
+	}
+	
 	public abstract < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

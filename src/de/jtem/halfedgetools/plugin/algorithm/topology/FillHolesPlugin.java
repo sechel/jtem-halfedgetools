@@ -40,14 +40,14 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.alexandrov.SurfaceUtility;
-import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.halfedgetools.util.SurfaceException;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class FillHolesPlugin extends HalfedgeAlgorithmPlugin {
+public class FillHolesPlugin extends AlgorithmPlugin {
 
 	@Override
 	public <

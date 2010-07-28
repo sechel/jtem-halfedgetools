@@ -42,13 +42,13 @@ import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
 import de.jtem.halfedgetools.algorithm.subdivision.LoopLinear;
 import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
-import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class LoopLinearPlugin extends HalfedgeAlgorithmPlugin {
+public class LoopLinearPlugin extends AlgorithmPlugin {
 
 	private LoopLinear 
 		subdivider = new LoopLinear();

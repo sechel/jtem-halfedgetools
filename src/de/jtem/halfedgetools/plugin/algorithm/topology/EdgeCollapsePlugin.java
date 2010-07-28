@@ -15,13 +15,13 @@ import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
-import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class EdgeCollapsePlugin extends HalfedgeAlgorithmPlugin {
+public class EdgeCollapsePlugin extends AlgorithmPlugin {
 
 	@Override
 	public <

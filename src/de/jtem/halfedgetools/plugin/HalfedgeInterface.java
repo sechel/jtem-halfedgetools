@@ -14,8 +14,6 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -40,9 +38,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-
 import de.jreality.geometry.GeometryMergeFactory;
 import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.plugin.JRViewerUtility;
@@ -63,7 +58,6 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.Calculator;
@@ -110,9 +104,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	private JButton
 		selectVertexButton = new JButton("V"),
 		selectEdgeButton = new JButton("E"),
-		selectFaceButton = new JButton("F"),
-		selectBoundaryButton = new JButton("Boundary Vertices"),
-		invertSelectionButton = new JButton("Invert");
+		selectFaceButton = new JButton("F");
 	private JList	
 		selectionList = new JList(),
 		geometryList = new JList();
@@ -124,8 +116,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	private JButton
 		saveHDSButton = new JButton(ImageHook.getIcon("disk.png")),
 		loadHDSButton = new JButton(ImageHook.getIcon("folder.png")),
-		saveSelectionButton = new JButton(ImageHook.getIcon("disk.png")),
-		loadSelectionButton = new JButton(ImageHook.getIcon("folder.png")),
 		clearSelectionButton = new JButton("Clean Selection"),
 		rescanButton = new JButton("Rescan"),
 		undoButton = new JButton(ImageHook.getIcon("book_previous.png")),
@@ -136,8 +126,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	private JCheckBox
 		viewSelectionChecker = new JCheckBox("View Selection", true);
 	private JFileChooser 
-		chooser = new JFileChooser(),
-		selChooser = new JFileChooser();
+		chooser = new JFileChooser();
 	
 	private boolean
 		automaticConversion = true,
@@ -160,8 +149,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		converterHeds2JR = new ConverterHeds2JR();
 	private ConverterJR2Heds
 		converterJR2Heds = new ConverterJR2Heds();
-	private XStream 
-		xstream = new XStream(new PureJavaReflectionProvider());
 	
 	private LinkedList<IndexedFaceSet> undoStack = new LinkedList<IndexedFaceSet>();
 	
@@ -249,19 +236,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		selectionPanel.add(selectEdgeButton, c);
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		selectionPanel.add(selectFaceButton, c);
-		selectionPanel.add(selectBoundaryButton, c);
-		c.gridwidth = GridBagConstraints.RELATIVE;
-		selectionPanel.add(saveSelectionButton, c);
-		selectionPanel.add(loadSelectionButton, c);
-		c.gridwidth = GridBagConstraints.REMAINDER;
-		selectionPanel.add(new JPanel(), c);
-		
 		c.weighty = 1.0;
 		shrinkPanel.add(selectionPanel, c);
 		c.weightx = 1.0;
-		c.gridwidth = GridBagConstraints.RELATIVE;
-		shrinkPanel.add(invertSelectionButton,c);
-		c.gridwidth = GridBagConstraints.REMAINDER;
 		shrinkPanel.add(clearSelectionButton, c);
 		
 		File userDir = new File(System.getProperty("user.dir"));
@@ -293,30 +270,11 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			}
 		});
 		
-		selChooser.setDialogTitle("Halfedge Selection");
-		selChooser.setCurrentDirectory(userDir);
-		selChooser.setAcceptAllFileFilterUsed(false);
-		selChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		selChooser.setMultiSelectionEnabled(false);
-		selChooser.setFileFilter(new FileFilter(){
-			@Override
-			public boolean accept(File f) {
-				return f.isDirectory() || f.getName().toLowerCase().endsWith(".sml");
-			}
-
-			@Override
-			public String getDescription() {
-				return "Selection XML (*.sml)";
-			}
-		});
-		
 		selectVertexButton.addActionListener(this);
 		selectEdgeButton.addActionListener(this);
 		selectFaceButton.addActionListener(this);
-		selectBoundaryButton.addActionListener(this);
 		rescanButton.addActionListener(this);
 		clearSelectionButton.addActionListener(this);
-		invertSelectionButton.addActionListener(this);
 		viewSelectionChecker.addActionListener(this);
 		undoButton.addActionListener(this);
 		undoButton.setEnabled(false);
@@ -324,8 +282,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		redoButton.setEnabled(false);
 		saveHDSButton.addActionListener(this);
 		loadHDSButton.addActionListener(this);
-		saveSelectionButton.addActionListener(this);
-		loadSelectionButton.addActionListener(this);
 	}
 	
 	
@@ -412,83 +368,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			Face<?,?,?> n = cachedHEDS.getFace(index);
 			boolean selected = selectionInterface.isSelected(n);
 			selectionInterface.setSelected(n, !selected);
-		}
-		if (selectBoundaryButton == source) {
-			int index = selectIndexModel.getNumber().intValue();
-			if (cachedHEDS == null || index >= cachedHEDS.numVertices()) return;
-			for(Vertex<?,?,?> v : HalfEdgeUtils.boundaryVertices(cachedHEDS)){
-				boolean sel = selectionInterface.isSelected(v);
-				selectionInterface.setSelected(v, !sel);
-			}
-		}
-		if (saveSelectionButton == source) {
-			if (selChooser.showSaveDialog(w) != JFileChooser.APPROVE_OPTION) {
-				return;
-			}
-			File file = selChooser.getSelectedFile();
-			HalfedgeSelection sel = getSelection();
-			int[] vIndices = new int[sel.getVertices().size()];
-			int[] eIndices = new int[sel.getEdges().size()];
-			int[] fIndices = new int[sel.getFaces().size()];
-			int i = 0;
-			for (Vertex<?,?,?> vertex : sel.getVertices()) {
-				vIndices[i++] = vertex.getIndex();
-			}
-			i = 0;
-			for (Edge<?,?,?> edge : sel.getEdges()) {
-				eIndices[i++] = edge.getIndex();
-			}
-			i = 0;
-			for (Face<?,?,?> face : sel.getFaces()) {
-				fIndices[i++] = face.getIndex();
-			}
-			int[][] indices = {vIndices, eIndices, fIndices};
-			String selXML = xstream.toXML(indices);
-			try {
-				FileWriter fw = new FileWriter(file);
-				fw.write(selXML);
-				fw.close();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-		if (loadSelectionButton == source) {
-			if (selChooser.showOpenDialog(w) != JFileChooser.APPROVE_OPTION) {
-				return;
-			}
-			File file = selChooser.getSelectedFile();
-			try {
-				selectionInterface.clearSelection();
-				HalfedgeSelection sel = new HalfedgeSelection();
-				FileReader fr = new FileReader(file);
-				int[][] indices = (int[][])xstream.fromXML(fr);
-				for (int vi : indices[0]) {
-					if (vi < cachedHEDS.numVertices()) {
-						Vertex<?,?,?> vertex = cachedHEDS.getVertex(vi);
-						sel.setSelected(vertex, true);
-					}
-				}
-				for (int ei : indices[1]) {
-					if (ei < cachedHEDS.numEdges()) {
-						Edge<?,?,?> edge = cachedHEDS.getEdge(ei);
-						sel.setSelected(edge, true);
-					}
-				}
-				for (int fi : indices[2]) {
-					if (fi < cachedHEDS.numFaces()) {
-						Face<?,?,?> face = cachedHEDS.getFace(fi);
-						sel.setSelected(face, true);
-					}
-				}
-				selectionInterface.setSelection(sel);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-		if(invertSelectionButton == source) {
-			for(Vertex<?,?,?> v : cachedHEDS.getVertices()) {
-				selectionInterface.setSelected(v, !selectionInterface.isSelected(v));
-			}
 		}
 		if(undoButton == source) {
 			if(!undoIterator.hasPrevious()) {
@@ -814,7 +693,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	@Override
 	public void mainUIChanged(String uiClass) {
 		SwingUtilities.updateComponentTreeUI(chooser);
-		SwingUtilities.updateComponentTreeUI(selChooser);
 	}
 	
 	@Override

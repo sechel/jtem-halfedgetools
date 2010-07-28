@@ -42,12 +42,12 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
-import de.jtem.halfedgetools.plugin.HalfedgeAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class FaceRemoverPlugin extends HalfedgeAlgorithmPlugin {
+public class FaceRemoverPlugin extends AlgorithmPlugin {
 
 	@Override
 	public <
@@ -72,7 +72,7 @@ public class FaceRemoverPlugin extends HalfedgeAlgorithmPlugin {
 	
 	@Override
 	public KeyStroke getKeyboardShortcut() {
-		return KeyStroke.getKeyStroke('F');
+		return KeyStroke.getKeyStroke('f');
 	}
 	
 	
