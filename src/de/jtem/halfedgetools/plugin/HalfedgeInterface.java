@@ -804,6 +804,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	@Override
 	public void mainUIChanged(String uiClass) {
 		SwingUtilities.updateComponentTreeUI(chooser);
+		SwingUtilities.updateComponentTreeUI(selChooser);
 	}
 	
 	@Override
