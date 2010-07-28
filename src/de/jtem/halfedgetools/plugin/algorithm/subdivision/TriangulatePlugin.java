@@ -47,8 +47,6 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class TriangulatePlugin extends HalfedgeAlgorithmPlugin {
 
-	private Triangulator 
-		triangulator = new Triangulator();
 	
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
@@ -77,10 +75,10 @@ public class TriangulatePlugin extends HalfedgeAlgorithmPlugin {
 	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) {
 		Set<F> faces = hcp.getSelection().getFaces(hds);
 		if(faces.size() == 0) {
-			triangulator.triangulate(hds);
+			Triangulator.triangulate(hds);
 		} else {
 			for(F f: faces) {
-				triangulator.triangulateFace(f,hds);
+				Triangulator.triangulateFace(f,hds);
 			}
 		}
 		hcp.set(hds, null);

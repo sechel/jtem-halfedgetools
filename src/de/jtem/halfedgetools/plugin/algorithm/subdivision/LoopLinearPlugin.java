@@ -65,8 +65,7 @@ public class LoopLinearPlugin extends HalfedgeAlgorithmPlugin {
 		if (hds == null) {
 			return;
 		}
-		Triangulator t = new Triangulator();
-		t.triangulate(hds);
+		Triangulator.triangulate(hds);
 		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
 		EdgeAverageCalculator ec = c.get(hds.getEdgeClass(), EdgeAverageCalculator.class);
 		FaceBarycenterCalculator fc = c.get(hds.getFaceClass(), FaceBarycenterCalculator.class);

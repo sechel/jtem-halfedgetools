@@ -34,15 +34,14 @@ package de.jtem.halfedgetools.plugin;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.jtem.halfedgetools.algorithm.triangulation.Delaunay;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.PerturbPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.ProjectPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.simplification.GarlandHeckbertPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkLinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.LoopLinearPlugin;
-import de.jtem.halfedgetools.plugin.algorithm.subdivision.MedialGraphLinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.LoopPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.subdivision.MedialGraphLinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.QuadGraphLinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.Sqrt3LinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.Sqrt3Plugin;

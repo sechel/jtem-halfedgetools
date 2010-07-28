@@ -37,8 +37,7 @@ public class GarlandHeckbertPlugin extends HalfedgeAlgorithmPlugin {
 		if (fac == null) {
 			throw new CalculatorException("FaceAreaCalculator not found for " + hds);
 		}
-		Triangulator t = new Triangulator();
-		t.triangulate(hds);
+		Triangulator.triangulate(hds);
 		GarlandHeckbert<V, E, F, HDS> gh = new GarlandHeckbert<V, E, F, HDS>(hds, vc, fnc, fac);
 		gh.simplify(500);
 		hcp.set(hds);

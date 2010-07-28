@@ -47,11 +47,11 @@ import de.jreality.geometry.GeometryMergeFactory;
 import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.plugin.JRViewerUtility;
 import de.jreality.plugin.basic.Content;
-import de.jreality.plugin.basic.Scene;
-import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.Content.ChangeEventType;
 import de.jreality.plugin.basic.Content.ContentChangedEvent;
 import de.jreality.plugin.basic.Content.ContentChangedListener;
+import de.jreality.plugin.basic.Scene;
+import de.jreality.plugin.basic.View;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.SceneGraphVisitor;
@@ -800,6 +800,11 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		content.removeContentChangedListener(contentChangedListener);
 	}
 	
+	
+	@Override
+	public void mainUIChanged(String uiClass) {
+		SwingUtilities.updateComponentTreeUI(chooser);
+	}
 	
 	@Override
 	public Class<? extends SideContainerPerspective> getPerspectivePluginClass() {

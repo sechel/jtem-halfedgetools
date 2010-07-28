@@ -257,8 +257,7 @@ public abstract class FunctionalTest <
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void createCube(HDS hds) {
 		HalfEdgeUtils.addCube(hds);
-		Triangulator trian = new Triangulator();
-		trian.triangulate(hds);
+		Triangulator.triangulate(hds);
 		hds.getVertex(0).setPosition(new Point3d(-0.5, -0.5, -0.5));
 		hds.getVertex(1).setPosition(new Point3d(0.5, -0.5, -0.5));
 		hds.getVertex(2).setPosition(new Point3d(-0.5, 0.5, -0.5));
