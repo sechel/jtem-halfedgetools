@@ -111,7 +111,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		selectVertexButton = new JButton("V"),
 		selectEdgeButton = new JButton("E"),
 		selectFaceButton = new JButton("F"),
-		selectBoundaryButton = new JButton("Boundary Vertices");
+		selectBoundaryButton = new JButton("Boundary Vertices"),
+		invertSelectionButton = new JButton("Invert");
 	private JList	
 		selectionList = new JList(),
 		geometryList = new JList();
@@ -258,6 +259,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		c.weighty = 1.0;
 		shrinkPanel.add(selectionPanel, c);
 		c.weightx = 1.0;
+		c.gridwidth = GridBagConstraints.RELATIVE;
+		shrinkPanel.add(invertSelectionButton,c);
+		c.gridwidth = GridBagConstraints.REMAINDER;
 		shrinkPanel.add(clearSelectionButton, c);
 		
 		File userDir = new File(System.getProperty("user.dir"));
@@ -312,6 +316,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		selectBoundaryButton.addActionListener(this);
 		rescanButton.addActionListener(this);
 		clearSelectionButton.addActionListener(this);
+		invertSelectionButton.addActionListener(this);
 		viewSelectionChecker.addActionListener(this);
 		undoButton.addActionListener(this);
 		undoButton.setEnabled(false);
@@ -478,6 +483,11 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				selectionInterface.setSelection(sel);
 			} catch (Exception ex) {
 				ex.printStackTrace();
+			}
+		}
+		if(invertSelectionButton == source) {
+			for(Vertex<?,?,?> v : cachedHEDS.getVertices()) {
+				selectionInterface.setSelected(v, !selectionInterface.isSelected(v));
 			}
 		}
 		if(undoButton == source) {

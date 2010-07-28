@@ -59,17 +59,18 @@ public class EdgeRemoverFillPlugin extends HalfedgeAlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hif) throws CalculatorException {
-		Set<E> edges = hif.getSelection().getEdges(hds);
+		HalfedgeSelection s = new HalfedgeSelection(hif.getSelection());
+		Set<E> edges = s.getEdges(hds);
 		if (edges.isEmpty()) return;
-		HalfedgeSelection s = hif.getSelection();
+		
 		for (E e : edges) {
 			if (e.isPositive()) continue;
-			F f = TopologyAlgorithms.removeEdgeFill(e);
-			s.add(f);
+			TopologyAlgorithms.removeEdgeFill(e);
 		}
 		s.removeAll(edges);
-		hif.setSelection(s);
 		hif.update();
+		hif.setSelection(s);
+		
 	}
 
 	@Override

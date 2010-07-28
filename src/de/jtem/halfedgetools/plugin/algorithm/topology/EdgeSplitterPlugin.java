@@ -41,6 +41,7 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
@@ -61,13 +62,14 @@ public class EdgeSplitterPlugin extends HalfedgeAlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hif) throws CalculatorException {
-		Set<E> edges = hif.getSelection().getEdges(hds);
+		HalfedgeSelection s = new HalfedgeSelection(hif.getSelection());
+		Set<E> edges = s.getEdges(hds);
 		if (edges.isEmpty()) return;
 		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
 		if (vc == null) {
 			throw new CalculatorException("No vertex position calculators found for " + this);
 		}
-		HalfedgeSelection s = new HalfedgeSelection();
+		
 		for (E e : edges) {
 			if(e.isPositive()){ 
 				double[] p1 = vc.get(e.getTargetVertex());
@@ -75,10 +77,15 @@ public class EdgeSplitterPlugin extends HalfedgeAlgorithmPlugin {
 				V v = TopologyAlgorithms.splitEdge(e);
 				vc.set(v, Rn.linearCombination(null, 0.5, p1, 0.5, p2));
 				s.setSelected(v, true);
+				for(E ae : HalfEdgeUtils.incomingEdges(v)) {
+					s.setSelected(ae, true);
+					s.setSelected(ae.getOppositeEdge(), true);
+				}
 			}
+			
 		}
-		hif.setSelection(s);
 		hif.update();
+		hif.setSelection(s);
 	}
 
 	@Override
