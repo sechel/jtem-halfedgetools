@@ -68,7 +68,7 @@ public class ImportSelection extends AlgorithmPlugin implements UIFlavor {
 	
 	@Override
 	public double getPriority() {
-		return -2;
+		return -3;
 	}
 
 	@Override

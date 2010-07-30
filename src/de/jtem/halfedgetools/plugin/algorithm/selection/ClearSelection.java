@@ -9,6 +9,8 @@ import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class ClearSelection extends AlgorithmPlugin {
 
@@ -32,4 +34,14 @@ public class ClearSelection extends AlgorithmPlugin {
 		hcp.clearSelection();
 	}
 
+	@Override
+	public double getPriority() {
+		return -1;
+	}
+	@Override
+	public PluginInfo getPluginInfo() {
+		PluginInfo info = new PluginInfo();
+		info.icon = ImageHook.getIcon("clearSel.png",16,16);
+		return info;
+	}
 }

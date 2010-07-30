@@ -122,7 +122,7 @@ public class ExportSelection extends AlgorithmPlugin implements UIFlavor {
 	
 	@Override
 	public double getPriority() {
-		return -1;
+		return -2;
 	}
 	
 	@Override

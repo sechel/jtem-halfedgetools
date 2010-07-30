@@ -11,6 +11,8 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class BoundaryEdgeSelection extends AlgorithmPlugin {
 
@@ -41,4 +43,10 @@ public class BoundaryEdgeSelection extends AlgorithmPlugin {
 		hcp.setSelection(sel);
 	}
 
+	@Override
+	public PluginInfo getPluginInfo() {
+		PluginInfo info = new PluginInfo();
+		info.icon = ImageHook.getIcon("bdEdges.png",16,16);
+		return info;
+	}
 }
