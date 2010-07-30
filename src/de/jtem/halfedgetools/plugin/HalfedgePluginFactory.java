@@ -80,7 +80,7 @@ import de.jtem.jrworkspace.plugin.Plugin;
 public class HalfedgePluginFactory {
 
 
-	public static Set<Plugin> createTopologyPlugins() {
+	public static Set<Plugin> createEditingPlugins() {
 		Set<Plugin> hs = new HashSet<Plugin>();
 		hs.add(new VertexRemoverPlugin());
 		hs.add(new RemoveVertexFillPlugin());
@@ -159,7 +159,7 @@ public class HalfedgePluginFactory {
 		s.addAll(createGeometryPlugins());
 		s.addAll(createSelectionPlugins());
 		s.addAll(createSubdivisionPlugins());
-		s.addAll(createTopologyPlugins());
+		s.addAll(createEditingPlugins());
 		s.addAll(createVisualizerPlugins());
 		return s;
 	}
