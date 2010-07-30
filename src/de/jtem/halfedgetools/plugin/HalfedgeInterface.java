@@ -29,6 +29,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -330,26 +331,28 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			selectionInterface.clearSelection();
 		}
 		if(loadHDSButton == source) {
-			File file = null;
-			if (chooser.showOpenDialog(w) == JFileChooser.APPROVE_OPTION) {
-				file = chooser.getSelectedFile();
-			}
-			if (file != null) {
+			int result = chooser.showOpenDialog(w);
+			if (result != JFileChooser.APPROVE_OPTION) return;
+			File file = chooser.getSelectedFile();
+			try {
 				HalfEdgeDataStructure<?, ?, ?> hds = HalfedgeIO.readHDS(file.getAbsolutePath());
 				set(hds, getAdapters());
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(w, ex.getLocalizedMessage());
 			}
 		}
 		if(saveHDSButton == source) {
-			File file = null;
-			if (chooser.showSaveDialog(w) == JFileChooser.APPROVE_OPTION) {
-				file = chooser.getSelectedFile();
-			}
-			if (file != null) {
+			int result = chooser.showSaveDialog(w);
+			if (result != JFileChooser.APPROVE_OPTION) return;
+			File file = chooser.getSelectedFile();
+			try {
 				if(file.getName().toLowerCase().endsWith(".heml")) {
 					HalfedgeIO.writeHDS(cachedHEDS, file.getAbsolutePath());
 				} else if(file.getName().toLowerCase().endsWith(".obj")) {
 					HalfedgeIO.writeOBJ(cachedHEDS,adapters,file.getAbsolutePath());
 				}
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(w, ex.getLocalizedMessage());
 			}
 		}
 		if (selectVertexButton == source) {

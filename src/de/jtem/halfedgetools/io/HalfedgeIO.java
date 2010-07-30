@@ -30,8 +30,6 @@ OF SUCH DAMAGE.
 **/
 
 package de.jtem.halfedgetools.io;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -51,56 +49,20 @@ import de.jtem.halfedgetools.jreality.ConverterHeds2JR;
 
 public class HalfedgeIO {
 
-	static XStream xstream = new XStream();
+	private static XStream 
+		xstream = new XStream();
 
-	private static String readTextFile(String fullPathFilename) throws IOException {
-		StringBuffer sb = new StringBuffer(1024);
-		BufferedReader reader = new BufferedReader(new FileReader(fullPathFilename));
-				
-		char[] chars = new char[1024];
-		while( reader.read(chars) > -1){
-			sb.append(String.valueOf(chars));	
-		}
-
-		reader.close();
-
-		return sb.toString();
-	}
-	
-	private static void writeTextFile(String contents, String fullPathFilename) throws IOException{
-		BufferedWriter writer = new BufferedWriter(new FileWriter(fullPathFilename));
-		writer.write(contents);
-		writer.flush();
-		writer.close();	
-	}
-	
-	public static
-	HalfEdgeDataStructure<?,?,?> readHDS(String filename){
-		String xml = null;
-		try {
-			xml = readTextFile(filename);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+	public static HalfEdgeDataStructure<?,?,?> readHDS(String filename) throws IOException {
+		FileReader fr = new FileReader(filename);
 		xstream.setMode(XStream.ID_REFERENCES);
-		
-		return (HalfEdgeDataStructure<?,?,?>)xstream.fromXML(xml);
+		return (HalfEdgeDataStructure<?,?,?>)xstream.fromXML(fr);
 	}
 	
 	
-	public static void writeHDS(HalfEdgeDataStructure<?,?,?> heds, String filename) {
-
+	public static void writeHDS(HalfEdgeDataStructure<?,?,?> heds, String filename) throws IOException {
+		FileWriter fw = new FileWriter(filename);
 		xstream.setMode(XStream.ID_REFERENCES);
-
-		String xml = xstream.toXML(heds);
-		try {
-			writeTextFile(xml, filename);
-		} catch (IOException e) {
-			System.err.println("Could not write to file " + filename);
-			e.printStackTrace();
-		}
-		
+		xstream.toXML(heds, fw);
 	}
 
 	public static <
@@ -108,11 +70,10 @@ public class HalfedgeIO {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	>void writeOBJ(HDS hds, AdapterSet adapters, String file) {
+	> void writeOBJ(HDS hds, AdapterSet adapters, String file) {
 		try {
 			ConverterHeds2JR converter = new ConverterHeds2JR();
-			WriterOBJ.write(converter.heds2ifs(hds, adapters,null),
-					new FileOutputStream(file));
+			WriterOBJ.write(converter.heds2ifs(hds, adapters,null), new FileOutputStream(file));
 		} catch (FileNotFoundException e1) {
 			System.err.println("Could not write to file " + file);
 			e1.printStackTrace();
