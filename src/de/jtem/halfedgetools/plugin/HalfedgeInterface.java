@@ -278,10 +278,14 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		viewSelectionChecker.addActionListener(this);
 		undoButton.addActionListener(this);
 		undoButton.setEnabled(false);
+		undoButton.setToolTipText("Undo");
 		redoButton.addActionListener(this);
 		redoButton.setEnabled(false);
+		redoButton.setToolTipText("Redo");
 		saveHDSButton.addActionListener(this);
+		saveHDSButton.setToolTipText("Save Halfedge Geometry");
 		loadHDSButton.addActionListener(this);
+		loadHDSButton.setToolTipText("Load Halfedge Geometry");
 	}
 	
 	

@@ -59,4 +59,22 @@ public abstract class JREdge <
 		radius = 1,
 		pointSize = 1;
 
+	public void copyData(V v) {
+		if (v.position != null) {
+			position = v.position.clone();
+		}
+		if (v.normal != null) {
+			normal = v.normal.clone();
+		}
+		if (v.color != null) {
+			color = v.color.clone();
+		}
+		if (v.normal != null) {
+			textCoord = v.textCoord.clone();
+		}
+		this.label = v.label;
+		this.radius = v.radius;
+		this.pointSize = v.pointSize;
+	}
+	
 }

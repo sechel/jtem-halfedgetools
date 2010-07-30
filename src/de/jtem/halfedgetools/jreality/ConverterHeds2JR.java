@@ -85,6 +85,7 @@ public class ConverterHeds2JR {
 				readOutData(adapters, v);
 			} catch (Exception e) {
 				System.err.println("Error reading vertex data: " + e.getLocalizedMessage());
+				e.printStackTrace();
 			}
 		}
 		ifs.setVertexAttributes(Attribute.COORDINATES, getdoubleArrayArray(coordinates));
@@ -110,6 +111,7 @@ public class ConverterHeds2JR {
 				readOutData(adapters, e);
 			} catch (Exception ex) {
 				System.err.println("Error reading edge data: " + ex.getLocalizedMessage());
+				ex.printStackTrace();
 			}
 			k++;
 		}
@@ -137,6 +139,7 @@ public class ConverterHeds2JR {
 				readOutData(adapters, f);
 			} catch (Exception e) {
 				System.err.println("Error reading face data: " + e.getLocalizedMessage());
+				e.printStackTrace();
 			}
 			faceIndices[i++] = face;
 		}

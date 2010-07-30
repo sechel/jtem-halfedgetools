@@ -67,8 +67,8 @@ public class RemoveVertexFillPlugin extends AlgorithmPlugin {
 			F f = TopologyAlgorithms.removeVertexFill(v);
 			s.setSelected(f, true);
 		}
-		hif.setSelection(s);
 		hif.update();
+		hif.setSelection(s);
 	}
 
 	@Override
