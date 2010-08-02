@@ -576,7 +576,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	> HDS get(HDS hds, AdapterSet a) {
 		if (a == null) a = new AdapterSet();
 		if (!(activeComponent.getGeometry() instanceof IndexedFaceSet)) {
-			return hds;
+			return (HDS)cachedHEDS;
 		}
 		if (hds == null) {
 			return (HDS)cachedHEDS;

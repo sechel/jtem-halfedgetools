@@ -63,7 +63,7 @@ public class EdgeRemoverFillPlugin extends AlgorithmPlugin {
 		Set<E> edges = s.getEdges(hds);
 		if (edges.isEmpty()) return;
 		for (E e : edges) {
-			if (e.isPositive() || e.isValid()) continue;
+			if (e.isPositive() || !e.isValid()) continue;
 			TopologyAlgorithms.removeEdgeFill(e);
 		}
 		s.removeAll(edges);
