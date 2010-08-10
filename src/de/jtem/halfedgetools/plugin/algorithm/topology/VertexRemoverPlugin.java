@@ -33,8 +33,6 @@ package de.jtem.halfedgetools.plugin.algorithm.topology;
 
 import java.util.Set;
 
-import javax.swing.KeyStroke;
-
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -68,11 +66,6 @@ public class VertexRemoverPlugin extends AlgorithmPlugin {
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
 		return AlgorithmCategory.Editing;
-	}
-	
-	@Override
-	public KeyStroke getKeyboardShortcut() {
-		return KeyStroke.getKeyStroke('v');
 	}
 	
 	@Override
