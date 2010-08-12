@@ -31,6 +31,8 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools;
 
+import javax.swing.UIManager;
+
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
@@ -38,6 +40,8 @@ import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 public class JRHalfedgeViewer {
 	
 	public static void main(String[] args) {
+		System.setProperty("de.jreality.scene.Viewer", "de.jreality.jogl.GLJPanelViewer");
+		UIManager.getDefaults().put("Slider.paintValue", false);
 		JRViewer v = new JRViewer();
 		v.setPropertiesFile("JRHalfedgeViewer.xml");
 		v.setPropertiesResource(JRHalfedgeViewer.class, "JRHalfedgeViewer.xml");

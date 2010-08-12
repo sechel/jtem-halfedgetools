@@ -62,7 +62,7 @@ import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.aggregators.ToolBarAggregator;
 
-public abstract class AlgorithmPlugin extends Plugin {
+public abstract class AlgorithmPlugin extends Plugin implements Comparable<AlgorithmPlugin> {
 
 	protected ViewMenuBar
 		viewMenuBar = null;
@@ -70,11 +70,19 @@ public abstract class AlgorithmPlugin extends Plugin {
 		toolbar = null;
 	protected HalfedgeInterface
 		hcp = null;
+	private HalfedgeAction 
+		action = new HalfedgeAction();
 	
 	public AlgorithmPlugin() {
 	}
 	
-	private class HalfedgeAction extends AbstractAction {
+	@Override
+	public int compareTo(AlgorithmPlugin o) {
+		return getAlgorithmName().compareTo(o.getAlgorithmName());
+	}
+	
+	
+	public class HalfedgeAction extends AbstractAction {
 		
 		private static final long 
 			serialVersionUID = 1L;
@@ -105,7 +113,6 @@ public abstract class AlgorithmPlugin extends Plugin {
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
-		HalfedgeAction action = new HalfedgeAction();
 		hcp = c.getPlugin(HalfedgeInterface.class);
 		viewMenuBar = c.getPlugin(ViewMenuBar.class);
 		viewMenuBar.addMenuItem(getClass(), getPriority(), action, "Halfedge", getAlgorithmCategory().toString());
@@ -146,6 +153,11 @@ public abstract class AlgorithmPlugin extends Plugin {
 		viewMenuBar.removeAll(getClass());
 		toolbar.removeAll(getClass());
 	}
+	
+	public HalfedgeAction getHalfedgeAction() {
+		return action;
+	}
+	
 	
 	public KeyStroke getKeyboardShortcut() {
 		return null;

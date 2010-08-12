@@ -1,18 +1,18 @@
 package de.jtem.halfedgetools.plugin;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
+import javax.swing.SwingUtilities;
+
 import de.jreality.plugin.JRViewerUtility;
-import de.jreality.tools.DragEventTool;
-import de.jreality.tools.FaceDragEvent;
-import de.jreality.tools.FaceDragListener;
-import de.jreality.tools.LineDragEvent;
-import de.jreality.tools.LineDragListener;
-import de.jreality.tools.PointDragEvent;
-import de.jreality.tools.PointDragListener;
+import de.jreality.scene.pick.PickResult;
+import de.jreality.scene.tool.ToolContext;
+import de.jreality.tools.ActionTool;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -23,23 +23,23 @@ import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class SelectionInterface extends Plugin implements PointDragListener, LineDragListener, FaceDragListener, HalfedgeListener {
+public class SelectionInterface extends Plugin implements ActionListener, HalfedgeListener {
 
 	private HalfedgeSelection
 		selection = new HalfedgeSelection();
 	private HalfedgeInterface
 		hif = null;
-	private DragEventTool
-		tool = new DragEventTool();
+	private ActionTool
+		actionTool1 = new ActionTool("PrimaryAction"),
+		actionTool2 = new ActionTool("SecondaryAction");
 	private List<SelectionListener>
 		listeners = new LinkedList<SelectionListener>();
 	private VisualizersManager
 		visManager = null;
 	
 	public SelectionInterface() {
-		tool.addPointDragListener(this);
-		tool.addLineDragListener(this);
-		tool.addFaceDragListener(this);
+		actionTool1.addActionListener(this);
+		actionTool2.addActionListener(this);
 	}
 	
 	@Override
@@ -69,14 +69,16 @@ public class SelectionInterface extends Plugin implements PointDragListener, Lin
 		hif.addHalfedgeListener(this);
 		visManager = c.getPlugin(VisualizersManager.class);
 		visManager.setActive(c.getPlugin(SelectionVisualizer.class), true);
-		JRViewerUtility.getContentPlugin(c).addContentTool(tool);
+		JRViewerUtility.getContentPlugin(c).addContentTool(actionTool1);
+		JRViewerUtility.getContentPlugin(c).addContentTool(actionTool2);
 	}
 
 	@Override
 	public void uninstall(Controller c) throws Exception {
 		super.uninstall(c);
 		hif.removeHalfedgeListener(this);
-		JRViewerUtility.getContentPlugin(c).removeContentTool(tool);
+		JRViewerUtility.getContentPlugin(c).removeContentTool(actionTool1);
+		JRViewerUtility.getContentPlugin(c).removeContentTool(actionTool2);
 	}
 	
 	
@@ -85,73 +87,73 @@ public class SelectionInterface extends Plugin implements PointDragListener, Lin
 		return super.getPluginInfo();
 	}
 
-	@Override
-	public void pointDragEnd(PointDragEvent e) {
-		HalfEdgeDataStructure<?, ?, ?> hds = hif.getCache();
-		if (hds == null) return;
-		if (hds.numVertices() <= e.getIndex()) return;
-		if (e.getIndex() < 0) return;
-		Vertex<?,?,?> v = hds.getVertex(e.getIndex());
-		boolean selected = isSelected(v);
-		setSelected(v, !selected);
-		hif.updateStates();
-	}
 	
 	@Override
-	public void pointDragStart(PointDragEvent e) {
+	public void actionPerformed(ActionEvent e) {
+		ToolContext tc = (ToolContext)e.getSource();
+		SelectionUpdater updater = new SelectionUpdater(tc);
+		SwingUtilities.invokeLater(updater);
 	}
-	@Override
-	public void pointDragged(PointDragEvent e) {
-	}
+	
+	
+	private class SelectionUpdater implements Runnable {
+		
+		private ToolContext
+			toolContext = null;
+		
+		public SelectionUpdater(ToolContext toolContext) {
+			this.toolContext = toolContext;
+		}
 
-	@Override
-	public void lineDragEnd(LineDragEvent e) {
-		HalfEdgeDataStructure<?, ?, ?> hds = hif.getCache();
-		if (hds == null) return;
-		Map<? extends Edge<?,?,?>, Integer> edgeMap = hif.getEdgeMap();
-		TreeSet<Integer> indexSet = new TreeSet<Integer>();
-		indexSet.addAll(edgeMap.values());
-		if (!indexSet.contains(e.getIndex())) {
-			System.err.println("Edge index not found");
-			return;
-		}
-		List<Edge<?,?,?>> eList = new LinkedList<Edge<?,?,?>>();
-		for (Edge<?,?,?> edge : edgeMap.keySet()) {
-			if (edgeMap.get(edge).equals(e.getIndex())) {
-				eList.add(edge);
+		@Override
+		public void run() {
+			PickResult pr = toolContext.getCurrentPick();
+			if (pr == null) return;
+			HalfEdgeDataStructure<?, ?, ?> hds = hif.getCache();
+			if (hds == null) return;
+			int index = pr.getIndex();
+			if (index < 0) return;
+			
+			switch (pr.getPickType()) {
+			case PickResult.PICK_TYPE_POINT:
+				if (hds.numVertices() <= index) return;
+				Vertex<?,?,?> v = hds.getVertex(index);
+				boolean selected = isSelected(v);
+				setSelected(v, !selected);
+				break;
+			case PickResult.PICK_TYPE_LINE:
+				Map<? extends Edge<?,?,?>, Integer> edgeMap = hif.getEdgeMap();
+				TreeSet<Integer> indexSet = new TreeSet<Integer>();
+				indexSet.addAll(edgeMap.values());
+				if (!indexSet.contains(index)) {
+					System.err.println("Edge index not found");
+					return;
+				}
+				List<Edge<?,?,?>> eList = new LinkedList<Edge<?,?,?>>();
+				for (Edge<?,?,?> edge : edgeMap.keySet()) {
+					if (edgeMap.get(edge).equals(index)) {
+						eList.add(edge);
+					}
+				}
+				for (Edge<?,?,?> edge : eList) {
+					selected = isSelected(edge);
+					selection.setSelected(edge, !selected);
+				}
+				fireSelectionChanged(selection);
+				break;
+			case PickResult.PICK_TYPE_FACE:
+				if (hds.numFaces() <= index) return;
+				Face<?,?,?> f = hds.getFace(index);
+				selected = isSelected(f);
+				setSelected(f, !selected);
+				break;
+			default:
+				return;
 			}
+			hif.updateStates();			
 		}
-		for (Edge<?,?,?> edge : eList) {
-			boolean selected = isSelected(edge);
-			selection.setSelected(edge, !selected);
-		}
-		fireSelectionChanged(selection);
-		hif.updateStates();
-	}
-	@Override
-	public void lineDragStart(LineDragEvent e) {
-	}
-	@Override
-	public void lineDragged(LineDragEvent e) {
 	}
 	
-	@Override
-	public void faceDragEnd(FaceDragEvent e) {
-		HalfEdgeDataStructure<?, ?, ?> hds = hif.getCache();
-		if (hds == null) return;
-		if (hds.numFaces() <= e.getIndex()) return;
-		if (e.getIndex() < 0) return;
-		Face<?,?,?> f = hds.getFace(e.getIndex());
-		boolean selected = isSelected(f);
-		setSelected(f, !selected);
-		hif.updateStates();
-	}
-	@Override
-	public void faceDragStart(FaceDragEvent e) {
-	}
-	@Override
-	public void faceDragged(FaceDragEvent e) {
-	}
 	
 	public void addSelectionListener(SelectionListener l) {
 		listeners.add(l);
