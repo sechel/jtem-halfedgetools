@@ -107,7 +107,12 @@ public class SelectionInterface extends Plugin implements ActionListener, Halfed
 
 		@Override
 		public void run() {
-			PickResult pr = toolContext.getCurrentPick();
+			PickResult pr = null;
+			try {
+				pr = toolContext.getCurrentPick();
+			} catch (Exception e) {
+				return;
+			}
 			if (pr == null) return;
 			HalfEdgeDataStructure<?, ?, ?> hds = hif.getCache();
 			if (hds == null) return;

@@ -123,7 +123,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		BasicStroke s = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, dash, 0);
 		g.setStroke(s);
 		g.setColor(Color.RED);
-		g.drawRect(x, y, w, h);
+		g.drawRect(x, y, w == 0 ? 1 : w, h == 0 ? 1 : h);
 		
 		g.setStroke(sOld);
 	}
