@@ -157,12 +157,18 @@ public class HalfedgeLayer implements ActionListener {
 	}
 	
 	
+	private void initVisualizers(AdapterSet a) {
+		for (VisualizerPlugin vp : visualizers) {
+			vp.initVisualization(hds, a, hif);
+		}
+	}
+	
+	
 	private void updateVisualizersGeometry(AdapterSet a) {
 		layerRoot.removeChild(visualizersRoot);
 		visualizersRoot = new SceneGraphComponent();
 		visualizersRoot.setName("Visualizers");
 		for (VisualizerPlugin vp : visualizers) {
-			vp.initVisualization(hds, a, hif);
 			if (vp.getComponent() != null) {
 				visualizersRoot.addChild(vp.getComponent());
 			}
@@ -276,6 +282,7 @@ public class HalfedgeLayer implements ActionListener {
 	private void convertHDS(AdapterSet a) {
 		clearSelection();
 		AdapterSet ea = getEffectiveAdapters(a);
+		initVisualizers(ea);
 		geometry = converterToIFS.heds2ifs(hds, ea, edgeMap);
 		geometryRoot.setGeometry(geometry);
 		updateVisualizersGeometry(ea);
