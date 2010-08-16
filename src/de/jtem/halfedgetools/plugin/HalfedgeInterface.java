@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.plugin;
 
+import static de.jreality.math.Pn.EUCLIDEAN;
 import static de.jreality.shader.CommonAttributes.LINE_SHADER;
 import static de.jreality.shader.CommonAttributes.POINT_RADIUS;
 import static de.jreality.shader.CommonAttributes.POINT_SHADER;
@@ -74,6 +75,7 @@ import de.jreality.shader.DefaultPointShader;
 import de.jreality.shader.EffectiveAppearance;
 import de.jreality.shader.ShaderUtility;
 import de.jreality.tools.ActionTool;
+import de.jreality.util.CameraUtility;
 import de.jreality.util.SceneGraphUtility;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -156,13 +158,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		disableListeners = false;
 	private List<SelectionListener>	
 		selectionListeners = new LinkedList<SelectionListener>();
-
-	
 	
 	private List<HalfedgeLayer>
 		layers = new ArrayList<HalfedgeLayer>();
 	private HalfedgeLayer
 		activeLayer = new HalfedgeLayer(this);
+	
 	
 	
 	public HalfedgeInterface() {
@@ -598,6 +599,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			}
 			updateStates();
 			checkContent();
+			encompassAll();
 		}
 		
 	}
@@ -859,17 +861,32 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	
 	public void addLayer(HalfedgeLayer layer) {
+		if (layers.contains(layer)) return;
+		layer.setActive(false);
 		layers.add(0, layer);
 		root.addChild(layer.getLayerRoot());
+		updateStates();
 	}
 	
 	public void removeLayer(HalfedgeLayer layer) {
+		if (!layers.contains(layer)) return;
 		int index = Math.max(layers.indexOf(layer) - 1, 0);
 		layers.remove(layer);
 		root.removeChild(layer.getLayerRoot());
-		HalfedgeLayer activeLayer = layers.get(index);
-		activateLayer(activeLayer);
+		if (layer == activeLayer) {
+			layer = layers.get(index);
+			activateLayer(layer);
+		}
+		updateStates();
 	}
+	
+	public void encompassAll() {
+		SceneGraphPath avatarPath = scene.getAvatarPath();
+		SceneGraphPath scenePath = scene.getContentPath();
+		SceneGraphPath cameraPath = scene.getCameraPath();
+		CameraUtility.encompass(avatarPath, scenePath, cameraPath, 1.75, EUCLIDEAN);
+	}
+	
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void mergeLayers(HalfedgeLayer layer, HalfedgeLayer mergeLayer) {
@@ -942,7 +959,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 						IndexedFaceSet ifs = (IndexedFaceSet)c.getGeometry();
 						HalfedgeLayer layer = new HalfedgeLayer(ifs, HalfedgeInterface.this);
 						layer.setName(ifs.getName());
-						layer.setLayerTransformation(layerTransform);
+						layer.setTransformation(layerTransform);
 						newLayers.add(layer);
 					}
 					c.childrenAccept(this);
@@ -957,6 +974,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			activateLayer(newLayers.get(0));
 			checkContent();
 			updateStates();
+			encompassAll();
 		}
 
 	}

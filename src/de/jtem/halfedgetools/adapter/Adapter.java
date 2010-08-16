@@ -110,7 +110,7 @@ public abstract class Adapter<VAL> implements Comparable<Adapter<VAL>> {
 			String n2 = o.getClass().getName();
 			return n1.compareTo(n2);
 		} else {
-			return p1 < p2 ? -1 : 1;
+			return p1 < p2 ? 1 : -1;
 		}
 	}
 	

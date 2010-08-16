@@ -55,7 +55,8 @@ public class HalfedgeLayer implements ActionListener {
 		geometryRoot = new SceneGraphComponent("Geometry"),
 		selectionRoot = new SceneGraphComponent("Selection"),
 		visualizersRoot = new SceneGraphComponent("Visualizers"),
-		boundingBoxRoot = new SceneGraphComponent("Bounding Box");
+		boundingBoxRoot = new SceneGraphComponent("Bounding Box"),
+		temporaryRoot = new SceneGraphComponent("Temporary Geometry");
 	private Map<Integer, Edge<?,?,?>>
 		edgeMap = new HashMap<Integer, Edge<?,?,?>>();
 	private HalfedgeSelection
@@ -84,7 +85,9 @@ public class HalfedgeLayer implements ActionListener {
 		layerRoot.addChild(geometryRoot);
 		layerRoot.addChild(boundingBoxRoot);
 		layerRoot.addChild(selectionRoot);
+		layerRoot.addChild(temporaryRoot);
 		layerRoot.setTransformation(new Transformation("Layer Transform"));
+		layerRoot.setAppearance(new Appearance("Layer Appearance"));
 		geometryRoot.addTool(actionTool);
 		selectionRoot.setPickable(false);
 		actionTool.addActionListener(this);
@@ -119,11 +122,17 @@ public class HalfedgeLayer implements ActionListener {
 	}
 	
 	
-	public Transformation getLayerTransformation() {
+	public Transformation getTransformation() {
 		return layerRoot.getTransformation();
 	}
-	public void setLayerTransformation(Transformation T) {
+	public void setTransformation(Transformation T) {
 		layerRoot.setTransformation(T);
+	}
+	public Appearance getAppearance() {
+		return layerRoot.getAppearance();
+	}
+	public void setAppearance(Appearance layerAppearance) {
+		layerRoot.setAppearance(layerAppearance);
 	}
 	
 	
@@ -260,6 +269,7 @@ public class HalfedgeLayer implements ActionListener {
 		}
 		converterToHDS.ifs2heds(geometry, hds, a, edgeMap);
 		updateBoundingBox();
+		resetTemporaryGeometry();
 	}
 	
 	
@@ -270,6 +280,7 @@ public class HalfedgeLayer implements ActionListener {
 		geometryRoot.setGeometry(geometry);
 		updateVisualizersGeometry(ea);
 		updateBoundingBox();
+		resetTemporaryGeometry();
 	}
 	
 
@@ -455,6 +466,18 @@ public class HalfedgeLayer implements ActionListener {
 		geometryRoot.setGeometry(geometry);
 		convertFaceSet(getEffectiveAdapters());
 		convertHDS(getEffectiveAdapters());
+	}
+	
+	public void addTemporaryGeometry(SceneGraphComponent root) {
+		temporaryRoot.addChild(root);
+		updateBoundingBox();
+	}
+	
+	public void resetTemporaryGeometry() {
+		layerRoot.removeChild(temporaryRoot);
+		temporaryRoot = new SceneGraphComponent("Temporary Geometry");
+		layerRoot.addChild(temporaryRoot);
+		updateBoundingBox();
 	}
 	
 }
