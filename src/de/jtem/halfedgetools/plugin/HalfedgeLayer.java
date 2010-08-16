@@ -80,7 +80,7 @@ public class HalfedgeLayer implements ActionListener {
 	private ActionTool
 		actionTool = new ActionTool("PrimaryAction");
 
-	public HalfedgeLayer() {
+	private HalfedgeLayer() {
 		layerRoot.addChild(geometryRoot);
 		layerRoot.addChild(boundingBoxRoot);
 		layerRoot.addChild(selectionRoot);
@@ -94,9 +94,9 @@ public class HalfedgeLayer implements ActionListener {
 		bBoxApp.setAttribute(CommonAttributes.VERTEX_DRAW, false);
 		bBoxApp.setAttribute(CommonAttributes.EDGE_DRAW, true);
 		bBoxApp.setAttribute(LINE_SHADER + "." + TUBES_DRAW, false);
-		bBoxApp.setAttribute(LINE_SHADER + "." + LINE_WIDTH, 2);
+		bBoxApp.setAttribute(LINE_SHADER + "." + LINE_WIDTH, 1);
 		bBoxApp.setAttribute(LINE_SHADER + "." + LINE_STIPPLE, true);
-		bBoxApp.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR, Color.WHITE);
+		bBoxApp.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR, Color.RED);
 		bBoxApp.setAttribute(LINE_SHADER + "." + DEPTH_FUDGE_FACTOR, 1.5f);
 		bBoxApp.setAttribute(LINE_SHADER + "." + Z_BUFFER_ENABLED, true);
 		boundingBoxRoot.setAppearance(bBoxApp);
@@ -241,7 +241,7 @@ public class HalfedgeLayer implements ActionListener {
 	}
 		
 	
-	public HalfEdgeDataStructure<?, ?, ?> get() {
+	public HalfEdgeDataStructure<?,?,?> get() {
 		return hds;
 	}
 	

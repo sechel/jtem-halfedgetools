@@ -10,9 +10,11 @@ import static java.awt.GridBagConstraints.BOTH;
 import static java.awt.event.InputEvent.CTRL_DOWN_MASK;
 import static javax.swing.JFileChooser.FILES_ONLY;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.PLAIN_MESSAGE;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
+import static javax.swing.SwingUtilities.getWindowAncestor;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -29,6 +31,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -36,7 +39,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
@@ -78,6 +80,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.Calculator;
@@ -118,6 +121,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		contentChangedListener = new HalfedgeContentListener();
 	private Action
 		newLayerAction = new NewLayerAction(),
+		deleteLayerAction = new DeleteLayerAction(),
+		mergeLayersAction = new MergeLayersAction(),
 		importAction = new ImportAction(),
 		exportAction = new ExportAction(),
 		undoAction = new UndoAction(),
@@ -190,20 +195,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			l.selectionChanged(sel, this);
 		}
 	}
-	
-	
-//	private class LayerVisibilityListener implements CellEditorListener {
-//
-//		@Override
-//		public void editingCanceled(ChangeEvent e) {
-//		}
-//
-//		@Override
-//		public void editingStopped(ChangeEvent e) {
-//			
-//		}
-//		
-//	}
 	
 	
 	private class LayerModel extends DefaultTableModel {
@@ -325,7 +316,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		layersPanel.add(layersScroller);
 		layersScroller.setMinimumSize(new Dimension(30, 150));
 		layersTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
-//		layersTable.getDefaultEditor(Boolean.class).addCellEditorListener(new LayerVisibilityListener());
 		layersTable.setRowHeight(22);
 		layersTable.getSelectionModel().addListSelectionListener(this);
 		layersTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
@@ -337,10 +327,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		c.weighty = 0.0;
 		shrinkPanel.add(layerToolbar, c);
 		layerToolbar.add(newLayerAction);
-		layerToolbar.add(new JSeparator());
+		layerToolbar.add(deleteLayerAction);
+		layerToolbar.add(mergeLayersAction);
+		layerToolbar.add(new JToolBar.Separator());
 		layerToolbar.add(undoAction);
 		layerToolbar.add(redoAction);
-		layerToolbar.add(new JSeparator());
+		layerToolbar.add(new JToolBar.Separator());
 		layerToolbar.add(importAction);
 		layerToolbar.add(exportAction);
 		layerToolbar.setFloatable(false);
@@ -417,20 +409,80 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 
 		public NewLayerAction() {
 			putValue(NAME, "New Layer");
-			putValue(SMALL_ICON, ImageHook.getIcon("page_white.png"));
+			putValue(SMALL_ICON, ImageHook.getIcon("page_white_add.png"));
 			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke('N', CTRL_DOWN_MASK));
 			putValue(SHORT_DESCRIPTION, "New Layer");
 		}
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			HalfedgeLayer layer = new HalfedgeLayer();
+			HalfedgeLayer layer = new HalfedgeLayer(HalfedgeInterface.this);
 			layer.setName("New Layer");
 			addLayer(layer);
+			activateLayer(layer);
 			updateStates();
 		}
 		
 	}
+	
+	private class DeleteLayerAction extends AbstractAction {
+
+		private static final long 
+			serialVersionUID = 1L;
+
+		public DeleteLayerAction() {
+			putValue(NAME, "Delete Layer");
+			putValue(SMALL_ICON, ImageHook.getIcon("page_white_delete.png"));
+			putValue(SHORT_DESCRIPTION, "New Layer");
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			HalfedgeLayer layer = getActiveLayer();
+			Window w = getWindowAncestor(shrinkPanel);
+			int result = JOptionPane.showConfirmDialog(w, "Delete Layer " + layer + "?");
+			if (result != JOptionPane.OK_OPTION) return;
+			removeLayer(layer);
+			updateStates();
+		}
+		
+	}
+	
+	
+	private class MergeLayersAction extends AbstractAction {
+
+		private static final long 
+			serialVersionUID = 1L;
+
+		public MergeLayersAction() {
+			putValue(NAME, "Merge Layers");
+			putValue(SMALL_ICON, ImageHook.getIcon("page_white_link.png"));
+			putValue(SHORT_DESCRIPTION, "Merge Layers");
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Window w = getWindowAncestor(shrinkPanel);
+			HalfedgeLayer layer = getActiveLayer();
+			List<HalfedgeLayer> otherLayers = new LinkedList<HalfedgeLayer>(layers);
+			otherLayers.remove(layer);
+			HalfedgeLayer[] layersArr = otherLayers.toArray(new HalfedgeLayer[otherLayers.size()]);
+			HalfedgeLayer mergeLayer = (HalfedgeLayer)JOptionPane.showInputDialog(
+				w, 
+				"Merge Layer " + layer.getName(), 
+				"Merge Layers", 
+				PLAIN_MESSAGE, 
+				(Icon)getValue(SMALL_ICON), 
+				layersArr, 
+				layer
+			);
+			if (mergeLayer == null) return;
+			mergeLayers(layer, mergeLayer);
+			updateStates();
+		}
+
+	}
+	
 	
 	
 	private class UndoAction extends AbstractAction {
@@ -542,6 +594,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				}
 			} catch (Exception ex) {
 				JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
+				ex.printStackTrace();
 			}
 			updateStates();
 			checkContent();
@@ -586,6 +639,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		text += "F" + hds.numFaces() + " ";
 		hdsLabel.setText(text);
 		hdsLabel.repaint();
+		deleteLayerAction.setEnabled(layers.size() > 1);
 		undoAction.setEnabled(activeLayer.canUndo());
 		redoAction.setEnabled(activeLayer.canRedo());
 		undoButton.updateUI();
@@ -713,16 +767,18 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	@Override
 	public void storeStates(Controller c) throws Exception {
 		super.storeStates(c);
-		c.storeProperty(getClass(), "importExportLocation", chooser.getCurrentDirectory());
+		String chooserDir = chooser.getCurrentDirectory().getAbsolutePath();
+		c.storeProperty(getClass(), "importExportLocation", chooserDir);
 	}
 	
 	@Override
 	public void restoreStates(Controller c) throws Exception {
 		super.restoreStates(c);
-		File chooserDir = new File(System.getProperty("user.dir"));
+		String chooserDir = System.getProperty("user.dir");
 		chooserDir = c.getProperty(getClass(), "importExportLocation", chooserDir);
-		if (chooserDir.exists()) {
-			chooser.setCurrentDirectory(chooserDir);
+		File chooserDirFile = new File(chooserDir);
+		if (chooserDirFile.exists()) {
+			chooser.setCurrentDirectory(chooserDirFile);
 		}
 	}
 	
@@ -808,8 +864,39 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	public void removeLayer(HalfedgeLayer layer) {
+		int index = Math.max(layers.indexOf(layer) - 1, 0);
 		layers.remove(layer);
 		root.removeChild(layer.getLayerRoot());
+		HalfedgeLayer activeLayer = layers.get(index);
+		activateLayer(activeLayer);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void mergeLayers(HalfedgeLayer layer, HalfedgeLayer mergeLayer) {
+		HalfEdgeDataStructure<?,?,?> hds1 = layer.get();
+		HalfEdgeDataStructure<?,?,?> hds2 = createEmpty(hds1);
+		hds2 = mergeLayer.get(hds2);
+		int vOffset = hds1.numVertices();
+		int eOffset = hds1.numEdges();
+		int fOffset = hds1.numFaces();
+		HalfEdgeUtils.copy(hds2, hds1);
+		
+		for (Vertex v : hds2.getVertices()) {
+			Vertex vv = hds1.getVertex(v.getIndex() + vOffset);
+			vv.copyData(v);
+		}
+		for (Edge e : hds2.getEdges()) {
+			Edge ee = hds1.getEdge(e.getIndex() + eOffset);
+			ee.copyData(e);
+		}
+		for (Face f : hds2.getFaces()) {
+			Face ff = hds1.getFace(f.getIndex() + fOffset);
+			ff.copyData(f);
+		}
+		
+		removeLayer(mergeLayer);
+		layer.set(hds1);
+		activateLayer(layer);
 	}
 	
 	public void activateLayer(HalfedgeLayer layer) {
