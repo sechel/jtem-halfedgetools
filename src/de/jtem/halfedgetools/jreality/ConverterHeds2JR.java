@@ -58,18 +58,17 @@ public class ConverterHeds2JR {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> IndexedFaceSet heds2ifs(HDS hds, AdapterSet adapters, Map<E, Integer> edgeMap) throws AdapterException {
+	> IndexedFaceSet heds2ifs(HDS hds, AdapterSet adapters, Map<Integer, Edge<?,?,?>> edgeMap) throws AdapterException {
 		if (!adapters.isAvailable(Position.class, hds.getVertexClass(), double[].class)) {
 			throw new AdapterException("No vertex position adapter found in ConverterHeds2Jr.heds2ifs");
 		}
-		// seperate adapters
 		if (edgeMap != null) {
 			edgeMap.clear();
 		}
 		// some facts
 		int numV =hds.numVertices();	
 		if (numV==0) {
-			return null; 
+			return new IndexedFaceSet(); 
 		}
 		int numHE =hds.numEdges();
 		int numE =numHE/2;
@@ -102,8 +101,7 @@ public class ConverterHeds2JR {
 		int k = 0;
 		for (E e : hds.getPositiveEdges()) {
 			if (edgeMap != null) {
-				edgeMap.put(e, k);
-				edgeMap.put(e.getOppositeEdge(), k);
+				edgeMap.put(k, e);
 			}
 			edgeIndis[k][0]=e.getOppositeEdge().getTargetVertex().getIndex();
 			edgeIndis[k][1]=e.getTargetVertex().getIndex();

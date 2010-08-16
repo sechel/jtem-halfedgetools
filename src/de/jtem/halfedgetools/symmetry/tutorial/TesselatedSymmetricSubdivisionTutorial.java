@@ -208,7 +208,7 @@ public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent i
 		viewer.registerPlugin(tc);
 		
 		hif.addHalfedgeListener(tc);
-		hif.setAutomaticConversion(false);
+//		hif.setAutomaticConversion(false);
 		
 		viewer.registerPlugin(hif);
 		viewer.registerPlugin(new SymmetricCatmullClarkPlugin());

@@ -11,10 +11,10 @@ import de.jtem.halfedgetools.adapter.type.Selection;
 @Selection
 public class SelectionAdapter extends AbstractAdapter<Boolean> {
 
-	private SelectionInterface
+	private HalfedgeInterface
 		hif = null;
 	
-	public SelectionAdapter(SelectionInterface hif) {
+	public SelectionAdapter(HalfedgeInterface hif) {
 		super(Boolean.class, true, true);
 		this.hif = hif;
 	}

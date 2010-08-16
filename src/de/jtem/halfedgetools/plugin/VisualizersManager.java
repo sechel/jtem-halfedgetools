@@ -38,12 +38,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -57,27 +53,16 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
-import de.jreality.plugin.basic.View;
-import de.jreality.scene.SceneGraphComponent;
-import de.jtem.halfedge.Edge;
-import de.jtem.halfedge.Face;
-import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.Adapter;
-import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.swing.IconCellRenderer;
 import de.jtem.jrworkspace.plugin.Controller;
-import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
-import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
+import de.jtem.jrworkspace.plugin.Plugin;
 
-public class VisualizersManager extends ShrinkPanelPlugin implements ListSelectionListener, HalfedgeListener {
+public class VisualizersManager extends Plugin implements ListSelectionListener {
 
 	private HalfedgeInterface
 		hif = null;
 	private List<VisualizerPlugin>
 		visualizers = new LinkedList<VisualizerPlugin>();
-	private Set<String>
-		activateSet = new HashSet<String>();
 	private JPanel
 		optionsPanel = new JPanel();
 	private JTable
@@ -85,15 +70,11 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	private JScrollPane
 		pluginScroller = new JScrollPane(pluginTable),
 		optionsScroller = new JScrollPane(optionsPanel);
-	private Map<VisualizerPlugin, Set<? extends Adapter<?>>>
-		adapterMap = new HashMap<VisualizerPlugin, Set<? extends Adapter<?>>>();
-	private SceneGraphComponent
-		geometryRoot = new SceneGraphComponent("Visualizers Geometry");
+	private JPanel
+		panel = new JPanel();
 	
 	public VisualizersManager() {
-		shrinkPanel.setTitle("Visualizers");
-		
-		shrinkPanel.setLayout(new GridBagLayout());
+		panel.setLayout(new GridBagLayout());
 		GridBagConstraints gbc2 = new GridBagConstraints();
 		gbc2.fill = GridBagConstraints.BOTH;
 		gbc2.weightx = 1.0;
@@ -112,8 +93,10 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 		optionsPanel.setPreferredSize(new Dimension(10, 100));
 		optionsPanel.setBorder(BorderFactory.createTitledBorder("Options"));
 		
-		shrinkPanel.add(pluginScroller, gbc2);
-		shrinkPanel.add(optionsScroller, gbc2);
+		gbc2.weighty = 1.0;
+		panel.add(pluginScroller, gbc2);
+		gbc2.weighty = 0.0;
+		panel.add(optionsScroller, gbc2);
 	}
 	
 	
@@ -173,7 +156,7 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 				case 0:
 					return op.getPluginInfo().icon;
 				case 1: 
-					return activateSet.contains(op.getName());
+					return isActive(op);
 				case 2:
 					value = op;
 					break;
@@ -214,88 +197,47 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 			VisualizerPlugin op = visualizers.get(row);
 			setActive(op, !isActive(op));
 			updateContent();
+			pluginTable.revalidate();
 		}
 		
 	}
 	
 	
-	public void update() {
-		for (VisualizerPlugin p : visualizers) {
-			if (isActive(p)) {
-				p.initVisualization(hif.get(), hif.getAdapters(), hif);
-			}
-		}
-		updateComponents();
-		updateAdapters();
-	}
-	
-	
-	
-	protected void updateComponents() {
-		hif.getAuxComponent().removeChild(geometryRoot);
-		geometryRoot = new SceneGraphComponent("Visualizers Geometry");
-		for (VisualizerPlugin p : visualizers) {
-			if (isActive(p)) {	
-				SceneGraphComponent c = p.getComponent();
-				if (c != null) {
-					geometryRoot.addChild(c);
-				}
-			}
-		}
-		hif.getAuxComponent().addChild(geometryRoot);
-	}
-	
-	protected void updateAdapters() {
-		for (VisualizerPlugin p : visualizers) {
-			if (adapterMap.containsKey(p)) {
-				for (Adapter<?> a : adapterMap.get(p)) {
-					hif.removeAdapter(a);
-				}
-			}
-			Set<? extends Adapter<?>> adapters = p.getAdapters();
-			adapterMap.put(p, adapters);
-			if (isActive(p)) {
-				for (Adapter<?> a : adapters) {
-					hif.addAdapter(a);
-				}
-			} else {
-				for (Adapter<?> a : adapters) {
-					hif.removeAdapter(a);
-				}
-			}
-		}
-	}
-	
 	public void updateContent() {
 		HalfedgeSelection sel = hif.getSelection();
-		hif.update();
+		hif.updateNoUndo();
 		hif.setSelection(sel);
 	}
 	
 	
 	public boolean isActive(VisualizerPlugin op) {
-		return activateSet.contains(op.getName());
+		HalfedgeLayer layer = hif.getActiveLayer();
+		return layer.getVisualizers().contains(op);
 	}
 	
 	public void setActive(VisualizerPlugin op, boolean active) {
-		if (!active) {
-			activateSet.remove(op.getName());
+		HalfedgeLayer layer = hif.getActiveLayer();
+		if (active) {
+			layer.addVisualizer(op);
 		} else {
-			activateSet.add(op.getName());
+			layer.removeVisualizer(op);
 		}
 	}
 	
 	
-	@Override
-	public Class<? extends SideContainerPerspective> getPerspectivePluginClass() {
-		return View.class;
+	public void update() {
+		updatePluginTable();
 	}
-
+	
+	public JPanel getPanel() {
+		return panel;
+	}
+	
+	
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
-		hif.addHalfedgeListener(this);
 	}
 	
 	
@@ -310,8 +252,6 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 	protected void addVisualizerPlugin(VisualizerPlugin vp) {
 		visualizers.add(vp);
 		updatePluginTable();
-		updateAdapters();
-		updateComponents();
 	}
 	
 	protected void removeVisualizerPlugin(VisualizerPlugin vp) {
@@ -319,31 +259,4 @@ public class VisualizersManager extends ShrinkPanelPlugin implements ListSelecti
 		updatePluginTable();
 	}
 
-
-	@Override
-	public < 
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void halfedgeConverting(HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		for (VisualizerPlugin p : visualizers) {
-			if (isActive(p)) {
-				p.initVisualization(hds, hif.getAdapters(), hif);
-			}
-		}
-		updateAdapters();
-	}
-	
-	@Override
-	public < 
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void halfedgeChanged(HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		updateComponents();	
-	}
-	
-	
 }

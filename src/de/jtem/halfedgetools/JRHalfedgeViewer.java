@@ -36,8 +36,19 @@ import javax.swing.UIManager;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
+import de.jtem.jrworkspace.plugin.lnfswitch.LookAndFeelSwitch;
+import de.jtem.jrworkspace.plugin.lnfswitch.plugin.CrossPlatformLnF;
+import de.jtem.jrworkspace.plugin.lnfswitch.plugin.NimbusLnF;
+import de.jtem.jrworkspace.plugin.lnfswitch.plugin.SystemLookAndFeel;
 
 public class JRHalfedgeViewer {
+	
+	private static void addLnFPlugins(JRViewer v) {
+		v.registerPlugin(new LookAndFeelSwitch());
+		v.registerPlugin(new CrossPlatformLnF());
+		v.registerPlugin(new NimbusLnF());
+		v.registerPlugin(new SystemLookAndFeel());
+	}
 	
 	public static void main(String[] args) {
 		System.setProperty("de.jreality.scene.Viewer", "de.jreality.jogl.GLJPanelViewer");
@@ -49,6 +60,8 @@ public class JRHalfedgeViewer {
 		v.addBasicUI();
 		v.addContentSupport(ContentType.CenteredAndScaled);
 		v.registerPlugins(HalfedgePluginFactory.createPlugins());
+		v.getController().setManageLookAndFeel(true);
+		addLnFPlugins(v);
 		v.startup(); 
 	}
 }

@@ -7,8 +7,9 @@ import javax.swing.JPanel;
 
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
 
-public abstract class WidgetPlugin extends Plugin {
+public abstract class WidgetPlugin extends Plugin implements UIFlavor {
 
 	private WidgetInterface
 		customGUI = null;
@@ -30,6 +31,11 @@ public abstract class WidgetPlugin extends Plugin {
 	
 	public JComponent getWidgetComponent() {
 		return null;
+	}
+	
+	@Override
+	public void mainUIChanged(String uiClass) {
+		
 	}
 	
 }

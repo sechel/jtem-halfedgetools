@@ -48,7 +48,7 @@ import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
 
-public abstract class VisualizerPlugin extends Plugin implements UIFlavor {
+public abstract class VisualizerPlugin extends Plugin implements UIFlavor, Comparable<VisualizerPlugin> {
 
 	public < 
 		V extends Vertex<V, E, F>,
@@ -72,6 +72,11 @@ public abstract class VisualizerPlugin extends Plugin implements UIFlavor {
 	
 	public JPanel getOptionPanel() {
 		return null;
+	}
+	
+	@Override
+	public int compareTo(VisualizerPlugin o) {
+		return getName().compareTo(o.getName());
 	}
 	
 	@Override

@@ -335,7 +335,7 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 		}
 		
 		if(e.getSource() == identifyButton) {
-			SHDS hds = hedsConnector.get(new SHDS(), new AdapterSet());
+			SHDS hds = hedsConnector.get(new SHDS());
 
 			SFace f1 = null, f2 = null;
 			SEdge e1 = null, e2 = null;

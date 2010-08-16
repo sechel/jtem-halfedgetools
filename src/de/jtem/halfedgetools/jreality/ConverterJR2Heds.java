@@ -30,8 +30,9 @@ public class ConverterJR2Heds {
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F> 
-	> void ifs2heds(IndexedFaceSet ifs, HalfEdgeDataStructure<V, E, F> heds, AdapterSet adapters) {
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void ifs2heds(IndexedFaceSet ifs, HDS heds, AdapterSet adapters) {
 		ifs2heds(ifs, heds, adapters, null);
 	}
 	
@@ -39,9 +40,13 @@ public class ConverterJR2Heds {
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F> 
-	> void ifs2heds(IndexedFaceSet ifs, HalfEdgeDataStructure<V, E, F> heds, AdapterSet adapters, Map<E, Integer> edgeMap) {
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void ifs2heds(IndexedFaceSet ifs, HDS heds, AdapterSet adapters, Map<Integer, Edge<?,?,?>> edgeMap) {
 		heds.clear();
+		if (edgeMap != null) {
+			edgeMap.clear();
+		}
 		AdapterSet vAdapters = adapters.querySet(heds.getVertexClass(), double[].class);
 		AdapterSet eAdapters = adapters.querySet(heds.getEdgeClass(), double[].class);
 		AdapterSet fAdapters = adapters.querySet(heds.getFaceClass(), double[].class);
@@ -177,11 +182,11 @@ public class ConverterJR2Heds {
 					if (edgeMap == null) continue;
 					if (vertexEdgeMap.containsKey(s, t)) {
 						E edge = vertexEdgeMap.get(s, t);
-						edgeMap.put(edge, i);
+						edgeMap.put(i, edge);
 					} 
 					if (vertexEdgeMap.containsKey(t, s)) {
 						E edge = vertexEdgeMap.get(t, s);
-						edgeMap.put(edge, i);
+						edgeMap.put(i, edge);
 					}
 				} else {
 					E ed = heds.addNewEdge();
@@ -208,8 +213,7 @@ public class ConverterJR2Heds {
 					if (textCoords[1] != null) eAdapters.set(TexCoordinate.class, edOp, textCoords[1][i]);
 					
 					if (edgeMap == null) continue;
-					edgeMap.put(ed, i);
-					edgeMap.put(edOp, i);
+					edgeMap.put(i, ed);
 				}
 			}
 		}
@@ -232,9 +236,9 @@ public class ConverterJR2Heds {
 					oppEdge = heds.addNewEdge();
 					oppEdge.setTargetVertex(heds.getVertex(s));
 					vertexEdgeMap.put(t, s, oppEdge);
-					if (edgeMap != null) {
-						edgeMap.put(oppEdge, edgeMap.get(faceEdge));
-					}
+//					if (edgeMap != null) {
+//						edgeMap.put(oppEdge, edgeMap.get(faceEdge));
+//					}
 				}
 				E nextEdge = vertexEdgeMap.get(t, next);
 				faceEdge.linkOppositeEdge(oppEdge);

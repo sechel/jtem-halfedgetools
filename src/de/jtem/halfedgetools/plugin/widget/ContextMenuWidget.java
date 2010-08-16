@@ -6,11 +6,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.WidgetInterface;
 import de.jtem.halfedgetools.plugin.WidgetPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -42,6 +45,11 @@ public class ContextMenuWidget extends WidgetPlugin implements PopupMenuListener
 	@Override
 	public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 		popup.removeAll();
+		HalfedgeInterface hif = controller.getPlugin(HalfedgeInterface.class);
+		for (Action action : hif.getHalfedgeActions()) {
+			popup.add(action);
+		}
+		popup.add(new JPopupMenu.Separator());
 		List<AlgorithmPlugin> aPlugs = controller.getPlugins(AlgorithmPlugin.class);
 		Map<AlgorithmCategory, List<AlgorithmPlugin>> aMap = new HashMap<AlgorithmCategory,  List<AlgorithmPlugin>>();
 		for (AlgorithmPlugin ap : aPlugs) {
@@ -69,6 +77,12 @@ public class ContextMenuWidget extends WidgetPlugin implements PopupMenuListener
 		wi = c.getPlugin(WidgetInterface.class);
 		wi.getPanel().setComponentPopupMenu(popup);
 		controller = c;
+	}
+	
+	@Override
+	public void mainUIChanged(String uiClass) {
+		super.mainUIChanged(uiClass);
+		SwingUtilities.updateComponentTreeUI(popup);
 	}
 	
 	

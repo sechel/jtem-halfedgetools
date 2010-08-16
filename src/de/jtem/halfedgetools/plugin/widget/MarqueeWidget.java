@@ -56,7 +56,8 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		int xMax = xMin + w;
 		int yMax = yMin + h;
 		SceneGraphComponent root = view.getViewer().getSceneRoot();
-		SceneGraphPath hifPath = SceneGraphUtility.getPathsBetween(root, hif.getActiveComponent()).iterator().next();
+		SceneGraphComponent layerRoot = hif.getActiveLayer().getLayerRoot();
+		SceneGraphPath hifPath = SceneGraphUtility.getPathsBetween(root, layerRoot).get(0);
 		SceneGraphPath camPath = view.getViewer().getCameraPath();
 		Matrix P = new Matrix(CameraUtility.getCameraToNDC(view.getViewer()));
 		Matrix C = new Matrix(camPath.getMatrix(null));

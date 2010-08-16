@@ -99,7 +99,7 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			try {
-				execute(hcp.get(null), hcp.getCalculators(), hcp);
+				execute(hcp.get(), hcp.getCalculators(), hcp);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 				Window w = SwingUtilities.getWindowAncestor(hcp.getShrinkPanel());
