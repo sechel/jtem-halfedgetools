@@ -84,8 +84,7 @@ public class JRHalfedgeViewer {
 	
 	
 	public static void main(String[] args) {
-		System.setProperty("de.jreality.scene.Viewer", "de.jreality.jogl.GLJPanelViewer");
-		UIManager.getDefaults().put("Slider.paintValue", false);
+		initHalfedgeFronted();
 		JRViewer v = new JRViewer();
 		v.setPropertiesFile("JRHalfedgeViewer.xml");
 		v.setPropertiesResource(JRHalfedgeViewer.class, "JRHalfedgeViewer.xml");
