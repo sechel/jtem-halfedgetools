@@ -92,7 +92,8 @@ public class TopologyAlgorithms {
 					
 					E eopo = eop.getOppositeEdge();
 					E eono = eon.getOppositeEdge();
-					eopo.linkOppositeEdge(eono);				} else { // n-gon, n > 3
+					eopo.linkOppositeEdge(eono);				
+				} else { // n-gon, n > 3
 					esToRemove.add(eo);
 					eop.linkNextEdge(eon);
 					eop.setTargetVertex(w);

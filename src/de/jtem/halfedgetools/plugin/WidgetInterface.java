@@ -26,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import de.jreality.plugin.basic.View;
+import de.jtem.halfedgetools.JRHalfedgeViewer;
 import de.jtem.halfedgetools.plugin.widget.WrapLayout;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
@@ -80,6 +81,9 @@ public class WidgetInterface extends Plugin implements ComponentListener {
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		view = c.getPlugin(View.class);
+		if (!JRHalfedgeViewer.supportsOverlay()) {
+			return;
+		}
 		Component viewComponent = view.getViewer().getViewingComponent();
 		JFrame mainFrame = (JFrame)SwingUtilities.getWindowAncestor(viewComponent);
 		JLayeredPane layers = mainFrame.getLayeredPane();

@@ -33,8 +33,10 @@ package de.jtem.halfedgetools;
 
 import javax.swing.UIManager;
 
+import de.jreality.jogl.GLJPanelViewer;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
+import de.jreality.util.SystemProperties;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.jrworkspace.plugin.lnfswitch.LookAndFeelSwitch;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.CrossPlatformLnF;
@@ -43,12 +45,43 @@ import de.jtem.jrworkspace.plugin.lnfswitch.plugin.SystemLookAndFeel;
 
 public class JRHalfedgeViewer {
 	
+	public static void initHalfedgeFronted() {
+		if (supportsOverlay()) {
+			System.setProperty(
+				"de.jreality.scene.Viewer", 
+				"de.jreality.jogl.GLJPanelViewer" + " " + 
+				SystemProperties.VIEWER_DEFAULT_SOFT
+			);
+		} else {
+			System.err.println("Halfedge widget overlays not supported.");
+		}
+		UIManager.getDefaults().put("Slider.paintValue", false);
+	}
+	
+	private static Boolean
+		supportsOverlay = null;
+	
+	public static boolean supportsOverlay() {
+		if (supportsOverlay == null) {
+			new JRViewer(); 
+			try {
+				new GLJPanelViewer();
+				supportsOverlay = true;
+			} catch (Exception e) {
+				supportsOverlay = false;
+			}
+		}
+		return supportsOverlay;
+	}
+	
+	
 	private static void addLnFPlugins(JRViewer v) {
 		v.registerPlugin(new LookAndFeelSwitch());
 		v.registerPlugin(new CrossPlatformLnF());
 		v.registerPlugin(new NimbusLnF());
 		v.registerPlugin(new SystemLookAndFeel());
 	}
+	
 	
 	public static void main(String[] args) {
 		System.setProperty("de.jreality.scene.Viewer", "de.jreality.jogl.GLJPanelViewer");
