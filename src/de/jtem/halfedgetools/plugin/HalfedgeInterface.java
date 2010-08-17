@@ -12,6 +12,7 @@ import static java.awt.event.InputEvent.CTRL_DOWN_MASK;
 import static javax.swing.JFileChooser.FILES_ONLY;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.PLAIN_MESSAGE;
+import static javax.swing.JOptionPane.YES_NO_OPTION;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
@@ -546,6 +547,19 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			int result = chooser.showSaveDialog(w);
 			if (result != JFileChooser.APPROVE_OPTION) return;
 			File file = chooser.getSelectedFile();
+			String name = file.getName().toLowerCase();
+			if (!name.endsWith(".obj") && !name.endsWith(".heml")) {
+				file = new File(file.getAbsoluteFile() + ".obj");
+			}
+			if (file.exists()) {
+				int result2 = JOptionPane.showConfirmDialog(
+					w, 
+					"File " + file.getName() + " exists. Overwrite?", 
+					"Overwrite?", 
+					YES_NO_OPTION
+				);
+				if (result2 != JOptionPane.YES_OPTION) return;
+			}
 			try {
 				if(file.getName().toLowerCase().endsWith(".heml")) {
 					HalfedgeIO.writeHDS(hds, file.getAbsolutePath());
@@ -553,7 +567,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 					HalfedgeIO.writeOBJ(hds, adapters, file.getAbsolutePath());
 				}
 			} catch (Exception ex) {
-				JOptionPane.showMessageDialog(w, ex.getLocalizedMessage());
+				JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
+				ex.printStackTrace();
 			}
 		}
 		
