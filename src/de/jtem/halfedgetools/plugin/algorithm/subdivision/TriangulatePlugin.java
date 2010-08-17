@@ -81,6 +81,6 @@ public class TriangulatePlugin extends AlgorithmPlugin {
 				Triangulator.triangulateFace(f,hds);
 			}
 		}
-		hcp.set(hds, null);
+		hcp.set(hds);
 	}
 }
