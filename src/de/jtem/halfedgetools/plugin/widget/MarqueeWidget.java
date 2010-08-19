@@ -28,6 +28,10 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.WidgetInterface;
 import de.jtem.halfedgetools.plugin.WidgetPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.selection.InsideEdgesSelection;
+import de.jtem.halfedgetools.plugin.algorithm.selection.InsideFacesSelection;
+import de.jtem.halfedgetools.plugin.algorithm.selection.TouchingEdgesSelection;
+import de.jtem.halfedgetools.plugin.algorithm.selection.TouchingFacesSelection;
 import de.jtem.jrworkspace.plugin.Controller;
 
 public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, MouseListener {
@@ -45,13 +49,23 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 	private Point
 		start = new Point(),
 		active = new Point();
-	
+	private InsideFacesSelection 
+		ifSel = null;
+	private InsideEdgesSelection
+		ieSel = null;
+	private TouchingFacesSelection
+		tfSel = null;
+	private TouchingEdgesSelection
+		teSel = null; 
+	boolean b = false;
 	
 	private void updateVertexSelection() {
 		Dimension size = view.getViewer().getViewingComponentSize();
+		int sign = active.x - start.x;
+		b = (sign >=0);
 		int w = Math.abs(active.x - start.x);
 		int h = Math.abs(active.y - start.y);
-		int xMin = Math.min(active.x, start.x) - size.width / 2;
+		int xMin = Math.min(active.x, start.x) - size.width / 2;  
 		int yMin = Math.min(active.y, start.y) - size.height / 2;
 		int xMax = xMin + w;
 		int yMax = yMin + h;
@@ -94,6 +108,22 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		hif.setSelection(sel);
 	}
 	
+	public void updateInsideFacesSelection(){
+		ifSel.execute(hif.get(), null, hif);
+	}
+	
+	public void updateInsideEdgesSelection(){
+		ieSel.execute(hif.get(), null, hif);
+	}
+	
+	public void updateTouchingFacesSelection(){
+		tfSel.execute(hif.get(), null, hif);
+	}
+	
+	public void updateTouchingEdgesSelection(){
+		teSel.execute(hif.get(), null, hif);
+	}
+	
 	
 	
 	@Override
@@ -105,6 +135,10 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		gui = c.getPlugin(WidgetInterface.class);
 		gui.getPanel().addMouseListener(this);
 		gui.getPanel().addMouseMotionListener(this);
+		ifSel = c.getPlugin(InsideFacesSelection.class);
+		ieSel = c.getPlugin(InsideEdgesSelection.class);
+		tfSel = c.getPlugin(TouchingFacesSelection.class);
+		teSel = c.getPlugin(TouchingEdgesSelection.class);
 	}
 	
 	
@@ -140,6 +174,22 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		active = e.getPoint();
 		repaint();
 		updateVertexSelection();
+		if (b){
+			if (e.isAltDown()) {
+				updateInsideFacesSelection();
+			}
+			if (e.isShiftDown()) {
+				updateInsideEdgesSelection();
+			}
+		}
+		else{
+			if (e.isAltDown()) {
+				updateTouchingFacesSelection();
+			}
+			if (e.isShiftDown()) {
+				updateTouchingEdgesSelection();
+			}
+		}
 	}
 
 	@Override
@@ -155,16 +205,37 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		start = e.getPoint();
 		active = start;
 		contentTools.setRotationEnabled(false);
+		contentTools.setDragEnabled(false);
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		contentTools.setRotationEnabled(true);
+		contentTools.setDragEnabled(true);
 		if (e.isControlDown()) {
 			updateVertexSelection();
 		}
+		if (b){
+			if (e.isAltDown()) {
+				updateInsideFacesSelection();
+			}
+			if (e.isShiftDown()) {
+				updateInsideEdgesSelection();
+			}
+		}
+		else{
+			if (e.isAltDown()) {
+				updateTouchingFacesSelection();
+			}
+			if (e.isShiftDown()) {
+				updateTouchingEdgesSelection();
+			}
+		}
 		isDragging = false;
 		repaint();
+
+			
+		
 	}
 
 	@Override
