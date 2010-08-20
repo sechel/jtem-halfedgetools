@@ -39,6 +39,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		Window w = SwingUtilities.getWindowAncestor(view.getCenterComponent());
 		Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : defaultIcon;
 		int result = OK_OPTION;
+		executeBeforeDialog(hcp.get(),hcp.getCalculators(),hcp);
 		if (getDialogPanel() != null) {
 			result = JOptionPane.showOptionDialog(
 				w, getDialogPanel(), 
@@ -78,5 +79,13 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		if (getDialogPanel() != null) {
 			SwingUtilities.updateComponentTreeUI(getDialogPanel());
 		}
+	}
+	
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void executeBeforeDialog(HDS hds, CalculatorSet c, HalfedgeInterface hcp) {
 	}
 }

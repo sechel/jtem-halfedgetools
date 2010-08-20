@@ -31,20 +31,20 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
-import java.util.List;
+import java.util.Set;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
-import de.jtem.halfedgetools.algorithm.alexandrov.SurfaceUtility;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
-import de.jtem.halfedgetools.util.SurfaceException;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class FillHolesPlugin extends AlgorithmPlugin {
@@ -56,19 +56,30 @@ public class FillHolesPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hif) throws CalculatorException {
-		try {
-			SurfaceUtility.linkBoundary(hds);
-		} catch (SurfaceException e1) {
-			e1.printStackTrace();
-		}
-		List<F> holes;
-		try {
-			holes = SurfaceUtility.fillHoles(hds);
-			System.err.println("Filled " + holes.size() + " holes");
-		} catch (SurfaceException e1) {
-			e1.printStackTrace();
+		HalfedgeSelection sel = new HalfedgeSelection(hif.getSelection());
+		Set<E> edges = sel.getEdges(hds);
+		if(edges.size() == 0) {
+//			try {
+//				SurfaceUtility.linkBoundary(hds);
+//			} catch (SurfaceException e1) {
+//				e1.printStackTrace();
+//			}
+//			List<F> holes;
+//			try {
+//				holes = SurfaceUtility.fillHoles(hds);
+//			} catch (SurfaceException e1) {
+//				e1.printStackTrace();
+//			}
+			HalfEdgeUtils.fillAllHoles(hds);
+		} else {
+			for(E e : edges) {
+				if(e.getLeftFace() == null) {
+					HalfEdgeUtils.fillHole(e);
+				}
+			}
 		}
 		hcp.update();
+		hcp.setSelection(sel);
 	}
 
 	@Override
