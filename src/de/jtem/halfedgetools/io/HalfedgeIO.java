@@ -30,7 +30,6 @@ OF SUCH DAMAGE.
 **/
 
 package de.jtem.halfedgetools.io;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -71,10 +70,13 @@ public class HalfedgeIO {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void writeOBJ(HDS hds, AdapterSet adapters, String file) {
+		
 		try {
+			FileOutputStream fos = new FileOutputStream(file);
 			ConverterHeds2JR converter = new ConverterHeds2JR();
-			WriterOBJ.write(converter.heds2ifs(hds, adapters,null), new FileOutputStream(file));
-		} catch (FileNotFoundException e1) {
+			WriterOBJ.write(converter.heds2ifs(hds, adapters,null), fos);
+			fos.close();
+		} catch (Exception e1) {
 			System.err.println("Could not write to file " + file);
 			e1.printStackTrace();
 		}

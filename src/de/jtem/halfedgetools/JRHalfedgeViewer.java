@@ -90,7 +90,7 @@ public class JRHalfedgeViewer {
 		v.setPropertiesResource(JRHalfedgeViewer.class, "JRHalfedgeViewer.xml");
 		v.addContentUI();
 		v.addBasicUI();
-		v.addContentSupport(ContentType.CenteredAndScaled);
+		v.addContentSupport(ContentType.Raw);
 		v.registerPlugins(HalfedgePluginFactory.createPlugins());
 		v.getController().setManageLookAndFeel(true);
 		addLnFPlugins(v);

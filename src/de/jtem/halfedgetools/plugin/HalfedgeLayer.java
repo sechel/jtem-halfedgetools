@@ -25,7 +25,10 @@ import de.jreality.geometry.BoundingBoxUtility;
 import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.math.Matrix;
 import de.jreality.scene.Appearance;
+import de.jreality.scene.Geometry;
 import de.jreality.scene.IndexedFaceSet;
+import de.jreality.scene.IndexedLineSet;
+import de.jreality.scene.PointSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.Transformation;
 import de.jreality.scene.pick.PickResult;
@@ -67,7 +70,7 @@ public class HalfedgeLayer implements ActionListener {
 	private List<IndexedFaceSet> 
 		undoHistory = new ArrayList<IndexedFaceSet>();
 	private int
-		undoIndex = 0,
+		undoIndex = -1,
 		undoSize = 10;
 	
 	private boolean 
@@ -97,7 +100,7 @@ public class HalfedgeLayer implements ActionListener {
 		bBoxApp.setAttribute(CommonAttributes.VERTEX_DRAW, false);
 		bBoxApp.setAttribute(CommonAttributes.EDGE_DRAW, true);
 		bBoxApp.setAttribute(LINE_SHADER + "." + TUBES_DRAW, false);
-		bBoxApp.setAttribute(LINE_SHADER + "." + LINE_WIDTH, 1);
+		bBoxApp.setAttribute(LINE_SHADER + "." + LINE_WIDTH, 0.5);
 		bBoxApp.setAttribute(LINE_SHADER + "." + LINE_STIPPLE, true);
 		bBoxApp.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR, Color.RED);
 		bBoxApp.setAttribute(LINE_SHADER + "." + DEPTH_FUDGE_FACTOR, 1.5f);
@@ -109,16 +112,12 @@ public class HalfedgeLayer implements ActionListener {
 	public HalfedgeLayer(HalfedgeInterface hif) {
 		this();
 		this.hif = hif;
-		undoHistory.add(undoIndex, geometry);
 	}
 	
-	public HalfedgeLayer(IndexedFaceSet geometry, HalfedgeInterface hif) {
+	public HalfedgeLayer(Geometry geometry, HalfedgeInterface hif) {
 		this();
 		this.hif = hif;
-		this.geometry = geometry;
-		geometryRoot.setGeometry(geometry);
-		undoHistory.add(undoIndex, geometry);
-		convertFaceSet(getEffectiveAdapters());
+		set(geometry);
 	}
 	
 	
@@ -213,20 +212,35 @@ public class HalfedgeLayer implements ActionListener {
 		set(hds, new AdapterSet());
 	}
 	
-	public void setNoUndo(IndexedFaceSet ifs, AdapterSet a) {
-		geometry = ifs;
+	public void setNoUndo(Geometry g, AdapterSet a) {
+		if (g instanceof IndexedFaceSet) {
+			geometry = (IndexedFaceSet)g;
+		} else 
+		if (g instanceof IndexedLineSet){
+			IndexedLineSet ils = (IndexedLineSet)g;
+			geometry = new IndexedFaceSet(g.getName());
+			geometry.setVertexAttributes(ils.getVertexAttributes());
+			geometry.setEdgeAttributes(ils.getEdgeAttributes());
+		} else 
+		if (g instanceof PointSet) {
+			PointSet ps = (PointSet)g;
+			geometry = new IndexedFaceSet(g.getName());
+			geometry.setVertexAttributes(ps.getVertexAttributes());
+		} else {
+			geometry = new IndexedFaceSet(g.getName());
+		}
 		geometryRoot.setGeometry(geometry);
 		convertFaceSet(getEffectiveAdapters(a));
 		clearSelection();
 	}
 	
-	public void set(IndexedFaceSet ifs, AdapterSet a) {
-		setNoUndo(ifs, a);
+	public void set(Geometry g, AdapterSet a) {
+		setNoUndo(g, a);
 		updateUndoList();
 	}
 	
-	public void set(IndexedFaceSet ifs) {
-		set(ifs, new AdapterSet());
+	public void set(Geometry g) {
+		set(g, new AdapterSet());
 	}
 	
 	

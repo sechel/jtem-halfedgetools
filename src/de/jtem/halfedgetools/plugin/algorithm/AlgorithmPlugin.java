@@ -78,7 +78,13 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 	
 	@Override
 	public int compareTo(AlgorithmPlugin o) {
-		return getAlgorithmName().compareTo(o.getAlgorithmName());
+		double p0 = getPriority();
+		double p1 = o.getPriority();
+		if (p0 == p1) {
+			return getAlgorithmName().compareTo(o.getAlgorithmName());
+		} else {
+			return p0 < p1 ? -1 : 1;
+		}
 	}
 	
 	

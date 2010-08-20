@@ -45,7 +45,6 @@ import de.jtem.halfedgetools.plugin.algorithm.selection.ClearVertexSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.ClearEdgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.ClearFaceSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.ExportSelection;
-import de.jtem.halfedgetools.plugin.algorithm.selection.CornerVertexSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.ImportSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.InsideEdgesSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.TouchingEdgesSelection;
@@ -146,7 +145,6 @@ public class HalfedgePluginFactory {
 		s.add(new BoundaryEdgeSelection());
 		s.add(new BoundaryFaceSelection());
 		s.add(new InvertVertexSelection());
-		s.add(new CornerVertexSelection());
 		s.add(new InsideEdgesSelection());
 		s.add(new InsideFacesSelection());
 		s.add(new TouchingEdgesSelection());

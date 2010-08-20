@@ -52,7 +52,9 @@ import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
+import de.jreality.geometry.BoundingBoxUtility;
 import de.jreality.geometry.IndexedFaceSetUtility;
+import de.jreality.math.MatrixBuilder;
 import de.jreality.plugin.JRViewerUtility;
 import de.jreality.plugin.basic.Content;
 import de.jreality.plugin.basic.Content.ContentChangedEvent;
@@ -77,6 +79,7 @@ import de.jreality.shader.EffectiveAppearance;
 import de.jreality.shader.ShaderUtility;
 import de.jreality.tools.ActionTool;
 import de.jreality.util.CameraUtility;
+import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -116,6 +119,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		menuBar = null;
 	private SceneGraphComponent
 		root = new SceneGraphComponent("Halfedge Root");
+	private Transformation
+		rootTransform = new Transformation("Normalization");
 	private JTable
 		layersTable = new JTable();
 	private JScrollPane
@@ -178,6 +183,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		calculators.add(new JRFaceNormalCalculator());
 		calculators.add(new JRSubdivisionCalculator());
 		root.addTool(layerActivationTool);
+		root.setTransformation(rootTransform);
 		layerActivationTool.addActionListener(this);
 		visualizersPopup.addPopupMenuListener(this);
 		
@@ -269,23 +275,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		
 	}
 	
-	
-	
-	public class AuxSceneGraphComponent extends SceneGraphComponent {
-		
-		public AuxSceneGraphComponent() {
-			super("Halfedge Aux");
-		}
-		
-		public void startWriting() {
-			startWriter();
-		}
-		
-		public void finishWriting() {
-			finishWriter();
-		}
-		
-	}
 	
 	@Override
 	public void popupMenuCanceled(PopupMenuEvent e) {
@@ -598,11 +587,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 					ReaderOBJ reader = new ReaderOBJ();
 					SceneGraphComponent c = reader.read(file);
 					Geometry g = SceneGraphUtility.getFirstGeometry(c);
+					if (g == null) return;
 					if (g instanceof IndexedFaceSet) {
 						IndexedFaceSet ifs = (IndexedFaceSet)g;
 						IndexedFaceSetUtility.calculateAndSetNormals(ifs);
-						getActiveLayer().set(ifs);
 					}
+					getActiveLayer().set(g);
 				} else
 				if (file.getName().toLowerCase().endsWith(".heml")) {
 					HalfEdgeDataStructure<?, ?, ?> hds = HalfedgeIO.readHDS(file.getAbsolutePath());
@@ -689,7 +679,15 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void set(HDS hds) {
-		activeLayer.set(hds);
+		set(hds, new AdapterSet());
+	}
+	
+	public void set(Geometry g, AdapterSet a) {
+		activeLayer.set(g, a);
+	}
+	
+	public void set(Geometry g) {
+		set(g, new AdapterSet());
 		updateStates();
 		checkContent();
 	}
@@ -813,6 +811,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		menuBar.addMenuItem(getClass(), -100, redoAction, "Halfedge");
 		menuBar.addMenuItem(getClass(), -51, exportAction, "Halfedge");
 		menuBar.addMenuItem(getClass(), -50, importAction, "Halfedge");
+		menuBar.addMenuSeparator(getClass(), -1, "Halfedge");
 		
 		layersTable.setModel(new LayerModel());
 		layersTable.getColumnModel().getColumn(0).setMaxWidth(30);
@@ -950,6 +949,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		if (paths.isEmpty()) {
 			content.setContent(root);
 		}
+		MatrixBuilder mb = MatrixBuilder.euclidean();
+		rootTransform.setMatrix(mb.getArray());
+		Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(root);
+		double maxExtend = bbox.getMaxExtent();		
+		mb.scale(10 / maxExtend);
+		rootTransform.setMatrix(mb.getArray());
 	}
 	
 	
@@ -958,10 +963,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		@Override
 		public void contentChanged(ContentChangedEvent cce) {
 			if (cce.node == root || cce.node == null) return; // update boomerang
-			
 			final List<HalfedgeLayer> newLayers = new LinkedList<HalfedgeLayer>();
 			cce.node.accept(new SceneGraphVisitor() {
-				
 				private SceneGraphPath
 					path = new SceneGraphPath();
 				
@@ -969,11 +972,11 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				public void visit(SceneGraphComponent c) {
 					if (!c.isVisible()) return;
 					path.push(c);
-					if (c.getGeometry() instanceof IndexedFaceSet) {
+					if (c.getGeometry() != null) {
+						Geometry g = c.getGeometry();
 						Transformation layerTransform = new Transformation(path.getMatrix(null));
-						IndexedFaceSet ifs = (IndexedFaceSet)c.getGeometry();
-						HalfedgeLayer layer = new HalfedgeLayer(ifs, HalfedgeInterface.this);
-						layer.setName(ifs.getName());
+						HalfedgeLayer layer = new HalfedgeLayer(g, HalfedgeInterface.this);
+						layer.setName(g.getName());
 						layer.setTransformation(layerTransform);
 						newLayers.add(layer);
 					}
