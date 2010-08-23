@@ -1,7 +1,5 @@
 package de.jtem.halfedgetools.plugin.algorithm.selection;
 
-import java.util.List;
-
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -18,6 +16,8 @@ import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class InsideFacesSelection extends AlgorithmPlugin {
+	
+	private HalfedgeSelection oldSel = null;
 
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
@@ -35,20 +35,38 @@ public class InsideFacesSelection extends AlgorithmPlugin {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
-		HalfedgeSelection sel = hcp.getSelection();
-		
-		
-		for (V v : sel.getVertices(hds)){
+		> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
+		if(oldSel == null) {
+			oldSel = hcp.getSelection();
+		}
+		HalfedgeSelection faceSel = selectFaces(hcp.get());
+		for(F f : faceSel.getFaces(hds)){
+			oldSel.setSelected(f, true);
+		}
+			
+		hcp.setSelection(oldSel);
+	}
+	
+	private<
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+		>HalfedgeSelection selectFaces(HDS hds) {
+		HalfedgeSelection selFaces = hcp.getSelection();
+		for (V v : selFaces.getVertices(hds)){
 			for(F f : HalfEdgeUtilsExtra.getFaceStar(v) ){
 				boolean s = true;
 				for(V vf : HalfEdgeUtils.boundaryVertices(f)){
-					s &= sel.isSelected(vf);//&= ist isSelcted einmal false wird auch s false gesetzt
+					s &= selFaces.isSelected(vf);
 				}
-				if(s==true) sel.setSelected(f,true);
+				if(s==true) selFaces.setSelected(f,true);
 			}
 		}
-		hcp.setSelection(sel);
+		for (V v : selFaces.getVertices(hds)){
+			selFaces.setSelected(v, false);
+		}
+		return selFaces;
 	}
 
 	@Override

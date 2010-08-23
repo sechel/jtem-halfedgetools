@@ -1,7 +1,5 @@
 package de.jtem.halfedgetools.plugin.algorithm.selection;
 
-import java.util.List;
-
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -14,10 +12,11 @@ import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
-import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class InsideEdgesSelection extends AlgorithmPlugin {
+	
+	private HalfedgeSelection oldSel = null;
 
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
@@ -36,19 +35,40 @@ public class InsideEdgesSelection extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
-		HalfedgeSelection sel = hcp.getSelection();
-		
-		
-		for (V v : sel.getVertices(hds)){
+		if(oldSel == null) {
+			oldSel = hcp.getSelection();
+		}
+		HalfedgeSelection faceSel = selectEdges(hcp.get());
+		for(E e : faceSel.getEdges(hds)){
+			oldSel.setSelected(e, true);
+		}
+			
+		hcp.setSelection(oldSel);
+	}
+	
+	private<
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+		>HalfedgeSelection selectEdges(HDS hds) {
+		HalfedgeSelection selEdges = hcp.getSelection();
+		for (V v : selEdges.getVertices(hds)){
 			for(E e : HalfEdgeUtils.incomingEdges(v) ){
-				if(sel.isSelected(e.getStartVertex())) {
-					sel.setSelected(e,true);
-					sel.setSelected(e.getOppositeEdge(),true);
+				if(selEdges.isSelected(e.getStartVertex())) {
+					selEdges.setSelected(e,true);
+					selEdges.setSelected(e.getOppositeEdge(),true);
 				}
 			}
 		}
-		hcp.setSelection(sel);
+		for (V v : selEdges.getVertices(hds)){
+			selEdges.setSelected(v, false);
+		}
+		return selEdges;
 	}
+	
+	
+
 
 	@Override
 	public PluginInfo getPluginInfo() {

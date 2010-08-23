@@ -9,6 +9,13 @@ import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import javax.swing.JPanel;
 
@@ -20,6 +27,8 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.SceneGraphPath;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.SceneGraphUtility;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
@@ -28,10 +37,6 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.WidgetInterface;
 import de.jtem.halfedgetools.plugin.WidgetPlugin;
-import de.jtem.halfedgetools.plugin.algorithm.selection.InsideEdgesSelection;
-import de.jtem.halfedgetools.plugin.algorithm.selection.InsideFacesSelection;
-import de.jtem.halfedgetools.plugin.algorithm.selection.TouchingEdgesSelection;
-import de.jtem.halfedgetools.plugin.algorithm.selection.TouchingFacesSelection;
 import de.jtem.jrworkspace.plugin.Controller;
 
 public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, MouseListener {
@@ -49,20 +54,13 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 	private Point
 		start = new Point(),
 		active = new Point();
-	private InsideFacesSelection 
-		ifSel = null;
-	private InsideEdgesSelection
-		ieSel = null;
-	private TouchingFacesSelection
-		tfSel = null;
-	private TouchingEdgesSelection
-		teSel = null; 
-	boolean b = false;
+	boolean selectInside = false;
+	private HalfedgeSelection oldSel = null;
 	
-	private void updateVertexSelection() {
+	private Set<Vertex<?,?,?>> getMarqueeVertex() {
 		Dimension size = view.getViewer().getViewingComponentSize();
 		int sign = active.x - start.x;
-		b = (sign >=0);
+		selectInside = (sign >=0);
 		int w = Math.abs(active.x - start.x);
 		int h = Math.abs(active.y - start.y);
 		int xMin = Math.min(active.x, start.x) - size.width / 2;  
@@ -79,7 +77,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		C.invert();
 		T.multiplyOnLeft(C);
 
-		HalfedgeSelection sel = new HalfedgeSelection();
+		Set<Vertex<?,?,?>> vSet = new HashSet<Vertex<?,?,?>>();
 		AdapterSet a = hif.getAdapters();
 		HalfEdgeDataStructure<?, ?, ?> hds = hif.get();
 		double[] homPos = {0,0,0,1};
@@ -102,29 +100,146 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 			double yPos = -homPos[1] * size.height / 2;
 			if (xPos > xMin && xPos < xMax &&
 				yPos > yMin && yPos < yMax) {
-				sel.setSelected(v, true);
+				vSet.add(v);
 			}
 		}
-		hif.setSelection(sel);
+		return vSet;
 	}
 	
-	public void updateInsideFacesSelection(){
-		ifSel.execute(hif.get(), null, hif);
+	private 
+	 	Set<Face<?,?,?>> getMarqueeFaces(Set<Vertex<?,?,?>> verts) {
+		Set<Face<?,?,?>> result = new HashSet<Face<?,?,?>>();
+		if (selectInside) {//inside
+			for (Vertex<?,?,?> v : verts){
+				for(Face<?,?,?> f : getFaceStar(v) ){
+					boolean containsAll = true;
+					for(Vertex<?,?,?> vf : boundaryVertices(f)){
+						containsAll &= verts.contains(vf);
+					}
+					if(containsAll) {
+						result.add(f);
+					}
+				}
+			}
+		} else {//touching
+			for (Vertex<?,?,?> v : verts){
+				for(Face<?,?,?> f : getFaceStar(v) ){		
+					result.add(f);
+				}
+			}
+		}
+		return result;
 	}
 	
-	public void updateInsideEdgesSelection(){
-		ieSel.execute(hif.get(), null, hif);
+	private
+	 	Set<Edge<?,?,?>> getMarqueeEdges(Set<Vertex<?,?,?>> verts) {
+		Set<Edge<?,?,?>> result = new HashSet<Edge<?,?,?>>();
+		if (selectInside){//inside
+			for (Vertex<?,?,?> v : verts){ 
+				for(Edge<?,?,?> e : incomingEdges(v) ){
+					if(verts.contains(e.getStartVertex())) {
+						result.add(e);
+						result.add(e.getOppositeEdge());
+					}
+				}
+			}
+			return result;
+	
+		} else {//touching
+			for (Vertex<?,?,?> v : verts){
+				for(Edge<?,?,?> e : incomingEdges(v) ){
+					result.add(e);
+					result.add(e.getOppositeEdge());
+				}
+			}
+			return result;
+		}
 	}
 	
-	public void updateTouchingFacesSelection(){
-		tfSel.execute(hif.get(), null, hif);
+
+	
+	private static List<Edge<?,?,?>> incomingEdges(Vertex<?,?,?> vertex){
+		Edge<?,?,?> e0 = vertex.getIncomingEdge();
+		if (e0 == null) {
+			return Collections.emptyList();
+		}
+		LinkedList<Edge<?,?,?>> result = new LinkedList<Edge<?,?,?>>();
+		Edge<?,?,?> e = e0;
+		do {
+			if (vertex != e.getTargetVertex()) {
+				throw new RuntimeException("Edge " + e + " does not have vertex " + vertex + " as target vertex, " +
+				"although it is the opposite of the next edge of an edge which does.");
+			}
+			result.add(e);
+			e = e.getNextEdge();
+			if (e == null) {
+				throw new RuntimeException("Some edge has null as next edge.");
+			}
+			e = e.getOppositeEdge();
+			if (e == null) {
+				throw new RuntimeException("Some edge has null as opposite edge.");
+			}
+		} while (e != e0);
+		return result;
 	}
 	
-	public void updateTouchingEdgesSelection(){
-		teSel.execute(hif.get(), null, hif);
+	 private static 	
+	    	List<Face<?,?,?>> getFaceStar(Vertex<?,?,?> vertex) {
+	        List<Face<?,?,?>> faceStar = new ArrayList<Face<?,?,?>>();
+	        for (Edge<?,?,?> e : getEdgeStar(vertex)){
+	        	if (e.getLeftFace() != null)
+	        		faceStar.add(e.getLeftFace());
+	        }
+	        return faceStar;
+	    }
+	 
+	 public static 
+	 	List<Vertex<?,?,?>> boundaryVertices(Face<?,?,?> face) {
+		Collection<Edge<?,?,?>> b = boundaryEdges(face);
+		LinkedList<Vertex<?,?,?>> vList = new LinkedList<Vertex<?,?,?>>();
+		for (Edge<?,?,?> e : b) {
+			vList.add(e.getTargetVertex());
+		}
+		return vList;
 	}
+	 
+	 private static  List<Edge<?,?,?>> boundaryEdges(Face<?,?,?> face) {
+			final Edge<?,?,?> e0 = face.getBoundaryEdge();
+			if (e0 == null) {
+				return Collections.emptyList();
+			}
+			LinkedList<Edge<?,?,?>> result = new LinkedList<Edge<?,?,?>>();
+			Edge<?,?,?> e = e0;
+			do {
+				if (face != e.getLeftFace()) {
+					throw new RuntimeException("Edge " + e + " does not have face " + face + " as left face, " +
+							"although it is the next edge of an edge which does.");
+				}
+				result.add(e);
+				e = e.getNextEdge();
+				if (e == null) {
+					throw new RuntimeException("Some edge has null as next edge.");
+				}
+			} while (e != e0);
+			return result;
+		}
 	
-	
+	 private static 
+	 	 List<Edge<?,?,?>> getEdgeStar(Vertex<?,?,?> vertex){
+		 List<Edge<?,?,?>> edgeStar = new LinkedList<Edge<?,?,?>>();
+		 if (vertex.getIncomingEdge() == null || !vertex.getIncomingEdge().isValid())
+			 return Collections.emptyList();
+		 Edge<?,?,?> actEdge = vertex.getIncomingEdge();
+		 do {
+			if (actEdge == null)
+			return Collections.emptyList();
+	     	edgeStar.add(actEdge);
+	     	if (actEdge.getNextEdge() == null)
+	     		return Collections.emptyList();
+	     	actEdge = actEdge.getNextEdge().getOppositeEdge();
+		} while (actEdge != vertex.getIncomingEdge());
+		return edgeStar;
+	 }
 	
 	@Override
 	public void install(Controller c) throws Exception {
@@ -135,10 +250,6 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		gui = c.getPlugin(WidgetInterface.class);
 		gui.getPanel().addMouseListener(this);
 		gui.getPanel().addMouseMotionListener(this);
-		ifSel = c.getPlugin(InsideFacesSelection.class);
-		ieSel = c.getPlugin(InsideEdgesSelection.class);
-		tfSel = c.getPlugin(TouchingFacesSelection.class);
-		teSel = c.getPlugin(TouchingEdgesSelection.class);
 	}
 	
 	
@@ -165,31 +276,40 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		if (!e.isControlDown()) {
+		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) {
 			isDragging = false;
 			repaint();
 			return;
 		}
-		isDragging = true;
+		
 		active = e.getPoint();
+		HalfedgeSelection sel = new HalfedgeSelection();
+		
+		Set<Vertex<?,?,?>> marqeeVertices = getMarqueeVertex();
+		if (marqeeVertices.isEmpty()) return;
+		
+		if(e.isControlDown()){
+			isDragging = true;
+			for (Vertex<?,?,?> v : marqeeVertices) {
+				sel.setSelected(v, true);
+			}
+		}
+		if(e.isAltDown()){
+			isDragging = true;
+			for(Edge<?,?,?> edge : getMarqueeEdges(marqeeVertices)){
+				sel.setSelected(edge, true);
+			}
+		}
+		
+		if(e.isShiftDown()){
+			isDragging = true;
+			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
+				sel.setSelected(face, true);
+			}
+		}	
 		repaint();
-		updateVertexSelection();
-		if (b){
-			if (e.isAltDown()) {
-				updateInsideFacesSelection();
-			}
-			if (e.isShiftDown()) {
-				updateInsideEdgesSelection();
-			}
-		}
-		else{
-			if (e.isAltDown()) {
-				updateTouchingFacesSelection();
-			}
-			if (e.isShiftDown()) {
-				updateTouchingEdgesSelection();
-			}
-		}
+		sel.addAll(oldSel.getNodes());
+		hif.setSelection(sel);
 	}
 
 	@Override
@@ -201,41 +321,46 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if (!e.isControlDown()) return;
+		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) return;
 		start = e.getPoint();
 		active = start;
 		contentTools.setRotationEnabled(false);
 		contentTools.setDragEnabled(false);
+		if(oldSel == null) {
+			oldSel = hif.getSelection();
+		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) return;
+		Set<Vertex<?,?,?>> marqeeVertices = getMarqueeVertex();
+		HalfedgeSelection sel = new HalfedgeSelection();
 		contentTools.setRotationEnabled(true);
 		contentTools.setDragEnabled(true);
 		if (e.isControlDown()) {
-			updateVertexSelection();
+			for (Vertex<?,?,?> v : marqeeVertices) {
+				sel.setSelected(v, true);
+			}
+			oldSel.addAll(sel.getVertices());
 		}
-		if (b){
-			if (e.isAltDown()) {
-				updateInsideFacesSelection();
+		if (e.isAltDown()){
+			for(Edge<?,?,?> edge : getMarqueeEdges(marqeeVertices)){
+				sel.setSelected(edge, true);
 			}
-			if (e.isShiftDown()) {
-				updateInsideEdgesSelection();
-			}
+			oldSel.addAll(sel.getEdges());
 		}
-		else{
-			if (e.isAltDown()) {
-				updateTouchingFacesSelection();
+		if (e.isShiftDown()){
+			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
+				sel.setSelected(face, true);
 			}
-			if (e.isShiftDown()) {
-				updateTouchingEdgesSelection();
-			}
+			oldSel.addAll(sel.getFaces());
 		}
+
 		isDragging = false;
 		repaint();
-
-			
-		
+		hif.setSelection(oldSel);
+					
 	}
 
 	@Override
