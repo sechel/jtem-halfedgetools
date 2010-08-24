@@ -125,7 +125,7 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		makeHolesChecker.setSelected(layer.isMakeHoles());
 		holeFactorModel.setValue(layer.getHoleFactor());
 		stepsPerEdgeModel.setValue(layer.getStepsPerEdge());
-		noEffectChecker.setSelected(!implodeChecker.isSelected() && !thickenChecker.isSelected());
+		noEffectChecker.setSelected(!layer.isImplode() && !layer.isThickenSurface());
 		disableListeners = false;
 	}
 	
