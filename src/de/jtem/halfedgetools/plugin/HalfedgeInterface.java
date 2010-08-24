@@ -60,14 +60,14 @@ import de.jreality.geometry.BoundingBoxUtility;
 import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.plugin.JRViewer;
-import de.jreality.plugin.JRViewerUtility;
 import de.jreality.plugin.JRViewer.ContentType;
+import de.jreality.plugin.JRViewerUtility;
 import de.jreality.plugin.basic.Content;
+import de.jreality.plugin.basic.Content.ContentChangedEvent;
+import de.jreality.plugin.basic.Content.ContentChangedListener;
 import de.jreality.plugin.basic.Scene;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewMenuBar;
-import de.jreality.plugin.basic.Content.ContentChangedEvent;
-import de.jreality.plugin.basic.Content.ContentChangedListener;
 import de.jreality.plugin.content.ContentTools;
 import de.jreality.reader.ReaderOBJ;
 import de.jreality.scene.Appearance;
@@ -428,8 +428,10 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		importButton.addActionListener(this);
 		importButton.setToolTipText("Load Halfedge Geometry");
 		visualizersToggle.addActionListener(this);
+		visualizersToggle.setToolTipText("Visualizers");
 		visualizersPopup.addPopupMenuListener(this);
 		layerOptionsToggle.addActionListener(this);
+		layerOptionsToggle.setToolTipText("Layer Options");
 		layerOptionsPopup.addPopupMenuListener(this);
 	}
 	
@@ -957,7 +959,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void mergeLayers(HalfedgeLayer layer, HalfedgeLayer mergeLayer) {
 		HalfEdgeDataStructure<?,?,?> hds1 = layer.get();
 		HalfEdgeDataStructure<?,?,?> hds2 = createEmpty(hds1);

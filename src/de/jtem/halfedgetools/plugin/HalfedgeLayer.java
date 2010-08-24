@@ -86,7 +86,7 @@ public class HalfedgeLayer implements ActionListener {
 	//layer properties
 	private boolean
 		thickenSurface = false,
-		makeHoles = false,
+		makeHoles = true,
 		implode = false;
 	private int 
 		stepsPerEdge = 1; 
