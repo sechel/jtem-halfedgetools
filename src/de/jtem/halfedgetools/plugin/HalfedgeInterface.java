@@ -25,6 +25,8 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,6 +35,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -56,13 +59,16 @@ import javax.swing.table.DefaultTableModel;
 import de.jreality.geometry.BoundingBoxUtility;
 import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.math.MatrixBuilder;
+import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewerUtility;
+import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.Content;
-import de.jreality.plugin.basic.Content.ContentChangedEvent;
-import de.jreality.plugin.basic.Content.ContentChangedListener;
 import de.jreality.plugin.basic.Scene;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewMenuBar;
+import de.jreality.plugin.basic.Content.ContentChangedEvent;
+import de.jreality.plugin.basic.Content.ContentChangedListener;
+import de.jreality.plugin.content.ContentTools;
 import de.jreality.reader.ReaderOBJ;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.Geometry;
@@ -178,7 +184,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	private HalfedgeLayer
 		activeLayer = new HalfedgeLayer(this);
 	
-	
+	private GeometryPreviewerPanel 
+		previewPanel = new GeometryPreviewerPanel();
 	
 	public HalfedgeInterface() {
 		makeLayout();
@@ -197,6 +204,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		
 		addLayer(activeLayer);
 		activateLayer(activeLayer);
+		
+		chooser.setAccessory(previewPanel);
+		chooser.addPropertyChangeListener(previewPanel);
 	}
 	
 	
@@ -947,7 +957,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	private void mergeLayers(HalfedgeLayer layer, HalfedgeLayer mergeLayer) {
 		HalfEdgeDataStructure<?,?,?> hds1 = layer.get();
 		HalfEdgeDataStructure<?,?,?> hds2 = createEmpty(hds1);
@@ -1092,6 +1102,68 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	public boolean isSelected(Node<?,?,?> n) {
 		return getSelection().isSelected(n);
+	}
+	
+	private class GeometryPreviewerPanel extends JPanel implements PropertyChangeListener {
+
+		private static final long serialVersionUID = 1L;
+		
+		private	JRViewer viewer = new JRViewer(true);
+		private Appearance rootApp = null;
+		
+		public GeometryPreviewerPanel() {
+			setLayout(new GridLayout());
+			setPreferredSize(new Dimension(250, 200));
+			setBorder(BorderFactory.createTitledBorder("Preview"));
+			viewer.addContentSupport(ContentType.Raw);
+			viewer.addContentUI();
+			viewer.startupLocal();
+			View view = viewer.getPlugin(View.class);
+			Scene scene = viewer.getPlugin(Scene.class);
+			rootApp = scene.getSceneRoot().getAppearance();
+			add(view.getViewer().getViewingComponent());
+			ContentTools tools = viewer.getPlugin(ContentTools.class);
+			tools.setRotationEnabled(true);
+			tools.setDragEnabled(false);
+			tools.setEncompassEnabled(true);
+		}
+		
+		@Override
+		public void updateUI() {
+			super.updateUI();
+			if (rootApp != null) {
+				rootApp.setAttribute("backgroundColor", getBackground());
+			}
+		}
+		
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
+			String propertyName = evt.getPropertyName();
+			if (propertyName.equals(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY)) {
+	            File file = (File)evt.getNewValue();
+	            if (file == null) {
+	                return;
+	            } 
+				try {
+					if (file.getName().toLowerCase().endsWith(".obj")) {
+						ReaderOBJ reader = new ReaderOBJ();
+						SceneGraphComponent c = reader.read(file);
+						Geometry g = SceneGraphUtility.getFirstGeometry(c);
+						if (g instanceof IndexedFaceSet) {
+							IndexedFaceSetUtility.calculateAndSetFaceNormals((IndexedFaceSet)g);
+						}
+						Content content = JRViewerUtility.getContentPlugin(viewer.getController());
+						content.setContent(c);
+						View view = viewer.getPlugin(View.class);
+						CameraUtility.encompass(view.getViewer());
+					}
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
+					ex.printStackTrace();
+				}
+			}
+		}
 	}
 	
 }
