@@ -14,6 +14,7 @@ import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class GarlandHeckbertPlugin extends AlgorithmPlugin {
@@ -48,7 +49,6 @@ public class GarlandHeckbertPlugin extends AlgorithmPlugin {
 		return "Garland & Heckbert";
 	}
 
-
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
 		return AlgorithmCategory.Simplification;
@@ -57,6 +57,7 @@ public class GarlandHeckbertPlugin extends AlgorithmPlugin {
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo("Garland & Heckbert Algorithm", "Stefan Sechelmann, Kristoffer Josefsson");
+		info.icon = ImageHook.getIcon("emoticon_smile.png");
 		return info;
 	}
 
