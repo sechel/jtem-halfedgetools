@@ -42,6 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -101,6 +102,7 @@ import de.jtem.halfedgetools.jreality.calculator.JRFaceNormalCalculator;
 import de.jtem.halfedgetools.jreality.calculator.JRSubdivisionCalculator;
 import de.jtem.halfedgetools.jreality.calculator.JRVertexPositionCalculator;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.plugin.widget.LayerPropertyWidget;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -140,7 +142,13 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		exportButton = new JButton(exportAction),
 		undoButton = new JButton(undoAction),
 		redoButton = new JButton(redoAction);
+	private LayerPropertyWidget
+		layerPropertyWidget = new LayerPropertyWidget();
+	private JToggleButton
+		visualizersToggle = new JToggleButton(ImageHook.getIcon("page_white_paint_arrow.png")),
+		layerOptionsToggle = new JToggleButton(ImageHook.getIcon("page_white_gear_arrow.png"));
 	private JPopupMenu
+		layerOptionsPopup = new JPopupMenu("Layer Options"),
 		visualizersPopup = new JPopupMenu("Visualizers");
 	private JToolBar
 		layerToolbar = new JToolBar();
@@ -278,7 +286,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	@Override
 	public void popupMenuCanceled(PopupMenuEvent e) {
-		
+		if (visualizersPopup == e.getSource()) {
+			visualizersToggle.setSelected(false);
+		}
+		if (layerOptionsPopup == e.getSource()) {
+			layerOptionsToggle.setSelected(false);
+		}
 	}
 	@Override
 	public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
@@ -286,13 +299,24 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	@Override
 	public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-		visualizersManager.update();
-		visualizersPopup.removeAll();
-		visualizersPopup.setLayout(new GridLayout());
-		visualizersPopup.add(visualizersManager.getPanel());
-		visualizersPopup.setSize(300, 400);
-		visualizersPopup.setMinimumSize(new Dimension(300, 400));
-		visualizersPopup.setPreferredSize(new Dimension(300, 400));
+		if (visualizersPopup == e.getSource()) {
+			visualizersManager.update();
+			visualizersPopup.setBorderPainted(true);
+			visualizersPopup.removeAll();
+			visualizersPopup.setLayout(new GridLayout());
+			visualizersPopup.add(visualizersManager.getPanel());
+			visualizersPopup.setMinimumSize(new Dimension(250, 400));
+			visualizersPopup.setPreferredSize(new Dimension(250, 400));
+		}
+		if (layerOptionsPopup == e.getSource()) {
+			layerPropertyWidget.setLayer(activeLayer);
+			layerOptionsPopup.setBorderPainted(true);
+			layerOptionsPopup.removeAll();
+			layerOptionsPopup.setLayout(new GridLayout());
+			layerOptionsPopup.add(layerPropertyWidget);
+			layerOptionsPopup.setMinimumSize(new Dimension(250, 200));
+			layerOptionsPopup.setPreferredSize(new Dimension(250, 200));
+		}
 	}
 	
 	private void makeLayout() {
@@ -326,6 +350,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		layerToolbar.add(new JToolBar.Separator());
 		layerToolbar.add(importAction);
 		layerToolbar.add(exportAction);
+		layerToolbar.add(new JToolBar.Separator());
+		layerToolbar.add(layerOptionsToggle);
+		layerToolbar.add(visualizersToggle);
 		layerToolbar.setFloatable(false);
 		
 		chooser.setAcceptAllFileFilterUsed(false);
@@ -390,6 +417,10 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		exportButton.setToolTipText("Save Halfedge Geometry");
 		importButton.addActionListener(this);
 		importButton.setToolTipText("Load Halfedge Geometry");
+		visualizersToggle.addActionListener(this);
+		visualizersPopup.addPopupMenuListener(this);
+		layerOptionsToggle.addActionListener(this);
+		layerOptionsPopup.addPopupMenuListener(this);
 	}
 	
 	
@@ -424,7 +455,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		public DeleteLayerAction() {
 			putValue(NAME, "Delete Layer");
 			putValue(SMALL_ICON, ImageHook.getIcon("page_white_delete.png"));
-			putValue(SHORT_DESCRIPTION, "New Layer");
+			putValue(SHORT_DESCRIPTION, "Delete Layer");
 		}
 		
 		@Override
@@ -435,6 +466,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			if (result != JOptionPane.OK_OPTION) return;
 			removeLayer(layer);
 			updateStates();
+			checkContent();
 		}
 		
 	}
@@ -470,6 +502,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			if (mergeLayer == null) return;
 			mergeLayers(layer, mergeLayer);
 			updateStates();
+			checkContent();
 		}
 
 	}
@@ -492,6 +525,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		public void actionPerformed(ActionEvent e) {
 			getActiveLayer().undo();
 			updateStates();
+			checkContent();
 		}
 		
 	}
@@ -512,6 +546,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		public void actionPerformed(ActionEvent e) {
 			getActiveLayer().redo();
 			updateStates();
+			checkContent();
 		}
 		
 	}
@@ -621,6 +656,16 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 					return;
 				}
 			}
+		}
+		if (visualizersToggle == e.getSource() && visualizersToggle.isSelected()) {
+			int posx = visualizersToggle.getSize().width / 2;
+			int posy = visualizersToggle.getSize().height / 2;
+			visualizersPopup.show(visualizersToggle, posx, posy);
+		}
+		if (layerOptionsToggle == e.getSource() && layerOptionsToggle.isSelected()) {
+			int posx = layerOptionsToggle.getSize().width / 2;
+			int posy = layerOptionsToggle.getSize().height / 2;
+			layerOptionsPopup.show(layerOptionsToggle, posx, posy);
 		}
 		updateStates();
 	}
@@ -735,7 +780,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	
 	public void update() {
-		activeLayer.set(activeLayer.get());
+		activeLayer.update();
 		updateStates();
 		checkContent();
 	}

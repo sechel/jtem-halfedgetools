@@ -1,11 +1,18 @@
 package de.jtem.halfedgetools.plugin;
 
+import static de.jreality.scene.Appearance.INHERITED;
 import static de.jreality.shader.CommonAttributes.DEPTH_FUDGE_FACTOR;
 import static de.jreality.shader.CommonAttributes.DIFFUSE_COLOR;
+import static de.jreality.shader.CommonAttributes.EDGE_DRAW;
+import static de.jreality.shader.CommonAttributes.FACE_DRAW;
 import static de.jreality.shader.CommonAttributes.LINE_SHADER;
 import static de.jreality.shader.CommonAttributes.LINE_STIPPLE;
 import static de.jreality.shader.CommonAttributes.LINE_WIDTH;
+import static de.jreality.shader.CommonAttributes.PICKABLE;
+import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
+import static de.jreality.shader.CommonAttributes.TRANSPARENCY;
 import static de.jreality.shader.CommonAttributes.TUBES_DRAW;
+import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 import static de.jreality.shader.CommonAttributes.Z_BUFFER_ENABLED;
 import static java.util.Collections.unmodifiableSet;
 
@@ -23,6 +30,7 @@ import javax.swing.SwingUtilities;
 
 import de.jreality.geometry.BoundingBoxUtility;
 import de.jreality.geometry.IndexedFaceSetUtility;
+import de.jreality.geometry.ThickenedSurfaceFactory;
 import de.jreality.math.Matrix;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.Geometry;
@@ -33,7 +41,6 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.Transformation;
 import de.jreality.scene.pick.PickResult;
 import de.jreality.scene.tool.ToolContext;
-import de.jreality.shader.CommonAttributes;
 import de.jreality.tools.ActionTool;
 import de.jreality.util.Rectangle3D;
 import de.jtem.halfedge.Edge;
@@ -55,11 +62,14 @@ public class HalfedgeLayer implements ActionListener {
 		geometry = new IndexedFaceSet();
 	private SceneGraphComponent
 		layerRoot = new SceneGraphComponent("Default Layer"),
+		displayFacesRoot = new SceneGraphComponent("Display Faces"),
 		geometryRoot = new SceneGraphComponent("Geometry"),
 		selectionRoot = new SceneGraphComponent("Selection"),
 		visualizersRoot = new SceneGraphComponent("Visualizers"),
 		boundingBoxRoot = new SceneGraphComponent("Bounding Box"),
 		temporaryRoot = new SceneGraphComponent("Temporary Geometry");
+	private Appearance
+		geometryAppearance = new Appearance("Geometry Appearance");
 	private Map<Integer, Edge<?,?,?>>
 		edgeMap = new HashMap<Integer, Edge<?,?,?>>();
 	private HalfedgeSelection
@@ -72,6 +82,18 @@ public class HalfedgeLayer implements ActionListener {
 	private int
 		undoIndex = -1,
 		undoSize = 10;
+	
+	//layer properties
+	private boolean
+		thickenSurface = false,
+		makeHoles = false,
+		implode = false;
+	private int 
+		stepsPerEdge = 1; 
+	private double
+		holeFactor = 1.0,
+		thickness = 0.1,
+		implodeFactor = 0.5;
 	
 	private boolean 
 		active = true;
@@ -86,6 +108,7 @@ public class HalfedgeLayer implements ActionListener {
 
 	private HalfedgeLayer() {
 		layerRoot.addChild(geometryRoot);
+		layerRoot.addChild(displayFacesRoot);
 		layerRoot.addChild(boundingBoxRoot);
 		layerRoot.addChild(selectionRoot);
 		layerRoot.addChild(temporaryRoot);
@@ -96,16 +119,25 @@ public class HalfedgeLayer implements ActionListener {
 		actionTool.addActionListener(this);
 		
 		Appearance bBoxApp = new Appearance("Bounding Box Appearance");
-		bBoxApp.setAttribute(CommonAttributes.FACE_DRAW, false);
-		bBoxApp.setAttribute(CommonAttributes.VERTEX_DRAW, false);
-		bBoxApp.setAttribute(CommonAttributes.EDGE_DRAW, true);
+		bBoxApp.setAttribute(FACE_DRAW, false);
+		bBoxApp.setAttribute(VERTEX_DRAW, false);
+		bBoxApp.setAttribute(EDGE_DRAW, true);
 		bBoxApp.setAttribute(LINE_SHADER + "." + TUBES_DRAW, false);
 		bBoxApp.setAttribute(LINE_SHADER + "." + LINE_WIDTH, 0.5);
 		bBoxApp.setAttribute(LINE_SHADER + "." + LINE_STIPPLE, true);
 		bBoxApp.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR, Color.RED);
 		bBoxApp.setAttribute(LINE_SHADER + "." + DEPTH_FUDGE_FACTOR, 1.5f);
 		bBoxApp.setAttribute(LINE_SHADER + "." + Z_BUFFER_ENABLED, true);
+		bBoxApp.setAttribute(PICKABLE, false);
 		boundingBoxRoot.setAppearance(bBoxApp);
+		
+		Appearance facesAppearance = new Appearance("Faces Appearance");
+		facesAppearance.setAttribute(VERTEX_DRAW, false);
+		facesAppearance.setAttribute(EDGE_DRAW, false);
+		facesAppearance.setAttribute(PICKABLE, false);
+		displayFacesRoot.setAppearance(facesAppearance);
+		
+		geometryRoot.setAppearance(geometryAppearance);
 	}
 	
 	
@@ -212,6 +244,12 @@ public class HalfedgeLayer implements ActionListener {
 		set(hds, new AdapterSet());
 	}
 	
+	
+	public void update() {
+		set(get());
+	}
+	
+	
 	public void setNoUndo(Geometry g, AdapterSet a) {
 		if (g instanceof IndexedFaceSet) {
 			geometry = (IndexedFaceSet)g;
@@ -229,7 +267,6 @@ public class HalfedgeLayer implements ActionListener {
 		} else {
 			geometry = new IndexedFaceSet(g.getName());
 		}
-		geometryRoot.setGeometry(geometry);
 		convertFaceSet(getEffectiveAdapters(a));
 		clearSelection();
 	}
@@ -288,6 +325,7 @@ public class HalfedgeLayer implements ActionListener {
 			return;
 		}
 		converterToHDS.ifs2heds(geometry, hds, a, edgeMap);
+		createDisplayGeometry();
 		updateBoundingBox();
 		resetTemporaryGeometry();
 	}
@@ -298,11 +336,39 @@ public class HalfedgeLayer implements ActionListener {
 		AdapterSet ea = getEffectiveAdapters(a);
 		initVisualizers(ea);
 		geometry = converterToIFS.heds2ifs(hds, ea, edgeMap);
-		geometryRoot.setGeometry(geometry);
+		createDisplayGeometry();
 		updateVisualizersGeometry(ea);
 		updateBoundingBox();
 		resetTemporaryGeometry();
 	}
+	
+	
+	private void createDisplayGeometry() {
+		IndexedFaceSet shownGeometry = geometry;
+		if (thickenSurface && geometry != null) {
+			ThickenedSurfaceFactory tsf = new ThickenedSurfaceFactory(geometry);
+			tsf.setThickness(thickness);
+			tsf.setMakeHoles(makeHoles);
+			tsf.setKeepFaceColors(true);
+			tsf.setHoleFactor(holeFactor);
+			tsf.setStepsPerEdge(stepsPerEdge);
+			tsf.setProfileCurve(new double[][]{{0,0}, {0,.4}, {.1,.5},{.9, .5},{1.0, .4}, {1,0}});
+			tsf.update();
+			shownGeometry = tsf.getThickenedSurface();
+		}
+		if (implode && geometry != null) {
+			shownGeometry = IndexedFaceSetUtility.implode(shownGeometry, implodeFactor);
+		}
+		geometryRoot.setGeometry(geometry);
+		if (shownGeometry != geometry) {
+			displayFacesRoot.setGeometry(shownGeometry);
+			geometryAppearance.setAttribute(POLYGON_SHADER + "." + TRANSPARENCY, 1.0);
+		} else {
+			displayFacesRoot.setGeometry(null);
+			geometryAppearance.setAttribute(POLYGON_SHADER + "." + TRANSPARENCY, INHERITED);
+		}
+	}
+	
 	
 
 	public Map<Integer, ? extends Edge<?, ?, ?>> getEdgeMap() {
@@ -500,5 +566,69 @@ public class HalfedgeLayer implements ActionListener {
 		layerRoot.addChild(temporaryRoot);
 		updateBoundingBox();
 	}
+
+
+	public boolean isThickenSurface() {
+		return thickenSurface;
+	}
+
+
+	public void setThickenSurface(boolean thickenSurface) {
+		this.thickenSurface = thickenSurface;
+	}
+
+
+	
+	public boolean isImplode() {
+		return implode;
+	}
+
+
+	public void setImplode(boolean implode) {
+		this.implode = implode;
+	}
+
+
+	public double getThickness() {
+		return thickness;
+	}
+
+
+	public void setThickness(double thickness) {
+		this.thickness = thickness;
+	}
+
+
+	public double getImplodeFactor() {
+		return implodeFactor;
+	}
+
+
+	public void setImplodeFactor(double implodeFactor) {
+		this.implodeFactor = implodeFactor;
+	}
+	
+	public boolean isMakeHoles() {
+		return makeHoles;
+	}
+	
+	public void setMakeHoles(boolean makeHoles) {
+		this.makeHoles = makeHoles;
+	}
+	
+	public double getHoleFactor() {
+		return holeFactor;
+	}
+	public void setHoleFactor(double holeFactor) {
+		this.holeFactor = holeFactor;
+	}
+	
+	public int getStepsPerEdge() {
+		return stepsPerEdge;
+	}
+	public void setStepsPerEdge(int stepsPerEdge) {
+		this.stepsPerEdge = stepsPerEdge;
+	}
+	
 	
 }
