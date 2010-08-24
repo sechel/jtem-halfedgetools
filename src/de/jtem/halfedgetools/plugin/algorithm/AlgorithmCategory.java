@@ -10,6 +10,6 @@ public enum AlgorithmCategory {
 	Selection,
 	Topology,
 	Geometry,
-	Custom
+	Custom;
 	
 }

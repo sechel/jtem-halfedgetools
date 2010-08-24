@@ -59,7 +59,9 @@ public class ContextMenuWidget extends WidgetPlugin implements PopupMenuListener
 			List<AlgorithmPlugin> aList = aMap.get(ap.getAlgorithmCategory());
 			aList.add(ap);
 		}
-		for (AlgorithmCategory ac : aMap.keySet()) {
+		List<AlgorithmCategory> sortedCategories = new LinkedList<AlgorithmCategory>(aMap.keySet());
+		Collections.sort(sortedCategories);
+		for (AlgorithmCategory ac : sortedCategories) {
 			List<AlgorithmPlugin> pList = aMap.get(ac);
 			Collections.sort(pList);
 			JMenu catMenu = new JMenu(ac.name());
