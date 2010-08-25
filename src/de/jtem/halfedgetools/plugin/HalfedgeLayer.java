@@ -60,6 +60,8 @@ public class HalfedgeLayer implements ActionListener {
 		hds = new DefaultJRHDS();
 	private IndexedFaceSet
 		geometry = new IndexedFaceSet();
+	private AdapterSet
+		additionalAdapters = new AdapterSet();
 	private SceneGraphComponent
 		layerRoot = new SceneGraphComponent("Default Layer"),
 		displayFacesRoot = new SceneGraphComponent("Display Faces"),
@@ -93,7 +95,7 @@ public class HalfedgeLayer implements ActionListener {
 	private double
 		holeFactor = 1.0,
 		thickness = 0.1,
-		implodeFactor = 0.5;
+		implodeFactor = -0.85;
 	
 	private boolean 
 		active = true;
@@ -168,7 +170,7 @@ public class HalfedgeLayer implements ActionListener {
 	
 	
 	private AdapterSet getVisualizerAdapters() {
-		AdapterSet r = new AdapterSet(hif.getAdapters());
+		AdapterSet r = new AdapterSet(hif.getRegisteredAdapters());
 		for (VisualizerPlugin p : visualizers) {
 			r.addAll(p.getAdapters());
 		}
@@ -178,7 +180,7 @@ public class HalfedgeLayer implements ActionListener {
 	private AdapterSet getEffectiveAdapters(AdapterSet a) {
 		AdapterSet effectiveAdapters = new AdapterSet();
 		effectiveAdapters.addAll(a);
-		effectiveAdapters.addAll(hif.getAdapters());
+		effectiveAdapters.addAll(hif.getRegisteredAdapters());
 		effectiveAdapters.addAll(getVisualizerAdapters());
 		return effectiveAdapters;
 	}
@@ -246,7 +248,7 @@ public class HalfedgeLayer implements ActionListener {
 	
 	
 	public void update() {
-		set(get());
+		set(get(), additionalAdapters);
 	}
 	
 	
@@ -328,6 +330,7 @@ public class HalfedgeLayer implements ActionListener {
 		createDisplayGeometry();
 		updateBoundingBox();
 		resetTemporaryGeometry();
+		additionalAdapters = a;
 	}
 	
 	
@@ -340,6 +343,7 @@ public class HalfedgeLayer implements ActionListener {
 		updateVisualizersGeometry(ea);
 		updateBoundingBox();
 		resetTemporaryGeometry();
+		additionalAdapters = a;
 	}
 	
 	
@@ -630,5 +634,8 @@ public class HalfedgeLayer implements ActionListener {
 		this.stepsPerEdge = stepsPerEdge;
 	}
 	
+	public AdapterSet getAdditionalAdapters() {
+		return additionalAdapters;
+	}
 	
 }

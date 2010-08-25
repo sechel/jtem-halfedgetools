@@ -653,7 +653,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				}
 			} catch (Exception ex) {
 				JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
-				ex.printStackTrace();
 			}
 			updateStates();
 			checkContent();
@@ -815,6 +814,13 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	 * @param a
 	 */
 	public AdapterSet getAdapters() {
+		AdapterSet result = new AdapterSet();
+		result.addAll(adapters);
+		result.addAll(activeLayer.getAdditionalAdapters());
+		return result;
+	}
+	
+	protected AdapterSet getRegisteredAdapters() {
 		AdapterSet result = new AdapterSet();
 		result.addAll(adapters);
 		return result;
@@ -1162,7 +1168,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			String propertyName = evt.getPropertyName();
 			if (propertyName.equals(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY)) {
 	            File file = (File)evt.getNewValue();
-	            if (file == null) {
+	            if (file == null || !file.exists()) {
 	                return;
 	            } 
 				try {

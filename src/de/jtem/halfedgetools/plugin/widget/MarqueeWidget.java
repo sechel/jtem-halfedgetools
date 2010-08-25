@@ -302,7 +302,10 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		
 		HalfedgeSelection sel = new HalfedgeSelection();
 		Set<Vertex<?,?,?>> marqeeVertices = getMarqueeVertices();
-		if (marqeeVertices.isEmpty()) return;
+		if (marqeeVertices.isEmpty()) {
+			hif.setSelection(startSelection);
+			return;
+		}
 		
 		if(e.isControlDown()){
 			for (Vertex<?,?,?> v : marqeeVertices) {

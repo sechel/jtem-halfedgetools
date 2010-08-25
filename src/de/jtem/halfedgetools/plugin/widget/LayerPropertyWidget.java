@@ -34,9 +34,9 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		makeHolesChecker = new JCheckBox("Holes");
 	private SpinnerNumberModel
 		stepsPerEdgeModel = new SpinnerNumberModel(1, 1, 100, 1),
-		holeFactorModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.1),
-		implodeFactorModel = new SpinnerNumberModel(0.5, 0.0, 1.0, 0.1),
-		thicknessModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.1);
+		holeFactorModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.01),
+		implodeFactorModel = new SpinnerNumberModel(0.5, -1.0, 1.0, 0.01),
+		thicknessModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.01);
 	private JSpinner
 		stepsPerEdgeSpinner = new JSpinner(stepsPerEdgeModel),
 		holeFactorSpinner = new JSpinner(holeFactorModel),
