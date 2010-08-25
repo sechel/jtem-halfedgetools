@@ -181,7 +181,7 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 	public void actionPerformed(ActionEvent e) {
 		Object s = e.getSource();
 		if (getGeometryButton == s) {
-			hds = hcp.get(hds);
+			hds = hcp.get();
 			setData(hds);
 		}
 		if (continueButton == s) {

@@ -50,14 +50,19 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 	private WidgetInterface
 		gui = null;
 	private boolean
-		isDragging = false;
+		rotateWasEnabled = false,
+		dragWasEnabled = false,
+		marqueeEnabled = false;
 	private Point
 		start = new Point(),
 		active = new Point();
-	boolean selectInside = false;
-	private HalfedgeSelection oldSel = null;
+	private boolean 
+		selectInside = false;
+	private HalfedgeSelection 
+		startSelection = new HalfedgeSelection();
 	
-	private Set<Vertex<?,?,?>> getMarqueeVertex() {
+	private Set<Vertex<?,?,?>> getMarqueeVertices() {
+		Set<Vertex<?,?,?>> vSet = new HashSet<Vertex<?,?,?>>();
 		Dimension size = view.getViewer().getViewingComponentSize();
 		int sign = active.x - start.x;
 		selectInside = (sign >=0);
@@ -69,15 +74,15 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		int yMax = yMin + h;
 		SceneGraphComponent root = view.getViewer().getSceneRoot();
 		SceneGraphComponent layerRoot = hif.getActiveLayer().getLayerRoot();
-		SceneGraphPath hifPath = SceneGraphUtility.getPathsBetween(root, layerRoot).get(0);
+		List<SceneGraphPath> paths = SceneGraphUtility.getPathsBetween(root, layerRoot);
+		if (paths.isEmpty()) return vSet;
+		SceneGraphPath hifPath = paths.get(0);
 		SceneGraphPath camPath = view.getViewer().getCameraPath();
 		Matrix P = new Matrix(CameraUtility.getCameraToNDC(view.getViewer()));
 		Matrix C = new Matrix(camPath.getMatrix(null));
 		Matrix T = new Matrix(hifPath.getMatrix(null));
 		C.invert();
 		T.multiplyOnLeft(C);
-
-		Set<Vertex<?,?,?>> vSet = new HashSet<Vertex<?,?,?>>();
 		AdapterSet a = hif.getAdapters();
 		HalfEdgeDataStructure<?, ?, ?> hds = hif.get();
 		double[] homPos = {0,0,0,1};
@@ -255,7 +260,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 	
 	@Override
 	public void paint(Graphics2D g, JPanel canvas) {
-		if (!isDragging) return;
+		if (!marqueeEnabled) return;
 		Stroke sOld = g.getStroke();
 		int w = Math.abs(active.x - start.x);
 		int h = Math.abs(active.y - start.y);
@@ -274,41 +279,48 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		g.setStroke(sOld);
 	}
 
+	
+	private void cancelMarqee() {
+		marqueeEnabled = false;
+		hif.setSelection(startSelection);
+		repaint();
+		contentTools.setRotationEnabled(rotateWasEnabled);
+		contentTools.setDragEnabled(dragWasEnabled);
+	}
+	
+	
+	
 	@Override
 	public void mouseDragged(MouseEvent e) {
+		if (!marqueeEnabled) return;
 		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) {
-			isDragging = false;
-			repaint();
+			cancelMarqee();
 			return;
 		}
-		
 		active = e.getPoint();
-		HalfedgeSelection sel = new HalfedgeSelection();
+		repaint();
 		
-		Set<Vertex<?,?,?>> marqeeVertices = getMarqueeVertex();
+		HalfedgeSelection sel = new HalfedgeSelection();
+		Set<Vertex<?,?,?>> marqeeVertices = getMarqueeVertices();
 		if (marqeeVertices.isEmpty()) return;
 		
 		if(e.isControlDown()){
-			isDragging = true;
 			for (Vertex<?,?,?> v : marqeeVertices) {
 				sel.setSelected(v, true);
 			}
 		}
 		if(e.isAltDown()){
-			isDragging = true;
 			for(Edge<?,?,?> edge : getMarqueeEdges(marqeeVertices)){
 				sel.setSelected(edge, true);
 			}
 		}
 		
 		if(e.isShiftDown()){
-			isDragging = true;
 			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
 				sel.setSelected(face, true);
 			}
 		}	
-		repaint();
-		sel.addAll(oldSel.getNodes());
+		sel.addAll(startSelection.getNodes());
 		hif.setSelection(sel);
 	}
 
@@ -321,20 +333,27 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) return;
+		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) {
+			return;
+		}
+		marqueeEnabled = true;
 		start = e.getPoint();
 		active = start;
+		rotateWasEnabled = contentTools.isRotationEnabled();
+		dragWasEnabled = contentTools.isDragEnabled();
 		contentTools.setRotationEnabled(false);
 		contentTools.setDragEnabled(false);
-		if(oldSel == null) {
-			oldSel = hif.getSelection();
-		}
+		startSelection = hif.getSelection();
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) return;
-		Set<Vertex<?,?,?>> marqeeVertices = getMarqueeVertex();
+		if (!marqueeEnabled) return;
+		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) {
+			cancelMarqee();
+			return;
+		}
+		Set<Vertex<?,?,?>> marqeeVertices = getMarqueeVertices();
 		HalfedgeSelection sel = new HalfedgeSelection();
 		contentTools.setRotationEnabled(true);
 		contentTools.setDragEnabled(true);
@@ -342,25 +361,21 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 			for (Vertex<?,?,?> v : marqeeVertices) {
 				sel.setSelected(v, true);
 			}
-			oldSel.addAll(sel.getVertices());
 		}
 		if (e.isAltDown()){
 			for(Edge<?,?,?> edge : getMarqueeEdges(marqeeVertices)){
 				sel.setSelected(edge, true);
 			}
-			oldSel.addAll(sel.getEdges());
 		}
 		if (e.isShiftDown()){
 			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
 				sel.setSelected(face, true);
 			}
-			oldSel.addAll(sel.getFaces());
 		}
-
-		isDragging = false;
+		sel.addAll(startSelection.getNodes());
+		hif.setSelection(sel);
+		marqueeEnabled = false;
 		repaint();
-		hif.setSelection(oldSel);
-					
 	}
 
 	@Override

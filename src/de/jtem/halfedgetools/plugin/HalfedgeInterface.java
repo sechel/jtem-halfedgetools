@@ -1,11 +1,16 @@
 package de.jtem.halfedgetools.plugin;
 
 import static de.jreality.math.Pn.EUCLIDEAN;
+import static de.jreality.shader.CommonAttributes.DIFFUSE_COLOR;
+import static de.jreality.shader.CommonAttributes.EDGE_DRAW;
+import static de.jreality.shader.CommonAttributes.FACE_DRAW;
 import static de.jreality.shader.CommonAttributes.LINE_SHADER;
 import static de.jreality.shader.CommonAttributes.POINT_RADIUS;
 import static de.jreality.shader.CommonAttributes.POINT_SHADER;
+import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
 import static de.jreality.shader.CommonAttributes.RADII_WORLD_COORDINATES;
 import static de.jreality.shader.CommonAttributes.TUBE_RADIUS;
+import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 import static de.jreality.util.SceneGraphUtility.getPathsBetween;
 import static java.awt.GridBagConstraints.BOTH;
 import static java.awt.event.InputEvent.CTRL_DOWN_MASK;
@@ -18,6 +23,7 @@ import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 import static javax.swing.SwingUtilities.getWindowAncestor;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
@@ -1110,8 +1116,11 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 
 		private static final long serialVersionUID = 1L;
 		
-		private	JRViewer viewer = new JRViewer(true);
-		private Appearance rootApp = null;
+		private	JRViewer 
+			viewer = new JRViewer(true);
+		private Appearance
+			contentApp = new Appearance(),
+			rootApp = null;
 		
 		public GeometryPreviewerPanel() {
 			setLayout(new GridLayout());
@@ -1128,6 +1137,15 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			tools.setRotationEnabled(true);
 			tools.setDragEnabled(false);
 			tools.setEncompassEnabled(true);
+			
+			contentApp.setAttribute(VERTEX_DRAW, true);
+			contentApp.setAttribute(EDGE_DRAW, true);
+			contentApp.setAttribute(FACE_DRAW, true);
+			contentApp.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, 0.07);
+			contentApp.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR, new Color(100, 200, 50));
+			contentApp.setAttribute(POINT_SHADER + "." + POINT_RADIUS, 0.12);
+			contentApp.setAttribute(POINT_SHADER + "." + DIFFUSE_COLOR, new Color(200, 100, 50));
+			contentApp.setAttribute(POLYGON_SHADER + "." + DIFFUSE_COLOR, new Color(230, 230, 230));
 		}
 		
 		@Override
@@ -1155,6 +1173,15 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 						if (g instanceof IndexedFaceSet) {
 							IndexedFaceSetUtility.calculateAndSetFaceNormals((IndexedFaceSet)g);
 						}
+						Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(c);
+						MatrixBuilder mb = MatrixBuilder.euclidean();
+						double maxExtend = bbox.getMaxExtent();		
+						mb.scale(10 / maxExtend);
+						Transformation normalizeTransform = new Transformation();
+						normalizeTransform.setMatrix(mb.getArray());
+						c.setTransformation(normalizeTransform);
+						c.setAppearance(contentApp);
+						
 						Content content = JRViewerUtility.getContentPlugin(viewer.getController());
 						content.setContent(c);
 						View view = viewer.getPlugin(View.class);
