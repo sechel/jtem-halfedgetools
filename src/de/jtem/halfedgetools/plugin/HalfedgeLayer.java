@@ -91,10 +91,10 @@ public class HalfedgeLayer implements ActionListener {
 		makeHoles = true,
 		implode = false;
 	private int 
-		stepsPerEdge = 1; 
+		stepsPerEdge = 8; 
 	private double
-		holeFactor = 1.0,
-		thickness = 0.1,
+		holeFactor = 0.4,
+		thickness = 0.05,
 		implodeFactor = -0.85;
 	
 	private boolean 

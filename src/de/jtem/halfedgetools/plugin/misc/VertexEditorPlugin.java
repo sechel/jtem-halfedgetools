@@ -7,6 +7,7 @@ import java.awt.Insets;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import de.jreality.plugin.JRViewerUtility;
 import de.jreality.plugin.basic.View;
@@ -107,7 +108,12 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 				(yBox.isSelected())?xyz[1]:e.getY(),
 				(zBox.isSelected())?xyz[2]:e.getZ()};
 		adapters.set(Position.class, v, newPos);
-		hif.update();
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				hif.update();				
+			}
+		});
 	}
 
 	@Override

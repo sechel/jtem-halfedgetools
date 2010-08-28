@@ -9,6 +9,7 @@ import static de.jreality.shader.CommonAttributes.POINT_RADIUS;
 import static de.jreality.shader.CommonAttributes.POINT_SHADER;
 import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
 import static de.jreality.shader.CommonAttributes.RADII_WORLD_COORDINATES;
+import static de.jreality.shader.CommonAttributes.SMOOTH_SHADING;
 import static de.jreality.shader.CommonAttributes.TUBE_RADIUS;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 import static de.jreality.util.SceneGraphUtility.getPathsBetween;
@@ -155,7 +156,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		undoButton = new JButton(undoAction),
 		redoButton = new JButton(redoAction);
 	private LayerPropertyWidget
-		layerPropertyWidget = new LayerPropertyWidget();
+		layerPropertyPanel = new LayerPropertyWidget();
 	private JToggleButton
 		visualizersToggle = new JToggleButton(ImageHook.getIcon("page_white_paint_arrow.png")),
 		layerOptionsToggle = new JToggleButton(ImageHook.getIcon("page_white_gear_arrow.png"));
@@ -325,11 +326,11 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			visualizersPopup.setPreferredSize(new Dimension(250, 400));
 		}
 		if (layerOptionsPopup == e.getSource()) {
-			layerPropertyWidget.setLayer(activeLayer);
+			layerPropertyPanel.setLayer(activeLayer);
 			layerOptionsPopup.setBorderPainted(true);
 			layerOptionsPopup.removeAll();
 			layerOptionsPopup.setLayout(new GridLayout());
-			layerOptionsPopup.add(layerPropertyWidget);
+			layerOptionsPopup.add(layerPropertyPanel);
 			layerOptionsPopup.setMinimumSize(new Dimension(250, 200));
 			layerOptionsPopup.setPreferredSize(new Dimension(250, 200));
 		}
@@ -911,6 +912,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	@Override
 	public void mainUIChanged(String uiClass) {
 		SwingUtilities.updateComponentTreeUI(chooser);
+		SwingUtilities.updateComponentTreeUI(layerPropertyPanel);
 	}
 	
 	@Override
@@ -1152,6 +1154,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			contentApp.setAttribute(POINT_SHADER + "." + POINT_RADIUS, 0.12);
 			contentApp.setAttribute(POINT_SHADER + "." + DIFFUSE_COLOR, new Color(200, 100, 50));
 			contentApp.setAttribute(POLYGON_SHADER + "." + DIFFUSE_COLOR, new Color(230, 230, 230));
+			contentApp.setAttribute(POLYGON_SHADER + "." + SMOOTH_SHADING, false);
 		}
 		
 		@Override
