@@ -34,25 +34,26 @@ package de.jtem.halfedgetools.plugin;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.jtem.halfedgetools.plugin.algorithm.generator.ConvexHullGenerator;
 import de.jtem.halfedgetools.plugin.algorithm.generator.RandomSphereGenerator;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.PerturbPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.ProjectPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.selection.BoundaryEdgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.BoundaryFaceSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.BoundaryVertexSelection;
-import de.jtem.halfedgetools.plugin.algorithm.selection.ClearSelection;
-import de.jtem.halfedgetools.plugin.algorithm.selection.ClearVertexSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.ClearEdgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.ClearFaceSelection;
+import de.jtem.halfedgetools.plugin.algorithm.selection.ClearSelection;
+import de.jtem.halfedgetools.plugin.algorithm.selection.ClearVertexSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.ExportSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.ImportSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.InsideEdgesSelection;
-import de.jtem.halfedgetools.plugin.algorithm.selection.TouchingEdgesSelection;
-import de.jtem.halfedgetools.plugin.algorithm.selection.TouchingFacesSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.InsideFacesSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.InvertEdgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.InvertFaceSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.InvertVertexSelection;
+import de.jtem.halfedgetools.plugin.algorithm.selection.TouchingEdgesSelection;
+import de.jtem.halfedgetools.plugin.algorithm.selection.TouchingFacesSelection;
 import de.jtem.halfedgetools.plugin.algorithm.simplification.GarlandHeckbertPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkLinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkPlugin;
@@ -136,6 +137,7 @@ public class HalfedgePluginFactory {
 	public static Set<Plugin> createGeneratorPlugins() {
 		Set<Plugin> s = new HashSet<Plugin>();
 		s.add(new RandomSphereGenerator());
+		s.add(new ConvexHullGenerator());
 		return s;
 	}
 	
