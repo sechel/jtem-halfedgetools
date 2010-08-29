@@ -295,6 +295,21 @@ public class HalfedgeLayer implements ActionListener {
 		}
 		hds = template;
 		convertFaceSet(getEffectiveAdapters(a));
+		// convert selection
+		HalfedgeSelection newSelection = new HalfedgeSelection();
+		for (Vertex<?,?,?> v : selection.getVertices()) {
+			Vertex<?,?,?> nv = hds.getVertex(v.getIndex());
+			newSelection.setSelected(nv, true);
+		}
+		for (Edge<?,?,?> e : selection.getEdges()) {
+			Edge<?,?,?> ne = hds.getEdge(e.getIndex());
+			newSelection.setSelected(ne, true);
+		}
+		for (Face<?,?,?> f : selection.getFaces()) {
+			Face<?,?,?> nf = hds.getFace(f.getIndex());
+			newSelection.setSelected(nf, true);
+		}
+		selection = newSelection;
 		return template;
 	}
 	
