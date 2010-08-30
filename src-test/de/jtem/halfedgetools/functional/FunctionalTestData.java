@@ -13,6 +13,20 @@ public class FunctionalTestData {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void createCombinatorialTriangle(HDS hds) {
+	
+		V v1 = hds.addNewVertex();
+		V v2 = hds.addNewVertex();
+		V v3 = hds.addNewVertex();
+	
+		constructFaceByVertices(hds, v1, v2, v3);
+	}
+		
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void createCombinatorialTetrahedron(HDS hds) {
 
 		V v1 = hds.addNewVertex();
