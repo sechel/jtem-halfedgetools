@@ -93,6 +93,7 @@ public class CornerVertexSelection extends AlgorithmDialogPlugin implements Chan
 		super.install(c);
 	}
 	
+	@Override
 	protected JPanel getDialogPanel() {
 		return panel;
 	}
@@ -112,6 +113,7 @@ public class CornerVertexSelection extends AlgorithmDialogPlugin implements Chan
 		return info;
 	}
 	
+	@Override
 	public void stateChanged(ChangeEvent e){
 		if(oldSelection == null) {
 			oldSelection = hcp.getSelection();

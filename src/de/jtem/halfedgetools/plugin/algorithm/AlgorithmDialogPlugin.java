@@ -30,6 +30,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 	private static Icon
 		defaultIcon = ImageHook.getIcon("cog_edit.png");
 
+	@Override
 	public final < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

@@ -59,6 +59,7 @@ public abstract class JRVertex <
 		radius = 1,
 		pointSize = 1;
 	
+	@Override
 	public void copyData(V v) {
 		if (v.position != null) {
 			position = v.position.clone();
