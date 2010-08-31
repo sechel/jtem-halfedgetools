@@ -331,8 +331,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			layerOptionsPopup.removeAll();
 			layerOptionsPopup.setLayout(new GridLayout());
 			layerOptionsPopup.add(layerPropertyPanel);
-			layerOptionsPopup.setMinimumSize(new Dimension(250, 200));
-			layerOptionsPopup.setPreferredSize(new Dimension(250, 200));
+			layerOptionsPopup.setMinimumSize(new Dimension(250, 400));
+			layerOptionsPopup.setPreferredSize(new Dimension(250, 400));
 		}
 	}
 	

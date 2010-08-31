@@ -1,18 +1,31 @@
 package de.jtem.halfedgetools.plugin.widget;
 
+import static java.lang.Double.parseDouble;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.StringTokenizer;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -34,7 +47,7 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		makeHolesChecker = new JCheckBox("Holes");
 	private SpinnerNumberModel
 		stepsPerEdgeModel = new SpinnerNumberModel(1, 1, 100, 1),
-		holeFactorModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.01),
+		holeFactorModel = new SpinnerNumberModel(1.0, -100.0, 100.0, 0.01),
 		implodeFactorModel = new SpinnerNumberModel(0.5, -1.0, 1.0, 0.01),
 		thicknessModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.01);
 	private JSpinner
@@ -42,7 +55,14 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		holeFactorSpinner = new JSpinner(holeFactorModel),
 		implodeFactorSpinner = new JSpinner(implodeFactorModel), 
 		thicknessSpinner = new JSpinner(thicknessModel); 
-	
+	private JTextArea
+		profileCurveArea = new JTextArea();
+	private JScrollPane
+		profileScroller = new JScrollPane(profileCurveArea);
+	private JPanel
+		profilePanel = new JPanel(new GridLayout());
+	private JButton
+		updateButton = new JButton("Update Geometry");
 	private boolean
 		disableListeners = false;
 	
@@ -70,6 +90,12 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		add(holeFactorSpinner, c2);
 		add(new JLabel("Steps Per Edge"), c1);
 		add(stepsPerEdgeSpinner, c2);
+		add(profilePanel, c2);
+		profilePanel.add(profileScroller);
+		profilePanel.setBorder(BorderFactory.createTitledBorder("Profile Curve"));
+		profilePanel.setMinimumSize(new Dimension(10, 150));
+		profilePanel.setPreferredSize(new Dimension(10, 150));
+		add(updateButton, c2);
 		
 		c2.weighty = 1.0;
 		add(new JPanel(), c2);
@@ -82,6 +108,7 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		holeFactorSpinner.addChangeListener(this);
 		stepsPerEdgeSpinner.addChangeListener(this);
 		noEffectChecker.addActionListener(this);
+		updateButton.addActionListener(this);
 		
 		ButtonGroup modeGroup = new ButtonGroup();
 		modeGroup.add(noEffectChecker);
@@ -112,6 +139,23 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		layer.setMakeHoles(makeHolesChecker.isSelected());
 		layer.setHoleFactor(holeFactorModel.getNumber().doubleValue());
 		layer.setStepsPerEdge(stepsPerEdgeModel.getNumber().intValue());
+		
+		String profileCurveTxt = profileCurveArea.getText();
+		StringTokenizer st = new StringTokenizer(profileCurveTxt);
+		List<double[]> pointsList = new LinkedList<double[]>();
+		try {
+			while (st.hasMoreTokens()) {
+				String xStr = st.nextToken();
+				String yStr = st.nextToken();
+				double[] p = {parseDouble(xStr), parseDouble(yStr)};
+				pointsList.add(p);
+			}
+			double[][] profileCurve = pointsList.toArray(new double[pointsList.size()][]);
+			layer.setProfileCurve(profileCurve);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, e.getMessage(), "Profile Curve Parsing Error", ERROR_MESSAGE);
+			return;
+		}
 		layer.update();
 	}
 	
@@ -126,6 +170,11 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		holeFactorModel.setValue(layer.getHoleFactor());
 		stepsPerEdgeModel.setValue(layer.getStepsPerEdge());
 		noEffectChecker.setSelected(!layer.isImplode() && !layer.isThickenSurface());
+		StringBuffer sb = new StringBuffer();
+		for (double[] p : layer.getProfileCurve()) {
+			sb.append(p[0] + "\t" + p[1] + "\n");
+		}
+		profileCurveArea.setText(sb.toString());
 		disableListeners = false;
 	}
 	

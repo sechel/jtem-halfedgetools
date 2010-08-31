@@ -92,6 +92,8 @@ public class HalfedgeLayer implements ActionListener {
 		implode = false;
 	private int 
 		stepsPerEdge = 8; 
+	private double[][]
+	    profileCurve = new double[][]{{0,0}, {0,.4}, {.1,.5},{.9, .5},{1.0, .4}, {1,0}};
 	private double
 		holeFactor = 0.4,
 		thickness = 0.05,
@@ -371,7 +373,7 @@ public class HalfedgeLayer implements ActionListener {
 			tsf.setKeepFaceColors(true);
 			tsf.setHoleFactor(holeFactor);
 			tsf.setStepsPerEdge(stepsPerEdge);
-			tsf.setProfileCurve(new double[][]{{0,0}, {0,.4}, {.1,.5},{.9, .5},{1.0, .4}, {1,0}});
+			tsf.setProfileCurve(profileCurve);
 			tsf.update();
 			shownGeometry = tsf.getThickenedSurface();
 		}
@@ -651,6 +653,13 @@ public class HalfedgeLayer implements ActionListener {
 	
 	public AdapterSet getAdditionalAdapters() {
 		return additionalAdapters;
+	}
+	
+	public double[][] getProfileCurve() {
+		return profileCurve;
+	}
+	public void setProfileCurve(double[][] profileCurve) {
+		this.profileCurve = profileCurve;
 	}
 	
 }
