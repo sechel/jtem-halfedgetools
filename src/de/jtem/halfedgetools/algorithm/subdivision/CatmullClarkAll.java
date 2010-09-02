@@ -73,8 +73,9 @@ import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 public class CatmullClarkAll {
 
 	/**
-	 * Subdivides a given surface with the Catmull-Clark rule Subdivides the
-	 * boundary with the Lane-Riesenfeld rule
+	 * Subdivides a given surface with the Catmull-Clark rule 
+	 * Subdivides the boundary with the Lane-Riesenfeld rule
+	 * Subdivides a given edge selection with the Lane-Riesenfeld rule
 	 * 
 	 * @param <HDS>
 	 * @param oldHeds

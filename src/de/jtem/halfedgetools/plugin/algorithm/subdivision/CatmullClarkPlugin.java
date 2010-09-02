@@ -63,7 +63,7 @@ import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 
-public class CatmullClarkPlugin extends AlgorithmDialogPlugin  implements ChangeListener, ActionListener {
+public class CatmullClarkPlugin extends AlgorithmDialogPlugin {
 	
 	private JPanel
 		panel = new JPanel();
@@ -121,8 +121,6 @@ public class CatmullClarkPlugin extends AlgorithmDialogPlugin  implements Change
 		
 		BSplineLines.setSelected(true);
 		LinesGroup.add(BSplineLines);
-		BSplineLines.addActionListener(this);
-		BSplineLines.addChangeListener(this);
 		LinesGroup.add(NoLines);
 		
 		featuredLines.add(BSplineLines,gbc2);
@@ -146,18 +144,9 @@ public class CatmullClarkPlugin extends AlgorithmDialogPlugin  implements Change
 		if (vc == null || ec == null || fc == null) {
 			throw new CalculatorException("No Subdivision calculators found for " + hds);
 		}
-		if(BSplineLines.isSelected()){
-			b4 = true;
-		}
-		if(BSplineButton.isSelected()){
-			b1 = true;
-		}
-		if(FixedButton.isSelected()){
-			b1 = false; 
-		}
-		if(NoBoundary.isSelected()){
-			b3 = true;
-		}
+		b4 = BSplineLines.isSelected();
+		b1 = BSplineButton.isSelected();
+		b3 = NoBoundary.isSelected();
 		HalfedgeSelection sel = new HalfedgeSelection(hcp.getSelection());
 		cc.subdivide(hds, hds2, vc, ec, fc, sel, b1, b3, b4);
 		hcp.set(hds2);
@@ -186,32 +175,5 @@ public class CatmullClarkPlugin extends AlgorithmDialogPlugin  implements Change
 		return panel;
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		Object src = e.getSource();
-		if(BSplineLines == src){
-			BSplineLines.setSelected(true);
-		}
-		if(BSplineButton == src){
-			BSplineButton.setSelected(true);
-		}
-		if(NoBoundary == src){
-			NoBoundary.setSelected(true);
-		}
-	}
-
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		Object src = e.getSource();
-		if(BSplineLines == src){
-			b4 = false;	
-		} 
-		if(BSplineButton == src){
-			b1 = false;
-		}
-		if(NoBoundary == src){
-			b3 = false;
-		}
-	}
 
 }
