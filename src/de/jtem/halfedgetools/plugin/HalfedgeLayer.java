@@ -172,7 +172,7 @@ public class HalfedgeLayer implements ActionListener {
 	
 	
 	private AdapterSet getVisualizerAdapters() {
-		AdapterSet r = new AdapterSet(hif.getRegisteredAdapters());
+		AdapterSet r = new AdapterSet();
 		for (VisualizerPlugin p : visualizers) {
 			r.addAll(p.getAdapters());
 		}
@@ -227,6 +227,7 @@ public class HalfedgeLayer implements ActionListener {
 		this.hds = hds;
 		convertHDS(getEffectiveAdapters(a));
 		clearSelection();
+		additionalAdapters = a;
 	}
 	
 	public <
@@ -254,6 +255,11 @@ public class HalfedgeLayer implements ActionListener {
 	}
 	
 	
+	public void updateNoUndo() {
+		setNoUndo(get(), additionalAdapters);
+	}
+	
+	
 	public void setNoUndo(Geometry g, AdapterSet a) {
 		if (g instanceof IndexedFaceSet) {
 			geometry = (IndexedFaceSet)g;
@@ -273,6 +279,7 @@ public class HalfedgeLayer implements ActionListener {
 		}
 		convertFaceSet(getEffectiveAdapters(a));
 		clearSelection();
+		additionalAdapters = a;
 	}
 	
 	public void set(Geometry g, AdapterSet a) {
@@ -347,7 +354,6 @@ public class HalfedgeLayer implements ActionListener {
 		createDisplayGeometry();
 		updateBoundingBox();
 		resetTemporaryGeometry();
-		additionalAdapters = a;
 	}
 	
 	
@@ -360,7 +366,6 @@ public class HalfedgeLayer implements ActionListener {
 		updateVisualizersGeometry(ea);
 		updateBoundingBox();
 		resetTemporaryGeometry();
-		additionalAdapters = a;
 	}
 	
 	

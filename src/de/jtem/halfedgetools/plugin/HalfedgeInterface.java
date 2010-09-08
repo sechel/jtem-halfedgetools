@@ -804,7 +804,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	public void updateNoUndo() {
-		activeLayer.setNoUndo(activeLayer.get(), new AdapterSet());
+		activeLayer.updateNoUndo();
 		updateStates();
 		checkContent();
 	}
