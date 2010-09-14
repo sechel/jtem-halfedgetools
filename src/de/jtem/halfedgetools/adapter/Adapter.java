@@ -108,7 +108,8 @@ public abstract class Adapter<VAL> implements Comparable<Adapter<VAL>> {
 		if (p1 == p2) {
 			String n1 = getClass().getName();
 			String n2 = o.getClass().getName();
-			return n1.compareTo(n2);
+			int c = n1.compareTo(n2);
+			return c != 0 ? c : this.hashCode() - o.hashCode();
 		} else {
 			return p1 < p2 ? 1 : -1;
 		}

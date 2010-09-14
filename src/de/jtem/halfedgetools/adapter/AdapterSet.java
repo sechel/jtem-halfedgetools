@@ -90,6 +90,19 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 	
 
 	public <
+		A extends Annotation
+	> List<Adapter<?>> queryAll(Class<A> type) {
+		LinkedList<Adapter<?>> result = new LinkedList<Adapter<?>>();
+		for (Adapter<?> a : this) {
+			if (a.getClass().isAnnotationPresent(type)) {
+				result.add(a);
+			}
+		}
+		return result;
+	}
+	
+
+	public <
 		O
 	> TypedAdapterSet<O> querySet(Class<O> out) throws AdapterException {
 		TypedAdapterSet<O> set = new TypedAdapterSet<O>(out);
