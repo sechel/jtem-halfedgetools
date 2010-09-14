@@ -10,6 +10,7 @@ public enum AlgorithmCategory {
 	Selection,
 	Topology,
 	Geometry,
+	VectorField,
 	Custom;
 	
 }
