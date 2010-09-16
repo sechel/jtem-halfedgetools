@@ -47,6 +47,7 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.jreality.ConverterHeds2JR;
 import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
@@ -61,7 +62,8 @@ public class HalfedgeLayer implements ActionListener {
 	private IndexedFaceSet
 		geometry = new IndexedFaceSet();
 	private AdapterSet
-		additionalAdapters = new AdapterSet();
+		persistentAdapters = new AdapterSet(),
+		volatileAdapters = new AdapterSet();
 	private SceneGraphComponent
 		layerRoot = new SceneGraphComponent("Default Layer"),
 		displayFacesRoot = new SceneGraphComponent("Display Faces"),
@@ -179,18 +181,13 @@ public class HalfedgeLayer implements ActionListener {
 		return r;
 	}
 	
-	private AdapterSet getEffectiveAdapters(AdapterSet a) {
+	private AdapterSet getEffectiveAdapters() {
 		AdapterSet effectiveAdapters = new AdapterSet();
-		effectiveAdapters.addAll(a);
-		effectiveAdapters.addAll(hif.getRegisteredAdapters());
+		effectiveAdapters.addAll(hif.getGlobalAdapters());
+		effectiveAdapters.addAll(getAllAdapters());
 		effectiveAdapters.addAll(getVisualizerAdapters());
 		return effectiveAdapters;
 	}
-	
-	private AdapterSet getEffectiveAdapters() {
-		return getEffectiveAdapters(new AdapterSet());
-	}
-	
 	
 	private void initVisualizers(AdapterSet a) {
 		for (VisualizerPlugin vp : visualizers) {
@@ -223,21 +220,11 @@ public class HalfedgeLayer implements ActionListener {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void setNoUndo(HDS hds, AdapterSet a) {
+	> void setNoUndo(HDS hds) {
 		this.hds = hds;
-		convertHDS(getEffectiveAdapters(a));
+		convertHDS();
 		clearSelection();
-		additionalAdapters = a;
-	}
-	
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void set(HDS hds, AdapterSet a) {
-		setNoUndo(hds, a);
-		updateUndoList();
+		
 	}
 	
 	public <
@@ -246,21 +233,22 @@ public class HalfedgeLayer implements ActionListener {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void set(HDS hds) {
-		set(hds, new AdapterSet());
+		setNoUndo(hds);
+		updateUndoList();
+		volatileAdapters.clear();
 	}
 	
-	
 	public void update() {
-		set(get(), additionalAdapters);
+		set(get());
 	}
 	
 	
 	public void updateNoUndo() {
-		setNoUndo(get(), additionalAdapters);
+		setNoUndo(get());
 	}
 	
 	
-	public void setNoUndo(Geometry g, AdapterSet a) {
+	public void setNoUndo(Geometry g) {
 		if (g instanceof IndexedFaceSet) {
 			geometry = (IndexedFaceSet)g;
 		} else 
@@ -277,20 +265,14 @@ public class HalfedgeLayer implements ActionListener {
 		} else {
 			geometry = new IndexedFaceSet(g.getName());
 		}
-		convertFaceSet(getEffectiveAdapters(a));
+		convertFaceSet();
 		clearSelection();
-		additionalAdapters = a;
-	}
-	
-	public void set(Geometry g, AdapterSet a) {
-		setNoUndo(g, a);
-		updateUndoList();
 	}
 	
 	public void set(Geometry g) {
-		set(g, new AdapterSet());
+		setNoUndo(g);
+		updateUndoList();
 	}
-	
 	
 	@SuppressWarnings("unchecked")
 	public <
@@ -298,12 +280,12 @@ public class HalfedgeLayer implements ActionListener {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> HDS get(HDS template, AdapterSet a) {
+	> HDS get(HDS template) {
 		if (template.getClass().isAssignableFrom(hds.getClass())) {
 			return (HDS)hds;
 		}
 		hds = template;
-		convertFaceSet(getEffectiveAdapters(a));
+		convertFaceSet();
 		// convert selection
 		HalfedgeSelection newSelection = new HalfedgeSelection();
 		for (Vertex<?,?,?> v : selection.getVertices()) {
@@ -322,17 +304,6 @@ public class HalfedgeLayer implements ActionListener {
 		return template;
 	}
 	
-	
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> HDS get(HDS template) {
-		return get(template, new AdapterSet());
-	}
-		
-	
 	public HalfEdgeDataStructure<?,?,?> get() {
 		return hds;
 	}
@@ -343,23 +314,23 @@ public class HalfedgeLayer implements ActionListener {
 	}
 	
 	
-	private void convertFaceSet(AdapterSet a) {
+	private void convertFaceSet() {
 		hds.clear();
 		boolean oriented = IndexedFaceSetUtility.makeConsistentOrientation(geometry);
 		if (!oriented) {
 			System.err.println("Not orientable face set in convertFaceSet()");
 			return;
 		}
-		converterToHDS.ifs2heds(geometry, hds, a, edgeMap);
+		converterToHDS.ifs2heds(geometry, hds, getEffectiveAdapters(), edgeMap);
 		createDisplayGeometry();
 		updateBoundingBox();
 		resetTemporaryGeometry();
 	}
 	
 	
-	private void convertHDS(AdapterSet a) {
+	private void convertHDS() {
 		clearSelection();
-		AdapterSet ea = getEffectiveAdapters(a);
+		AdapterSet ea = getEffectiveAdapters();
 		initVisualizers(ea);
 		geometry = converterToIFS.heds2ifs(hds, ea, edgeMap);
 		createDisplayGeometry();
@@ -568,8 +539,8 @@ public class HalfedgeLayer implements ActionListener {
 		undoIndex--;
 		geometry = undoHistory.get(undoIndex);
 		geometryRoot.setGeometry(geometry);
-		convertFaceSet(getEffectiveAdapters());
-		convertHDS(getEffectiveAdapters());
+		convertFaceSet();
+		convertHDS();
 	}
 	
 	public void redo() {
@@ -577,8 +548,8 @@ public class HalfedgeLayer implements ActionListener {
 		undoIndex++;
 		geometry = undoHistory.get(undoIndex);
 		geometryRoot.setGeometry(geometry);
-		convertFaceSet(getEffectiveAdapters());
-		convertHDS(getEffectiveAdapters());
+		convertFaceSet();
+		convertHDS();
 	}
 	
 	public void addTemporaryGeometry(SceneGraphComponent root) {
@@ -656,8 +627,19 @@ public class HalfedgeLayer implements ActionListener {
 		this.stepsPerEdge = stepsPerEdge;
 	}
 	
-	public AdapterSet getAdditionalAdapters() {
-		return additionalAdapters;
+	public AdapterSet getAllAdapters() {
+		AdapterSet adapters = new AdapterSet();
+		adapters.addAll(persistentAdapters);
+		adapters.addAll(volatileAdapters);
+		return adapters;
+	}
+	
+	public AdapterSet getPersistentAdapters() {
+		return persistentAdapters;
+	}
+	
+	public AdapterSet getVolatileAdapters() {
+		return volatileAdapters;
 	}
 	
 	public double[][] getProfileCurve() {
@@ -665,6 +647,22 @@ public class HalfedgeLayer implements ActionListener {
 	}
 	public void setProfileCurve(double[][] profileCurve) {
 		this.profileCurve = profileCurve;
+	}
+
+
+	public boolean addAdapter(Adapter<?> a, boolean persistent) {
+		if(persistent) {
+			return persistentAdapters.add(a);
+		} else {
+			return volatileAdapters.add(a);
+		}
+	}
+
+	public boolean removeAdapter(Adapter<?> a) {
+		boolean 
+			pa = persistentAdapters.remove(a), 
+			va = volatileAdapters.remove(a);
+		return pa || va;
 	}
 	
 }

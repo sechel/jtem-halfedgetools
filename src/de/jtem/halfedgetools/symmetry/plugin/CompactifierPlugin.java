@@ -76,7 +76,6 @@ import de.jtem.discretegroup.core.DiscreteGroupUtility;
 import de.jtem.discretegroup.core.FiniteStateAutomaton;
 import de.jtem.discretegroup.core.Platycosm;
 import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.symmetry.node.SEdge;
@@ -499,7 +498,7 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 			generateGroup();
 			hds.setGroup(theGroup);
 			
-			hedsConnector.set(hds, new AdapterSet());
+			hedsConnector.set(hds);
 			
 			leftIndexSpinner.setValue(0);
 			leftIndexVertexSpinner.setValue(0);

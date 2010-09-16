@@ -1,17 +1,11 @@
 package de.jtem.halfedgetools.plugin;
 
 import static de.jreality.math.Pn.EUCLIDEAN;
-import static de.jreality.shader.CommonAttributes.DIFFUSE_COLOR;
-import static de.jreality.shader.CommonAttributes.EDGE_DRAW;
-import static de.jreality.shader.CommonAttributes.FACE_DRAW;
 import static de.jreality.shader.CommonAttributes.LINE_SHADER;
 import static de.jreality.shader.CommonAttributes.POINT_RADIUS;
 import static de.jreality.shader.CommonAttributes.POINT_SHADER;
-import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
 import static de.jreality.shader.CommonAttributes.RADII_WORLD_COORDINATES;
-import static de.jreality.shader.CommonAttributes.SMOOTH_SHADING;
 import static de.jreality.shader.CommonAttributes.TUBE_RADIUS;
-import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 import static de.jreality.util.SceneGraphUtility.getPathsBetween;
 import static java.awt.GridBagConstraints.BOTH;
 import static java.awt.event.InputEvent.CTRL_DOWN_MASK;
@@ -24,7 +18,6 @@ import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 import static javax.swing.SwingUtilities.getWindowAncestor;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
@@ -32,8 +25,6 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +33,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -66,16 +56,13 @@ import javax.swing.table.DefaultTableModel;
 import de.jreality.geometry.BoundingBoxUtility;
 import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.math.MatrixBuilder;
-import de.jreality.plugin.JRViewer;
-import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.JRViewerUtility;
 import de.jreality.plugin.basic.Content;
-import de.jreality.plugin.basic.Content.ContentChangedEvent;
-import de.jreality.plugin.basic.Content.ContentChangedListener;
 import de.jreality.plugin.basic.Scene;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewMenuBar;
-import de.jreality.plugin.content.ContentTools;
+import de.jreality.plugin.basic.Content.ContentChangedEvent;
+import de.jreality.plugin.basic.Content.ContentChangedListener;
 import de.jreality.reader.ReaderOBJ;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.Geometry;
@@ -172,7 +159,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		chooser = new JFileChooser();
 	
 	private AdapterSet
-		adapters = new AdapterSet();
+		persistentAdapters = new AdapterSet(),
+		volatileAdapters = new AdapterSet();
+	
 	private CalculatorSet
 		calculators = new CalculatorSet();
 	
@@ -196,10 +185,10 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	public HalfedgeInterface() {
 		makeLayout();
-		adapters.add(new JRNormalAdapter());
-		adapters.add(new JRPositionAdapter());
-		adapters.add(new JRTexCoordAdapter());
-		adapters.add(new NormalAdapter());
+		persistentAdapters.add(new JRNormalAdapter());
+		persistentAdapters.add(new JRPositionAdapter());
+		persistentAdapters.add(new JRTexCoordAdapter());
+		persistentAdapters.add(new NormalAdapter());
 		calculators.add(new JRVertexPositionCalculator());
 		calculators.add(new JRFaceAreaCalculator());
 		calculators.add(new JRFaceNormalCalculator());
@@ -607,7 +596,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				if(file.getName().toLowerCase().endsWith(".heml")) {
 					HalfedgeIO.writeHDS(hds, file.getAbsolutePath());
 				} else if(file.getName().toLowerCase().endsWith(".obj")) {
-					HalfedgeIO.writeOBJ(hds, adapters, file.getAbsolutePath());
+					HalfedgeIO.writeOBJ(hds, persistentAdapters, file.getAbsolutePath());
 				}
 			} catch (Exception ex) {
 				JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
@@ -650,7 +639,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				} else
 				if (file.getName().toLowerCase().endsWith(".heml")) {
 					HalfEdgeDataStructure<?, ?, ?> hds = HalfedgeIO.readHDS(file.getAbsolutePath());
-					set(hds, getAdapters());
+					set(hds);
 				}
 			} catch (Exception ex) {
 				JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
@@ -729,41 +718,28 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void set(final HDS hds, final AdapterSet a) {
-		activeLayer.set(hds, a);
+	> void set(final HDS hds) {
+		activeLayer.set(hds);
 		updateStates();
 		checkContent();
+		volatileAdapters.clear();
 	}
 
-	
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void set(HDS hds) {
-		set(hds, new AdapterSet());
-	}
-	
-	public void set(Geometry g, AdapterSet a) {
-		activeLayer.set(g, a);
-	}
-	
-	public void set(Geometry g) {
-		set(g, new AdapterSet());
-		updateStates();
-		checkContent();
-	}
+//	public void set(Geometry g) {
+//		activeLayer.set(g);
+//		updateStates();
+//		checkContent();
+//	}
 	
 	
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> HDS get(HDS hds, AdapterSet a) {
-		return activeLayer.get(hds, a);
-	}
+//	public <
+//		V extends Vertex<V, E, F>,
+//		E extends Edge<V, E, F>, 
+//		F extends Face<V, E, F>,
+//		HDS extends HalfEdgeDataStructure<V, E, F>
+//	> HDS get(HDS hds, AdapterSet a) {
+//		return activeLayer.get(hds, a);
+//	}
 	
 	
 	public <
@@ -816,23 +792,51 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	 */
 	public AdapterSet getAdapters() {
 		AdapterSet result = new AdapterSet();
-		result.addAll(adapters);
-		result.addAll(activeLayer.getAdditionalAdapters());
+		result.addAll(persistentAdapters);
+		result.addAll(volatileAdapters);
+		result.addAll(activeLayer.getAllAdapters());
 		return result;
 	}
 	
-	protected AdapterSet getRegisteredAdapters() {
+	public AdapterSet getPersistantAdapters() {
 		AdapterSet result = new AdapterSet();
-		result.addAll(adapters);
+		result.addAll(persistentAdapters);
+		result.addAll(activeLayer.getPersistentAdapters());
 		return result;
 	}
 	
-	public boolean addAdapter(Adapter<?> a) {
-		return adapters.add(a);
+	public AdapterSet getVolatileAdapters() {
+		AdapterSet result = new AdapterSet();
+		result.addAll(volatileAdapters);
+		result.addAll(activeLayer.getVolatileAdapters());
+		return result;
+	}
+	
+	protected AdapterSet getGlobalAdapters() {
+		AdapterSet result = new AdapterSet();
+		result.addAll(persistentAdapters);
+		result.addAll(volatileAdapters);
+		return result;
+	}
+	
+	public boolean addGlobalAdapter(Adapter<?> a, boolean persistent) {
+		if(persistent) {
+			return persistentAdapters.add(a);
+		} else {
+			return volatileAdapters.add(a);
+		}
+	}
+	
+	public boolean addLayerAdapter(Adapter<?> a, boolean persistent) {
+		return activeLayer.addAdapter(a,persistent);
 	}
 	
 	public boolean removeAdapter(Adapter<?> a) {
-		return adapters.remove(a);
+		boolean 
+			pa = persistentAdapters.remove(a),
+			va = volatileAdapters.remove(a),
+			la = activeLayer.removeAdapter(a);
+		return pa || va || la;
 	}
 	
 	
@@ -847,7 +851,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	public boolean removeCalculator(Calculator c) {
 		return calculators.remove(c);
 	}
-	
 	
 	@Override
 	public void storeStates(Controller c) throws Exception {
@@ -874,7 +877,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		content.addContentChangedListener(contentChangedListener);
 		scene = c.getPlugin(Scene.class);
 		visualizersManager = c.getPlugin(VisualizersManager.class);
-		adapters.add(new SelectionAdapter(this));
+		persistentAdapters.add(new SelectionAdapter(this));
 		menuBar = c.getPlugin(ViewMenuBar.class);
 		
 		menuBar.addMenuItem(getClass(), -101, undoAction, "Halfedge");
@@ -1119,89 +1122,5 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	public boolean isSelected(Node<?,?,?> n) {
 		return getSelection().isSelected(n);
 	}
-	
-	private class GeometryPreviewerPanel extends JPanel implements PropertyChangeListener {
 
-		private static final long serialVersionUID = 1L;
-		
-		private	JRViewer 
-			viewer = new JRViewer(true);
-		private Appearance
-			contentApp = new Appearance(),
-			rootApp = null;
-		
-		public GeometryPreviewerPanel() {
-			setLayout(new GridLayout());
-			setPreferredSize(new Dimension(250, 200));
-			setBorder(BorderFactory.createTitledBorder("Preview"));
-			viewer.addContentSupport(ContentType.Raw);
-			viewer.addContentUI();
-			viewer.startupLocal();
-			View view = viewer.getPlugin(View.class);
-			Scene scene = viewer.getPlugin(Scene.class);
-			rootApp = scene.getSceneRoot().getAppearance();
-			add(view.getViewer().getViewingComponent());
-			ContentTools tools = viewer.getPlugin(ContentTools.class);
-			tools.setRotationEnabled(true);
-			tools.setDragEnabled(false);
-			tools.setEncompassEnabled(true);
-			
-			contentApp.setAttribute(VERTEX_DRAW, true);
-			contentApp.setAttribute(EDGE_DRAW, true);
-			contentApp.setAttribute(FACE_DRAW, true);
-			contentApp.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, 0.07);
-			contentApp.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR, new Color(100, 200, 50));
-			contentApp.setAttribute(POINT_SHADER + "." + POINT_RADIUS, 0.12);
-			contentApp.setAttribute(POINT_SHADER + "." + DIFFUSE_COLOR, new Color(200, 100, 50));
-			contentApp.setAttribute(POLYGON_SHADER + "." + DIFFUSE_COLOR, new Color(230, 230, 230));
-			contentApp.setAttribute(POLYGON_SHADER + "." + SMOOTH_SHADING, false);
-		}
-		
-		@Override
-		public void updateUI() {
-			super.updateUI();
-			if (rootApp != null) {
-				rootApp.setAttribute("backgroundColor", getBackground());
-			}
-		}
-		
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
-			String propertyName = evt.getPropertyName();
-			if (propertyName.equals(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY)) {
-	            File file = (File)evt.getNewValue();
-	            if (file == null || !file.exists()) {
-	                return;
-	            } 
-				try {
-					if (file.getName().toLowerCase().endsWith(".obj")) {
-						ReaderOBJ reader = new ReaderOBJ();
-						SceneGraphComponent c = reader.read(file);
-						Geometry g = SceneGraphUtility.getFirstGeometry(c);
-						if (g instanceof IndexedFaceSet) {
-							IndexedFaceSetUtility.calculateAndSetFaceNormals((IndexedFaceSet)g);
-						}
-						Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(c);
-						MatrixBuilder mb = MatrixBuilder.euclidean();
-						double maxExtend = bbox.getMaxExtent();		
-						mb.scale(10 / maxExtend);
-						Transformation normalizeTransform = new Transformation();
-						normalizeTransform.setMatrix(mb.getArray());
-						c.setTransformation(normalizeTransform);
-						c.setAppearance(contentApp);
-						
-						Content content = JRViewerUtility.getContentPlugin(viewer.getController());
-						content.setContent(c);
-						View view = viewer.getPlugin(View.class);
-						CameraUtility.encompass(view.getViewer());
-					}
-				} catch (Exception ex) {
-					JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
-					ex.printStackTrace();
-				}
-			}
-		}
-	}
-	
 }

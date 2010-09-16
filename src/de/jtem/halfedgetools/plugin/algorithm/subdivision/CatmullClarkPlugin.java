@@ -35,15 +35,11 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
