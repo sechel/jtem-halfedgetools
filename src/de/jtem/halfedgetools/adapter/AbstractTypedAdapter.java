@@ -130,4 +130,9 @@ public abstract class AbstractTypedAdapter<
 		setFaceValue((F)f, value, a);
 	}
 
+	@Override
+	public double getPriority() {
+		return 0;
+	}
+	
 }

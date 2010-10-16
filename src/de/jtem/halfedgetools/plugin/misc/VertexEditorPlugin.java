@@ -3,23 +3,31 @@ package de.jtem.halfedgetools.plugin.misc;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
+import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewerUtility;
 import de.jreality.plugin.basic.View;
+import de.jreality.scene.PointSet;
+import de.jreality.scene.data.Attribute;
 import de.jreality.scene.tool.InputSlot;
-import de.jreality.tools.DragEventTool;
 import de.jreality.tools.PointDragEvent;
 import de.jreality.tools.PointDragListener;
+import de.jtem.halfedge.Edge;
+import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -29,21 +37,25 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 
 	private HalfedgeInterface
 		hif = null;
-	
-	private DragEventTool
-		tool = new DragEventTool(InputSlot.SHIFT_LEFT_BUTTON);
-	
+	private SwingDragEventTool
+		tool = new SwingDragEventTool(InputSlot.SHIFT_LEFT_BUTTON);
 	private JCheckBox
 		xBox = new JCheckBox("X"),
 		yBox = new JCheckBox("Y"),
 		zBox = new JCheckBox("Z");
-	
 	private JPanel
 		panel = new JPanel();
+
+	private Set<Vertex<?,?,?>> 
+		selectedVertices = new HashSet<Vertex<?,?,?>>();
+	private double[] 
+	    position = null;
+	
 	
 	public VertexEditorPlugin() {
 		tool.addPointDragListener(this);
 		tool.setDescription("Vertex Editor Tool");
+		shrinkPanel.setTitle("Vertex Coordinate Editor");
 		
 		panel.setLayout(new GridBagLayout());
 		GridBagConstraints gbc1 = new GridBagConstraints();
@@ -56,7 +68,6 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 		gbc2.weightx = 1.0;
 		gbc2.gridwidth = GridBagConstraints.REMAINDER;
 		gbc2.insets = new Insets(2, 2, 2, 2);
-		
 		
 		panel.add(new JLabel("Fix direction"));
 		panel.add(xBox,gbc1);
@@ -88,10 +99,19 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 
 	@Override
 	public void pointDragEnd(PointDragEvent e) {
+		HalfEdgeDataStructure<?, ?, ?> hds = hif.get();
+		AdapterSet adapters = hif.getAdapters();
+		final Vertex<?,?,?> v = hds.getVertex(e.getIndex());
+		double[] oldPos = adapters.get(Position.class, v, double[].class);
+		double[] translation = Rn.subtract(null, position, oldPos);
+		TranslatedPositionAdapter posAdapter = new TranslatedPositionAdapter(translation, selectedVertices);
+		hif.getActiveLayer().updateGeometry(posAdapter);
 	}
 	
 	@Override
 	public void pointDragStart(PointDragEvent e) {
+		HalfedgeSelection hes = new HalfedgeSelection(hif.getSelection());
+		selectedVertices = new HashSet<Vertex<?,?,?>>(hes.getVertices());
 	}
 	
 	@Override
@@ -100,21 +120,55 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 		if (hds == null) return;
 		if (hds.numVertices() <= e.getIndex()) return;
 		if (e.getIndex() < 0) return;
-		Vertex<?,?,?> v = hds.getVertex(e.getIndex());
-		AdapterSet adapters = hif.getAdapters();
-		double[] xyz = adapters.get(Position.class,v,double[].class);
-		double[] newPos = new double[]{
-				(xBox.isSelected())?xyz[0]:e.getX(),
-				(yBox.isSelected())?xyz[1]:e.getY(),
-				(zBox.isSelected())?xyz[2]:e.getZ()};
-		adapters.set(Position.class, v, newPos);
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				hif.update();				
-			}
-		});
+		PointSet ps = e.getPointSet();
+		position = e.getPosition();
+		double[][] coords = ps.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(null);
+		double[] xyz = coords[e.getIndex()];
+		position[0] = (xBox.isSelected())?xyz[0]:position[0];
+		position[1] = (yBox.isSelected())?xyz[1]:position[1];
+		position[2] = (zBox.isSelected())?xyz[2]:position[2];
+		double[] translation = Rn.subtract(null, position, xyz);
+		selectedVertices.add(hds.getVertex(e.getIndex()));
+		TranslatedPositionAdapter posAdapter = new TranslatedPositionAdapter(translation, selectedVertices);
+		hif.updateGeometry(posAdapter);
 	}
+	
+	@Position
+	public static class TranslatedPositionAdapter extends AbstractAdapter<double[]> {
+
+		private double[]
+			translation = null;
+		private Set<Vertex<?,?,?>>
+			effected = null;
+
+		public TranslatedPositionAdapter(double[] translation, Set<Vertex<?,?,?>> effected) {
+			super(double[].class, true, false);
+			this.translation = translation;
+			this.effected = effected;
+		}
+		
+		@Override
+		public <
+			V extends Vertex<V, E, F>,
+			E extends Edge<V, E, F>,
+			F extends Face<V, E, F>
+		> double[] getV(V v, AdapterSet a) {
+			double[] pos = a.get(Position.class, v, double[].class);
+			if (effected.contains(v)) {
+				pos[0] += translation[0];
+				pos[1] += translation[1];
+				pos[2] += translation[2];
+			}
+			return pos;
+		}
+		
+		@Override
+		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
+			return true;
+		}
+		
+	}
+	
 
 	@Override
 	public Class<? extends SideContainerPerspective> getPerspectivePluginClass() {

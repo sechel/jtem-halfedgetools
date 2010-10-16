@@ -724,23 +724,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		checkContent();
 		volatileAdapters.clear();
 	}
-
-//	public void set(Geometry g) {
-//		activeLayer.set(g);
-//		updateStates();
-//		checkContent();
-//	}
-	
-	
-//	public <
-//		V extends Vertex<V, E, F>,
-//		E extends Edge<V, E, F>, 
-//		F extends Face<V, E, F>,
-//		HDS extends HalfEdgeDataStructure<V, E, F>
-//	> HDS get(HDS hds, AdapterSet a) {
-//		return activeLayer.get(hds, a);
-//	}
-	
 	
 	public <
 		V extends Vertex<V, E, F>,
@@ -755,8 +738,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	public HalfEdgeDataStructure<?, ?, ?> get() {
 		return activeLayer.get();
 	}
-	
-	
 	
 	@SuppressWarnings("unchecked")
 	public <
@@ -784,6 +765,20 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		updateStates();
 		checkContent();
 	}
+	
+	public void updateGeometry(Adapter<double[]> positionAdapter) {
+		activeLayer.updateGeometry(positionAdapter);
+		updateStates();
+		checkContent();
+	}
+	
+	public void updateGeometryNoUndo(Adapter<double[]> positionAdapter) {
+		activeLayer.updateGeometryNoUndo(positionAdapter);
+		updateStates();
+		checkContent();
+	}
+	
+
 	
 	
 	/**

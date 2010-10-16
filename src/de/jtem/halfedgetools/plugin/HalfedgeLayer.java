@@ -1,6 +1,7 @@
 package de.jtem.halfedgetools.plugin;
 
 import static de.jreality.scene.Appearance.INHERITED;
+import static de.jreality.scene.data.Attribute.COORDINATES;
 import static de.jreality.shader.CommonAttributes.DEPTH_FUDGE_FACTOR;
 import static de.jreality.shader.CommonAttributes.DIFFUSE_COLOR;
 import static de.jreality.shader.CommonAttributes.EDGE_DRAW;
@@ -39,6 +40,8 @@ import de.jreality.scene.IndexedLineSet;
 import de.jreality.scene.PointSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.Transformation;
+import de.jreality.scene.data.DataList;
+import de.jreality.scene.data.DoubleArrayArray;
 import de.jreality.scene.pick.PickResult;
 import de.jreality.scene.tool.ToolContext;
 import de.jreality.tools.ActionTool;
@@ -49,6 +52,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.jreality.ConverterHeds2JR;
 import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
@@ -224,8 +228,43 @@ public class HalfedgeLayer implements ActionListener {
 		this.hds = hds;
 		convertHDS();
 		clearSelection();
-		
 	}
+	
+	
+	/**
+	 * Update the vertex positions for a previously set mesh
+	 * @param positionAdapter the vertex position adapter
+	 */
+	public void updateGeometryNoUndo(Adapter<double[]> positionAdapter) {
+		AdapterSet adapters = getEffectiveAdapters();
+		double[][] posArr = new double[hds.numVertices()][];
+		for (Vertex<?,?,?> v : hds.getVertices()) {
+			double[] pos = positionAdapter.get(v, adapters);
+			if (pos != null) {
+				adapters.set(Position.class, v, pos);
+				posArr[v.getIndex()] = pos;
+			} else {
+				posArr[v.getIndex()] = new double[3];
+			}
+		}
+		DataList vData = new DoubleArrayArray.Array(posArr);
+		geometry.setVertexCountAndAttributes(COORDINATES, vData);
+		IndexedFaceSetUtility.calculateAndSetNormals(geometry);
+		createDisplayGeometry();
+		updateBoundingBox();
+		resetTemporaryGeometry();
+		updateSelection();
+	}
+	
+	/**
+	 * Update the vertex positions for a previously set mesh
+	 * @param positionAdapter the vertex position adapter
+	 */
+	public void updateGeometry(Adapter<double[]> positionAdapter) {
+		updateGeometryNoUndo(positionAdapter);
+		updateUndoList();
+	}
+	
 	
 	public <
 		V extends Vertex<V, E, F>,
@@ -346,7 +385,7 @@ public class HalfedgeLayer implements ActionListener {
 			ThickenedSurfaceFactory tsf = new ThickenedSurfaceFactory(geometry);
 			tsf.setThickness(thickness);
 			tsf.setMakeHoles(makeHoles);
-			tsf.setKeepFaceColors(true);
+			tsf.setKeepFaceColors(false);
 			tsf.setHoleFactor(holeFactor);
 			tsf.setStepsPerEdge(stepsPerEdge);
 			tsf.setProfileCurve(profileCurve);

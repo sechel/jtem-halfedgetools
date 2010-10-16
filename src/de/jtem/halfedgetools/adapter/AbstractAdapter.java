@@ -69,5 +69,9 @@ public abstract class AbstractAdapter<VAL> extends Adapter<VAL> {
 		throw new RuntimeException("setF not supported in this adapter: " + getClass().getSimpleName());
 	}
 	
+	@Override
+	public double getPriority() {
+		return 0;
+	}
 
 }
