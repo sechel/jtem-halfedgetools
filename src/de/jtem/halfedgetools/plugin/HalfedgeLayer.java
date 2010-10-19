@@ -10,8 +10,6 @@ import static de.jreality.shader.CommonAttributes.LINE_SHADER;
 import static de.jreality.shader.CommonAttributes.LINE_STIPPLE;
 import static de.jreality.shader.CommonAttributes.LINE_WIDTH;
 import static de.jreality.shader.CommonAttributes.PICKABLE;
-import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
-import static de.jreality.shader.CommonAttributes.TRANSPARENCY;
 import static de.jreality.shader.CommonAttributes.TUBES_DRAW;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 import static de.jreality.shader.CommonAttributes.Z_BUFFER_ENABLED;
@@ -398,10 +396,10 @@ public class HalfedgeLayer implements ActionListener {
 		geometryRoot.setGeometry(geometry);
 		if (shownGeometry != geometry) {
 			displayFacesRoot.setGeometry(shownGeometry);
-			geometryAppearance.setAttribute(POLYGON_SHADER + "." + TRANSPARENCY, 1.0);
+			geometryAppearance.setAttribute(FACE_DRAW, false);
 		} else {
 			displayFacesRoot.setGeometry(null);
-			geometryAppearance.setAttribute(POLYGON_SHADER + "." + TRANSPARENCY, INHERITED);
+			geometryAppearance.setAttribute(FACE_DRAW, INHERITED);
 		}
 	}
 	

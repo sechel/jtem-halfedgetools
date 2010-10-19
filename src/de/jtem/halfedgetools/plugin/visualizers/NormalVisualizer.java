@@ -31,7 +31,7 @@ public class NormalVisualizer extends VisualizerPlugin implements ChangeListener
 	private SceneGraphComponent 
 		normalComponent = null;
 	private SpinnerNumberModel
-		lengthModel = new SpinnerNumberModel(1.0, -100.0, 100.0, 0.01);
+		lengthModel = new SpinnerNumberModel(0.2, -100.0, 100.0, 0.01);
 	private JSpinner
 		lengthSpinner = new JSpinner(lengthModel);
 	private JPanel

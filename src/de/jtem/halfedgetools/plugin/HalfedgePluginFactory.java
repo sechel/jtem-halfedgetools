@@ -78,6 +78,8 @@ import de.jtem.halfedgetools.plugin.algorithm.topology.FaceSplitterPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.FillHolesPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.RemoveVertexFillPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.VertexRemoverPlugin;
+import de.jtem.halfedgetools.plugin.modes.EditMode;
+import de.jtem.halfedgetools.plugin.modes.SelectionMode;
 import de.jtem.halfedgetools.plugin.visualizers.DirichletEnergyVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.EdgeLengthVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.FacePlanarityVisualizer;
@@ -181,6 +183,16 @@ public class HalfedgePluginFactory {
 		return s;
 	}
 	
+	
+	public static Set<Plugin> createEditorModePlugins() {
+		Set<Plugin> s = new HashSet<Plugin>();
+		s.add(new EditorManager());
+		s.add(new EditMode());
+		s.add(new SelectionMode());
+		return s;
+	}
+	
+	
 	public static Set<Plugin> createPlugins() {
 		Set<Plugin> s = new HashSet<Plugin>();
 		s.addAll(createGeneratorPlugins());
@@ -190,6 +202,7 @@ public class HalfedgePluginFactory {
 		s.addAll(createEditingPlugins());
 		s.addAll(createVisualizerPlugins());
 		s.addAll(createWidgetPlugins());
+		s.addAll(createEditorModePlugins());
 		return s;
 	}
 	

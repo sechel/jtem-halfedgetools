@@ -50,6 +50,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 	private WidgetInterface
 		gui = null;
 	private boolean
+		activated = true,
 		rotateWasEnabled = false,
 		dragWasEnabled = false,
 		marqueeEnabled = false;
@@ -292,6 +293,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
+		if (!activated) return;
 		if (!marqueeEnabled) return;
 		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) {
 			cancelMarqee();
@@ -336,6 +338,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		if (!activated) return;
 		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) {
 			return;
 		}
@@ -387,6 +390,14 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 
 	@Override
 	public void mouseExited(MouseEvent e) {
+	}
+	
+	public void setActivated(boolean activated) {
+		this.activated = activated;
+	}
+	
+	public boolean isActivated() {
+		return activated;
 	}
 
 }
