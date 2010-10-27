@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.jreality.adapter;
+package de.jtem.halfedgetools.adapter.generic;
 
 import java.util.List;
 
@@ -10,14 +10,13 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.Calculator;
 import de.jtem.halfedgetools.adapter.type.BaryCenter;
 import de.jtem.halfedgetools.adapter.type.Position;
 
 @BaryCenter
-public class JRBaryCenterAdapter extends AbstractAdapter<double[]> implements Calculator {
+public class BaryCenterAdapter extends AbstractAdapter<double[]> {
 
-	public JRBaryCenterAdapter() {
+	public BaryCenterAdapter() {
 		super(double[].class, true, false);
 	}
 	

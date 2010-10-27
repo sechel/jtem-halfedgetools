@@ -56,7 +56,6 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		return null;	
 	}
 	
-	
 	@SuppressWarnings("unchecked")
 	public <
 		A extends Annotation, 
@@ -89,6 +88,21 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 	}
 	
 
+
+	@SuppressWarnings("unchecked")
+	public <
+		A extends Annotation,
+		O 
+	> List<Adapter<O>> queryAll(Class<A> type, Class<O> out) {
+		LinkedList<Adapter<O>> result = new LinkedList<Adapter<O>>();
+		for (Adapter<?> a : this) {
+			if (a.getClass().isAnnotationPresent(type) && a.checkType(out)) {
+				result.add((Adapter<O>)a);
+			}
+		}
+		return result;
+	}
+	
 	public <
 		A extends Annotation
 	> List<Adapter<?>> queryAll(Class<A> type) {

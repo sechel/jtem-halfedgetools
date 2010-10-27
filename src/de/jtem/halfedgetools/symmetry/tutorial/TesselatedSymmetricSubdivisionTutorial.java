@@ -38,17 +38,10 @@ import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
-import de.jtem.discretegroup.core.DiscreteGroup;
 import de.jtem.discretegroup.core.TriangleGroup;
 import de.jtem.discretegroup.plugin.TessellatedContent;
-import de.jtem.halfedge.Edge;
-import de.jtem.halfedge.Face;
-import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeListener;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.PerturbPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.TriangulatePlugin;
 import de.jtem.halfedgetools.symmetry.adapters.BundleCycleColorAdapter;
@@ -67,7 +60,7 @@ import de.jtem.halfedgetools.symmetry.plugin.SymmetricSqrt3Plugin;
 import de.jtem.halfedgetools.symmetry.plugin.visualizer.SymmetryVisualizer;
 import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
 
-public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent implements HalfedgeListener{
+public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent {
 	
 	private static TesselatedSymmetricSubdivisionTutorial tc;
 	
@@ -207,7 +200,7 @@ public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent i
 		tc = new TesselatedSymmetricSubdivisionTutorial();
 		viewer.registerPlugin(tc);
 		
-		hif.addHalfedgeListener(tc);
+//		hif.addHalfedgeListener(tc);
 //		hif.setAutomaticConversion(false);
 		
 		viewer.registerPlugin(hif);
@@ -226,30 +219,30 @@ public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent i
 	//	hif.set(cube);
 		
 	}
-
-
-	@Override
-	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> void halfedgeChanged(
-			HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		
-			
-		
-			if(SHDS.class.isAssignableFrom(hds.getClass())) {
-				SHDS shds = (SHDS)hds;
-				DiscreteGroup group = shds.getGroup();
-				if(group != null) {
-					this.setGroup(shds.getGroup(), true);
-				}
-				System.out.println("changed heds and group");
-			}
-		
-	}
-
-
-	@Override
-	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> void halfedgeConverting(
-			HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		// TODO Auto-generated method stub
-		
-	}
+//
+//
+//	@Override
+//	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> void halfedgeChanged(
+//			HDS hds, AdapterSet a, HalfedgeInterface hif) {
+//		
+//			
+//		
+//			if(SHDS.class.isAssignableFrom(hds.getClass())) {
+//				SHDS shds = (SHDS)hds;
+//				DiscreteGroup group = shds.getGroup();
+//				if(group != null) {
+//					this.setGroup(shds.getGroup(), true);
+//				}
+//				System.out.println("changed heds and group");
+//			}
+//		
+//	}
+//
+//
+//	@Override
+//	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> void halfedgeConverting(
+//			HDS hds, AdapterSet a, HalfedgeInterface hif) {
+//		// TODO Auto-generated method stub
+//		
+//	}
 }

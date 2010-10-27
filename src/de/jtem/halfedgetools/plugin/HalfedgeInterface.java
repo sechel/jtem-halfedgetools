@@ -92,6 +92,7 @@ import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.Calculator;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.adapter.generic.BaryCenterAdapter;
 import de.jtem.halfedgetools.adapter.generic.NormalAdapter;
 import de.jtem.halfedgetools.io.HalfedgeIO;
 import de.jtem.halfedgetools.jreality.adapter.JRNormalAdapter;
@@ -185,10 +186,11 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	public HalfedgeInterface() {
 		makeLayout();
+		persistentAdapters.add(new NormalAdapter());
+		persistentAdapters.add(new BaryCenterAdapter());
 		persistentAdapters.add(new JRNormalAdapter());
 		persistentAdapters.add(new JRPositionAdapter());
 		persistentAdapters.add(new JRTexCoordAdapter());
-		persistentAdapters.add(new NormalAdapter());
 		calculators.add(new JRVertexPositionCalculator());
 		calculators.add(new JRFaceAreaCalculator());
 		calculators.add(new JRFaceNormalCalculator());
@@ -635,7 +637,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 						IndexedFaceSet ifs = (IndexedFaceSet)g;
 						IndexedFaceSetUtility.calculateAndSetNormals(ifs);
 					}
-					getActiveLayer().set(g);
+					set(g);
 				} else
 				if (file.getName().toLowerCase().endsWith(".heml")) {
 					HalfEdgeDataStructure<?, ?, ?> hds = HalfedgeIO.readHDS(file.getAbsolutePath());
@@ -723,6 +725,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		updateStates();
 		checkContent();
 		volatileAdapters.clear();
+		fireDataChanged();
 	}
 	
 	public <
@@ -732,6 +735,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> HDS get(HDS hds) {
 		return activeLayer.get(hds);
+	}
+	
+	
+	public void set(Geometry g) {
+		activeLayer.set(g);
+		fireDataChanged();
 	}
 	
 	
@@ -815,15 +824,20 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	public boolean addGlobalAdapter(Adapter<?> a, boolean persistent) {
+		boolean result = false;
 		if(persistent) {
-			return persistentAdapters.add(a);
+			result = persistentAdapters.add(a);
 		} else {
-			return volatileAdapters.add(a);
+			result = volatileAdapters.add(a);
 		}
+		fireAdaptersChanged();
+		return result;
 	}
 	
 	public boolean addLayerAdapter(Adapter<?> a, boolean persistent) {
-		return activeLayer.addAdapter(a,persistent);
+		boolean result = activeLayer.addAdapter(a,persistent);
+		fireAdaptersChanged();
+		return result;
 	}
 	
 	public boolean removeAdapter(Adapter<?> a) {
@@ -831,6 +845,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			pa = persistentAdapters.remove(a),
 			va = volatileAdapters.remove(a),
 			la = activeLayer.removeAdapter(a);
+		fireAdaptersChanged();
 		return pa || va || la;
 	}
 	
@@ -1000,12 +1015,14 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	public void activateLayer(HalfedgeLayer layer) {
+		HalfedgeLayer old = activeLayer;
 		activeLayer = layer;
 		for (HalfedgeLayer l : layers) {
 			l.setActive(l == layer);
 		}
 		fireSelectionChanged(getSelection());
-		updateStates();		
+		fireActiveLayerChanged(old, activeLayer);
+		updateStates();	
 	}
 	
 	public HalfedgeLayer getActiveLayer() {
@@ -1076,28 +1093,23 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	
-	protected < 
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void fireHalfedgeConverting(HDS hds) {
+	protected void fireActiveLayerChanged(HalfedgeLayer old, HalfedgeLayer active) {
 		for (HalfedgeListener l : listeners) {
-			l.halfedgeConverting(hds, getAdapters(), this);
+			l.activeLayerChanged(old, active);
 		}
 	}
 	
-	protected < 
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void fireHalfedgeChanged(HDS hds) {
+	protected void fireDataChanged() {
 		for (HalfedgeListener l : listeners) {
-			l.halfedgeChanged(hds, getAdapters(), this);
+			l.dataChanged(getActiveLayer());
 		}
 	}
 	
+	protected void fireAdaptersChanged() {
+		for (HalfedgeListener l : listeners) {
+			l.adaptersChanged(getActiveLayer());
+		}
+	}
 	
 	public HalfedgeSelection getSelection() {
 		return activeLayer.getSelection();

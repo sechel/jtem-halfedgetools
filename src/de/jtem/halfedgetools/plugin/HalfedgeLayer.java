@@ -44,6 +44,7 @@ import de.jreality.scene.pick.PickResult;
 import de.jreality.scene.tool.ToolContext;
 import de.jreality.tools.ActionTool;
 import de.jreality.util.Rectangle3D;
+import de.jreality.util.SceneGraphUtility;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -272,7 +273,6 @@ public class HalfedgeLayer implements ActionListener {
 	> void set(HDS hds) {
 		setNoUndo(hds);
 		updateUndoList();
-		volatileAdapters.clear();
 	}
 	
 	public void update() {
@@ -362,6 +362,7 @@ public class HalfedgeLayer implements ActionListener {
 		createDisplayGeometry();
 		updateBoundingBox();
 		resetTemporaryGeometry();
+		volatileAdapters.clear();
 	}
 	
 	
@@ -374,6 +375,7 @@ public class HalfedgeLayer implements ActionListener {
 		updateVisualizersGeometry(ea);
 		updateBoundingBox();
 		resetTemporaryGeometry();
+		volatileAdapters.clear();
 	}
 	
 	
@@ -590,15 +592,18 @@ public class HalfedgeLayer implements ActionListener {
 	}
 	
 	public void addTemporaryGeometry(SceneGraphComponent root) {
-		temporaryRoot.addChild(root);
-		updateBoundingBox();
+		SceneGraphUtility.addChildNode(temporaryRoot, root);
 	}
 	
+	public void removeTemporaryGeometry(SceneGraphComponent root) {
+		SceneGraphUtility.removeChildNode(temporaryRoot, root);
+	}
+	
+	
 	public void resetTemporaryGeometry() {
-		layerRoot.removeChild(temporaryRoot);
+		SceneGraphUtility.removeChildNode(layerRoot, temporaryRoot);
 		temporaryRoot = new SceneGraphComponent("Temporary Geometry");
-		layerRoot.addChild(temporaryRoot);
-		updateBoundingBox();
+		SceneGraphUtility.addChildNode(layerRoot, temporaryRoot);
 	}
 
 

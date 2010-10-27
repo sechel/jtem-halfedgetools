@@ -301,6 +301,7 @@ public class CatmullClarkAll {
 				lastFace = newHeds.addNewFace();
 				out.setLeftFace(lastFace);
 			}
+			assert firstIn != null;
 			firstIn.setLeftFace(lastFace);
 			firstIn.linkNextEdge(lastOut);
 		}
