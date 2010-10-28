@@ -12,8 +12,10 @@ import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Normal;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.VectorField;
 
 @Normal
+@VectorField
 public class NormalAdapter extends AbstractAdapter<double[]>  {
 
 

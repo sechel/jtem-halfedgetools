@@ -24,7 +24,6 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
@@ -85,11 +84,6 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 		CalculatorSet c,
 		HalfedgeInterface hcp
 	) throws CalculatorException {
-		for (F f : hds.getFaces()) {
-			if (HalfEdgeUtils.boundaryEdges(f).size() != 3) {
-				throw new RuntimeException("No triangulated surface in CurvatureVectorField()");
-			}
-		}
 		AdapterSet a = hcp.getAdapters();
 		KdTree<V, E, F> kd = new KdTree<V, E, F>(hds, a, 10, false);
 		double scale = GeometryUtility.getMeanEdgeLength(hds, a);
