@@ -4,9 +4,11 @@ import java.util.Map;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Node;
+import de.jtem.halfedgetools.adapter.type.CurvatureField;
 import de.jtem.halfedgetools.adapter.type.VectorField;
 
 @VectorField
+@CurvatureField
 public class EdgeVectorFielAdapter extends AbstractVectorFielAdapter {
 
 	public EdgeVectorFielAdapter(
