@@ -24,6 +24,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.CalculatorException;
 import de.jtem.halfedgetools.adapter.CalculatorSet;
@@ -40,7 +41,8 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 	private JCheckBox
 		k1Radio = new JCheckBox("K1", true),
 		k2Radio = new JCheckBox("K2"),
-		nRadio = new JCheckBox("N");
+		nRadio = new JCheckBox("N"),
+		onBoundaryChecker = new JCheckBox("On Boundary");
 	private JComboBox
 		nodeTypeCombo = new JComboBox(new String[] {"Vertices", "Edges", "Faces"});
 	private SpinnerNumberModel
@@ -65,6 +67,7 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 		panel.add(new JLabel("On"), c);
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		panel.add(nodeTypeCombo, c);
+		panel.add(onBoundaryChecker, c);
 		nodeTypeCombo.setSelectedIndex(0);
 		
 		vecPanel.setLayout(new GridLayout(1, 3));
@@ -86,6 +89,7 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 	) throws CalculatorException {
 		AdapterSet a = hcp.getAdapters();
 		KdTree<V, E, F> kd = new KdTree<V, E, F>(hds, a, 10, false);
+		boolean boundaryOnly = onBoundaryChecker.isSelected();
 		double scale = GeometryUtility.getMeanEdgeLength(hds, a);
 		double radius = radiusModel.getNumber().doubleValue();
 		EVD evd = null;
@@ -96,10 +100,18 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 		Collection<? extends Node<V, E, F>> nodes = null;
 		switch (nodeTypeCombo.getSelectedIndex()) {
 			case 0: default: 
-				nodes = hds.getVertices(); 
+				if (boundaryOnly) {
+					nodes = HalfEdgeUtils.boundaryVertices(hds);
+				} else {
+					nodes = hds.getVertices();
+				}
 				break;
 			case 1: 
-				nodes = hds.getEdges(); 
+				if (boundaryOnly) {
+					nodes = HalfEdgeUtils.boundaryEdges(hds);
+				} else {
+					nodes = hds.getEdges();
+				}
 				break;
 			case 2: 
 				nodes = hds.getFaces(); 
