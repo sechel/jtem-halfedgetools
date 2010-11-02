@@ -98,4 +98,9 @@ public class NormalAdapter extends AbstractAdapter<double[]>  {
 		return true;
 	}
 	
+	@Override
+	public String toString() {
+		return "Normals";
+	}
+	
 }
