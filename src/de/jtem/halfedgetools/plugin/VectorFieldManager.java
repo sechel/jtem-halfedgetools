@@ -22,6 +22,7 @@ import java.awt.Insets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -172,15 +173,12 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 			ilf.update();
 			return ilf.getIndexedLineSet();
 		}
-		int n = nodes.size();
-		ilf.setVertexCount(2*n);
-		ilf.setEdgeCount(n);
-		
-		double[][] vData = new double[2*n][];
-		int[][] iData = new int[n][2];
-		int i = 0;
+		List<double[]> vData = new LinkedList<double[]>();
+		List<int[]> iData = new LinkedList<int[]>();
 		for (N node : nodes) {
-			double[] v = vec.get(node, aSet).clone();
+			double[] v = vec.get(node, aSet);
+			if (v == null) continue;
+			v = v.clone();
 			double[] p = aSet.get(BaryCenter.class, node, double[].class);
 			if (p.length == 4) {
 				double hom = p[3] == 0 ? 1.0 : p[3];
@@ -188,15 +186,15 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 			}
 			Rn.normalize(v, v);
 			Rn.times(v, posScale, v);
-			vData[i] = Rn.add(null, p, v);
+			vData.add(Rn.add(null, p, v));
 			Rn.times(v, -1, v);
-			vData[i + 1] = Rn.add(null, p, v); 
-			iData[i / 2][0] = i + 1;
-			iData[i / 2][1] = i;
-			i += 2;
+			vData.add(Rn.add(null, p, v));
+			iData.add(new int[] {vData.size() - 2, vData.size() - 1});
 		}
-		ilf.setVertexCoordinates(vData);
-		ilf.setEdgeIndices(iData);
+		ilf.setVertexCount(vData.size());
+		ilf.setEdgeCount(vData.size() / 2);
+		ilf.setVertexCoordinates(vData.toArray(new double[][] {}));
+		ilf.setEdgeIndices(iData.toArray(new int[][] {}));
 		ilf.update();
 		return ilf.getIndexedLineSet();
 	}
