@@ -130,23 +130,29 @@ public class Loop {
 //			Rn.add(pos, d, pos);
 //			Rn.times(pos, 1.0/8.0, pos);
 			
-			// calc with mid of barycenters and edge midpoint
-		
-			double[] b1 = fA.get(e.getLeftFace(),e);
-			double[] b2 = fA.get(e.getRightFace(),e);
-			eA.setEdgeAlpha(0.5);
-			eA.setEdgeIgnore(true);
-			double[] m = eA.get(e);
-			
-			Rn.times(b1, 3.0/8.0, b1);
-			Rn.times(b2, 3.0/8.0, b2);
-			Rn.times(m, 1.0/4.0, m);
-			
-			Rn.add(pos, b1, b2);
-			Rn.add(pos, m, pos);
-			
-			oldEtoPos.put(e, pos);
-			
+			if (e.getLeftFace() == null || e.getRightFace() == null){
+				// boarderhandling edge-midpoints
+				eA.setEdgeAlpha(0.5);
+				eA.setEdgeIgnore(true);
+				pos = eA.get(e);
+				oldEtoPos.put(e, pos);
+			} else {
+				// calc with mid of barycenters and edge midpoint
+				double[] b1 = fA.get(e.getLeftFace(),e);
+				double[] b2 = fA.get(e.getRightFace(),e);
+				eA.setEdgeAlpha(0.5);
+				eA.setEdgeIgnore(true);
+				double[] m = eA.get(e);
+				
+				Rn.times(b1, 3.0/8.0, b1);
+				Rn.times(b2, 3.0/8.0, b2);
+				Rn.times(m, 1.0/4.0, m);
+				
+				Rn.add(pos, b1, b2);
+				Rn.add(pos, m, pos);
+				
+				oldEtoPos.put(e, pos);
+			}
 		}
 		
 		//	Verschiebung der alten Punkte p_alt = (1-α)p_alt+ α*m
