@@ -9,10 +9,10 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.algorithm.computationalgeometry.ConvexHull;
-import de.jtem.halfedgetools.jreality.calculator.JRVertexPositionCalculator;
+import de.jtem.halfedgetools.jreality.adapter.JRPositionAdapter;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
 import de.jtem.halfedgetools.jreality.node.DefaultJRVertex;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -36,14 +36,12 @@ public class RandomSphereGenerator extends AlgorithmPlugin {
 
 	@Override
 	public <
-		V extends Vertex<V, E, F>, 
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>, 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(
-		HDS hds, CalculatorSet c, HalfedgeInterface hif) throws CalculatorException 
-	{
-		String numString = JOptionPane.showInputDialog("Number of points", 20);
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
+		String numString = JOptionPane.showInputDialog(getOptionParent(), "Number of points", 20);
 		if (numString == null) return;
 		int extraPoints = Integer.parseInt(numString);
 		DefaultJRHDS r = new DefaultJRHDS();
@@ -53,8 +51,10 @@ public class RandomSphereGenerator extends AlgorithmPlugin {
 			DefaultJRVertex v = r.addNewVertex();
 			v.position = pos;
 		}
-		ConvexHull.convexHull(r, new JRVertexPositionCalculator(), 1E-8);
-		hif.set(r);
+		TypedAdapterSet<double[]> ad = new TypedAdapterSet<double[]>(double[].class);
+		ad.add(new JRPositionAdapter());
+		ConvexHull.convexHull(r, ad, 1E-8);
+		hi.set(r);
 	}
 
 }

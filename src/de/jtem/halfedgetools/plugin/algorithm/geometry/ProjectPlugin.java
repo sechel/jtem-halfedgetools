@@ -36,9 +36,8 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
@@ -52,16 +51,12 @@ public class ProjectPlugin extends AlgorithmPlugin {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hif) throws CalculatorException {
-		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
-		if (vc == null) {
-			throw new CalculatorException("No vertex position calculators found for " + this);
-		}
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
 		for(V v : hds.getVertices()) {
-			double[] coord = vc.get(v);
+			double[] coord = a.get(Position.class, v, double[].class);
 			double norm = Rn.euclideanNorm(coord);
 			Rn.times(coord, 1/norm, coord);
-			vc.set(v, coord);
+			a.set(Position.class, v, coord);
 		}
 		hcp.update();
 	}

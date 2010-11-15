@@ -41,13 +41,13 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewMenuBar;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.AlgorithmToolbars.EditingCategoryToolbar;
 import de.jtem.halfedgetools.plugin.AlgorithmToolbars.FileCategoryToolbar;
 import de.jtem.halfedgetools.plugin.AlgorithmToolbars.GeneratorCategoryToolbar;
@@ -64,6 +64,8 @@ import de.jtem.jrworkspace.plugin.aggregators.ToolBarAggregator;
 
 public abstract class AlgorithmPlugin extends Plugin implements Comparable<AlgorithmPlugin> {
 
+	private View
+		view = null;
 	protected ViewMenuBar
 		viewMenuBar = null;
 	protected ToolBarAggregator
@@ -87,6 +89,10 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		}
 	}
 	
+	public Window getOptionParent() {
+		return SwingUtilities.getWindowAncestor(view.getCenterComponent());
+	}
+	
 	
 	public class HalfedgeAction extends AbstractAction {
 		
@@ -105,7 +111,7 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			try {
-				execute(hcp.get(), hcp.getCalculators(), hcp);
+				execute(hcp.get(), hcp.getAdapters(), hcp);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 				Window w = SwingUtilities.getWindowAncestor(hcp.getShrinkPanel());
@@ -119,6 +125,7 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
+		view = c.getPlugin(View.class);
 		hcp = c.getPlugin(HalfedgeInterface.class);
 		viewMenuBar = c.getPlugin(ViewMenuBar.class);
 		viewMenuBar.addMenuItem(getClass(), getPriority(), action, "Halfedge", getAlgorithmCategory().toString());
@@ -177,11 +184,11 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		return 0;
 	}
 	
-	public abstract < 
+	public abstract<
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException;
-	
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi);
+		
 }

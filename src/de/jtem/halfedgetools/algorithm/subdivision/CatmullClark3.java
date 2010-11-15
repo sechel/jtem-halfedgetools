@@ -36,15 +36,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.TypedAdapterSet;
+import de.jtem.halfedgetools.adapter.type.BaryCenter;
+import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 
 /**
@@ -72,9 +73,7 @@ public class CatmullClark3 {
 	> Map<E, Set<E>> subdivide(
 		HDS oldHeds, 
 		HDS newHeds, 
-		VertexPositionCalculator vA,
-		EdgeAverageCalculator eA,
-		FaceBarycenterCalculator fA
+		TypedAdapterSet<double[]> a
 	) {
 		Map<F, V> oldFnewVMap = new HashMap<F, V>();
 		Map<E, V> oldEnewVMap = new HashMap<E, V>();
@@ -101,14 +100,15 @@ public class CatmullClark3 {
 			double[] posE = new double[3];
 			double[] pos = new double [3];
 			for (E e : star){
-				eA.setEdgeAlpha(.5);
-				eA.setEdgeIgnore(false);
-				Rn.add(posE, eA.get(e), posE);
-				Rn.add(posF, fA.get(e.getLeftFace(),e),posF);
+				a.setParameter("alpha", 0.5);
+				a.setParameter("ignore", false);
+				Rn.add(posE, a.get(BaryCenter.class, e), posE);
+				a.setParameter("refEdge", e);
+				Rn.add(posF, a.get(BaryCenter.class, e.getLeftFace()), posF);
 			}
-			eA.setEdgeAlpha(1.0);
-			eA.setEdgeIgnore(true);
-			pos = eA.get(star.get(0));
+			a.setParameter("alpha", 1.0);
+			a.setParameter("ignore", true);
+			pos = a.get(BaryCenter.class, star.get(0));
 			Rn.times(pos, (deg-3.0), pos);
 			//Rn.times(pos, (deg-3.0)/deg, pos);
 			Rn.times(posE, 2.0/deg, posE);
@@ -123,8 +123,9 @@ public class CatmullClark3 {
 		}
 		
 		//calc coordinates for the new points at "face-barycenter"
+		a.setParameter("refEdge", (Object)null);
 		for(F oldF : oldHeds.getFaces()) {
-			double [] pos = fA.get(oldF);
+			double [] pos = a.get(BaryCenter.class, oldF);
 			oldFtoPos.put(oldF, pos);
 		}
 		
@@ -133,14 +134,16 @@ public class CatmullClark3 {
 			double[] pos = new double[3];
 			double[] pos1 = new double[3];
 			// calc with edge midpoint
-			eA.setEdgeAlpha(1);
-			eA.setEdgeIgnore(false);
-			pos = eA.get(oldPosE);
-			pos1= eA.get(oldPosE.getOppositeEdge());
+			a.setParameter("alpha", 1.0);
+			a.setParameter("ignore", false);
+			pos = a.get(BaryCenter.class, oldPosE);
+			pos1= a.get(BaryCenter.class, oldPosE.getOppositeEdge());
 			F fl = oldPosE.getLeftFace();
 			F fr = oldPosE.getOppositeEdge().getLeftFace();
-			double[] posfl = fA.get(fl,oldPosE);
-			double[] posfr = fA.get(fr,oldPosE.getOppositeEdge());
+			a.setParameter("refEdge", oldPosE);
+			double[] posfl = a.get(BaryCenter.class, fl);
+			a.setParameter("refEdge", oldPosE.getOppositeEdge());
+			double[] posfr = a.get(BaryCenter.class, fr);
 			
 			Rn.add(pos, pos1, pos);
 			Rn.add(pos, pos, posfl);
@@ -156,21 +159,21 @@ public class CatmullClark3 {
 		for(V oV : oldVnewVMap.keySet()) {
 			V nV = oldVnewVMap.get(oV);
 			double[] pos = oldVtoPos.get(oV);
-			vA.set(nV, pos);
+			a.set(Position.class, nV, pos);
 		}
 		
 		//set coordinates for the new points <-> old faces
 		for(F oF : oldFnewVMap.keySet()) {
 			V nV = oldFnewVMap.get(oF);
 			double[] pos = oldFtoPos.get(oF);
-			vA.set(nV, pos);
+			a.set(Position.class, nV, pos);
 		}
 		
 		//set coordinates for the new points <-> old edges
 		for(E oE : oldEnewVMap.keySet()){
 			V nV = oldEnewVMap.get(oE);
 			double[] pos = oldEtoPos.get(oE);
-			vA.set(nV, pos);
+			a.set(Position.class, nV, pos);
 		}
 		
 		boolean validSurface = HalfEdgeUtils.isValidSurface(newHeds);

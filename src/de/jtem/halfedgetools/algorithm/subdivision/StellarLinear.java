@@ -11,8 +11,9 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.TypedAdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
 
 public class StellarLinear {
 	
@@ -25,17 +26,17 @@ public class StellarLinear {
 	> Map<F, Set<F>> execute(
 		HEDS oldHeds, 
 		HEDS newHeds, 
-		VertexPositionCalculator vA,
-		FaceBarycenterCalculator fA)
-	{
+		TypedAdapterSet<double[]> a
+	){
 		oldHeds.createCombinatoriallyEquivalentCopy(newHeds);
 		Map<F, Set<F>> oldFtoNewFs = new HashMap<F,Set<F>>();
 		for(V v : oldHeds.getVertices()) {
-			vA.set(newHeds.getVertex(v.getIndex()), vA.get(v));
+			double[] p = a.get(BaryCenter4d.class, v); 
+			a.set(Position.class, newHeds.getVertex(v.getIndex()), p);
 		}
 		List<F> fList = new LinkedList<F>(newHeds.getFaces());
 		for(F f : fList) {
-			Set<F> newFaces = subdivideFace(newHeds, vA, fA, f);
+			Set<F> newFaces = subdivideFace(newHeds, f, a);
 			
 			oldFtoNewFs.put(f, newFaces);
 		}
@@ -48,15 +49,14 @@ public class StellarLinear {
 		F extends Face<V, E, F>,
 		HEDS extends HalfEdgeDataStructure<V, E, F>
 	> Set<F> subdivideFace(
-			HEDS newHeds,
-			VertexPositionCalculator vA, 
-			FaceBarycenterCalculator fA, 
-			F f) 
-	{
+		HEDS newHeds,
+		F f,
+		TypedAdapterSet<double[]> a
+	){
 		Set<F> newFaces = new HashSet<F>();
 		
 		V v = newHeds.addNewVertex();
-		vA.set(v, fA.get(f));
+		a.set(Position.class, v, a.get(BaryCenter4d.class, f));
 		
 		E se = f.getBoundaryEdge(); //startEdge
 		E be = se;

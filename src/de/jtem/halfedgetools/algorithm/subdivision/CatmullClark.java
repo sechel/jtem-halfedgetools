@@ -48,9 +48,9 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.TypedAdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 
 /**
@@ -63,6 +63,7 @@ import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
  * @param <F> Face class
  */
 public class CatmullClark {
+	
 	
 	/**
 	 * Subdivides a given surface with the Catmull-Clark rule
@@ -79,9 +80,7 @@ public class CatmullClark {
 	> Map<E, Set<E>> subdivide(
 		HDS oldHeds, 
 		HDS newHeds, 
-		VertexPositionCalculator vc,
-		EdgeAverageCalculator ec,
-		FaceBarycenterCalculator fc
+		TypedAdapterSet<double[]> a
 	) {
 		Map<F, V> oldFnewVMap = new HashMap<F, V>();
 		Map<E, V> oldEnewVMap = new HashMap<E, V>();
@@ -104,8 +103,9 @@ public class CatmullClark {
 //				size++;
 //			}
 //			times(sum, 1.0 / size, sum);
-			sum = fc.get(f);
-			vc.set(v, sum);
+			a.setParameter("refEdge", (Object)null);
+			sum = a.get(BaryCenter4d.class, f);
+			a.set(Position.class, v, sum);
 		}
 		
 		// edge vertices
@@ -120,13 +120,14 @@ public class CatmullClark {
 //			V leftV = fvMap.get(e.getLeftFace());
 //			V rightV = fvMap.get(e.getRightFace());
 			double[][] coords = new double[4][];
-			coords[0] = fc.get(e.getLeftFace(),e);
-			coords[1] = fc.get(e.getRightFace(),e);
-			ec.setEdgeAlpha(1.0);
-			ec.setEdgeIgnore(true);
-			coords[2] = ec.get(e);
-			coords[3] = ec.get(e.getOppositeEdge());
-			vc.set(v, average(null, coords));
+			a.setParameter("refEdge", e);
+			coords[0] = a.get(BaryCenter4d.class, e.getLeftFace());
+			coords[1] = a.get(BaryCenter4d.class, e.getRightFace());
+			a.setParameter("alpha", 1.0);
+			a.setParameter("ignore", true);
+			coords[2] = a.get(BaryCenter4d.class, e);
+			coords[3] = a.get(BaryCenter4d.class, e.getOppositeEdge());
+			a.set(Position.class, v, average(null, coords));
 		}
 	
 		// vertex vertices
@@ -143,25 +144,25 @@ public class CatmullClark {
 			double[] faceSum = new double[3];
 			for (F f : fStar) {
 				V fv = oldFnewVMap.get(f);
-				add(faceSum, faceSum, vc.get(fv));
+				add(faceSum, faceSum, a.get(Position.class, fv));
 			}
 			times(faceSum, 1.0 / fStar.size(), faceSum);
 			double[] edgeSum = new double[3];
 			for (E e : star) {
 //				add(edgeSum, coord.getCoord(e.getTargetVertex()), edgeSum);
 //				add(edgeSum, coord.getCoord(e.getStartVertex()), edgeSum);
-				ec.setEdgeIgnore(true);
-				ec.setEdgeAlpha(1.0);
-				add(edgeSum, ec.get(e), edgeSum);
-				add(edgeSum, ec.get(e.getOppositeEdge()), edgeSum);
+				a.setParameter("alpha", 1.0);
+				a.setParameter("ignore", true);
+				add(edgeSum, a.get(BaryCenter4d.class, e), edgeSum);
+				add(edgeSum, a.get(BaryCenter4d.class, e.getOppositeEdge()), edgeSum);
 			}
 			times(edgeSum, 1.0 / star.size(), edgeSum);
 			
 			int n = star.size();
-			double[] vertexSum = times(null, n - 3, vc.get(v));
+			double[] vertexSum = times(null, n - 3, a.get(Position.class, v));
 			
 			double[] sum = add(null, add(null, faceSum, edgeSum), vertexSum);
-			vc.set(nv, times(sum, 1.0 / n, sum));
+			a.set(Position.class, nv, times(sum, 1.0 / n, sum));
 		}
 
 		// face vertex connections and linkage

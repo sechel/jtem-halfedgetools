@@ -16,8 +16,7 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.Controller;
@@ -31,16 +30,16 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		defaultIcon = ImageHook.getIcon("cog_edit.png");
 
 	@Override
-	public final < 
+	public final <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
 		Window w = SwingUtilities.getWindowAncestor(view.getCenterComponent());
 		Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : defaultIcon;
 		int result = OK_OPTION;
-		executeBeforeDialog(hcp.get(),hcp.getCalculators(),hcp);
+		executeBeforeDialog(hds, a, hi);
 		if (getDialogPanel() != null) {
 			result = JOptionPane.showOptionDialog(
 				w, getDialogPanel(), 
@@ -53,16 +52,23 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 			);
 		}
 		if (result == OK_OPTION) {
-			executeAfterDialog(hds, c, hcp);
+			executeAfterDialog(hds, a, hi);
 		}
 	}
 	
-	public abstract < 
+	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void executeAfterDialog(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException;
+	> void executeBeforeDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) {}
+	
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) {}
 	
 	
 	@Override
@@ -81,12 +87,5 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 			SwingUtilities.updateComponentTreeUI(getDialogPanel());
 		}
 	}
-	
-	public <
-		V extends Vertex<V, E, F>, 
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>, 
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void executeBeforeDialog(HDS hds, CalculatorSet c, HalfedgeInterface hcp) {
-	}
+
 }

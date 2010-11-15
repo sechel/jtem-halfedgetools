@@ -43,9 +43,9 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.TypedAdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
 
 /**
  * @author Kristoffer Josefsson, Andre Heydt 
@@ -61,9 +61,7 @@ public class LoopLinear {
 	> Map<E, Set<E>> subdivide(
 		HDS oldHeds, 
 		HDS newHeds, 
-		VertexPositionCalculator vA, 
-		EdgeAverageCalculator eA, 
-		FaceBarycenterCalculator fA
+		TypedAdapterSet<double[]> a
 	){
 		Map<E, double[]> oldEtoPos = new HashMap<E, double[]>();
 		Map<V,E> newVtoOldE = new HashMap<V,E>();
@@ -85,26 +83,24 @@ public class LoopLinear {
 		}
 		
 		for(E e : oldHeds.getPositiveEdges()) {
-			eA.setEdgeAlpha(0.5);
-			eA.setEdgeIgnore(true);
-			double[] m = eA.get(e);
-			
+			a.setParameter("alpha", 0.5);
+			a.setParameter("ignore", true);
+			double[] m = a.get(BaryCenter4d.class, e);
 			oldEtoPos.put(e, m);
 		}
-		
 		
 		dyadicSubdiv(oldHeds, newHeds, newVtoOldE, oldEtoNewEs);
 		
 		for(V ov : oldHeds.getVertices()) {
-			double[] pos = vA.get(ov);
+			double[] pos = a.get(BaryCenter4d.class, ov);
 			V newV = newHeds.getVertex(ov.getIndex());
-			vA.set(newV, pos);
+			a.set(Position.class, newV, pos);
 		}
 		
 		for(V nv : newVtoOldE.keySet()) {
 			E oe = newVtoOldE.get(nv);
 			double[] pos = oldEtoPos.get(oe);
-			vA.set(nv, pos);
+			a.set(Position.class, nv, pos);
 		}
 		
 		return oldEtoNewEs;

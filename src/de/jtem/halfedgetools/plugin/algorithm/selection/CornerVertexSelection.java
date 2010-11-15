@@ -20,9 +20,8 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -75,9 +74,9 @@ public class CornerVertexSelection extends AlgorithmDialogPlugin implements Chan
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-		> void executeAfterDialog(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
+		> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
 		HalfedgeSelection sel = hcp.getSelection();
-		for(V v : selectCorners(hds,c).getVertices(hds)){
+		for(V v : selectCorners(hds, a).getVertices(hds)){
 			sel.setSelected(v,true);
 		}
 		hcp.setSelection(sel);
@@ -118,7 +117,7 @@ public class CornerVertexSelection extends AlgorithmDialogPlugin implements Chan
 		if(oldSelection == null) {
 			oldSelection = hcp.getSelection();
 		}
-		HalfedgeSelection cornerSel = selectCorners(hcp.get(), hcp.getCalculators());
+		HalfedgeSelection cornerSel = selectCorners(hcp.get(), hcp.getAdapters());
 		hcp.setSelection(cornerSel);
 	}
 
@@ -127,19 +126,18 @@ public class CornerVertexSelection extends AlgorithmDialogPlugin implements Chan
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-		>HalfedgeSelection selectCorners(HDS hds,CalculatorSet c)throws CalculatorException {
+	> HalfedgeSelection selectCorners(HDS hds, AdapterSet a) {
 		HalfedgeSelection selCorners = new HalfedgeSelection();
 		double eps = Math.PI / ratioPiModel.getNumber().intValue();
-		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
 		
 		double [] n = new double[3];
 		double [] u = new double[3];
 		double [] w = new double[3];
 		
 		for(E e : HalfEdgeUtils.boundaryEdges(hds)){
-			Rn.negate(n, vc.get(e.getTargetVertex()));
-			Rn.add(u, vc.get(e.getStartVertex()), n);
-			Rn.add(w, vc.get(e.getNextEdge().getTargetVertex()), n);
+			Rn.negate(n, a.get(Position.class, e.getTargetVertex(), double[].class));
+			Rn.add(u, a.get(Position.class, e.getStartVertex(), double[].class), n);
+			Rn.add(w, a.get(Position.class, e.getNextEdge().getTargetVertex(), double[].class), n);
 			if(Math.abs(Rn.euclideanAngle(u, w)-Math.PI) > eps){
 				selCorners.setSelected(e.getTargetVertex(), true);
 			}

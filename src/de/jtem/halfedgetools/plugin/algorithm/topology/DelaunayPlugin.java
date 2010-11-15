@@ -31,17 +31,11 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
-import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
-import de.jtem.halfedgetools.adapter.TypedAdapterSet;
-import de.jtem.halfedgetools.adapter.type.Position;
-import de.jtem.halfedgetools.algorithm.calculator.EdgeLengthCalculator;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.triangulation.Delaunay;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -52,50 +46,18 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class DelaunayPlugin extends AlgorithmPlugin {
 
-	private class EdgeLengthFromCoordinatesCalculator extends EdgeLengthCalculator {
-
-		private TypedAdapterSet<double[]>
-			a = null;
-		
-		public EdgeLengthFromCoordinatesCalculator(TypedAdapterSet<double[]> a) {
-			this.a = a;
-		}
-		
-		@Override
-		public <
-			N extends Node<?, ?, ?>
-		> boolean canAccept(Class<N> nodeClass) {
-			return Edge.class.isAssignableFrom(nodeClass);
-		}
-
-		@Override
-		public <
-			V extends Vertex<V, E, F>, 
-			E extends Edge<V, E, F>, 
-			F extends Face<V, E, F>
-		> double getLength(E e) {
-			double[] s = a.get(Position.class, e.getStartVertex());
-			double[] t = a.get(Position.class, e.getTargetVertex());
-			return Rn.euclideanDistance(s, t);
-		}
-		
-	}
-	
-
 	@Override
 	public <
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
 		if (!ConsistencyCheck.isTriangulation(hds)) {
 			throw new RuntimeException("Surface is no triangulation in Delaunay()");
 		}
-		TypedAdapterSet<double[]> a = hcp.getAdapters().querySet(double[].class);
-		EdgeLengthFromCoordinatesCalculator ec = new EdgeLengthFromCoordinatesCalculator(a);
 		try {
-			Delaunay.constructDelaunay(hds, ec);
+			Delaunay.constructDelaunay(hds, a);
 		} catch (TriangulationException e) {
 			throw new RuntimeException(e.getLocalizedMessage());
 		}

@@ -36,15 +36,13 @@ import java.util.Set;
 
 import javax.swing.KeyStroke;
 
-import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
@@ -60,27 +58,17 @@ public class FaceSplitterPlugin extends AlgorithmPlugin {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hif) throws CalculatorException {
-		Set<F> faces = hif.getSelection().getFaces(hds);
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
+		Set<F> faces = hi.getSelection().getFaces(hds);
 		if (faces.isEmpty()) return;
-		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
-		if (vc == null) {
-			throw new CalculatorException("No vertex position calculators found for " + this);
-		}
 		HalfedgeSelection s = new HalfedgeSelection();
 		for (F f : faces) {
-			double[] pos = new double[] {0.0,0.0,0.0};
-			double n = 0.0;
-			for(V bv : HalfEdgeUtils.boundaryVertices(f)) {
-				pos = Rn.add(null, pos, vc.get(bv));
-				n+=1.0;
-			}
-			pos = Rn.times(null, 1/n, pos);
+			double[] pos = a.get(BaryCenter3d.class, f, double[].class);
 			V v = TopologyAlgorithms.splitFace(f);
-			vc.set(v, pos);
+			a.set(Position.class, v, pos);
 		}
-		hif.setSelection(s);
-		hif.update();
+		hi.setSelection(s);
+		hi.update();
 	}
 
 	@Override

@@ -40,8 +40,7 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
@@ -59,16 +58,16 @@ public class RemoveVertexFillPlugin extends AlgorithmPlugin {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hif) throws CalculatorException {
-		Set<V> vertices = hif.getSelection().getVertices(hds);
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
+		Set<V> vertices = hi.getSelection().getVertices(hds);
 		if (vertices.isEmpty()) return;
 		HalfedgeSelection s = new HalfedgeSelection();
 		for (V v : vertices) {
 			F f = TopologyAlgorithms.removeVertexFill(v);
 			s.setSelected(f, true);
 		}
-		hif.update();
-		hif.setSelection(s);
+		hi.update();
+		hi.setSelection(s);
 	}
 
 	@Override

@@ -9,7 +9,8 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.algorithm.calculator.EdgeLengthCalculator;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Length;
 import de.jtem.halfedgetools.util.ConsistencyCheck;
 import de.jtem.halfedgetools.util.TriangulationException;
 
@@ -35,10 +36,10 @@ public class Delaunay {
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
-	> Double getAngle(E edge, EdgeLengthCalculator el) throws TriangulationException{
-		Double a = el.getLength(edge);
-		Double b = el.getLength(edge.getNextEdge());
-		Double c = el.getLength(edge.getPreviousEdge());
+	> Double getAngle(E edge, AdapterSet el) throws TriangulationException{
+		Double a = el.get(Length.class, edge, Double.class);
+		Double b = el.get(Length.class, edge.getNextEdge(), Double.class);
+		Double c = el.get(Length.class, edge.getPreviousEdge(), Double.class);
 		if ((a*a + b*b - c*c) / (2*a*b) > 1)
 			throw new TriangulationException("Triangle inequation doesn't hold for " + edge);
 		Double result = Math.abs(StrictMath.acos((a*a + b*b - c*c) / (2*a*b)));
@@ -56,9 +57,9 @@ public class Delaunay {
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
-	> boolean isDelaunay(E edge, EdgeLengthCalculator el) throws TriangulationException{
-		Double gamma = getAngle(edge.getNextEdge(), el);
-		Double delta = getAngle(edge.getOppositeEdge().getNextEdge(), el);
+	> boolean isDelaunay(E edge, AdapterSet a) throws TriangulationException{
+		Double gamma = getAngle(edge.getNextEdge(), a);
+		Double delta = getAngle(edge.getOppositeEdge().getNextEdge(), a);
 		return gamma + delta <= Math.PI;
 	}
 	
@@ -67,10 +68,10 @@ public class Delaunay {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V,E,F>
-	> boolean isDelaunay(HDS graph, EdgeLengthCalculator el) {
+	> boolean isDelaunay(HDS graph, AdapterSet a) {
 		for(E edge : graph.getEdges()){
 			try{
-				if(!isDelaunay(edge, el))
+				if(!isDelaunay(edge, a))
 				return false;
 			} catch (TriangulationException e) {
 				return false;
@@ -165,7 +166,7 @@ public class Delaunay {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void constructDelaunay(HDS graph, EdgeLengthCalculator el) throws TriangulationException{
+	> void constructDelaunay(HDS graph, AdapterSet a) throws TriangulationException{
 		if (!ConsistencyCheck.isTriangulation(graph)) {
 			throw new TriangulationException("Graph is no triangulation!");
 		}
@@ -178,7 +179,7 @@ public class Delaunay {
 		while (!stack.isEmpty()){
 			E ab = stack.pop();
 			markSet.remove(ab);
-			if (!isDelaunay(ab, el)){
+			if (!isDelaunay(ab, a)){
 				flip(ab);
 				for (E xy : getPositiveKiteBorder(ab)){
 					if (!markSet.contains(xy)){

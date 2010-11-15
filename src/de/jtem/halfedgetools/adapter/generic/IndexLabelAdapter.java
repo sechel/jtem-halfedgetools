@@ -21,7 +21,7 @@ public class IndexLabelAdapter extends AbstractAdapter<String> {
 
 	@Override
 	public double getPriority() {
-		return 0;
+		return -1;
 	}
 	
 	@Override

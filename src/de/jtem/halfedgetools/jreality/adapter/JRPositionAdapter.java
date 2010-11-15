@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.jreality.adapter;
 
+import de.jreality.math.Pn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
@@ -72,6 +73,7 @@ public class JRPositionAdapter extends Adapter<double[]> {
 		F extends Face<V, E, F>
 	> void setV(V v, double[] value, AdapterSet a) {
 		JRVertex<?, ?, ?> jv = (JRVertex<?, ?, ?>)v;
+		if (value.length == 3) value = Pn.homogenize(null, value);
 		jv.position = value;
 	}
 	@Override
@@ -81,6 +83,7 @@ public class JRPositionAdapter extends Adapter<double[]> {
 		F extends Face<V, E, F>
 	> void setE(E e, double[] value, AdapterSet a) {
 		JREdge<?, ?, ?> je = (JREdge<?, ?, ?>)e;
+		if (value.length == 3) value = Pn.homogenize(null, value);
 		je.position = value;
 	}
 	@Override
@@ -90,6 +93,7 @@ public class JRPositionAdapter extends Adapter<double[]> {
 		F extends Face<V, E, F>
 	> void setF(F f, double[] value, AdapterSet a) {
 		JRFace<?, ?, ?> jf = (JRFace<?, ?, ?>)f; 
+		if (value.length == 3) value = Pn.homogenize(null, value);
 		jf.position = value;
 	}
 

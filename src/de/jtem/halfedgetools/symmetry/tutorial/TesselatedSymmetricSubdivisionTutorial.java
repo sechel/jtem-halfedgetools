@@ -46,9 +46,9 @@ import de.jtem.halfedgetools.plugin.algorithm.geometry.PerturbPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.TriangulatePlugin;
 import de.jtem.halfedgetools.symmetry.adapters.BundleCycleColorAdapter;
 import de.jtem.halfedgetools.symmetry.adapters.SymmetricPositionAdapter;
+import de.jtem.halfedgetools.symmetry.adapters.SymmetricBaryCenterAdapter;
 import de.jtem.halfedgetools.symmetry.adapters.SymmetryEdgeColorAdapter;
 import de.jtem.halfedgetools.symmetry.adapters.SymmetryFaceColorAdapter;
-import de.jtem.halfedgetools.symmetry.calculators.SymmetricSubdivisionCalculator;
 import de.jtem.halfedgetools.symmetry.node.SEdge;
 import de.jtem.halfedgetools.symmetry.node.SFace;
 import de.jtem.halfedgetools.symmetry.node.SHDS;
@@ -195,7 +195,7 @@ public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent {
 		hif.addGlobalAdapter(new SymmetryEdgeColorAdapter(), true);
 		hif.addGlobalAdapter(new SymmetryFaceColorAdapter(), true);
 		hif.addGlobalAdapter(new BundleCycleColorAdapter(), true);
-		hif.addCalculator(new SymmetricSubdivisionCalculator());
+		hif.addGlobalAdapter(new SymmetricBaryCenterAdapter(), true);
 		
 		tc = new TesselatedSymmetricSubdivisionTutorial();
 		viewer.registerPlugin(tc);

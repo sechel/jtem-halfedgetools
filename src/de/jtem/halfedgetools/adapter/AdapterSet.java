@@ -1,10 +1,13 @@
 package de.jtem.halfedgetools.adapter;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import de.jtem.halfedge.Edge;
@@ -43,102 +46,154 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 	}
 	
 	
+	private Map<Long, Adapter<?>>
+		queryCache1 = new HashMap<Long, Adapter<?>>();
+	
 	@SuppressWarnings("unchecked")
 	public <
-		A extends Adapter<VAL>,
-		VAL
+		A
 	> A query(Class<A> aClass) {
+		long hash = aClass.hashCode();
+		Adapter<?> result = queryCache1.get(hash);
+		if (result != null) return (A)result;
 		for (Adapter<?> a : this) {
 			if (aClass.isAssignableFrom(a.getClass())) {
-				return (A)a;
+				result = a;
+				break;
 			}
 		}
-		return null;	
+		queryCache1.put(hash, result);
+		return (A)result;	
 	}
+	
+	private Map<Long, Object>
+		queryCache2 = new HashMap<Long, Object>();
 	
 	@SuppressWarnings("unchecked")
 	public <
 		A extends Annotation, 
 		N extends Node<?, ?, ?>,
 		O 
-	> Adapter<O> query(Class<A> type, Class<N> noteType, Class<O> out) {
-		Adapter<O> result = null;
+	> Adapter<O> query(Class<A> type, Class<N> nodeType, Class<O> out) {
+		long hash = type.hashCode() + nodeType.hashCode() + out.hashCode();
+		Adapter<O> result = (Adapter<O>)queryCache2.get(hash);
+		if (result != null) return result; 
 		for (Adapter<?> a : this) {
-			if (a.getClass().isAnnotationPresent(type) && a.canAccept(noteType) && a.checkType(out)) {
+			if (a.getClass().isAnnotationPresent(type) && a.canAccept(nodeType) && a.checkType(out)) {
 				result = (Adapter<O>)a;
 				break;
 			}
 		}
+		queryCache2.put(hash, result);
 		return result;
 	}
+	
+	
+	private Map<Long, Object>
+		queryCache3 = new HashMap<Long, Object>();
 	
 	@SuppressWarnings("unchecked")
 	public <
 		A extends Annotation, 
 		N extends Node<?, ?, ?>,
 		O 
-	> List<Adapter<O>> queryAll(Class<A> type, Class<N> noteType, Class<O> out) {
-		LinkedList<Adapter<O>> result = new LinkedList<Adapter<O>>();
+	> List<Adapter<O>> queryAll(Class<A> type, Class<N> nodeType, Class<O> out) {
+		long hash = type.hashCode() + nodeType.hashCode() + out.hashCode();
+		List<Adapter<O>> result = (List<Adapter<O>>)queryCache3.get(hash);
+		if (result != null) return result;
+		result = new LinkedList<Adapter<O>>();
 		for (Adapter<?> a : this) {
-			if (a.getClass().isAnnotationPresent(type) && a.canAccept(noteType) && a.checkType(out)) {
+			if (a.getClass().isAnnotationPresent(type) && a.canAccept(nodeType) && a.checkType(out)) {
 				result.add((Adapter<O>)a);
 			}
 		}
+		queryCache3.put(hash, result);
 		return result;
 	}
 	
 
-
+	private Map<Long, Object>
+		queryCache4 = new HashMap<Long, Object>();
+	
 	@SuppressWarnings("unchecked")
 	public <
 		A extends Annotation,
 		O 
 	> List<Adapter<O>> queryAll(Class<A> type, Class<O> out) {
-		LinkedList<Adapter<O>> result = new LinkedList<Adapter<O>>();
+		long hash = type.hashCode() + out.hashCode();
+		List<Adapter<O>> result = (List<Adapter<O>>)queryCache4.get(hash);
+		if (result != null) return result;
+		result = new LinkedList<Adapter<O>>();
 		for (Adapter<?> a : this) {
 			if (a.getClass().isAnnotationPresent(type) && a.checkType(out)) {
 				result.add((Adapter<O>)a);
 			}
 		}
+		queryCache4.put(hash, result);
 		return result;
 	}
+	
+	private Map<Long, List<Adapter<?>>>
+		queryCache5 = new HashMap<Long, List<Adapter<?>>>();
 	
 	public <
 		A extends Annotation
 	> List<Adapter<?>> queryAll(Class<A> type) {
-		LinkedList<Adapter<?>> result = new LinkedList<Adapter<?>>();
+		long hash = type.hashCode();
+		List<Adapter<?>> result = queryCache5.get(hash);
+		if (result != null) return result;
+		result = new LinkedList<Adapter<?>>();
 		for (Adapter<?> a : this) {
 			if (a.getClass().isAnnotationPresent(type)) {
 				result.add(a);
 			}
 		}
+		queryCache5.put(hash, result);
 		return result;
 	}
 	
-
+	
+	
+	private Map<Long, Object>
+		queryCache6 = new HashMap<Long, Object>();
+	
 	public <
 		O
 	> TypedAdapterSet<O> querySet(Class<O> out) throws AdapterException {
-		TypedAdapterSet<O> set = new TypedAdapterSet<O>(out);
+		long hash = out.hashCode();
+		@SuppressWarnings("unchecked")
+		TypedAdapterSet<O> result = (TypedAdapterSet<O>)queryCache6.get(hash);
+		if (result != null) return result;
+		result = new TypedAdapterSet<O>(out);
 		for (Adapter<?> a : this) {
 			if (a.checkType(out)) {
-				set.add(a);
+				result.add(a);
 			}
 		}
-		return set;		
+		queryCache6.put(hash, result);
+		return result;		
 	}
 
+	
+	private Map<Long, Object>
+		queryCache7 = new HashMap<Long, Object>();
+	
 	public <
 		N extends Node<?, ?, ?>,
 		O
 	> TypedAdapterSet<O> querySet(Class<N> noteType, Class<O> out) throws AdapterException {
-		TypedAdapterSet<O> set = new TypedAdapterSet<O>(out);
+		long hash = noteType.hashCode() + out.hashCode();
+		@SuppressWarnings("unchecked")
+		TypedAdapterSet<O> result = (TypedAdapterSet<O>)queryCache7.get(hash);
+		if (result != null) return result;
+		result = new TypedAdapterSet<O>(out);
 		for (Adapter<?> a : this) {
 			if (a.canAccept(noteType) && a.checkType(out)) {
-				set.add(a);
+				result.add(a);
 			}
 		}
-		return set;		
+		queryCache7.put(hash, result);
+		return result;		
 	}
 	
 	
@@ -170,9 +225,8 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		Adapter<VAL> a = query(type, n.getClass(), typeClass);
 		if (a != null && a.isGetter()) {
 			return a.get(n, this);
-		} else {
-			return null;
 		}
+		throw new AdapterException("AdapterSet.get()");
 	}
 	
 	
@@ -191,9 +245,8 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		}
 		if (a != null && a.isGetter()) {
 			return a.get(n, this);
-		} else {
-			return null;
 		}
+		throw new AdapterException("AdapterSet.get()");
 	}
 	
 	
@@ -216,6 +269,19 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 	}
 	
 	
+	/**
+	 * Sets a node value via a matching adapter. This operation might
+	 * not do anything if there is no adapter.
+	 * @param <A>
+	 * @param <V>
+	 * @param <E>
+	 * @param <F>
+	 * @param <N>
+	 * @param <VAL>
+	 * @param type
+	 * @param n
+	 * @param value
+	 */
 	@SuppressWarnings("unchecked")
 	public <		
 		A extends Annotation, 
@@ -230,6 +296,128 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 			a.set(n, value, this);
 		}
 	}
+	
+	
+	
+	private class ParameterInvokation {
+		
+		public Adapter<?> a = null;
+		public List<Method> m = null;
+		
+	}
+	
+	private HashMap<Long, List<ParameterInvokation>>
+		paramCache = new HashMap<Long, List<ParameterInvokation>>();
+	
+	/**
+	 * Sets a parameter value on all matching adapters 
+	 * @param <A>
+	 * @param type
+	 * @param name
+	 * @param value
+	 */
+	public <
+		A extends Annotation
+	> void setParameter(String name, Object... value) {
+		long hash = name.hashCode();
+		if (paramCache.containsKey(hash)) {
+			List<ParameterInvokation> piList = paramCache.get(hash);
+			for (ParameterInvokation pi : piList) {
+				for (Method m : pi.m) {
+					try {
+						m.invoke(pi.a, value);
+					} catch (Exception e) {
+						throw new AdapterException(e);
+					}
+				}
+			}
+			return;
+		}
+		List<ParameterInvokation> piList = new LinkedList<AdapterSet.ParameterInvokation>();
+		for (Adapter<?> a : this) {
+			List<Method> mList = new LinkedList<Method>();
+			for (Method m : a.getClass().getMethods()) {
+				Parameter ap = m.getAnnotation(Parameter.class);
+				if (ap != null && ap.name().equals(name)) {
+					try {
+						m.invoke(a, value);
+						mList.add(m);
+					} catch (Exception e) {
+						throw new AdapterException(e);
+					}
+				}
+				if (mList.size() != 0) {
+					ParameterInvokation pi = new ParameterInvokation();
+					pi.a = a;
+					pi.m = mList;
+					piList.add(pi);
+				}
+			}
+		}
+		paramCache.put(hash, piList);
+	}
+	
+
+	protected void resetQueryCache() {
+		queryCache1.clear();
+		queryCache2.clear();
+		queryCache3.clear();
+		queryCache4.clear();
+		queryCache5.clear();
+		queryCache6.clear();
+		queryCache7.clear();
+		paramCache.clear();
+	}
+	
+	
+	@Override
+	public boolean add(Adapter<?> e) {
+		resetQueryCache();
+		return super.add(e);
+	}
+	
+	@Override
+	public boolean addAll(Collection<? extends Adapter<?>> c) {
+		resetQueryCache();
+		return super.addAll(c);
+	}
+	
+	@Override
+	public void clear() {
+		resetQueryCache();
+		super.clear();
+	}
+	
+	@Override
+	public Adapter<?> pollFirst() {
+		resetQueryCache();
+		return super.pollFirst();
+	}
+	
+	@Override
+	public Adapter<?> pollLast() {
+		resetQueryCache();
+		return super.pollLast();
+	}
+	
+	@Override
+	public boolean remove(Object o) {
+		resetQueryCache();
+		return super.remove(o);
+	}
+	
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		resetQueryCache();
+		return super.removeAll(c);
+	}
+	
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		resetQueryCache();
+		return super.retainAll(c);
+	}
+	
 	
 	
 }

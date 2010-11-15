@@ -11,9 +11,7 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.util.SurfaceException;
 
 public class DooSabin {
@@ -42,9 +40,7 @@ public class DooSabin {
 	> Map<E, Set<E>> subdivide(
 			HDS oldHeds, 
 			HDS newHeds, 
-			VertexPositionCalculator vc,
-			EdgeAverageCalculator ec,
-			FaceBarycenterCalculator fc
+			TypedAdapterSet<double[]> a
 	) {
 		Map<V, F> oldVnewFMap = new HashMap<V,F>();
 		Map<F, F> oldFnewFMap = new HashMap<F, F>();

@@ -14,7 +14,7 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.adapter.type.GaussianCurvature;
 import de.jtem.halfedgetools.adapter.type.Normal;
-import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.functional.FunctionalUtils;
 
 @GaussianCurvature
@@ -34,7 +34,7 @@ public class AngleDefectAdapter extends AbstractAdapter<Double> {
 
 	@Override
 	public double getPriority() {
-		return 0;
+		return -1;
 	}
 
 	@Override
@@ -84,14 +84,14 @@ public class AngleDefectAdapter extends AbstractAdapter<Double> {
 //		System.out.print(""+le +"-"+ lf +"-"+ e +"-"+ rf +"-"+ re);
 		double[] 
 		       lec = Rn.subtract(null,
-		    		   tas.get(Position.class,le.getTargetVertex()), 
-		    		   tas.get(Position.class,le.getStartVertex())),
+		    		   tas.get(Position3d.class,le.getTargetVertex()), 
+		    		   tas.get(Position3d.class,le.getStartVertex())),
 		       rec = Rn.subtract(null,
-		    		   tas.get(Position.class,re.getTargetVertex()), 
-		    		   tas.get(Position.class,re.getStartVertex())),
+		    		   tas.get(Position3d.class,re.getTargetVertex()), 
+		    		   tas.get(Position3d.class,re.getStartVertex())),
 		       eec = Rn.subtract(null,
-		    		   tas.get(Position.class,e.getTargetVertex()), 
-		    		   tas.get(Position.class,e.getStartVertex()));
+		    		   tas.get(Position3d.class,e.getTargetVertex()), 
+		    		   tas.get(Position3d.class,e.getStartVertex()));
 		double 
 			sra = Math.signum(Rn.innerProduct(tas.get(Normal.class,rf),Rn.crossProduct(null, eec, rec))),
 			ra = ((sra==0)?1.0:sra)*FunctionalUtils.angle(eec, rec),

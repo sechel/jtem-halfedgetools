@@ -42,10 +42,10 @@ import de.jtem.discretegroup.core.DiscreteGroup;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedgetools.algorithm.alexandrov.SurfaceUtility;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
+import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.halfedgetools.util.PathUtility;
 import de.jtem.halfedgetools.util.SurfaceException;
-import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
 
 public class SymmetricHDS<
 V extends SymmetricVertex<V, E, F>, 

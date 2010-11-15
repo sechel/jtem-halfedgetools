@@ -7,8 +7,10 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.TypedAdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
+import de.jtem.halfedgetools.util.SurfaceException;
 
 public class MedialGraphLinear {
 
@@ -36,11 +38,10 @@ public class MedialGraphLinear {
 		Map<E, V> edgeVertexMap,
 		Map<F, F> faceFaceMap,
 		Map<E, E> edgeEdgeMap1,
-		VertexPositionCalculator vA,
-		EdgeAverageCalculator eA
+		TypedAdapterSet<double[]> a
 	) {
-		eA.setEdgeAlpha(0.5);
-		eA.setEdgeIgnore(true);
+		a.setParameter("alpha", 0.5);
+		a.setParameter("ignore", true);
 		vertexFaceMap.clear();
 		edgeVertexMap.clear();
 		faceFaceMap.clear();
@@ -65,7 +66,7 @@ public class MedialGraphLinear {
 				v = result.addNewVertex();
 				edgeVertexMap.put(e, v);
 				edgeVertexMap.put(e.getOppositeEdge(), v);
-				vA.set(v, eA.get(e));
+				a.set(Position.class, v, a.get(BaryCenter3d.class, e));
 			}
 			E e1 = result.addNewEdge();
 			E e2 = result.addNewEdge();

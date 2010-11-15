@@ -37,7 +37,7 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -72,8 +72,8 @@ public class TriangulatePlugin extends AlgorithmPlugin {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) {
-		Set<F> faces = hcp.getSelection().getFaces(hds);
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
+		Set<F> faces = hi.getSelection().getFaces(hds);
 		if(faces.size() == 0) {
 			Triangulator.triangulate(hds);
 		} else {
@@ -81,6 +81,6 @@ public class TriangulatePlugin extends AlgorithmPlugin {
 				Triangulator.triangulateFace(f,hds);
 			}
 		}
-		hcp.set(hds);
+		hi.set(hds);
 	}
 }

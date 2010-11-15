@@ -11,8 +11,8 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Normal;
-import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.VectorField;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 
 @Normal
 @VectorField
@@ -29,7 +29,7 @@ public class NormalAdapter extends AbstractAdapter<double[]>  {
 	
 	@Override
 	public double getPriority() {
-		return 0;
+		return -1;
 	}
 
 	@Override
@@ -82,9 +82,9 @@ public class NormalAdapter extends AbstractAdapter<double[]>  {
 		double[] n = new double[3];
 		for (E b1 : HalfEdgeUtils.boundaryEdges(f)) {
 			E b2 = b1.getPreviousEdge().getOppositeEdge();
-			double[] s1 = a.get(Position.class, b1.getTargetVertex(), double[].class);
-			double[] s2 = a.get(Position.class, b2.getTargetVertex(), double[].class);
-			double[] t = a.get(Position.class, b1.getStartVertex(), double[].class);
+			double[] s1 = a.get(Position3d.class, b1.getTargetVertex(), double[].class);
+			double[] s2 = a.get(Position3d.class, b2.getTargetVertex(), double[].class);
+			double[] t = a.get(Position3d.class, b1.getStartVertex(), double[].class);
 			double[] v1 = Rn.subtract(null, s1, t);
 			double[] v2 = Rn.subtract(null, s2, t);
 			double[] nf = Rn.crossProduct(null, v1, v2);

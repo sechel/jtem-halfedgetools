@@ -39,11 +39,8 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
-import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.algorithm.subdivision.DooSabin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -77,16 +74,11 @@ public class SymmetricDooSabinPlugin extends AlgorithmPlugin {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) {
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
 		SHDS shds = hcp.get(new SHDS());
 		SHDS result = new SHDS();
-		VertexPositionCalculator vc = c.get(shds.getVertexClass(), VertexPositionCalculator.class);
-		EdgeAverageCalculator ec = c.get(shds.getEdgeClass(), EdgeAverageCalculator.class);
-		FaceBarycenterCalculator fc = c.get(shds.getFaceClass(), FaceBarycenterCalculator.class);
-		if (vc == null || ec == null || fc == null) {
-			throw new CalculatorException("No Subdivision calculators found for " + hds);
-		}
-		Map<SEdge, Set<SEdge>> oldToDoubleNew = subdivider.subdivide(shds, result, vc, ec, fc);
+		TypedAdapterSet<double[]> da = a.querySet(double[].class);
+		Map<SEdge, Set<SEdge>> oldToDoubleNew = subdivider.subdivide(shds, result, da);
 		CuttingInfo<SVertex, SEdge, SFace> symmCopy = new CuttingInfo<SVertex, SEdge, SFace>(); 
 		CuttingInfo<SVertex, SEdge, SFace> symmOld = shds.getSymmetryCycles();
 		if (symmOld != null) {

@@ -1,14 +1,12 @@
 package de.jtem.halfedgetools.plugin.algorithm.simplification;
 
+import javax.swing.JOptionPane;
+
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
-import de.jtem.halfedgetools.algorithm.calculator.FaceAreaCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.FaceNormalCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.simplification.GarlandHeckbert;
 import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -19,28 +17,22 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class GarlandHeckbertPlugin extends AlgorithmPlugin {
 
+	
 	@Override
 	public < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
-		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
-		FaceNormalCalculator fnc = c.get(hds.getFaceClass(), FaceNormalCalculator.class);
-		FaceAreaCalculator fac = c.get(hds.getFaceClass(), FaceAreaCalculator.class);
-		if (vc == null) {
-			throw new CalculatorException("VertexPositionCalculator not found for " + hds);
-		}
-		if (fnc == null)  {
-			throw new CalculatorException("FaceNormalCalculator not found for " + hds);
-		}
-		if (fac == null) {
-			throw new CalculatorException("FaceAreaCalculator not found for " + hds);
-		}
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
+		String numString = JOptionPane.showInputDialog(getOptionParent(), "Retain Vertices", 20);
+		if (numString == null) return;
+		int retainVertices = Integer.parseInt(numString);
+		int numSteps = hds.numVertices() - retainVertices;
+		if (numSteps <= 0) return;
 		Triangulator.triangulate(hds);
-		GarlandHeckbert<V, E, F, HDS> gh = new GarlandHeckbert<V, E, F, HDS>(hds, vc, fnc, fac);
-		gh.simplify(500);
+		GarlandHeckbert<V, E, F, HDS> gh = new GarlandHeckbert<V, E, F, HDS>(hds, a);
+		gh.simplify(numSteps);
 		hcp.set(hds);
 	}
 

@@ -10,12 +10,16 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.Parameter;
 import de.jtem.halfedgetools.adapter.type.BaryCenter;
-import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 
 @BaryCenter
 public class BaryCenterAdapter extends AbstractAdapter<double[]> {
 
+	private double
+		edgeAlpha = 0.5;
+	
 	public BaryCenterAdapter() {
 		super(double[].class, true, false);
 	}
@@ -27,7 +31,7 @@ public class BaryCenterAdapter extends AbstractAdapter<double[]> {
 	
 	@Override
 	public double getPriority() {
-		return 0;
+		return -1;
 	}
 	
 	@Override
@@ -36,18 +40,20 @@ public class BaryCenterAdapter extends AbstractAdapter<double[]> {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> double[] getV(V v, AdapterSet a) {
-		return a.getDefault(Position.class, v, new double[] {0, 0, 0});
+		return a.getDefault(Position3d.class, v, new double[] {0, 0, 0});
 	}
+	
 	@Override
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> double[] getE(E e, AdapterSet a) {
-		double[] s = a.getDefault(Position.class, e.getStartVertex(), new double[] {0, 0, 0});
-		double[] t = a.getDefault(Position.class, e.getTargetVertex(), new double[] {0, 0, 0});
-		return Rn.linearCombination(null, 0.5, t, 0.5, s);
+		double[] s = getV(e.getStartVertex(), a);
+		double[] t = getV(e.getTargetVertex(), a);
+		return Rn.linearCombination(null, edgeAlpha, t, 1 - edgeAlpha, s);
 	}	
+	
 	@Override
 	public <
 		V extends Vertex<V, E, F>,
@@ -57,10 +63,15 @@ public class BaryCenterAdapter extends AbstractAdapter<double[]> {
 		double[] pos = new double[3];
 		List<E> b = HalfEdgeUtils.boundaryEdges(f);
 		for (E e : b) {
-			double[] tmp = a.getDefault(Position.class, e.getTargetVertex(), new double[] {0,0,0});
+			double[] tmp = getV(e.getTargetVertex(), a);
 			Rn.add(pos, pos, tmp);
 		}
 		return Rn.times(pos, 1.0 / b.size(), pos);
+	}
+	
+	@Parameter(name="alpha")
+	public void setEdgeAlpha(double edgeAlpha) {
+		this.edgeAlpha = edgeAlpha;
 	}
 	
 }

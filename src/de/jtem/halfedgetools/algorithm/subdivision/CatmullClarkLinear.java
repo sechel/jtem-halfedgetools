@@ -11,9 +11,9 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.TypedAdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
 
 public class CatmullClarkLinear {
 
@@ -28,27 +28,25 @@ public class CatmullClarkLinear {
 		Map<V, V> vertexVertexMap, 
 		Map<E, V> edgeVertexMap, 
 		Map<F, V> faceVertexMap,
-		VertexPositionCalculator vc,
-		EdgeAverageCalculator ec,
-		FaceBarycenterCalculator fc
+		TypedAdapterSet<double[]> a
 	) {
 		// vertices
-		ec.setEdgeAlpha(0.5);
-		ec.setEdgeIgnore(true);
+		a.setParameter("alpha", 0.5);
+		a.setParameter("ignore", true);
 		for (V v : graph.getVertices()){
 			V newVertex = quad.addNewVertex();
-			vc.set(newVertex, vc.get(v));
+			a.set(Position.class, newVertex, a.get(BaryCenter4d.class, v));
 			vertexVertexMap.put(v, newVertex);
 		}
 		for (E e : graph.getPositiveEdges()){
 			V newVertex = quad.addNewVertex();
-			vc.set(newVertex, ec.get(e));
+			a.set(Position.class, newVertex, a.get(BaryCenter4d.class, e));
 			edgeVertexMap.put(e, newVertex);
 			edgeVertexMap.put(e.getOppositeEdge(), newVertex);
 		}
 		for (F f : graph.getFaces()){
 			V newVertex = quad.addNewVertex();
-			vc.set(newVertex, fc.get(f));
+			a.set(Position.class, newVertex, a.get(BaryCenter4d.class, f));
 			faceVertexMap.put(f, newVertex);
 		}
 		

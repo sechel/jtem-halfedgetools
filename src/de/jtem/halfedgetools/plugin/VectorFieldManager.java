@@ -8,7 +8,6 @@ import static de.jreality.shader.CommonAttributes.LINE_WIDTH;
 import static de.jreality.shader.CommonAttributes.PICKABLE;
 import static de.jreality.shader.CommonAttributes.TUBES_DRAW;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
-import static de.jtem.halfedgetools.adapter.type.AdapterTypes.VectorField;
 import static java.awt.GridBagConstraints.BOTH;
 import static java.awt.GridBagConstraints.RELATIVE;
 import static java.awt.GridBagConstraints.REMAINDER;
@@ -53,7 +52,8 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.BaryCenter;
+import de.jtem.halfedgetools.adapter.type.VectorField;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
 import de.jtem.halfedgetools.util.GeometryUtility;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -139,7 +139,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 	
 	
 	private void updateStates() {
-		List<Adapter<double[]>> adapters = hif.getAdapters().queryAll(VectorField, double[].class);
+		List<Adapter<double[]>> adapters = hif.getAdapters().queryAll(VectorField.class, double[].class);
 		Collections.sort(adapters);
 		Map<Adapter<double[]>, SceneGraphComponent> active = new HashMap<Adapter<double[]>, SceneGraphComponent>();
 		for (Adapter<double[]> a : activeFields.keySet()) {
@@ -179,7 +179,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 			double[] v = vec.get(node, aSet);
 			if (v == null) continue;
 			v = v.clone();
-			double[] p = aSet.get(BaryCenter.class, node, double[].class);
+			double[] p = aSet.get(BaryCenter4d.class, node, double[].class);
 			if (p.length == 4) {
 				double hom = p[3] == 0 ? 1.0 : p[3];
 				p = new double[] {p[0] / hom, p[1] / hom, p[2] / hom};
@@ -243,7 +243,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 		
 		@Override
 		public int getRowCount() {
-			return hif.getAdapters().queryAll(VectorField, double[].class).size();
+			return hif.getAdapters().queryAll(VectorField.class, double[].class).size();
 		}
 		
 		@Override
@@ -262,7 +262,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 		
 		@Override
 		public Object getValueAt(int row, int column) {
-			List<Adapter<double[]>> vectorFields = hif.getAdapters().queryAll(VectorField, double[].class);
+			List<Adapter<double[]>> vectorFields = hif.getAdapters().queryAll(VectorField.class, double[].class);
 			if (row < 0 || row >= vectorFields.size()) {
 				return "-";
 			}
@@ -303,7 +303,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 		@Override
 		public void editingStopped(ChangeEvent e) {
 			int row = fieldTable.getSelectedRow();
-			List<Adapter<double[]>> vf = hif.getAdapters().queryAll(VectorField, double[].class);
+			List<Adapter<double[]>> vf = hif.getAdapters().queryAll(VectorField.class, double[].class);
 			Adapter<double[]> a = vf.get(row);
 			setActive(a, !isActive(a));
 			fieldTable.revalidate();

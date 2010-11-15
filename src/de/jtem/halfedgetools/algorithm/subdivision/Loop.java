@@ -37,18 +37,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.TypedAdapterSet;
+import de.jtem.halfedgetools.adapter.type.BaryCenter;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
 
 /**
  * @author Kristoffer Josefsson, Andre Heydt 
+ * TODO: Fix for meshes with boundary
  */
 public class Loop {
 
@@ -61,9 +64,7 @@ public class Loop {
 	> Map<E, Set<E>> subdivide(
 		HDS oldHeds, 
 		HDS newHeds, 
-		VertexPositionCalculator vA, 
-		EdgeAverageCalculator eA, 
-		FaceBarycenterCalculator fA
+		TypedAdapterSet<double[]> a
 	){
 		Map<E, double[]> oldEtoPos = new HashMap<E, double[]>();
 		Map<V, double[]> oldVtoPos = new HashMap<V, double[]>();
@@ -132,17 +133,18 @@ public class Loop {
 			
 			if (e.getLeftFace() == null || e.getRightFace() == null){
 				// boarderhandling edge-midpoints
-				eA.setEdgeAlpha(0.5);
-				eA.setEdgeIgnore(true);
-				pos = eA.get(e);
+				a.setParameter("alpha", 0.5);
+				a.setParameter("ignore", true);
+				pos = a.get(BaryCenter.class, e);
 				oldEtoPos.put(e, pos);
 			} else {
 				// calc with mid of barycenters and edge midpoint
-				double[] b1 = fA.get(e.getLeftFace(),e);
-				double[] b2 = fA.get(e.getRightFace(),e);
-				eA.setEdgeAlpha(0.5);
-				eA.setEdgeIgnore(true);
-				double[] m = eA.get(e);
+				a.setParameter("refEdge", e);
+				double[] b1 = a.get(BaryCenter.class, e.getLeftFace());
+				double[] b2 = a.get(BaryCenter.class, e.getRightFace());
+				a.setParameter("alpha", 0.5);
+				a.setParameter("ignore", true);
+				double[] m = a.get(BaryCenter.class, e);
 				
 				Rn.times(b1, 3.0/8.0, b1);
 				Rn.times(b2, 3.0/8.0, b2);
@@ -165,16 +167,16 @@ public class Loop {
 			
 			double[] mid = new double[3];
 			for(E e : star) {
-				eA.setEdgeAlpha(0.0);
-				eA.setEdgeIgnore(false);
-				Rn.add(mid, eA.get(e), mid);
+				a.setParameter("alpha", 0.0);
+				a.setParameter("ignore", false);
+				Rn.add(mid, a.get(BaryCenter3d.class, e), mid);
 			}
 			Rn.times(mid, 1.0 / deg, mid);	
 			
 			double[] newpos = new double[3];
 			double alpha = alphaMap.get(deg);
-			
-			Rn.linearCombination(newpos, 1.0 - alpha, vA.get(v), alpha, mid);
+			double[] p = a.get(BaryCenter3d.class, v);
+			Rn.linearCombination(newpos, 1.0 - alpha, p, alpha, mid);
 			
 			oldVtoPos.put(v, newpos);			
 		}
@@ -184,18 +186,16 @@ public class Loop {
 		for(V ov : oldVtoPos.keySet()) {
 			double[] pos = oldVtoPos.get(ov);
 			V newV = newHeds.getVertex(ov.getIndex());
-			vA.set(newV, pos);
+			a.set(Position.class, newV, pos);
 		}
 		
 		for(V nv : newVtoOldE.keySet()) {
 			E oe = newVtoOldE.get(nv);
 			double[] pos = oldEtoPos.get(oe);
-			vA.set(nv, pos);
+			a.set(Position.class, nv, pos);
 		}
 		
-		
 		return oldEtoNewEs;
-
 	};
 	
 	//return new HEDS subdivided

@@ -26,10 +26,8 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
-import de.jtem.halfedgetools.adapter.type.BaryCenter;
 import de.jtem.halfedgetools.adapter.type.Normal;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
 import de.jtem.halfedgetools.bsp.KdTree;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -82,12 +80,11 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void executeAfterDialog(
+	> void executeAfterDialog (
 		HDS hds,
-		CalculatorSet c,
-		HalfedgeInterface hcp
-	) throws CalculatorException {
-		AdapterSet a = hcp.getAdapters();
+		AdapterSet a,
+		HalfedgeInterface hi
+	){
 		KdTree<V, E, F> kd = new KdTree<V, E, F>(hds, a, 10, false);
 		boolean boundaryOnly = onBoundaryChecker.isSelected();
 		double scale = GeometryUtility.getMeanEdgeLength(hds, a);
@@ -119,7 +116,7 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 		}
 		
 		for (Node<V, E, F> node : nodes) {
-			double[] p = a.get(BaryCenter.class, node, double[].class);
+			double[] p = a.get(BaryCenter4d.class, node, double[].class);
 			try {
 				evd = getCurvatureTensor(p, scale * radius, kd, a);
 				double[] n = a.get(Normal.class, node, double[].class);

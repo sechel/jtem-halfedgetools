@@ -48,9 +48,9 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.algorithm.calculator.EdgeAverageCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.TypedAdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
@@ -86,82 +86,128 @@ public class CatmullClarkAll {
 	 *            a coordinates adapter
 	 */
 
-	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> Map<E, Set<E>> subdivide(
-			HDS oldHeds, HDS newHeds, VertexPositionCalculator vc,
-			EdgeAverageCalculator ec, FaceBarycenterCalculator fc,
-			HalfedgeSelection sel, boolean b1, boolean b3,
-			boolean b4) {
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> Map<E, Set<E>> subdivide(
+		HDS oldHeds, 
+		HDS newHeds, 
+		TypedAdapterSet<double[]> a,
+		HalfedgeSelection sel, 
+		boolean b1, 
+		boolean b3,
+		boolean b4) {
 		Map<F, V> oldFnewVMap = new HashMap<F, V>();
 		Map<E, V> oldEnewVMap = new HashMap<E, V>();
 		Map<V, V> oldVnewVMap = new HashMap<V, V>();
-		System.out.println();
-		System.out.println("Selection: "+sel.getEdges(oldHeds));
 		HalfEdgeUtilsExtra.clear(newHeds);
-		setNewCoordinates(oldHeds, newHeds, vc, ec, fc, sel, oldFnewVMap, oldEnewVMap, oldVnewVMap, b1, b4);
+		setNewCoordinates(oldHeds, newHeds, a, sel, oldFnewVMap, oldEnewVMap, oldVnewVMap, b1, b4);
 		return createCombinatorics(oldHeds, newHeds, sel, oldFnewVMap, oldEnewVMap, oldVnewVMap,b3, b4);
 
 	}
 
-	private <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> void setNewCoordinates(
-			HDS oldHeds, HDS newHeds, VertexPositionCalculator vc,
-			EdgeAverageCalculator ec, FaceBarycenterCalculator fc,
-			HalfedgeSelection sel, Map<F, V> oldFnewVMap,
-			Map<E, V> oldEnewVMap, Map<V, V> oldVnewVMap,
-			boolean b1,	boolean b4) {
+	private <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void setNewCoordinates(
+		HDS oldHeds, 
+		HDS newHeds, 
+		TypedAdapterSet<double[]> a,
+		HalfedgeSelection sel, 
+		Map<F, V> oldFnewVMap,
+		Map<E, V> oldEnewVMap, 
+		Map<V, V> oldVnewVMap,
+		boolean b1,
+		boolean b4
+	) {
 		HalfedgeSelection vertex = new HalfedgeSelection();
-		setNewFaceCoordinates(oldHeds, newHeds, oldFnewVMap, fc, vc);
-		setNewEdgeCoordinates(oldHeds, newHeds, oldFnewVMap, oldEnewVMap, oldVnewVMap, fc, vc, ec, sel, b4);
-		setNewVertexCoordinates(oldHeds, newHeds, oldFnewVMap, oldVnewVMap, sel, vertex, fc, vc, ec, b1, b4);
-		
-
+		setNewFaceCoordinates(oldHeds, newHeds, oldFnewVMap, a);
+		setNewEdgeCoordinates(oldHeds, newHeds, oldFnewVMap, oldEnewVMap, oldVnewVMap, a, sel, b4);
+		setNewVertexCoordinates(oldHeds, newHeds, oldFnewVMap, oldVnewVMap, sel, vertex, a, b1, b4);
 	}
 
-	private <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> void setNewFaceCoordinates(
-			HDS oldHeds, HDS newHeds, Map<F, V> oldFnewVMap,
-			FaceBarycenterCalculator fc, VertexPositionCalculator vc) {
+	private <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void setNewFaceCoordinates(
+		HDS oldHeds, 
+		HDS newHeds,
+		Map<F, V> oldFnewVMap,
+		TypedAdapterSet<double[]> a
+	) {
 		for (F f : oldHeds.getFaces()) {
 			V v = newHeds.addNewVertex();
 			oldFnewVMap.put(f, v);
 			double[] sum = new double[3];
-			sum = fc.get(f);
-			vc.set(v, sum);
+			a.setParameter("refEdge", (Object)null);
+			sum = a.get(BaryCenter4d.class, f);
+			a.set(Position.class, v, sum);
 		}
 	}
 
-	private <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> void setNewEdgeCoordinates(
-			HDS oldHeds, HDS newHeds, Map<F, V> oldFnewVMap,
-			Map<E, V> oldEnewVMap, Map<V, V> oldVnewVMap,
-			FaceBarycenterCalculator fc, VertexPositionCalculator vc,
-			EdgeAverageCalculator ec, HalfedgeSelection sel, boolean b4) {
+	private  <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void setNewEdgeCoordinates(
+		HDS oldHeds, 
+		HDS newHeds, 
+		Map<F, V> oldFnewVMap,
+		Map<E, V> oldEnewVMap, 
+		Map<V, V> oldVnewVMap,
+		TypedAdapterSet<double[]> a, 
+		HalfedgeSelection sel, 
+		boolean b4
+	) {
 	
 		for (E e : oldHeds.getPositiveEdges()) {
 			if (!isInteriorEdge(e)||(b4 && sel.isSelected(e))) {
 				V v = newHeds.addNewVertex();
 				oldEnewVMap.put(e, v);
 				oldEnewVMap.put(e.getOppositeEdge(), v);
-				ec.setEdgeAlpha(0.5);
-				ec.setEdgeIgnore(true);
-				vc.set(v, ec.get(e));
-			}else {
+				a.setParameter("alpha", 0.5);
+				a.setParameter("ignore", true);
+				a.set(Position.class, v, a.get(BaryCenter4d.class, e));
+			} else {
 				V v = newHeds.addNewVertex();
 				oldEnewVMap.put(e, v);
 				oldEnewVMap.put(e.getOppositeEdge(), v);
 				double[][] coords = new double[4][];
-				coords[0] = fc.get(e.getLeftFace(), e);
-				coords[1] = fc.get(e.getRightFace(), e);
-				ec.setEdgeAlpha(1.0);
-				ec.setEdgeIgnore(true);
-				coords[2] = ec.get(e);
-				coords[3] = ec.get(e.getOppositeEdge());
-				vc.set(v, average(null, coords));
+				a.setParameter("refEdge", e);
+				coords[0] = a.get(BaryCenter4d.class, e.getLeftFace());
+				coords[1] = a.get(BaryCenter4d.class, e.getRightFace());
+				a.setParameter("alpha", 1.0);
+				a.setParameter("ignore", true);
+				coords[2] = a.get(BaryCenter4d.class, e);
+				coords[3] = a.get(BaryCenter4d.class, e.getOppositeEdge());
+				a.set(Position.class, v, average(null, coords));
 			}
 		}
 	}
 	
-	private <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> void setNewVertexCoordinates(
-			HDS oldHeds, HDS newHeds, Map<F, V> oldFnewVMap,Map<V, V> oldVnewVMap,
-			HalfedgeSelection sel,HalfedgeSelection vertex,
-			FaceBarycenterCalculator fc, VertexPositionCalculator vc,EdgeAverageCalculator ec,boolean b1, boolean b4) {
+	private  <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void setNewVertexCoordinates(
+		HDS oldHeds, 
+		HDS newHeds, 
+		Map<F, V> oldFnewVMap,
+		Map<V, V> oldVnewVMap,
+		HalfedgeSelection sel,
+		HalfedgeSelection vertex,
+		TypedAdapterSet<double[]> a,
+		boolean b1, 
+		boolean b4
+	) {
 		if (b4) {
 			for (E e1 : sel.getEdges(oldHeds)) {
 				int counter = 0;
@@ -180,7 +226,6 @@ public class CatmullClarkAll {
 					}
 				}
 			}
-			System.out.println("selVerts: " + sel.getVertices(oldHeds));
 		} // end if (b4)
 		
 		for (V v : oldHeds.getVertices()) {
@@ -192,13 +237,13 @@ public class CatmullClarkAll {
 				vHelp[0] = null;
 				for (E e : star){
 					if(!isInteriorEdge(e)){
-						ec.setEdgeAlpha(0.75);
-						ec.setEdgeIgnore(true);
+						a.setParameter("alpha", 0.75);
+						a.setParameter("ignore", true);
 						if(vHelp[0] ==null){
-							vHelp[0] = ec.get(e);
+							vHelp[0] = a.get(BaryCenter4d.class, e);
 						} else {
-							vHelp[1] = ec.get(e);
-							vc.set(nv, average(null, vHelp));
+							vHelp[1] = a.get(BaryCenter4d.class, e);
+							a.set(Position.class, nv, average(null, vHelp));
 						}
 						
 					}
@@ -206,7 +251,7 @@ public class CatmullClarkAll {
 			} else if (isBoundaryVertex(v) && !b1){
 				V nv= newHeds.addNewVertex();
 				oldVnewVMap.put(v, nv);
-				vc.set(nv, vc.get(v));
+				a.set(Position.class, nv, a.get(Position.class, v));
 			} else if(sel.isSelected(v)){
 				V nv= newHeds.addNewVertex();
 				oldVnewVMap.put(v, nv);
@@ -215,13 +260,13 @@ public class CatmullClarkAll {
 				vHelp[0] = null;
 				for (E e : star){
 					if(sel.isSelected(e)){
-						ec.setEdgeAlpha(0.75);
-						ec.setEdgeIgnore(true);
+						a.setParameter("alpha", 0.75);
+						a.setParameter("ignore", true);
 						if(vHelp[0] ==null){
-							vHelp[0] = ec.get(e);
+							vHelp[0] = a.get(BaryCenter4d.class, e);
 						} else {
-							vHelp[1] = ec.get(e);
-							vc.set(nv, average(null, vHelp));
+							vHelp[1] = a.get(BaryCenter4d.class, e);
+							a.set(Position.class, nv, average(null, vHelp));
 						}
 						
 					}
@@ -229,8 +274,7 @@ public class CatmullClarkAll {
 			} else if (vertex.isSelected(v)) {
 				V nv = newHeds.addNewVertex();
 				oldVnewVMap.put(v, nv);
-				vc.set(nv, vc.get(v));
-				System.out.println("selected edge vertex: "+nv+" - "+vc.get(nv));
+				a.set(Position.class, nv, a.get(Position.class, v));
 			} else {
 				V nv = newHeds.addNewVertex();
 				oldVnewVMap.put(v, nv);
@@ -240,32 +284,42 @@ public class CatmullClarkAll {
 				double[] faceSum = new double[3];
 				for (F f : fStar) {
 					V fv = oldFnewVMap.get(f);
-					add(faceSum, faceSum, vc.get(fv));
+					add(faceSum, faceSum, a.get(Position.class, fv));
 				}
 				times(faceSum, 1.0 / fStar.size(), faceSum);
 				double[] edgeSum = new double[3];
 				for (E e : star) {
-					ec.setEdgeIgnore(true);
-					ec.setEdgeAlpha(1.0);
-					add(edgeSum, ec.get(e), edgeSum);
-					add(edgeSum, ec.get(e.getOppositeEdge()), edgeSum);
+					a.setParameter("alpha", 1.0);
+					a.setParameter("ignore", true);
+					add(edgeSum, a.get(BaryCenter4d.class, e), edgeSum);
+					add(edgeSum, a.get(BaryCenter4d.class, e.getOppositeEdge()), edgeSum);
 				}
 				times(edgeSum, 1.0 / star.size(), edgeSum);
 
 				int n = star.size();
-				double[] vertexSum = times(null, n - 3, vc.get(v));
+				double[] vertexSum = times(null, n - 3, a.get(Position.class, v));
 
 				double[] sum = add(null, add(null, faceSum, edgeSum), vertexSum);
-				vc.set(nv, times(sum, 1.0 / n, sum));
+				a.set(Position.class, nv, times(sum, 1.0 / n, sum));
 			}
 		}
 	}
 
-	private <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> Map<E, Set<E>> createCombinatorics(
-			HDS oldHeds, HDS newHeds,
-			HalfedgeSelection sel, Map<F, V> oldFnewVMap,
-			Map<E, V> oldEnewVMap, Map<V, V> oldVnewVMap,boolean b3, boolean b4) {
-
+	private <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> Map<E, Set<E>> createCombinatorics(
+		HDS oldHeds, 
+		HDS newHeds,
+		HalfedgeSelection sel, 
+		Map<F, V> oldFnewVMap,
+		Map<E, V> oldEnewVMap, 
+		Map<V, V> oldVnewVMap,
+		boolean b3, 
+		boolean b4
+	) {
 		Map<E, E> evOutEmap = new HashMap<E, E>();
 		Map<E, E> edgeMap = new HashMap<E, E>();
 		Map<E, Set<E>> oldEtoSubDivEs = new HashMap<E, Set<E>>();
@@ -407,7 +461,6 @@ public class CatmullClarkAll {
 		if (b4) {
 			sel.addAll(outSel.getEdges());
 		}
-		System.out.println(b4);
 		return oldEtoSubDivEs;
 	}
 

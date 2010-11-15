@@ -7,8 +7,9 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.TypedAdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
 
 public class Sqrt3Linear {
 
@@ -17,13 +18,12 @@ public class Sqrt3Linear {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V,E,F>
-	> HDS subsivide(
+	> HDS subdivide(
 		HDS graph, 
 		HDS quad, 
 		Map<V, V> vertexVertexMap, 
 		Map<F, V> faceVertexMap,
-		VertexPositionCalculator vA,
-		FaceBarycenterCalculator fA
+		TypedAdapterSet<double[]> a
 	) {
 		HashMap<E, E> leftQuadEdgeMap = new HashMap<E, E>();
 		HashMap<E, F> edgeFaceMap = new HashMap<E, F>();
@@ -31,12 +31,12 @@ public class Sqrt3Linear {
 		// vertices
 		for (V v : graph.getVertices()){
 			V newVertex = quad.addNewVertex();
-			vA.set(newVertex, vA.get(v));
+			a.set(Position.class, newVertex, a.get(BaryCenter3d.class, v));
 			vertexVertexMap.put(v, newVertex);
 		}
 		for (F f : graph.getFaces()){
 			V newVertex = quad.addNewVertex();
-			vA.set(newVertex, fA.get(f));
+			a.set(Position.class, newVertex, a.get(BaryCenter3d.class, f));
 			faceVertexMap.put(f, newVertex);
 		}
 		for (E e : graph.getPositiveEdges()){

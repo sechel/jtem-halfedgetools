@@ -37,10 +37,8 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
-import de.jtem.halfedgetools.algorithm.calculator.FaceBarycenterCalculator;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.algorithm.subdivision.StellarLinear;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -59,20 +57,16 @@ public class StellarLinearPlugin extends AlgorithmPlugin {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
 		HDS hds2 = hcp.createEmpty(hds);
-		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
-		FaceBarycenterCalculator fc = c.get(hds.getFaceClass(), FaceBarycenterCalculator.class);
-		if (vc == null || fc == null) {
-			throw new CalculatorException("No Subdivision calculators found for " + hds);
-		}
+		TypedAdapterSet<double[]> da = a.querySet(double[].class);
 		Set<F> faces = hcp.getSelection().getFaces(hds);
 		if(faces.size() == 0) {
-			subdivider.execute(hds, hds2, vc, fc);
+			subdivider.execute(hds, hds2, da);
 			hcp.set(hds2);	
 		} else {
 			for(F f: faces) {
-				subdivider.subdivideFace(hds,vc,fc,f);
+				subdivider.subdivideFace(hds, f, da);
 			}
 			hcp.set(hds);	
 		}

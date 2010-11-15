@@ -36,15 +36,14 @@ import java.util.Set;
 
 import javax.swing.KeyStroke;
 
-import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
-import de.jtem.halfedgetools.algorithm.calculator.VertexPositionCalculator;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
@@ -61,21 +60,15 @@ public class EdgeSplitterPlugin extends AlgorithmPlugin {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hif) throws CalculatorException {
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
 		HalfedgeSelection s = new HalfedgeSelection(hif.getSelection());
 		Set<E> edges = s.getEdges(hds);
 		if (edges.isEmpty()) return;
-		VertexPositionCalculator vc = c.get(hds.getVertexClass(), VertexPositionCalculator.class);
-		if (vc == null) {
-			throw new CalculatorException("No vertex position calculators found for " + this);
-		}
-		
 		for (E e : edges) {
 			if(e.isPositive()){ 
-				double[] p1 = vc.get(e.getTargetVertex());
-				double[] p2 = vc.get(e.getStartVertex());
+				double[] p = a.get(BaryCenter3d.class, e, double[].class);
 				V v = TopologyAlgorithms.splitEdge(e);
-				vc.set(v, Rn.linearCombination(null, 0.5, p1, 0.5, p2));
+				a.set(Position.class, v, p);
 				s.setSelected(v, true);
 				for(E ae : HalfEdgeUtils.incomingEdges(v)) {
 					s.setSelected(ae, true);

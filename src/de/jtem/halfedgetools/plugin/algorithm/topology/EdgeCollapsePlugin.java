@@ -10,8 +10,7 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.CalculatorException;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
@@ -29,7 +28,7 @@ public class EdgeCollapsePlugin extends AlgorithmPlugin {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, CalculatorSet c, HalfedgeInterface hcp) throws CalculatorException {
+	> void execute(HDS hds, AdapterSet c, HalfedgeInterface hcp) {
 		Set<E> edges = hcp.getSelection().getEdges(hds);
 		if (edges.isEmpty()) return;
 		HalfedgeSelection s = new HalfedgeSelection();

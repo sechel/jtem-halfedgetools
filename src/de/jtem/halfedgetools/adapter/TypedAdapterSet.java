@@ -2,6 +2,8 @@ package de.jtem.halfedgetools.adapter;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -19,6 +21,10 @@ public class TypedAdapterSet <VAL> extends AdapterSet {
 		this.typeClass = typeClass;
 	}
 	
+	public TypedAdapterSet(Adapter<?>... adapters) {
+		super(adapters);
+	}
+
 	public TypedAdapterSet(Class<VAL> typeClass, Collection<? extends Adapter<VAL>> adapters) {
 		this(typeClass);
 		for (Adapter<VAL> a : adapters) {
@@ -26,29 +32,26 @@ public class TypedAdapterSet <VAL> extends AdapterSet {
 		}
 	}
 	
-	public TypedAdapterSet(Class<VAL> typeClass, Adapter<VAL>... adapters) {
-		this(typeClass);
-		for (Adapter<VAL> a : adapters) {
-			add(a);
-		}
-	}
-	
-	public TypedAdapterSet(Adapter<VAL> a) {
-		add(a);
-	}
+	private Map<Long, Object>
+		queryCache1 = new HashMap<Long, Object>();
 	
 	@SuppressWarnings("unchecked")
 	public <
 		A extends Annotation, 
 		N extends Node<?, ?, ?>
-	> Adapter<VAL> query(Class<A> type, Class<N> noteType) {
-		Adapter<VAL> result = null;
+	> Adapter<VAL> query(Class<A> type, Class<N> nodeType) {
+		long hash = type.hashCode() + nodeType.hashCode();
+		Adapter<VAL> result = (Adapter<VAL>)queryCache1.get(hash);
+		if (result != null) {
+			return result;
+		}
 		for (Adapter<?> a : this) {
-			if (a.getClass().isAnnotationPresent(type) && a.canAccept(noteType)) {
+			if (a.getClass().isAnnotationPresent(type) && a.canAccept(nodeType)) {
 				result = (Adapter<VAL>)a;
 				break;
 			}
 		}
+		queryCache1.put(hash, result);
 		return result;
 	}
 	
@@ -129,7 +132,13 @@ public class TypedAdapterSet <VAL> extends AdapterSet {
 				return typeClass.cast(a.getF((F)n, this));
 			}
 		}
-		return null;
+		throw new AdapterException("AdapterSet.get()");
+	}
+	
+	@Override
+	protected void resetQueryCache() {
+		super.resetQueryCache();
+		queryCache1.clear();
 	}
 	
 }

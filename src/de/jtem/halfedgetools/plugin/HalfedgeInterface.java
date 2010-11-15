@@ -58,11 +58,11 @@ import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.plugin.JRViewerUtility;
 import de.jreality.plugin.basic.Content;
+import de.jreality.plugin.basic.Content.ContentChangedEvent;
+import de.jreality.plugin.basic.Content.ContentChangedListener;
 import de.jreality.plugin.basic.Scene;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewMenuBar;
-import de.jreality.plugin.basic.Content.ContentChangedEvent;
-import de.jreality.plugin.basic.Content.ContentChangedListener;
 import de.jreality.reader.ReaderOBJ;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.Geometry;
@@ -90,18 +90,17 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.Calculator;
-import de.jtem.halfedgetools.adapter.CalculatorSet;
 import de.jtem.halfedgetools.adapter.generic.BaryCenterAdapter;
+import de.jtem.halfedgetools.adapter.generic.BaryCenter4dAdapter;
+import de.jtem.halfedgetools.adapter.generic.EdgeLengthAdapter;
+import de.jtem.halfedgetools.adapter.generic.FaceAreaAdapter;
 import de.jtem.halfedgetools.adapter.generic.NormalAdapter;
+import de.jtem.halfedgetools.adapter.generic.Position3dAdapter;
+import de.jtem.halfedgetools.adapter.generic.Position4dAdapter;
 import de.jtem.halfedgetools.io.HalfedgeIO;
 import de.jtem.halfedgetools.jreality.adapter.JRNormalAdapter;
 import de.jtem.halfedgetools.jreality.adapter.JRPositionAdapter;
 import de.jtem.halfedgetools.jreality.adapter.JRTexCoordAdapter;
-import de.jtem.halfedgetools.jreality.calculator.JRFaceAreaCalculator;
-import de.jtem.halfedgetools.jreality.calculator.JRFaceNormalCalculator;
-import de.jtem.halfedgetools.jreality.calculator.JRSubdivisionCalculator;
-import de.jtem.halfedgetools.jreality.calculator.JRVertexPositionCalculator;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.halfedgetools.plugin.widget.LayerPropertyWidget;
 import de.jtem.jrworkspace.plugin.Controller;
@@ -163,9 +162,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		persistentAdapters = new AdapterSet(),
 		volatileAdapters = new AdapterSet();
 	
-	private CalculatorSet
-		calculators = new CalculatorSet();
-	
 	private List<HalfedgeListener>
 		listeners = new LinkedList<HalfedgeListener>();
 	
@@ -186,15 +182,17 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	public HalfedgeInterface() {
 		makeLayout();
+		// add generic and default adapters
 		persistentAdapters.add(new NormalAdapter());
 		persistentAdapters.add(new BaryCenterAdapter());
+		persistentAdapters.add(new BaryCenter4dAdapter());
+		persistentAdapters.add(new FaceAreaAdapter());
+		persistentAdapters.add(new Position3dAdapter());
+		persistentAdapters.add(new Position4dAdapter());
+		persistentAdapters.add(new EdgeLengthAdapter());
 		persistentAdapters.add(new JRNormalAdapter());
 		persistentAdapters.add(new JRPositionAdapter());
 		persistentAdapters.add(new JRTexCoordAdapter());
-		calculators.add(new JRVertexPositionCalculator());
-		calculators.add(new JRFaceAreaCalculator());
-		calculators.add(new JRFaceNormalCalculator());
-		calculators.add(new JRSubdivisionCalculator());
 		root.addTool(layerActivationTool);
 		root.setTransformation(rootTransform);
 		layerActivationTool.addActionListener(this);
@@ -849,18 +847,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		return pa || va || la;
 	}
 	
-	
-	public CalculatorSet getCalculators() {
-		return calculators;
-	}
-	
-	public boolean addCalculator(Calculator c) {
-		return calculators.add(c);
-	}
-	
-	public boolean removeCalculator(Calculator c) {
-		return calculators.remove(c);
-	}
 	
 	@Override
 	public void storeStates(Controller c) throws Exception {

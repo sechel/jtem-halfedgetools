@@ -12,20 +12,20 @@ public abstract class AbstractTypedAdapter<
 	VAL
 > extends Adapter<VAL> {
 
-	private Class<? extends Vertex<?,?,?>>
+	private Class<? extends V>
 		vClass = null;
-	private Class<? extends Edge<?,?,?>>
+	private Class<? extends E>
 		eClass = null;
-	private Class<? extends Face<?,?,?>>
+	private Class<? extends F>
 		fClass = null;
 	private Class<? extends VAL>
 		typeClass = null;
 	
 	
 	protected AbstractTypedAdapter(
-		Class<? extends Vertex<?,?,?>> vClass, 
-		Class<? extends Edge<?,?,?>> eClass, 
-		Class<? extends Face<?,?,?>> fClass,
+		Class<? extends V> vClass, 
+		Class<? extends E> eClass, 
+		Class<? extends F> fClass,
 		Class<? extends VAL> typeClass,
 		boolean getter,
 		boolean setter
