@@ -14,6 +14,18 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.generic.BaryCenter3dAdapter;
+import de.jtem.halfedgetools.adapter.generic.BaryCenter4dAdapter;
+import de.jtem.halfedgetools.adapter.generic.BaryCenterAdapter;
+import de.jtem.halfedgetools.adapter.generic.EdgeLengthAdapter;
+import de.jtem.halfedgetools.adapter.generic.EdgeVectorAdapter;
+import de.jtem.halfedgetools.adapter.generic.FaceAreaAdapter;
+import de.jtem.halfedgetools.adapter.generic.NormalAdapter;
+import de.jtem.halfedgetools.adapter.generic.Position3dAdapter;
+import de.jtem.halfedgetools.adapter.generic.Position4dAdapter;
+import de.jtem.halfedgetools.adapter.generic.TexturePosition2dAdapter;
+import de.jtem.halfedgetools.adapter.generic.TexturePosition3dAdapter;
+import de.jtem.halfedgetools.adapter.generic.TexturePosition4dAdapter;
 
 public class AdapterSet extends TreeSet<Adapter<?>> {
 
@@ -356,6 +368,25 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		}
 		paramCache.put(hash, piList);
 	}
+	
+	
+	public static AdapterSet createGenericAdapters() {
+		AdapterSet aSet = new AdapterSet();
+		aSet.add(new NormalAdapter());
+		aSet.add(new BaryCenterAdapter());
+		aSet.add(new BaryCenter3dAdapter());
+		aSet.add(new BaryCenter4dAdapter());
+		aSet.add(new FaceAreaAdapter());
+		aSet.add(new Position3dAdapter());
+		aSet.add(new Position4dAdapter());
+		aSet.add(new TexturePosition2dAdapter());
+		aSet.add(new TexturePosition3dAdapter());
+		aSet.add(new TexturePosition4dAdapter());
+		aSet.add(new EdgeVectorAdapter());
+		aSet.add(new EdgeLengthAdapter());
+		return aSet;
+	}
+	
 	
 
 	protected void resetQueryCache() {

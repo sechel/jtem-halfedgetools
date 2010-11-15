@@ -37,12 +37,19 @@ public class Position3dAdapter extends AbstractAdapter<double[]> {
 		F extends Face<V, E, F>
 	> double[] getV(V v, AdapterSet a) {
 		double[] r = a.getDefault(Position.class, v, new double[] {0, 0, 0});
-		if (r.length == 4) {
+		switch (r.length) {
+		case 4:
 			double[] ar = new double[3];
 			ar[0] = r[0] / r[3];
 			ar[1] = r[1] / r[3];
 			ar[2] = r[2] / r[3];
 			r = ar;
+			break;
+		case 3:
+			break;
+		case 2:
+			r = new double[] {r[0], r[1], 0};
+			break;
 		}
 		return r;
 	}

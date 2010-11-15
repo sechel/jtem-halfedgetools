@@ -94,6 +94,7 @@ import de.jtem.halfedgetools.adapter.generic.BaryCenter3dAdapter;
 import de.jtem.halfedgetools.adapter.generic.BaryCenter4dAdapter;
 import de.jtem.halfedgetools.adapter.generic.BaryCenterAdapter;
 import de.jtem.halfedgetools.adapter.generic.EdgeLengthAdapter;
+import de.jtem.halfedgetools.adapter.generic.EdgeVectorAdapter;
 import de.jtem.halfedgetools.adapter.generic.FaceAreaAdapter;
 import de.jtem.halfedgetools.adapter.generic.NormalAdapter;
 import de.jtem.halfedgetools.adapter.generic.Position3dAdapter;
@@ -197,6 +198,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		persistentAdapters.add(new TexturePosition2dAdapter());
 		persistentAdapters.add(new TexturePosition3dAdapter());
 		persistentAdapters.add(new TexturePosition4dAdapter());
+		persistentAdapters.add(new EdgeVectorAdapter());
 		persistentAdapters.add(new EdgeLengthAdapter());
 		persistentAdapters.add(new JRNormalAdapter());
 		persistentAdapters.add(new JRPositionAdapter());
@@ -1066,8 +1068,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			});
 			if (newLayers.isEmpty()) return;
 			Collections.reverse(newLayers);
-			for (HalfedgeLayer layer : newLayers) {
-				addLayer(layer);
+			List<HalfedgeLayer> oldLayers = new LinkedList<HalfedgeLayer>(layers);
+			for (HalfedgeLayer l : newLayers) {
+				addLayer(l);
+			}
+			for (HalfedgeLayer l : oldLayers) {
+				removeLayer(l);
 			}
 			activateLayer(newLayers.get(0));
 			checkContent();
