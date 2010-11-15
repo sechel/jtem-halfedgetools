@@ -7,9 +7,9 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.BaryCenter;
-import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
 
-@BaryCenter4d
+@BaryCenter3d
 public class BaryCenter3dAdapter extends AbstractAdapter<double[]> {
 
 	public BaryCenter3dAdapter() {

@@ -26,7 +26,7 @@ import de.jtem.halfedgetools.adapter.type.Normal;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.Radius;
 import de.jtem.halfedgetools.adapter.type.Size;
-import de.jtem.halfedgetools.adapter.type.TexCoordinate;
+import de.jtem.halfedgetools.adapter.type.TexturePosition;
 
 
 public class ConverterHeds2JR {
@@ -88,12 +88,12 @@ public class ConverterHeds2JR {
 			}
 		}
 		ifs.setVertexAttributes(Attribute.COORDINATES, getdoubleArrayArray(coordinates));
-		if(colors.size() > 0) ifs.setVertexAttributes(Attribute.COLORS, getdoubleArrayArray(colors)); 
-		if(normals.size() > 0) ifs.setVertexAttributes(Attribute.NORMALS, getdoubleArrayArray(normals)); 
-		if(textCoords.size() > 0) ifs.setVertexAttributes(Attribute.TEXTURE_COORDINATES, getdoubleArrayArray(textCoords)); 
-		if(labels.size() > 0) ifs.setVertexAttributes(Attribute.LABELS, getStringArray(labels));
-		if(radius.size() > 0) ifs.setVertexAttributes(Attribute.RELATIVE_RADII, getdoubleArray(radius));
-		if(pointSize.size() > 0) ifs.setVertexAttributes(Attribute.POINT_SIZE, getdoubleArray(pointSize));
+		if(colors.size() == hds.numVertices()) ifs.setVertexAttributes(Attribute.COLORS, getdoubleArrayArray(colors)); 
+		if(normals.size() == hds.numVertices()) ifs.setVertexAttributes(Attribute.NORMALS, getdoubleArrayArray(normals)); 
+		if(textCoords.size() == hds.numVertices()) ifs.setVertexAttributes(Attribute.TEXTURE_COORDINATES, getdoubleArrayArray(textCoords)); 
+		if(labels.size() == hds.numVertices()) ifs.setVertexAttributes(Attribute.LABELS, getStringArray(labels));
+		if(radius.size() == hds.numVertices()) ifs.setVertexAttributes(Attribute.RELATIVE_RADII, getdoubleArray(radius));
+		if(pointSize.size() == hds.numVertices()) ifs.setVertexAttributes(Attribute.POINT_SIZE, getdoubleArray(pointSize));
 		// Edges
 		resetData();
 		int[][] edgeIndis= new int[numE][2];
@@ -114,13 +114,13 @@ public class ConverterHeds2JR {
 			k++;
 		}
 		ifs.setEdgeAttributes(Attribute.INDICES, new IntArrayArray.Array(edgeIndis)); 
-		if(coordinates.size() > 0)ifs.setEdgeAttributes(Attribute.COORDINATES, getdoubleArrayArray(coordinates));
-		if(colors.size() > 0) ifs.setEdgeAttributes(Attribute.COLORS, getdoubleArrayArray(colors)); 
-		if(normals.size() > 0) ifs.setEdgeAttributes(Attribute.NORMALS, getdoubleArrayArray(normals)); 
-		if(textCoords.size() > 0) ifs.setEdgeAttributes(Attribute.TEXTURE_COORDINATES, getdoubleArrayArray(textCoords)); 
-		if(labels.size() > 0) ifs.setEdgeAttributes(Attribute.LABELS, getStringArray(labels));
-		if(radius.size() > 0) ifs.setEdgeAttributes(Attribute.RELATIVE_RADII, getdoubleArray(radius));
-		if(pointSize.size() > 0) ifs.setEdgeAttributes(Attribute.POINT_SIZE, getdoubleArray(pointSize));
+		if(coordinates.size() == hds.numEdges()/2)ifs.setEdgeAttributes(Attribute.COORDINATES, getdoubleArrayArray(coordinates));
+		if(colors.size() == hds.numEdges()/2) ifs.setEdgeAttributes(Attribute.COLORS, getdoubleArrayArray(colors)); 
+		if(normals.size() == hds.numEdges()/2) ifs.setEdgeAttributes(Attribute.NORMALS, getdoubleArrayArray(normals)); 
+		if(textCoords.size() == hds.numEdges()/2) ifs.setEdgeAttributes(Attribute.TEXTURE_COORDINATES, getdoubleArrayArray(textCoords)); 
+		if(labels.size() == hds.numEdges()/2) ifs.setEdgeAttributes(Attribute.LABELS, getStringArray(labels));
+		if(radius.size() == hds.numEdges()/2) ifs.setEdgeAttributes(Attribute.RELATIVE_RADII, getdoubleArray(radius));
+		if(pointSize.size() == hds.numEdges()/2) ifs.setEdgeAttributes(Attribute.POINT_SIZE, getdoubleArray(pointSize));
 		// Faces
 		///
 		resetData();
@@ -142,13 +142,13 @@ public class ConverterHeds2JR {
 			faceIndices[i++] = face;
 		}
 		ifs.setFaceAttributes(Attribute.INDICES,new IntArrayArray.Array(faceIndices)); 
-		if(coordinates.size()>0)ifs.setFaceAttributes(Attribute.COORDINATES,getdoubleArrayArray(coordinates));
-		if(colors.size()>0) ifs.setFaceAttributes(Attribute.COLORS,getdoubleArrayArray(colors)); 
-		if(normals.size()>0) ifs.setFaceAttributes(Attribute.NORMALS,getdoubleArrayArray(normals)); 
-		if(textCoords.size()>0) ifs.setFaceAttributes(Attribute.TEXTURE_COORDINATES,getdoubleArrayArray(textCoords)); 
-		if(labels.size()>0) ifs.setFaceAttributes(Attribute.LABELS,getStringArray(labels));
-		if(radius.size()>0) ifs.setFaceAttributes(Attribute.RELATIVE_RADII,getdoubleArray(radius));
-		if(pointSize.size()>0) ifs.setFaceAttributes(Attribute.POINT_SIZE,getdoubleArray(pointSize));
+		if(coordinates.size() == hds.numFaces())ifs.setFaceAttributes(Attribute.COORDINATES,getdoubleArrayArray(coordinates));
+		if(colors.size() == hds.numFaces()) ifs.setFaceAttributes(Attribute.COLORS,getdoubleArrayArray(colors)); 
+		if(normals.size() == hds.numFaces()) ifs.setFaceAttributes(Attribute.NORMALS,getdoubleArrayArray(normals)); 
+		if(textCoords.size() == hds.numFaces()) ifs.setFaceAttributes(Attribute.TEXTURE_COORDINATES,getdoubleArrayArray(textCoords)); 
+		if(labels.size() == hds.numFaces()) ifs.setFaceAttributes(Attribute.LABELS,getStringArray(labels));
+		if(radius.size() == hds.numFaces()) ifs.setFaceAttributes(Attribute.RELATIVE_RADII,getdoubleArray(radius));
+		if(pointSize.size() == hds.numFaces()) ifs.setFaceAttributes(Attribute.POINT_SIZE,getdoubleArray(pointSize));
 		// 
 		return ifs;
 	}
@@ -196,7 +196,7 @@ public class ConverterHeds2JR {
 		Adapter<double[]> pos = adapters.query(Position.class, n.getClass(), double[].class);
 		List<Adapter<double[]>> cols = adapters.queryAll(Color.class, n.getClass(), double[].class);
 		Adapter<double[]> normal = adapters.query(Normal.class, n.getClass(), double[].class);
-		Adapter<double[]> texCoord = adapters.query(TexCoordinate.class, n.getClass(), double[].class);
+		Adapter<double[]> texCoord = adapters.query(TexturePosition.class, n.getClass(), double[].class);
 		List<Adapter<String>> labs = adapters.queryAll(Label.class, n.getClass(), String.class);
 		Adapter<Double> rad = adapters.query(Radius.class, n.getClass(), Double.class); 
 		Adapter<Double> size = adapters.query(Size.class, n.getClass(), Double.class);

@@ -42,7 +42,9 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.TexturePosition;
 import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
+import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
@@ -63,9 +65,11 @@ public class FaceSplitterPlugin extends AlgorithmPlugin {
 		if (faces.isEmpty()) return;
 		HalfedgeSelection s = new HalfedgeSelection();
 		for (F f : faces) {
-			double[] pos = a.get(BaryCenter3d.class, f, double[].class);
+			double[] p = a.get(BaryCenter3d.class, f, double[].class);
+			double[] tp = a.get(TexturePosition2d.class, f, double[].class);
 			V v = TopologyAlgorithms.splitFace(f);
-			a.set(Position.class, v, pos);
+			a.set(Position.class, v, p);
+			a.set(TexturePosition.class, v, tp);
 		}
 		hi.setSelection(s);
 		hi.update();

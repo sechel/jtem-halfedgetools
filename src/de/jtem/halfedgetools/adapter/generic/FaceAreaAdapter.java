@@ -8,7 +8,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Area;
-import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 
 @Area
 public class FaceAreaAdapter extends AbstractAdapter<Double> {
@@ -25,9 +25,9 @@ public class FaceAreaAdapter extends AbstractAdapter<Double> {
 	> Double getF(F f, AdapterSet ad) {
 		E e1 = f.getBoundaryEdge();
 		E e2 = f.getBoundaryEdge().getNextEdge();
-		double[] v1 = ad.get(Position.class, e1.getTargetVertex(), double[].class);
-		double[] v2 = ad.get(Position.class, e2.getTargetVertex(), double[].class);
-		double[] v3 = ad.get(Position.class, e1.getStartVertex(), double[].class);
+		double[] v1 = ad.get(Position3d.class, e1.getTargetVertex(), double[].class);
+		double[] v2 = ad.get(Position3d.class, e2.getTargetVertex(), double[].class);
+		double[] v3 = ad.get(Position3d.class, e1.getStartVertex(), double[].class);
 		double a = 0,b = 0,c = 0;
 		for (int k=0; k<3; k++) {
            a += (v1[k] - v2[k]) * (v1[k] - v2[k]);

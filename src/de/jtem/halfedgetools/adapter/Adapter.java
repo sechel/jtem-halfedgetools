@@ -68,12 +68,15 @@ public abstract class Adapter<VAL> implements Comparable<Adapter<VAL>> {
 	> void set(N n, VAL value, AdapterSet a) {
 		if (n instanceof Vertex<?, ?, ?>) {
 			setV((V)n, value, a);
+			return;
 		}
 		if (n instanceof Edge<?, ?, ?>) {
 			setE((E)n, value, a);
+			return;
 		}
 		if (n instanceof Face<?, ?, ?>) {
 			setF((F)n, value, a);
+			return;
 		}
 	}
 	protected abstract  <

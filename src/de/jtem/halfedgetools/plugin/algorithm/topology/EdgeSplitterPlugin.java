@@ -32,7 +32,8 @@ OF SUCH DAMAGE.
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
 import java.awt.event.InputEvent;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.KeyStroke;
 
@@ -43,7 +44,9 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.TexturePosition;
 import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
+import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
@@ -62,13 +65,15 @@ public class EdgeSplitterPlugin extends AlgorithmPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
 		HalfedgeSelection s = new HalfedgeSelection(hif.getSelection());
-		Set<E> edges = s.getEdges(hds);
+		List<E> edges = new LinkedList<E>(s.getEdges(hds));
 		if (edges.isEmpty()) return;
 		for (E e : edges) {
 			if(e.isPositive()){ 
 				double[] p = a.get(BaryCenter3d.class, e, double[].class);
+				double[] tp = a.get(TexturePosition2d.class, e, double[].class);
 				V v = TopologyAlgorithms.splitEdge(e);
 				a.set(Position.class, v, p);
+				a.set(TexturePosition.class, v, tp);
 				s.setSelected(v, true);
 				for(E ae : HalfEdgeUtils.incomingEdges(v)) {
 					s.setSelected(ae, true);

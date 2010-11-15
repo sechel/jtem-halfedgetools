@@ -44,8 +44,10 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.TexturePosition;
 import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
+import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
@@ -72,19 +74,24 @@ public class FaceScalerPlugin extends AlgorithmPlugin {
 		if (faces.isEmpty()) return;
 		HalfedgeSelection s = new HalfedgeSelection();
 		for (F oldF : faces) {
-			double[] pos = a.get(BaryCenter3d.class, oldF, double[].class);
+			double[] p = a.get(BaryCenter3d.class, oldF, double[].class);
+			double[] tp = a.get(TexturePosition2d.class, oldF, double[].class);
 			int n = HalfEdgeUtils.boundaryVertices(oldF).size();
-			double[][] oldVs = new double[n][3];
+			double[][] oldVs = new double[n][];
+			double[][] oldVts = new double[n][];
 			int i = 0;
 			for(V bv : HalfEdgeUtils.boundaryVertices(oldF)) {
 				oldVs[i] = a.get(Position3d.class, bv, double[].class);
+				oldVts[i] = a.get(TexturePosition2d.class, bv, double[].class);
 				i++;
 			}
 			F f = TopologyAlgorithms.scaleFace(oldF);
 			i = 0;
 			for(V v : HalfEdgeUtils.boundaryVertices(f)) {
-				double[] newPos = Rn.linearCombination(null, t, pos, 1.0-t, oldVs[(i+twist-1+n)%n]);
+				double[] newPos = Rn.linearCombination(null, t, p, 1.0-t, oldVs[(i+twist-1+n)%n]);
+				double[] newTexPos = Rn.linearCombination(null, t, tp, 1.0-t, oldVts[(i+twist-1+n)%n]);
 				a.set(Position.class, v, newPos);
+				a.set(TexturePosition.class, v, newTexPos);
 				i++;
 			}
 			s.setSelected(f, true);

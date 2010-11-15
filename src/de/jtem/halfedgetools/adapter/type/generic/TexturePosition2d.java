@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.adapter.type;
+package de.jtem.halfedgetools.adapter.type.generic;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface TexCoordinate {
+public @interface TexturePosition2d {
 
 }

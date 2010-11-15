@@ -40,6 +40,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
@@ -59,7 +60,7 @@ public class PerturbPlugin extends AlgorithmPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
 		for(V v : hds.getVertices()) {
-			double[] coord = a.get(Position.class, v, double[].class);
+			double[] coord = a.get(Position3d.class, v, double[].class);
 			double[] noise = new double[] {
 				rnd.nextDouble() - 0.5,
 				rnd.nextDouble() - 0.5,

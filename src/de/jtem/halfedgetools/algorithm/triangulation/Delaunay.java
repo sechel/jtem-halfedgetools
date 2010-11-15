@@ -116,7 +116,6 @@ public class Delaunay {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> void flip(E e) throws TriangulationException{
-		System.out.println("Flip " + e);
 		F leftFace = e.getLeftFace();
 		F rightFace = e.getRightFace();
 		if (leftFace == rightFace)

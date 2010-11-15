@@ -22,7 +22,7 @@ import de.jtem.halfedgetools.adapter.type.Normal;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.Radius;
 import de.jtem.halfedgetools.adapter.type.Size;
-import de.jtem.halfedgetools.adapter.type.TexCoordinate;
+import de.jtem.halfedgetools.adapter.type.TexturePosition;
 
 
 public class ConverterJR2Heds {
@@ -106,7 +106,7 @@ public class ConverterJR2Heds {
 					radii[typNum]= dData.toDoubleArray(null);
 				}
 			}
-			if (adapters.isAvailable(TexCoordinate.class, nodeClass, double[].class)) {
+			if (adapters.isAvailable(TexturePosition.class, nodeClass, double[].class)) {
 				ddData= (DoubleArrayArray)AData.getList(Attribute.TEXTURE_COORDINATES);
 				if (ddData!=null) {
 					textCoords[typNum]= ddData.toDoubleArrayArray(null);
@@ -144,7 +144,7 @@ public class ConverterJR2Heds {
 			if (normals[0] != null) vAdapters.set(Normal.class, v, normals[0][i]);
 			if (pSize[0] != null) vAdapters.set(Size.class, v, pSize[0][i]);
 			if (radii[0] != null) vAdapters.set(Radius.class, v, radii[0][i]);
-			if (textCoords[0] != null) vAdapters.set(TexCoordinate.class, v, textCoords[0][i]);
+			if (textCoords[0] != null) vAdapters.set(TexturePosition.class, v, textCoords[0][i]);
 		}
 		
 		// edges (from faces)
@@ -166,7 +166,7 @@ public class ConverterJR2Heds {
 				if (normals[1] != null) eAdapters.set(Normal.class, e, normals[1][i]);
 				if (pSize[1] != null) eAdapters.set(Size.class, e, pSize[1][i]);
 				if (radii[1] != null) eAdapters.set(Radius.class, e, radii[1][i]);
-				if (textCoords[1] != null) eAdapters.set(TexCoordinate.class, e, textCoords[1][i]);
+				if (textCoords[1] != null) eAdapters.set(TexturePosition.class, e, textCoords[1][i]);
 			}
 		}
 		
@@ -203,14 +203,14 @@ public class ConverterJR2Heds {
 					if (normals[1] != null) eAdapters.set(Normal.class, ed, normals[1][i]);
 					if (pSize[1] != null) eAdapters.set(Size.class, ed, pSize[1][i]);
 					if (radii[1] != null) eAdapters.set(Radius.class, ed, radii[1][i]);
-					if (textCoords[1] != null) eAdapters.set(TexCoordinate.class, ed, textCoords[1][i]);
+					if (textCoords[1] != null) eAdapters.set(TexturePosition.class, ed, textCoords[1][i]);
 					if (coords[1] != null) eAdapters.set(Position.class, edOp, coords[1][i]);
 					if (colors[1] != null) eAdapters.set(Color.class, edOp, colors[1][i]);
 					if (labels[1] != null) eAdapters.set(Label.class, edOp, labels[1][i]);
 					if (normals[1] != null) eAdapters.set(Normal.class, edOp, normals[1][i]);
 					if (pSize[1] != null) eAdapters.set(Size.class, edOp, pSize[1][i]);
 					if (radii[1] != null) eAdapters.set(Radius.class, edOp, radii[1][i]);
-					if (textCoords[1] != null) eAdapters.set(TexCoordinate.class, edOp, textCoords[1][i]);
+					if (textCoords[1] != null) eAdapters.set(TexturePosition.class, edOp, textCoords[1][i]);
 					
 					if (edgeMap == null) continue;
 					edgeMap.put(i, ed);
@@ -251,7 +251,7 @@ public class ConverterJR2Heds {
 			if (normals[2] != null) fAdapters.set(Normal.class, f, normals[2][i]);
 			if (pSize[2] != null) fAdapters.set(Size.class, f, pSize[2][i]);
 			if (radii[2] != null) fAdapters.set(Radius.class, f, radii[2][i]);
-			if (textCoords[2] != null) fAdapters.set(TexCoordinate.class, f, textCoords[2][i]);
+			if (textCoords[2] != null) fAdapters.set(TexturePosition.class, f, textCoords[2][i]);
 			
 		}
 		

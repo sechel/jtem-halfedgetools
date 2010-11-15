@@ -6,15 +6,15 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.TexCoordinate;
+import de.jtem.halfedgetools.adapter.type.TexturePosition;
 import de.jtem.halfedgetools.jreality.node.JREdge;
 import de.jtem.halfedgetools.jreality.node.JRFace;
 import de.jtem.halfedgetools.jreality.node.JRVertex;
 
-@TexCoordinate
-public class JRTexCoordAdapter extends Adapter<double[]> {
+@TexturePosition
+public class JRTexturePositionAdapter extends Adapter<double[]> {
 
-	public JRTexCoordAdapter() {
+	public JRTexturePositionAdapter() {
 		super(true, true);
 	}
 	
