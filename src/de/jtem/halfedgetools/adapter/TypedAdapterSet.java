@@ -21,9 +21,6 @@ public class TypedAdapterSet <VAL> extends AdapterSet {
 		this.typeClass = typeClass;
 	}
 	
-	public TypedAdapterSet(Adapter<?>... adapters) {
-		super(adapters);
-	}
 
 	public TypedAdapterSet(Class<VAL> typeClass, Collection<? extends Adapter<VAL>> adapters) {
 		this(typeClass);
