@@ -37,11 +37,11 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 	}
 	
 	public AdapterSet(Collection<? extends Adapter<?>> adapters) {
-		super(adapters);
+		addAll(adapters);
 	}
 	
 	public AdapterSet(Adapter<?>... adapters) {
-		super(Arrays.asList(adapters));
+		addAll(Arrays.asList(adapters));
 	}
 	
 	public AdapterSet(Adapter<?> a) {
@@ -235,6 +235,21 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		VAL
 	> VAL get(Class<A> type, N n, Class<VAL> typeClass) {
 		Adapter<VAL> a = query(type, n.getClass(), typeClass);
+		if (a != null && a.isGetter()) {
+			return a.get(n, this);
+		}
+		throw new AdapterException("AdapterSet.get()");
+	}
+	
+	public <		
+		A extends Annotation, 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,		
+		N extends Node<V, E, F>,
+		VAL
+	> double[] getD(Class<A> type, N n) {
+		Adapter<double[]> a = query(type, n.getClass(), double[].class);
 		if (a != null && a.isGetter()) {
 			return a.get(n, this);
 		}

@@ -13,7 +13,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 
 
 /**
@@ -116,7 +116,7 @@ public class KdTree <
 	public KdTree(HalfEdgeDataStructure<V, E, F> hds, AdapterSet a, int maxBucketSize, boolean useMedian) {
 		this.points = new ArrayList<V>(hds.getVertices());
 		this.maxBucketSize = maxBucketSize;
-		this.posA = a.query(Position.class, hds.getVertexClass(), double[].class);
+		this.posA = a.query(Position3d.class, hds.getVertexClass(), double[].class);
 		if (posA == null) throw new RuntimeException("No position adapter found in KdTree()");
 		if (useMedian) {
         	root = buildKdTree(0, points.size() - 1, 0);
