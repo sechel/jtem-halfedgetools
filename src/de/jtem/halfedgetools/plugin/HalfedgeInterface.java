@@ -99,6 +99,7 @@ import de.jtem.halfedgetools.adapter.generic.FaceAreaAdapter;
 import de.jtem.halfedgetools.adapter.generic.NormalAdapter;
 import de.jtem.halfedgetools.adapter.generic.Position3dAdapter;
 import de.jtem.halfedgetools.adapter.generic.Position4dAdapter;
+import de.jtem.halfedgetools.adapter.generic.SelectionAdapter;
 import de.jtem.halfedgetools.adapter.generic.TexturePosition2dAdapter;
 import de.jtem.halfedgetools.adapter.generic.TexturePosition3dAdapter;
 import de.jtem.halfedgetools.adapter.generic.TexturePosition4dAdapter;
@@ -203,6 +204,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		persistentAdapters.add(new JRNormalAdapter());
 		persistentAdapters.add(new JRPositionAdapter());
 		persistentAdapters.add(new JRTexturePositionAdapter());
+		layerActivationTool.setDescription("Layer Activation");
 		root.addTool(layerActivationTool);
 		root.setTransformation(rootTransform);
 		layerActivationTool.addActionListener(this);

@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.plugin;
+package de.jtem.halfedgetools.adapter.generic;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -7,6 +7,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Selection;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 
 @Selection
 public class SelectionAdapter extends AbstractAdapter<Boolean> {

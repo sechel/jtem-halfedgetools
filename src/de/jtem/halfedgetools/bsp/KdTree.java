@@ -11,7 +11,6 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 
@@ -102,8 +101,7 @@ public class KdTree <
 	private int maxBucketSize; // maximum size of points per cell
 	private  ArrayList<V> points; // HasPosition data
 	private KdNode root; // root node
-	private Adapter<double[]> posA = null;
-	private AdapterSet emptySet = new AdapterSet();
+	private AdapterSet a = null;
 
 	
 	/**
@@ -116,8 +114,7 @@ public class KdTree <
 	public KdTree(HalfEdgeDataStructure<V, E, F> hds, AdapterSet a, int maxBucketSize, boolean useMedian) {
 		this.points = new ArrayList<V>(hds.getVertices());
 		this.maxBucketSize = maxBucketSize;
-		this.posA = a.query(Position3d.class, hds.getVertexClass(), double[].class);
-		if (posA == null) throw new RuntimeException("No position adapter found in KdTree()");
+		this.a = a;
 		if (useMedian) {
         	root = buildKdTree(0, points.size() - 1, 0);
         } else {
@@ -330,7 +327,7 @@ public class KdTree <
 			lower = start;
 			upper = end;
 			do {
-				double[] xPos = posA.get(x, emptySet);
+				double[] xPos = a.getD(Position3d.class, x);
 				while (isSmaller(getPos(lower), xPos, dim)) 
 					lower++;
 				while (isSmaller(xPos, getPos(upper), dim)) 
@@ -590,14 +587,7 @@ public class KdTree <
 	
 	
 	private double[] getPos(int index) {
-		double[] pos = posA.get(points.get(index), emptySet);
-		if (pos.length == 4) {
-			double hom = pos[3];
-			if (hom == 0) hom = 1.0;
-			return new double[] {pos[0] / hom, pos[1] / hom, pos[2] / hom};
-		} else {
-			return pos;
-		}
+		return a.getD(Position3d.class, points.get(index));
 	}
 	
 

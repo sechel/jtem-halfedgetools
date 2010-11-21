@@ -11,7 +11,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import de.jreality.math.Rn;
-import de.jreality.plugin.JRViewerUtility;
 import de.jreality.plugin.basic.View;
 import de.jreality.scene.PointSet;
 import de.jreality.scene.data.Attribute;
@@ -27,13 +26,15 @@ import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeLayer;
+import de.jtem.halfedgetools.plugin.HalfedgeListener;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
-public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragListener {
+public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragListener, HalfedgeListener {
 
 	private HalfedgeInterface
 		hif = null;
@@ -82,13 +83,12 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
-		JRViewerUtility.getContentPlugin(c).addContentTool(tool);
+		hif.addHalfedgeListener(this);
 	}
 
 	@Override
 	public void uninstall(Controller c) throws Exception {
 		super.uninstall(c);
-		JRViewerUtility.getContentPlugin(c).removeContentTool(tool);
 	}
 	
 	
@@ -173,6 +173,22 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 	@Override
 	public Class<? extends SideContainerPerspective> getPerspectivePluginClass() {
 		return View.class;
+	}
+
+	@Override
+	public void dataChanged(HalfedgeLayer layer) {
+		
+	}
+
+	@Override
+	public void adaptersChanged(HalfedgeLayer layer) {
+		
+	}
+
+	@Override
+	public void activeLayerChanged(HalfedgeLayer old, HalfedgeLayer active) {
+		old.getLayerRoot().removeTool(tool);
+		active.getLayerRoot().addTool(tool);
 	}
 	
 }

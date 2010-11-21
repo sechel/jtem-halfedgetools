@@ -123,6 +123,7 @@ public class HalfedgeLayer implements ActionListener {
 		layerRoot.addChild(temporaryRoot);
 		layerRoot.setTransformation(new Transformation("Layer Transform"));
 		layerRoot.setAppearance(new Appearance("Layer Appearance"));
+		actionTool.setDescription("Selection");
 		geometryRoot.addTool(actionTool);
 		selectionRoot.setPickable(false);
 		actionTool.addActionListener(this);
