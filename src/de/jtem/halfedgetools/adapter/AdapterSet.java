@@ -323,6 +323,12 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 			a.set(n, value, this);
 		}
 	}
+
+	public void revalidateAdapters() {
+		for(Adapter<?> a : this) {
+			a.update();
+		}
+	}
 	
 	
 	

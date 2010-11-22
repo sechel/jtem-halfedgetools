@@ -123,4 +123,8 @@ public abstract class Adapter<VAL> implements Comparable<Adapter<VAL>> {
 		return getClass().getSimpleName();
 	}
 	
+
+	public void update() {
+	}
+
 }

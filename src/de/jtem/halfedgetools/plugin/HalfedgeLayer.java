@@ -406,12 +406,6 @@ public class HalfedgeLayer implements ActionListener {
 		}
 	}
 	
-	
-
-	public Map<Integer, ? extends Edge<?, ?, ?>> getEdgeMap() {
-		return edgeMap;
-	}
-	
 	public HalfedgeSelection getSelection() {
 		return selection;
 	}

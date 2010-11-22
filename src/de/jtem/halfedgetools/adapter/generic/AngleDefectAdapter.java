@@ -12,12 +12,12 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.TypedAdapterSet;
-import de.jtem.halfedgetools.adapter.type.GaussianCurvature;
+import de.jtem.halfedgetools.adapter.type.GaussCurvature;
 import de.jtem.halfedgetools.adapter.type.Normal;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.functional.FunctionalUtils;
 
-@GaussianCurvature
+@GaussCurvature
 public class AngleDefectAdapter extends AbstractAdapter<Double> {
 
 	private Map<Edge<?,?,?>,Double> 

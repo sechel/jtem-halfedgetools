@@ -722,6 +722,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		layersTable.revalidate();
 		layersTable.getSelectionModel().setSelectionInterval(index, index);
 		disableListeners = false;
+		getAdapters().revalidateAdapters();
 	}
 	
 	
@@ -1020,7 +1021,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		}
 		fireSelectionChanged(getSelection());
 		fireActiveLayerChanged(old, activeLayer);
-		updateStates();	
+		updateStates();
 	}
 	
 	public HalfedgeLayer getActiveLayer() {
