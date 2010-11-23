@@ -1,11 +1,8 @@
 package de.jtem.halfedgetools.adapter.generic;
 
-import static java.util.logging.Level.WARNING;
-
 import java.util.List;
 
 import de.jreality.math.Rn;
-import de.jreality.util.LoggingSystem;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
@@ -44,7 +41,6 @@ public class TexturePosition2dAdapter extends AbstractAdapter<double[]> {
 		case 2:
 			break;
 		case 3:
-			LoggingSystem.getLogger(a).log(WARNING, "Texture point conversion 3d->2d is discarding dats");
 			r = new double[] {r[0], r[1]};
 			break;
 		case 4:

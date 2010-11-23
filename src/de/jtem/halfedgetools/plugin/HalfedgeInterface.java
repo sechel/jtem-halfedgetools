@@ -985,7 +985,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings("unchecked")
 	private void mergeLayers(HalfedgeLayer layer, HalfedgeLayer mergeLayer) {
 		HalfEdgeDataStructure<?,?,?> hds1 = layer.get();
 		HalfEdgeDataStructure<?,?,?> hds2 = createEmpty(hds1);
