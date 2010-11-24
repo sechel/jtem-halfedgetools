@@ -289,7 +289,8 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 	> VAL getDefault(Class<A> type, N n, VAL defaultValue) {
 		Adapter<VAL> a = query(type, n.getClass(), (Class<VAL>)defaultValue.getClass());
 		if (a != null && a.isGetter()) {
-			return a.get(n, this);
+			VAL r = a.get(n, this);
+			return r != null ? r : defaultValue;
 		} else {
 			return defaultValue;
 		}
