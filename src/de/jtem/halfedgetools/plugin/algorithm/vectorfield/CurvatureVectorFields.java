@@ -27,7 +27,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Normal;
-import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
 import de.jtem.halfedgetools.bsp.KdTree;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -116,7 +116,7 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 		}
 		
 		for (Node<V, E, F> node : nodes) {
-			double[] p = a.get(BaryCenter4d.class, node, double[].class);
+			double[] p = a.get(BaryCenter3d.class, node, double[].class);
 			try {
 				evd = getCurvatureTensor(p, scale * radius, kd, a);
 				double[] n = a.get(Normal.class, node, double[].class);

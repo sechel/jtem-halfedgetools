@@ -745,18 +745,25 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> HDS get(HDS hds) {
-		return activeLayer.get(hds);
+		HDS r = activeLayer.get(hds);
+		updateStates();
+		fireDataChanged();
+		return r;
 	}
 	
 	
 	public void set(Geometry g) {
 		activeLayer.set(g);
+		updateStates();
 		fireDataChanged();
 	}
 	
 	
 	public HalfEdgeDataStructure<?, ?, ?> get() {
-		return activeLayer.get();
+		HalfEdgeDataStructure<?, ?, ?> r = activeLayer.get();
+		updateStates();
+		fireDataChanged();
+		return r;
 	}
 	
 	@SuppressWarnings("unchecked")

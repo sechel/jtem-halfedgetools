@@ -3,6 +3,8 @@ package de.jtem.halfedgetools.jreality;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.data.Attribute;
@@ -11,6 +13,7 @@ import de.jreality.scene.data.DoubleArray;
 import de.jreality.scene.data.DoubleArrayArray;
 import de.jreality.scene.data.IntArrayArray;
 import de.jreality.scene.data.StringArray;
+import de.jreality.util.LoggingSystem;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -59,6 +62,7 @@ public class ConverterHeds2JR {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> IndexedFaceSet heds2ifs(HDS hds, AdapterSet adapters, Map<Integer, Edge<?,?,?>> edgeMap) throws AdapterException {
+		Logger log = LoggingSystem.getLogger(ConverterHeds2JR.class);
 		if (!adapters.isAvailable(Position.class, hds.getVertexClass(), double[].class)) {
 			throw new AdapterException("No vertex position adapter found in ConverterHeds2Jr.heds2ifs");
 		}
@@ -83,9 +87,13 @@ public class ConverterHeds2JR {
 			try {
 				readOutData(adapters, v);
 			} catch (Exception e) {
-				System.err.println("Error reading vertex data: " + e.getLocalizedMessage());
+				log.log(Level.SEVERE, "Error reading vertex data: " + e.getLocalizedMessage());
 				e.printStackTrace();
 			}
+		}
+		if (coordinates.size() != hds.numVertices()) {
+			log.log(Level.SEVERE, "Vertex position adapter returned null array");
+			return new IndexedFaceSet();
 		}
 		ifs.setVertexAttributes(Attribute.COORDINATES, getdoubleArrayArray(coordinates));
 		if(colors.size() == hds.numVertices()) ifs.setVertexAttributes(Attribute.COLORS, getdoubleArrayArray(colors)); 
@@ -108,7 +116,7 @@ public class ConverterHeds2JR {
 			try {
 				readOutData(adapters, e);
 			} catch (Exception ex) {
-				System.err.println("Error reading edge data: " + ex.getLocalizedMessage());
+				log.log(Level.SEVERE, "Error reading edge data: " + ex.getLocalizedMessage());
 				ex.printStackTrace();
 			}
 			k++;
@@ -136,7 +144,7 @@ public class ConverterHeds2JR {
 			try {
 				readOutData(adapters, f);
 			} catch (Exception e) {
-				System.err.println("Error reading face data: " + e.getLocalizedMessage());
+				log.log(Level.SEVERE, "Error reading face data: " + e.getLocalizedMessage());
 				e.printStackTrace();
 			}
 			faceIndices[i++] = face;
