@@ -85,6 +85,7 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 		AdapterSet a,
 		HalfedgeInterface hi
 	){
+		System.out.println("Adapters: \n" + a);
 		KdTree<V, E, F> kd = new KdTree<V, E, F>(hds, a, 10, false);
 		boolean boundaryOnly = onBoundaryChecker.isSelected();
 		double scale = GeometryUtility.getMeanEdgeLength(hds, a);
