@@ -109,4 +109,25 @@ public class FunctionalTestData {
 		constructFaceByVertices(hds, v4, v1, v5);
 	}
 
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void createCombinatorial4Quads(HDS hds) {
+		V v1 = hds.addNewVertex();
+		V v2 = hds.addNewVertex();
+		V v3 = hds.addNewVertex();
+		V v4 = hds.addNewVertex();
+		V v5 = hds.addNewVertex();
+		V v6 = hds.addNewVertex();
+		V v7 = hds.addNewVertex();
+		V v8 = hds.addNewVertex();
+		V v9 = hds.addNewVertex();
+		constructFaceByVertices(hds, v2, v1, v4, v5);
+		constructFaceByVertices(hds, v3, v2, v5, v6);
+		constructFaceByVertices(hds, v5, v4, v7, v8);
+		constructFaceByVertices(hds, v6, v5, v8, v9);		
+	}
+
 }
