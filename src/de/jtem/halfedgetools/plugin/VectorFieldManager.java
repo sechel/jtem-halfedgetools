@@ -1,11 +1,13 @@
 package de.jtem.halfedgetools.plugin;
 
+import static de.jreality.scene.Appearance.DEFAULT;
 import static de.jreality.shader.CommonAttributes.DEPTH_FUDGE_FACTOR;
 import static de.jreality.shader.CommonAttributes.DIFFUSE_COLOR;
 import static de.jreality.shader.CommonAttributes.EDGE_DRAW;
 import static de.jreality.shader.CommonAttributes.LINE_SHADER;
 import static de.jreality.shader.CommonAttributes.LINE_WIDTH;
 import static de.jreality.shader.CommonAttributes.PICKABLE;
+import static de.jreality.shader.CommonAttributes.TEXTURE_2D;
 import static de.jreality.shader.CommonAttributes.TUBES_DRAW;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 import static java.awt.GridBagConstraints.BOTH;
@@ -53,7 +55,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.VectorField;
-import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
 import de.jtem.halfedgetools.util.GeometryUtility;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -179,11 +181,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 			double[] v = vec.get(node, aSet);
 			if (v == null) continue;
 			v = v.clone();
-			double[] p = aSet.get(BaryCenter4d.class, node, double[].class);
-			if (p.length == 4) {
-				double hom = p[3] == 0 ? 1.0 : p[3];
-				p = new double[] {p[0] / hom, p[1] / hom, p[2] / hom};
-			}
+			double[] p = aSet.getD(BaryCenter3d.class, node);
 			Rn.normalize(v, v);
 			Rn.times(v, posScale, v);
 			vData.add(Rn.add(null, p, v));
@@ -212,7 +210,10 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 	    bsf.setShowSticks(true);
 	    bsf.setStickRadius(scale);
 		bsf.update();
-		return bsf.getSceneGraphComponent();
+		
+		SceneGraphComponent c = bsf.getSceneGraphComponent();
+		c.getAppearance().setAttribute(TEXTURE_2D, DEFAULT);
+		return c;
 	}
 	
 	
@@ -243,7 +244,9 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 		
 		@Override
 		public int getRowCount() {
-			return hif.getAdapters().queryAll(VectorField.class, double[].class).size();
+			AdapterSet a = hif.getAdapters();
+			a.queryAll(VectorField.class, double[].class);
+			return a.queryAll(VectorField.class, double[].class).size();
 		}
 		
 		@Override
@@ -343,10 +346,11 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 				vecApp.setAttribute(LINE_SHADER + "." + TUBES_DRAW, false);
 				vecApp.setAttribute(LINE_SHADER + "." + LINE_WIDTH, 1.0);
 				vecApp.setAttribute(LINE_SHADER + "." + PICKABLE, false);
-				c = new SceneGraphComponent(vec.toString());
+				c = new SceneGraphComponent();
 				c.setAppearance(vecApp);
 				c.setGeometry(ils);
 			}
+			c.setName(vec.toString());
 			hif.getActiveLayer().addTemporaryGeometry(c);
 			activeFields.put(vec, c);
 		} else {

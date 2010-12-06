@@ -19,7 +19,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Normal;
-import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.bsp.KdTree;
 import de.jtem.halfedgetools.bsp.KdUtility;
 
@@ -120,9 +120,9 @@ public class CurvatureUtility {
 		V v1 = b.getStartVertex();
 		V v2 = b.getTargetVertex();
 		V v3 = b.getNextEdge().getTargetVertex();
-		double[] p1 = a.get(Position.class, v1, double[].class);
-		double[] p2 = a.get(Position.class, v2, double[].class);
-		double[] p3 = a.get(Position.class, v3, double[].class);
+		double[] p1 = a.getD(Position3d.class, v1);
+		double[] p2 = a.getD(Position3d.class, v2);
+		double[] p3 = a.getD(Position3d.class, v3);
 		double[] d1 = Rn.subtract(null, p2, p1);
 		double[] d2 = Rn.subtract(null, p3, p1);
 		double[] cr = Rn.crossProduct(null, d1, d2);
@@ -292,8 +292,8 @@ public class CurvatureUtility {
 		if (lf == null || rf == null) {
 			return 0;
 		}
-		double[] ln = a.get(Normal.class, lf, double[].class);
-		double[] rn = a.get(Normal.class, rf, double[].class);
+		double[] ln = a.getD(Normal.class, lf);
+		double[] rn = a.getD(Normal.class, rf);
 		return curvatureSign(e, a) * Rn.euclideanAngle(ln, rn);
 	}
 	
@@ -309,8 +309,8 @@ public class CurvatureUtility {
 	){
 		Matrix m = MatrixBuilder.euclidean().getMatrix();
 		m.setColumn(0, getVector(e, a));
-		m.setColumn(1, a.get(Normal.class, e.getLeftFace(), double[].class));
-		m.setColumn(2, a.get(Normal.class, e.getRightFace(), double[].class));
+		m.setColumn(1, a.getD(Normal.class, e.getLeftFace()));
+		m.setColumn(2, a.getD(Normal.class, e.getRightFace()));
 		double det = m.getDeterminant() ;
 		if(Math.abs(det) < 1E-10) {
 			return 0;
@@ -328,8 +328,8 @@ public class CurvatureUtility {
 		E e,
 		AdapterSet a
 	){
-    	double[] pos1 = a.get(Position.class, e.getStartVertex(), double[].class);
-    	double[] pos2 = a.get(Position.class, e.getTargetVertex(), double[].class);
+    	double[] pos1 = a.getD(Position3d.class, e.getStartVertex());
+    	double[] pos2 = a.getD(Position3d.class, e.getTargetVertex());
     	return Rn.euclideanDistance(pos1, pos2);
 	}
     
@@ -341,8 +341,8 @@ public class CurvatureUtility {
 		E e,
 		AdapterSet a
 	){
-    	double[] pos1 = a.get(Position.class, e.getTargetVertex(), double[].class);
-    	double[] pos2 = a.get(Position.class, e.getStartVertex(), double[].class);
+    	double[] pos1 = a.getD(Position3d.class, e.getTargetVertex());
+    	double[] pos2 = a.getD(Position3d.class, e.getStartVertex());
 		return Rn.subtract(null, pos1, pos2);
     	
     }
