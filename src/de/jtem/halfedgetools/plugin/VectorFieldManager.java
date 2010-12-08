@@ -21,14 +21,19 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -62,7 +67,7 @@ import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
-public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListener, HalfedgeListener {
+public class VectorFieldManager extends ShrinkPanelPlugin implements ActionListener, ChangeListener, HalfedgeListener {
 	
 	private SpinnerNumberModel
 		lengthModel = new SpinnerNumberModel(1.0, 0.0, 10.0, 0.1),
@@ -81,6 +86,8 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 		fieldScrollPane = new JScrollPane(fieldTable);
 	private Map<Adapter<double[]>, SceneGraphComponent>
 		activeFields = new HashMap<Adapter<double[]>, SceneGraphComponent>();
+	private JButton
+		updateButton = new JButton("Update");
 	private HalfedgeInterface 
 		hif = null;
 	
@@ -106,6 +113,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 		shrinkPanel.add(directedChecker, c);
 		c.gridwidth = REMAINDER;
 		shrinkPanel.add(tubesChecker, c);
+		shrinkPanel.add(updateButton, c);
 		
 		fieldTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
 		fieldTable.getDefaultEditor(Boolean.class).addCellEditorListener(new VectorFieldActivationListener());
@@ -117,9 +125,8 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 		c.weighty = 1.0;
 		fieldScrollPane.setPreferredSize(new Dimension(10, 150));
 		shrinkPanel.add(fieldScrollPane,c);
-		
+		updateButton.addActionListener(this);
 	}
-	
 	
 	@Override
 	public void activeLayerChanged(HalfedgeLayer old, HalfedgeLayer active) {
@@ -157,7 +164,14 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 		panel.updateUI();
 	}
 	
-	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Set<Adapter<double[]>> active = new HashSet<Adapter<double[]>>(activeFields.keySet());
+		for (Adapter<double[]> a : active) {
+			setActive(a, false);
+			setActive(a, true);
+		}
+	}
 	
 	private < 
 		V extends Vertex<V, E, F>,
@@ -221,13 +235,19 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 	
 	@Override
 	public void storeStates(Controller c) throws Exception {
-		c.storeProperty(getClass(), "normalLength", lengthModel.getNumber());
+		c.storeProperty(getClass(), "length", lengthModel.getNumber());
+		c.storeProperty(getClass(), "thickness", thicknessModel.getNumber());
+		c.storeProperty(getClass(), "directed", directedChecker.isSelected());
+		c.storeProperty(getClass(), "tubes", tubesChecker.isSelected());
 	}
 	
 	
 	@Override
 	public void restoreStates(Controller c) throws Exception {
 		lengthModel.setValue(c.getProperty(getClass(), "normalLength", lengthModel.getNumber()));
+		thicknessModel.setValue(c.getProperty(getClass(), "thickness", thicknessModel.getNumber()));
+		directedChecker.setSelected(c.getProperty(getClass(), "directed", directedChecker.isSelected()));
+		tubesChecker.setSelected(c.getProperty(getClass(), "tubes", tubesChecker.isSelected()));
 	}
 	
 	@Override
@@ -362,6 +382,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 				hif.getActiveLayer().removeTemporaryGeometry(c);
 			}
 		}
+		System.gc();
 	}
 
 	private boolean isActive(Adapter<double[]> a) {

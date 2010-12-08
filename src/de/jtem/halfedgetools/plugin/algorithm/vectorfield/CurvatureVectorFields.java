@@ -139,19 +139,19 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 		
 		switch (nodeTypeCombo.getSelectedIndex()) {
 			case 0: default: 
-				k1Adapter = new VertexVectorFielAdapter(k1Map, "K1 Curvature Field"); 
-				k2Adapter = new VertexVectorFielAdapter(k2Map, "K2 Curvature Field"); 
-				nAdapter = new VertexVectorFielAdapter(nMap, "Normals"); 
+				k1Adapter = new VertexVectorFielAdapter(k1Map, "K1 on Vertices"); 
+				k2Adapter = new VertexVectorFielAdapter(k2Map, "K2 on Vertices"); 
+				nAdapter = new VertexVectorFielAdapter(nMap, "Vertex Normals"); 
 				break;
 			case 1: 
-				k1Adapter = new EdgeVectorFielAdapter(k1Map, "K1 Curvature Field"); 
-				k2Adapter = new EdgeVectorFielAdapter(k2Map, "K2 Curvature Field"); 
-				nAdapter = new EdgeVectorFielAdapter(nMap, "Normals"); 
+				k1Adapter = new EdgeVectorFielAdapter(k1Map, "K1 on Edges"); 
+				k2Adapter = new EdgeVectorFielAdapter(k2Map, "K2 on Edges"); 
+				nAdapter = new EdgeVectorFielAdapter(nMap, "Edge Normals"); 
 				break;
 			case 2: 
-				k1Adapter = new FaceVectorFielAdapter(k1Map, "K1 Curvature Field"); 
-				k2Adapter = new FaceVectorFielAdapter(k2Map, "K2 Curvature Field"); 
-				nAdapter = new FaceVectorFielAdapter(nMap, "Normals"); 
+				k1Adapter = new FaceVectorFielAdapter(k1Map, "K1 on Faces"); 
+				k2Adapter = new FaceVectorFielAdapter(k2Map, "K2 on Faces"); 
+				nAdapter = new FaceVectorFielAdapter(nMap, "Face Normals"); 
 				break;
 		}
 		
