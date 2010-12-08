@@ -7,6 +7,7 @@ import static de.jreality.shader.CommonAttributes.EDGE_DRAW;
 import static de.jreality.shader.CommonAttributes.LINE_SHADER;
 import static de.jreality.shader.CommonAttributes.LINE_WIDTH;
 import static de.jreality.shader.CommonAttributes.PICKABLE;
+import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
 import static de.jreality.shader.CommonAttributes.TEXTURE_2D;
 import static de.jreality.shader.CommonAttributes.TUBES_DRAW;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
@@ -212,7 +213,8 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ChangeListe
 		bsf.update();
 		
 		SceneGraphComponent c = bsf.getSceneGraphComponent();
-		c.getAppearance().setAttribute(TEXTURE_2D, DEFAULT);
+		Appearance app = c.getAppearance();
+		app.setAttribute(POLYGON_SHADER + "." + TEXTURE_2D, DEFAULT); 
 		return c;
 	}
 	

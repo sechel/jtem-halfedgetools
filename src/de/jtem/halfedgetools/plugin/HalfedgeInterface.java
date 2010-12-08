@@ -886,6 +886,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		}
 	}
 	
+	
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
@@ -944,6 +945,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		PluginInfo info = new PluginInfo();
 		info.name = "Halfedge JReality Interface";
 		info.vendorName = "Stefan Sechelmann";
+		info.icon = ImageHook.getIcon("asterisk_orange.png");
 		return info;
 	}
 	
