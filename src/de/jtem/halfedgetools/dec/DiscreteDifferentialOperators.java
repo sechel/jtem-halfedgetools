@@ -1,17 +1,19 @@
 package de.jtem.halfedgetools.dec;
 
 import java.util.Iterator;
+import java.util.List;
 
 import no.uib.cipr.matrix.Matrix;
 import no.uib.cipr.matrix.MatrixEntry;
+import no.uib.cipr.matrix.sparse.CompColMatrix;
 import no.uib.cipr.matrix.sparse.CompDiagMatrix;
 import no.uib.cipr.matrix.sparse.FlexCompColMatrix;
-import no.uib.cipr.matrix.sparse.FlexCompRowMatrix;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.TriangleVolumeAdapter;
 import de.jtem.halfedgetools.adapter.type.CircumCenter;
@@ -133,15 +135,12 @@ public class DiscreteDifferentialOperators
 				return new CompDiagMatrix(heds.numVertices(),1); 			
 			case 0:
 			{
-				Matrix D0 = new FlexCompRowMatrix(heds.numEdges()/2,heds.numVertices());
-				getBoundaryOperator(heds,adapters,0).transpose(D0);
-				return D0;
+				
+				return getBoundaryOperator(heds,adapters,0).transpose();
 			}
 			case 1:
 			{
-				Matrix D1 = new FlexCompRowMatrix(heds.numFaces(),heds.numEdges()/2);
-				getBoundaryOperator(heds,adapters,1).transpose(D1);
-				return D1;
+				return getBoundaryOperator(heds,adapters,1).transpose();
 			}
 			case 2:
 				return new CompDiagMatrix(1,heds.numFaces()); 
@@ -162,8 +161,7 @@ public class DiscreteDifferentialOperators
 		switch (dim) {
 			case -1:
 			{
-				M =  new CompDiagMatrix(1,heds.numVertices());
-				break;
+				return new CompDiagMatrix(1,heds.numVertices());
 			}
 			case 0:
 			{
@@ -181,8 +179,7 @@ public class DiscreteDifferentialOperators
 			}
 			case 2:
 			{
-				M =  new CompDiagMatrix(heds.numFaces(),1);
-				break;
+				return new CompDiagMatrix(heds.numFaces(),1);
 			}
 		}
  		return M;
@@ -266,17 +263,36 @@ public class DiscreteDifferentialOperators
 			return new CompDiagMatrix(1,heds.numVertices());
 		}
 		case 0:
-			Matrix d0 = new FlexCompColMatrix(heds.numVertices(),heds.numEdges()/2);
-			for(E e : heds.getEdges()) {
-				if(e.isPositive()) {
-					int j = adapters.get(EdgeIndex.class,e,Integer.class);
-					d0.set(e.getStartVertex().getIndex(),j,-1.0);
-					d0.set(e.getTargetVertex().getIndex(),j,1.0);
-				}
+		{
+			int[][] nz = new int[heds.numEdges()/2][2];
+			for(E e : heds.getPositiveEdges()) {
+				int j = adapters.get(EdgeIndex.class,e,Integer.class);
+				nz[j][0] = e.getStartVertex().getIndex();
+				nz[j][1] = e.getTargetVertex().getIndex();
+			}
+			Matrix d0 = new CompColMatrix(heds.numVertices(), heds.numEdges()/2, nz);
+			for(E e : heds.getPositiveEdges()) {
+				int j = adapters.get(EdgeIndex.class,e,Integer.class);
+				d0.set(e.getStartVertex().getIndex(),j,-1.0);
+				d0.set(e.getTargetVertex().getIndex(),j,1.0);
 			}
 			return d0;
+		}
 		case 1:
-			Matrix d1 = new FlexCompColMatrix(heds.numEdges()/2,heds.numFaces());
+		{
+			int[][] nz = new int[heds.numFaces()][];  
+			for(F f : heds.getFaces()) {
+				int j = f.getIndex();
+				List<E> edges = HalfEdgeUtils.boundaryEdges(f);
+				nz[j] = new int[edges.size()];
+				int i = 0;
+				for(E e : edges) {
+					int ei = adapters.get(EdgeIndex.class,e,Integer.class);
+					nz[j][i] = ei;
+					i++;
+				}
+			}
+			Matrix d1 = new CompColMatrix(heds.numEdges()/2,heds.numFaces(),nz);
 			for(F f : heds.getFaces()) {
 				int j = f.getIndex();
 				E e = f.getBoundaryEdge();
@@ -288,6 +304,7 @@ public class DiscreteDifferentialOperators
 				} while(e != f.getBoundaryEdge());
 			}
 			return d1;
+		}
 		case 2:
 			{
 				return new CompDiagMatrix(heds.numFaces(),1); 
