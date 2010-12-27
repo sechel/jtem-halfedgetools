@@ -174,6 +174,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	private ActionTool
 		layerActivationTool = new ActionTool("PrimaryAction");
 	private boolean
+		showBoundingBox = false,
 		disableListeners = false;
 	private List<SelectionListener>	
 		selectionListeners = new LinkedList<SelectionListener>();
@@ -1140,6 +1141,15 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	public boolean isSelected(Node<?,?,?> n) {
 		return getSelection().isSelected(n);
+	}
+	
+	public boolean isShowBoundingBox() {
+		return showBoundingBox;
+	}
+	
+	protected void setShowBoundingBox(boolean showBoundingBox) {
+		this.showBoundingBox = showBoundingBox;
+		getActiveLayer().updateBoundingBox();
 	}
 
 }

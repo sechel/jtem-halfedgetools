@@ -24,13 +24,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
 import de.jreality.geometry.BoundingBoxUtility;
 import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.geometry.ThickenedSurfaceFactory;
-import de.jreality.math.Matrix;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.Geometry;
 import de.jreality.scene.IndexedFaceSet;
@@ -43,6 +44,7 @@ import de.jreality.scene.data.DoubleArrayArray;
 import de.jreality.scene.pick.PickResult;
 import de.jreality.scene.tool.ToolContext;
 import de.jreality.tools.ActionTool;
+import de.jreality.util.LoggingSystem;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 import de.jtem.halfedge.Edge;
@@ -58,6 +60,8 @@ import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
 
 public class HalfedgeLayer implements ActionListener {
 
+	private static Logger
+		layerLogger = LoggingSystem.getLogger(HalfedgeLayer.class);
 	private HalfedgeInterface
 		hif = null;
 	private HalfEdgeDataStructure<?, ?, ?>
@@ -212,12 +216,6 @@ public class HalfedgeLayer implements ActionListener {
 		layerRoot.addChild(visualizersRoot);
 	}
 	
-	protected void setBoundingBox(Rectangle3D bbox, Matrix T) {
-		BoundingBoxUtility.removeZeroExtends(bbox);
-		IndexedFaceSet bBoxGeometry = IndexedFaceSetUtility.representAsSceneGraph(bbox);
-		boundingBoxRoot.setGeometry(bBoxGeometry);
-		boundingBoxRoot.setTransformation(new Transformation(T.getArray()));
-	}
 	
 	public <
 		V extends Vertex<V, E, F>,
@@ -448,11 +446,13 @@ public class HalfedgeLayer implements ActionListener {
 	
 	
 	protected void updateBoundingBox() {
-		Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(geometryRoot);
+		boundingBoxRoot.setGeometry(null);
+		Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(layerRoot);
 		BoundingBoxUtility.removeZeroExtends(bbox);
 		IndexedFaceSet ifs = IndexedFaceSetUtility.representAsSceneGraph(bbox);
 		ifs.setName("Bounding Box");
 		boundingBoxRoot.setGeometry(ifs);
+		boundingBoxRoot.setVisible(hif.isShowBoundingBox());
 	}
 	
 	
@@ -591,7 +591,11 @@ public class HalfedgeLayer implements ActionListener {
 	}
 	
 	public void removeTemporaryGeometry(SceneGraphComponent root) {
-		SceneGraphUtility.removeChildNode(temporaryRoot, root);
+		try {
+			SceneGraphUtility.removeChildNode(temporaryRoot, root);
+		} catch (Exception e) {
+			layerLogger.log(Level.FINEST, e.getMessage());
+		}
 	}
 	
 	

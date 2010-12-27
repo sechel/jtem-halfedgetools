@@ -198,6 +198,7 @@ public class HalfedgePluginFactory {
 		s.addAll(createEditorModePlugins());
 		s.add(new VectorFieldManager());
 		s.add(new CurvatureVectorFields());
+		s.add(new HalfedgePreferencePage());
 		return s;
 	}
 	
