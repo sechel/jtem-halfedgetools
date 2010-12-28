@@ -297,6 +297,9 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 	}
 	
 	
+	private Map<Long, Object>
+		queryCache8 = new HashMap<Long, Object>();
+	
 	/**
 	 * Sets a node value via a matching adapter. This operation might
 	 * not do anything if there is no adapter.
@@ -319,9 +322,19 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		N extends Node<V, E, F>,
 		VAL
 	> void set(Class<A> type, N n, VAL value) {
-		Adapter<VAL> a = query(type, n.getClass(), (Class<VAL>)value.getClass());
-		if (a != null && a.isSetter()) {
-			a.set(n, value, this);
+		long hash = type.hashCode() + n.getClass().hashCode() + value.getClass().hashCode();
+		Adapter<VAL> setter = (Adapter<VAL>)queryCache8.get(hash);
+		if (setter != null) {
+			setter.set(n, value, this);
+			return;
+		}
+		List<Adapter<VAL>> aList = queryAll(type, n.getClass(), (Class<VAL>)value.getClass());
+		for (Adapter<VAL> a : aList) {
+			if (a.isSetter()) {
+				a.set(n, value, this);
+				queryCache8.put(hash, a);
+				break;
+			}
 		}
 	}
 
@@ -419,6 +432,7 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		queryCache5.clear();
 		queryCache6.clear();
 		queryCache7.clear();
+		queryCache8.clear();
 		paramCache.clear();
 	}
 	
