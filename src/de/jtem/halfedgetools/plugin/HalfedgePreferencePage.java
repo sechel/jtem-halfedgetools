@@ -53,7 +53,7 @@ public class HalfedgePreferencePage extends Plugin implements PreferencesFlavor,
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
-		hif.setShowBoundingBox(showBoundingBoxChecker.isSelected());
+		hif.setShowBoundingBox(c.getProperty(getClass(), "showBoundingBox", false));
 	}
 	
 	
