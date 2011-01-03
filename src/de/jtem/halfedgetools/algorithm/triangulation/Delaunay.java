@@ -48,7 +48,7 @@ public class Delaunay {
 	
 	
 	/**
-	 * Checks wether this edge is locally delaunay
+	 * Checks if this edge is locally delaunay
 	 * @param edge the edge to check
 	 * @return the check result
 	 * @throws TriangulationException
