@@ -189,9 +189,10 @@ public class HalfedgeLayer implements ActionListener {
 		return r;
 	}
 	
-	private AdapterSet getEffectiveAdapters() {
+	protected AdapterSet getEffectiveAdapters() {
 		AdapterSet effectiveAdapters = new AdapterSet();
-		effectiveAdapters.addAll(hif.getGlobalAdapters());
+		effectiveAdapters.addAll(hif.getPersistantAdapters());
+		effectiveAdapters.addAll(hif.getVolatileAdapters());
 		effectiveAdapters.addAll(getAllAdapters());
 		effectiveAdapters.addAll(getVisualizerAdapters());
 		return effectiveAdapters;
@@ -308,6 +309,7 @@ public class HalfedgeLayer implements ActionListener {
 	public void set(Geometry g) {
 		setNoUndo(g);
 		updateUndoList();
+		updateNoUndo(); // update visualizers
 	}
 	
 	@SuppressWarnings("unchecked")

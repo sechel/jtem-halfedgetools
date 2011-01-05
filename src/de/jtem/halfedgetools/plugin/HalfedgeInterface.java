@@ -736,8 +736,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		activeLayer.set(hds);
 		updateStates();
 		checkContent();
-		volatileAdapters.clear();
 		fireDataChanged();
+		volatileAdapters.clear();
 	}
 	
 	public <
@@ -748,7 +748,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	> HDS get(HDS hds) {
 		HDS r = activeLayer.get(hds);
 		updateStates();
-		fireDataChanged();
+//		fireDataChanged();
 		return r;
 	}
 	
@@ -786,24 +786,28 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		activeLayer.update();
 		updateStates();
 		checkContent();
+		fireDataChanged();
 	}
 	
 	public void updateNoUndo() {
 		activeLayer.updateNoUndo();
 		updateStates();
 		checkContent();
+		fireDataChanged();
 	}
 	
 	public void updateGeometry(Adapter<double[]> positionAdapter) {
 		activeLayer.updateGeometry(positionAdapter);
 		updateStates();
 		checkContent();
+		fireDataChanged();
 	}
 	
 	public void updateGeometryNoUndo(Adapter<double[]> positionAdapter) {
 		activeLayer.updateGeometryNoUndo(positionAdapter);
 		updateStates();
 		checkContent();
+		fireDataChanged();
 	}
 	
 
@@ -854,7 +858,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	public boolean addLayerAdapter(Adapter<?> a, boolean persistent) {
-		boolean result = activeLayer.addAdapter(a,persistent);
+		boolean result = activeLayer.addAdapter(a, persistent);
 		fireAdaptersChanged();
 		return result;
 	}
