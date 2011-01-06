@@ -234,20 +234,15 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 	}
 	
 	
-	private class PlanarityValueAdapter extends AbstractAdapter<Number> {
+	private class PlanarityValueAdapter extends AbstractAdapter<Double> {
 		
 		public PlanarityValueAdapter() {
-			super(Number.class, true, false);
+			super(Double.class, true, false);
 		}
 
 		@Override
 		public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
 			return Face.class.isAssignableFrom(nodeClass);
-		}
-		
-		@Override
-		public boolean checkType(Class<?> typeClass) {
-			return super.checkType(typeClass);
 		}
 		
 		@Override
@@ -260,7 +255,7 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 			V extends Vertex<V, E, F>,
 			E extends Edge<V, E, F>,
 			F extends Face<V, E, F>
-		> Number getF(F f, AdapterSet a) {
+		> Double getF(F f, AdapterSet a) {
 			return getRelativeUnevenness(f, a);
 		}
 		

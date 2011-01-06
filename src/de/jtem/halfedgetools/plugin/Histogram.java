@@ -27,7 +27,7 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
-public class ScalarHistogram extends ShrinkPanelPlugin implements HalfedgeListener {
+public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener {
 
 	private HalfedgeInterface
 		hif = null;
@@ -48,8 +48,8 @@ public class ScalarHistogram extends ShrinkPanelPlugin implements HalfedgeListen
 	private ChartPanel
 		chartPanel = new ChartPanel(chart);
 	
-	public ScalarHistogram() {
-		shrinkPanel.setTitle("Scalar Histogram");
+	public Histogram() {
+		shrinkPanel.setTitle("Histogram");
 		chartPanel.setMinimumSize(new Dimension(10, 200));
 		setInitialPosition(SHRINKER_TOP);
 		GridBagConstraints c = new GridBagConstraints();
@@ -80,6 +80,7 @@ public class ScalarHistogram extends ShrinkPanelPlugin implements HalfedgeListen
 	}
 	
 	private void updateHistograms(HalfedgeLayer l) {
+		HalfEdgeDataStructure<?, ?, ?> hds = l.get();
 		AdapterSet aSet = l.getEffectiveAdapters();
 		TypedAdapterSet<Number> numSet = aSet.querySet(Number.class);
 		dataSet = new HistogramDataset();
@@ -87,22 +88,29 @@ public class ScalarHistogram extends ShrinkPanelPlugin implements HalfedgeListen
 			plot.setDataset(dataSet);
 			return;
 		}
-		HalfEdgeDataStructure<?, ?, ?> hds = l.get();
 		for (Adapter<?> a : numSet) {
+			String name = a.toString().replace("Adapter", "");
 			if (a.canAccept(hds.getVertexClass())) { // create vertex histogram
 				double[] data = getData(hds.getVertices(), (Adapter<?>)a, aSet);
-				dataSet.addSeries(a.toString(), data, numBins);
+				if (data.length > 0) {
+					dataSet.addSeries(name, data, numBins);
+				}
 			}
 			if (a.canAccept(hds.getEdgeClass())) { // create edge histogram
 				double[] data = getData(hds.getEdges(), (Adapter<?>)a, aSet);
-				dataSet.addSeries(a.toString(), data, numBins);
+				if (data.length > 0) {
+					dataSet.addSeries(name, data, numBins);
+				}
 			}
 			if (a.canAccept(hds.getFaceClass())) { // create face histogram
 				double[] data = getData(hds.getFaces(), (Adapter<?>)a, aSet);
-				dataSet.addSeries(a.toString(), data, numBins);
+				if (data.length > 0) {
+					dataSet.addSeries(name, data, numBins);
+				}
 			}
 		}
 		plot.setDataset(dataSet);
+		chartPanel.restoreAutoBounds();
 	}
 	
 	
@@ -145,7 +153,7 @@ public class ScalarHistogram extends ShrinkPanelPlugin implements HalfedgeListen
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = super.getPluginInfo();
-		info.name = "Scalar Histogram View";
+		info.name = "Histogram View";
 		info.vendorName = "Stefan Sechelmann";
 		info.email = "sechel@math.tu-berlin.de";
 		try {
@@ -156,7 +164,7 @@ public class ScalarHistogram extends ShrinkPanelPlugin implements HalfedgeListen
 
 	public static void main(String[] args) {
 		JRViewer v = new JRViewer();
-		v.registerPlugin(new ScalarHistogram());
+		v.registerPlugin(new Histogram());
 		v.startup();
 	}
 	

@@ -16,7 +16,7 @@ public abstract class AbstractAdapter<VAL> extends Adapter<VAL> {
 	
 	@Override
 	public boolean checkType(Class<?> typeClass) {
-		return this.typeClass.isAssignableFrom(typeClass);
+		return typeClass.isAssignableFrom(this.typeClass);
 	}
 	
 	@Override

@@ -199,7 +199,7 @@ public class HalfedgePluginFactory {
 		s.add(new VectorFieldManager());
 		s.add(new CurvatureVectorFields());
 		s.add(new HalfedgePreferencePage());
-		s.add(new ScalarHistogram());
+		s.add(new Histogram());
 		return s;
 	}
 	

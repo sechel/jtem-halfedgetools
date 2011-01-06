@@ -50,7 +50,7 @@ public abstract class AbstractTypedAdapter<
 	
 	@Override
 	public boolean checkType(Class<?> typeClass) {
-		return this.typeClass.isAssignableFrom(typeClass);
+		return typeClass.isAssignableFrom(this.typeClass);
 	}
 	
 
