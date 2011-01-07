@@ -1,11 +1,23 @@
 package de.jtem.halfedgetools.plugin;
 
+import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
+
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Paint;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -47,16 +59,36 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener {
 		chart = new JFreeChart(plot);
 	private ChartPanel
 		chartPanel = new ChartPanel(chart);
+	private JTable
+		adapterTable = new JTable();
+	private JScrollPane
+		adapterScrollPane = new JScrollPane(adapterTable);
+	
+	private List<Adapter<Number>>
+		availableSet = new ArrayList<Adapter<Number>>(),
+		activeSet = new ArrayList<Adapter<Number>>();
 	
 	public Histogram() {
 		shrinkPanel.setTitle("Histogram");
-		chartPanel.setMinimumSize(new Dimension(10, 200));
+		chartPanel.setMinimumSize(new Dimension(300, 250));
 		setInitialPosition(SHRINKER_TOP);
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 1;
+		c.gridwidth = GridBagConstraints.RELATIVE;
 		c.weighty = 1;
+		c.weightx = 0;
+		shrinkPanel.add(adapterScrollPane, c);
+		c.gridwidth = GridBagConstraints.REMAINDER;
+		c.weightx = 1;
 		shrinkPanel.add(chartPanel, c);
+		
+		adapterScrollPane.setMinimumSize(new Dimension(150, 250));
+		adapterTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
+		TableCellEditor boolEditor = adapterTable.getDefaultEditor(Boolean.class);
+		boolEditor.addCellEditorListener(new DataActivationListener());	
+		adapterTable.setRowHeight(22);
+		adapterTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
+		adapterTable.setBorder(BorderFactory.createEtchedBorder());
 		
 		domainAxis.setAutoRange(true);
 		rangeAxis.setAutoRange(true);
@@ -65,7 +97,86 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener {
 		chartPanel.zoomOutBoth(2.0, 2.0);
 		chartPanel.restoreAutoBounds();
 	}
+	
+	
+	private class DataTableModel extends DefaultTableModel {
 
+		private static final long 
+			serialVersionUID = 1L;
+		
+		@Override
+		public int getRowCount() {
+			return availableSet.size();
+		}
+		
+		@Override
+		public int getColumnCount() {
+			return 2;
+		}
+		
+		@Override
+		public Class<?> getColumnClass(int columnIndex) {
+			switch (columnIndex) {
+				case 0: return Boolean.class;
+				default: return String.class;
+			}
+		}
+		
+		@Override
+		public Object getValueAt(int row, int column) {
+			if (row < 0 || row >= availableSet.size()) {
+				return "-";
+			}
+			Adapter<Number> op = availableSet.get(row);
+			Object value = null;
+			switch (column) {
+				case 0: 
+					return activeSet.contains(op);
+				case 1:
+					return op.toString().replace("Adapter", "");
+				default: 
+					value = "-";
+					break;
+			}
+			return value;
+		}
+		
+		@Override
+		public boolean isCellEditable(int row, int column) {
+			switch (column) {
+				case 0:
+					return true;
+				default: 
+					return false;
+			}
+		}
+		
+		
+	}
+	
+	private class DataActivationListener implements CellEditorListener {
+
+		@Override
+		public void editingCanceled(ChangeEvent e) {
+		}
+
+		@Override
+		public void editingStopped(ChangeEvent e) {
+			int row = adapterTable.getSelectedRow();
+			if (adapterTable.getRowSorter() != null) {
+				row = adapterTable.getRowSorter().convertRowIndexToModel(row);
+			}
+			Adapter<Number> op = availableSet.get(row);
+			if (activeSet.contains(op)) {
+				activeSet.remove(op);
+			} else {
+				activeSet.add(op);
+			}
+			updateActive(hif.getActiveLayer());
+			adapterTable.revalidate();
+		}
+		
+	}
 	
 	private class ColoredXYBarRenderer extends XYBarRenderer {
 		
@@ -79,16 +190,26 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener {
 		
 	}
 	
-	private void updateHistograms(HalfedgeLayer l) {
+	private void updateAdapterTable() {
+		adapterTable.setModel(new DataTableModel());
+		adapterTable.getColumnModel().getColumn(0).setMaxWidth(30);
+	}
+	
+	private void updateActive(HalfedgeLayer l) {
 		HalfEdgeDataStructure<?, ?, ?> hds = l.get();
 		AdapterSet aSet = l.getEffectiveAdapters();
-		TypedAdapterSet<Number> numSet = aSet.querySet(Number.class);
 		dataSet = new HistogramDataset();
-		if (numSet.isEmpty()) {
+		if (activeSet.size() == 0 ||
+			hds.numVertices() == 0 ||
+			hds.numEdges() == 0 ||
+			hds.numFaces() == 0
+		) {
 			plot.setDataset(dataSet);
+			chartPanel.restoreAutoBounds();
+			updateAdapterTable();
 			return;
 		}
-		for (Adapter<?> a : numSet) {
+		for (Adapter<? extends Number> a : activeSet) {
 			String name = a.toString().replace("Adapter", "");
 			if (a.canAccept(hds.getVertexClass())) { // create vertex histogram
 				double[] data = getData(hds.getVertices(), (Adapter<?>)a, aSet);
@@ -111,6 +232,34 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener {
 		}
 		plot.setDataset(dataSet);
 		chartPanel.restoreAutoBounds();
+		updateAdapterTable();
+	}
+
+	
+	@SuppressWarnings("unchecked")
+	private void updateAvailable(HalfedgeLayer l) {
+		availableSet.clear();
+		activeSet.clear();
+		HalfEdgeDataStructure<?, ?, ?> hds = l.get();
+		AdapterSet aSet = l.getEffectiveAdapters();
+		TypedAdapterSet<Number> numSet = aSet.querySet(Number.class);
+		if (numSet.isEmpty() || 
+			hds.numVertices() == 0 ||
+			hds.numEdges() == 0 ||
+			hds.numFaces() == 0
+		) return;
+		for (Adapter<?> a : numSet) {
+			if (a.canAccept(hds.getVertexClass())) { // create vertex histogram
+				availableSet.add((Adapter<Number>)a);
+			}
+			if (a.canAccept(hds.getEdgeClass())) { // create edge histogram
+				availableSet.add((Adapter<Number>)a);
+			}
+			if (a.canAccept(hds.getFaceClass())) { // create face histogram
+				availableSet.add((Adapter<Number>)a);
+			}
+		}
+		updateActive(l);
 	}
 	
 	
@@ -126,14 +275,14 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener {
 	
 	@Override
 	public void activeLayerChanged(HalfedgeLayer old, HalfedgeLayer active) {
-		updateHistograms(active);
+		updateAvailable(active);
 	}
 	@Override
 	public void adaptersChanged(HalfedgeLayer layer) {
 	}
 	@Override
 	public void dataChanged(HalfedgeLayer layer) {
-		updateHistograms(layer);
+		updateAvailable(layer);
 	}
 	
 	
