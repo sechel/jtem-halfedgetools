@@ -4,6 +4,8 @@ import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Paint;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,10 +14,15 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 
@@ -39,13 +46,10 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
-public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener {
+public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, ChangeListener {
 
 	private HalfedgeInterface
 		hif = null;
-	private int
-		numBins = 500;
-	
 	private HistogramDataset
 		dataSet = new HistogramDataset();
 	private NumberAxis 
@@ -63,6 +67,14 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener {
 		adapterTable = new JTable();
 	private JScrollPane
 		adapterScrollPane = new JScrollPane(adapterTable);
+	private SpinnerNumberModel
+		numBinsModel = new SpinnerNumberModel(500, 1, 100000, 1),
+		scaleExpModel = new SpinnerNumberModel(0, -20, 20, 1);
+	private JSpinner
+		numBinsSpinner = new JSpinner(numBinsModel),
+		scaleExpSpinner = new JSpinner(scaleExpModel);
+	private JPanel
+		selectionPanel = new JPanel();
 	
 	private List<Adapter<Number>>
 		availableSet = new ArrayList<Adapter<Number>>(),
@@ -70,15 +82,29 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener {
 	
 	public Histogram() {
 		shrinkPanel.setTitle("Histogram");
+		selectionPanel.setLayout(new GridBagLayout());
 		chartPanel.setMinimumSize(new Dimension(300, 250));
+		
+		
 		setInitialPosition(SHRINKER_TOP);
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
+		c.insets = new Insets(2, 1, 0, 1);
+		c.weightx = 1;
 		c.gridwidth = GridBagConstraints.RELATIVE;
-		c.weighty = 1;
-		c.weightx = 0;
-		shrinkPanel.add(adapterScrollPane, c);
+		selectionPanel.add(new JLabel("Bins"), c);
 		c.gridwidth = GridBagConstraints.REMAINDER;
+		selectionPanel.add(numBinsSpinner, c);
+		c.gridwidth = GridBagConstraints.RELATIVE;
+		selectionPanel.add(new JLabel("Exp"), c);
+		c.gridwidth = GridBagConstraints.REMAINDER;
+		selectionPanel.add(scaleExpSpinner, c);
+		c.weighty = 1;
+		selectionPanel.add(adapterScrollPane, c);
+		
+		c.gridwidth = GridBagConstraints.RELATIVE;
+		c.weightx = 0;
+		shrinkPanel.add(selectionPanel, c);
 		c.weightx = 1;
 		shrinkPanel.add(chartPanel, c);
 		
@@ -96,6 +122,9 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener {
 		barRenderer.setBarPainter(new StandardXYBarPainter());
 		chartPanel.zoomOutBoth(2.0, 2.0);
 		chartPanel.restoreAutoBounds();
+		
+		numBinsSpinner.addChangeListener(this);
+		scaleExpSpinner.addChangeListener(this);
 	}
 	
 	
@@ -190,12 +219,20 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener {
 		
 	}
 	
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		if (hif != null) {
+			updateActive(hif.getActiveLayer());
+		}
+	}
+	
 	private void updateAdapterTable() {
 		adapterTable.setModel(new DataTableModel());
 		adapterTable.getColumnModel().getColumn(0).setMaxWidth(30);
 	}
 	
 	private void updateActive(HalfedgeLayer l) {
+		int numBins = numBinsModel.getNumber().intValue();
 		HalfEdgeDataStructure<?, ?, ?> hds = l.get();
 		AdapterSet aSet = l.getEffectiveAdapters();
 		dataSet = new HistogramDataset();
@@ -264,10 +301,13 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener {
 	
 	
 	private double[] getData(Collection<?> nodes, Adapter<?> a, AdapterSet aSet) {
+		int scaleExp = scaleExpModel.getNumber().intValue();
+		double scale = Math.pow(10, scaleExp); 
 		double[] data = new double[nodes.size()];
 		int i = 0;
 		for (Object n : nodes) {
-			data[i++] = ((Number)a.get((Node<?,?,?>)n, aSet)).doubleValue();
+			double value = ((Number)a.get((Node<?,?,?>)n, aSet)).doubleValue();
+			data[i++] = value * scale;
 		}
 		return data;
 	}
@@ -285,6 +325,19 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener {
 		updateAvailable(layer);
 	}
 	
+	@Override
+	public void storeStates(Controller c) throws Exception {
+		super.storeStates(c);
+		c.storeProperty(getClass(), "numBins", numBinsModel.getNumber().intValue());
+		c.storeProperty(getClass(), "scaleExp", scaleExpModel.getNumber().intValue());
+	}
+	
+	@Override
+	public void restoreStates(Controller c) throws Exception {
+		super.restoreStates(c);
+		numBinsModel.setValue(c.getProperty(getClass(), "numBins", 500));
+		scaleExpModel.setValue(c.getProperty(getClass(), "scaleExp", 0));
+	}
 	
 	@Override
 	public void install(Controller c) throws Exception {
