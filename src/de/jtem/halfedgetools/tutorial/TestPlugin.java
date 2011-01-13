@@ -26,13 +26,17 @@ public class TestPlugin extends ShrinkPanelPlugin implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		VHDS hds = hif.get(new VHDS());
-		System.out.println("Got data structure with " + hds.numVertices() + " vertices");
+		System.out.println("Got data structure:\n" + hds);
+		double area = TestAlgorithm.doSomething(hds, hif.getAdapters());
+		System.out.println("Area is " + area);
+		hif.update();
 	}
 	
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
+		hif.addGlobalAdapter(new TestPositionAdapter(), true);
 	}
 	
 	@Override

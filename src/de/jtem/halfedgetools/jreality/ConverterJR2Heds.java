@@ -70,12 +70,12 @@ public class ConverterJR2Heds {
 		for (Class<? extends Node<?,?,?>> nodeClass : nodeClasses) {
 			DataListSet AData= getDataListOfTyp(nodeClass, ifs);
 			int typNum=getTypNum(nodeClass);
-			if (adapters.isAvailable(Position.class, nodeClass, double[].class)) {
+//			if (adapters.isAvailable(Position.class, nodeClass, double[].class)) {
 				ddData = (DoubleArrayArray)AData.getList(Attribute.COORDINATES);
 				if (ddData!=null) {
 					coords[typNum]= ddData.toDoubleArrayArray(null);
 				}
-			}
+//			}
 			if (adapters.isAvailable(Color.class, nodeClass, double[].class)) {
 				ddData= (DoubleArrayArray)AData.getList(Attribute.COLORS);
 				if (ddData!=null) {

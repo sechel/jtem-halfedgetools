@@ -72,14 +72,14 @@ public class GeometryPreviewerPanel extends JPanel implements PropertyChangeList
 		tools.setDragEnabled(false);
 		tools.setEncompassEnabled(true);
 		
-		contentApp.setAttribute(VERTEX_DRAW, true);
-		contentApp.setAttribute(EDGE_DRAW, true);
+		contentApp.setAttribute(VERTEX_DRAW, false);
+		contentApp.setAttribute(EDGE_DRAW, false);
 		contentApp.setAttribute(FACE_DRAW, true);
 		contentApp.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, 0.07);
 		contentApp.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR, new Color(100, 200, 50));
 		contentApp.setAttribute(POINT_SHADER + "." + POINT_RADIUS, 0.12);
 		contentApp.setAttribute(POINT_SHADER + "." + DIFFUSE_COLOR, new Color(200, 100, 50));
-		contentApp.setAttribute(POLYGON_SHADER + "." + DIFFUSE_COLOR, new Color(230, 230, 230));
+		contentApp.setAttribute(POLYGON_SHADER + "." + DIFFUSE_COLOR, new Color(10, 230, 230));
 		contentApp.setAttribute(POLYGON_SHADER + "." + SMOOTH_SHADING, false);
 	}
 	
