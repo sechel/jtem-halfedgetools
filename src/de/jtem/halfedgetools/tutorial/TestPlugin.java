@@ -29,6 +29,7 @@ public class TestPlugin extends ShrinkPanelPlugin implements ActionListener {
 		System.out.println("Got data structure:\n" + hds);
 		double area = TestAlgorithm.doSomething(hds, hif.getAdapters());
 		System.out.println("Area is " + area);
+		hif.addGlobalAdapter(new TestVectorField(), false);
 		hif.update();
 	}
 	
