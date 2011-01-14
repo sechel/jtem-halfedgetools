@@ -43,9 +43,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -63,7 +61,6 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
-import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Color;
 import de.jtem.halfedgetools.adapter.type.Label;
@@ -336,8 +333,8 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 	
 	
 	@Override
-	public Set<? extends Adapter<?>> getAdapters() {
-		Set<Adapter<?>> result = new HashSet<Adapter<?>>();
+	public AdapterSet getAdapters() {
+		AdapterSet result = new AdapterSet();
 		if (showColors.isSelected()) {
 			result.add(new PlanarityColorAdapter());
 		}

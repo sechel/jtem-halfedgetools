@@ -1,0 +1,93 @@
+\ProvidesPackage{beamerouterthemematheon}
+
+\mode<presentation>
+
+%--------------------------------------------------------------------------
+%------------------------ bar styles --------------------------------------
+%--------------------------------------------------------------------------
+
+
+% We do not allow for frame subtitles
+\defbeamertemplate{frametitle}{matheon bar frametitle}
+{
+  \nointerlineskip%
+  % compute width:
+  \@tempdima=\textwidth%
+  \advance\@tempdima by\beamer@leftmargin%
+  \advance\@tempdima by\beamer@rightmargin%
+  \begin{beamercolorbox}[wd=\the\@tempdima,rightskip=1ex,ht=2.4ex,dp=0.75ex]{frametitle}
+    % insert logo
+    \hspace{1mm}%
+    \begin{minipage}[b][2ex][c]{1cm}\vspace{1mm}\pgfuseimage{MatheonLogoImage}\end{minipage}%
+    % insert title
+    \hfill\usebeamerfont{frametitle}\insertframetitle\par%
+  \end{beamercolorbox}%
+  \vskip-0.25\baselineskip
+}
+
+\defbeamertemplate{footline}{matheon bar footline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=2.25ex,dp=1ex]{matheon footline}%
+    \hspace{1ex}\usebeamerfont{information in head/foot}\insert@footinfo\hfill
+    \usebeamerfont{page number in head/foot}\insertframenumber{} / \inserttotalframenumber\hspace*{2ex} 
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+
+
+
+%--------------------------------------------------------------------------
+%------------------------ line styles -------------------------------------
+%--------------------------------------------------------------------------
+
+% We do not allow for frame subtitles
+\defbeamertemplate*{frametitle}{matheon line frametitle}
+{
+  \nointerlineskip%
+  \vspace{1mm}
+  % insert logo
+  \hspace{-1ex}%
+  \begin{minipage}[b][1.4cm][t]{1.5cm}\pgfuseimage{MatheonLogoColorImage}\end{minipage}%
+  % compute width
+  \@tempdima=\textwidth%
+  \advance\@tempdima by\beamer@leftmargin%
+  \advance\@tempdima by\beamer@rightmargin%
+  \advance\@tempdima by -2cm%
+  \hfill
+  \begin{minipage}[b][1.4cm][t]{\@tempdima}
+    \begin{minipage}[b][3ex][t]{\@tempdima}
+      \begin{beamercolorbox}[sep=0pt,wd=\the\@tempdima,ht=1.75ex,dp=1ex,right]{frametitle}
+        % insert title
+        \usebeamerfont{frametitle}\insertframetitle\par%
+      \end{beamercolorbox}%
+    \end{minipage}%
+    % add rule:
+    \vskip-3ex%
+%    \hbox{\usebeamercolor[fg]{separation line}\rule[0.25ex]{\textwidth}{.03cm}}%
+    \usebeamercolor[fg]{separation line}\rule[0.25ex]{\textwidth}{.03cm}%
+  \end{minipage}
+  % \nointerlineskip
+  \vskip-0.5\baselineskip  % maybe this has to be corrected!
+}
+
+
+\defbeamertemplate{footline}{matheon line footline}
+{
+  % add rule
+  \hspace{3ex}%
+  \hbox{\usebeamercolor[fg]{separation line}\rule[3ex]{0.95\paperwidth}{.03cm}}%
+  \vskip-7pt
+  \hbox{%
+    \begin{beamercolorbox}[wd=0.97\paperwidth,ht=2.25ex,dp=1ex]{matheon footline}%
+      \hspace{3ex}\usebeamerfont{information in head/foot}\insert@footinfo\hfill
+      \usebeamerfont{page number in head/foot}\insertframenumber{} / \inserttotalframenumber
+    \end{beamercolorbox}%
+  }%
+}
+
+
+
+\mode
+<all>

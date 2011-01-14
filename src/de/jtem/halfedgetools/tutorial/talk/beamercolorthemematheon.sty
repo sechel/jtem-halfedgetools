@@ -1,0 +1,31 @@
+\ProvidesPackage{beamercolorthemematheon}
+
+\mode<presentation>
+
+\setbeamercolor*{palette primary}{use=structure,fg=white,bg=structure.fg}
+\setbeamercolor*{palette secondary}{use=structure,fg=white,bg=structure.fg!75!black}
+\setbeamercolor*{palette tertiary}{use=structure,fg=white,bg=structure.fg!50!black}
+\setbeamercolor*{palette quaternary}{fg=white,bg=black}
+
+\setbeamercolor*{titlelike}{parent=palette primary}
+
+\setbeamercolor{block title}{use=structure,fg=structure.fg,bg=structure.fg!20!bg}
+\setbeamercolor{block title alerted}{use=alerted text,fg=alerted text.fg,bg=alerted text.fg!20!bg}
+\setbeamercolor{block title example}{use=example text,fg=example text.fg,bg=example text.fg!20!bg}
+
+\setbeamercolor{block body}{parent=normal text,use=block title,bg=block title.bg!50!bg}
+\setbeamercolor{block body alerted}{parent=normal text,use=block title alerted,bg=block title alerted.bg!50!bg}
+\setbeamercolor{block body example}{parent=normal text,use=block title example,bg=block title example.bg!50!bg}
+
+\setbeamercolor{section number projected}{matheonblue}
+\setbeamercolor{subsection number projected}{matheonblue}
+\setbeamercolor{item}{fg=matheonblue}
+\setbeamercolor{enumerate}{fg=matheonblue}
+
+\setbeamercolor*{example text}{fg=matheonblue!70!black}
+
+\setbeamercolor*{block title}{use=example text, fg=example text.fg,bg=example text.fg!20!bg}
+\setbeamercolor*{block body}{parent=normal text,use=block title example,bg=block title example.bg!50!bg}
+
+\mode
+<all>

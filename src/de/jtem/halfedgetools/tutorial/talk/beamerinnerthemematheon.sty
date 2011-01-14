@@ -1,0 +1,21 @@
+\mode<presentation>
+
+% Define environment for setting the table of contents (toc).  The toc is
+% set in a colored rounded box. Because of reasons unclear to me, the
+% numbers in the toc are set directly on the left margin and I could not
+% find another way to change this, except to include a minipage that is
+% moved to the right (see below).
+\newenvironment<>{tocbox}{%
+  \par\vskip\medskipamount%
+  \begin{beamercolorbox}[sep=3ex,left,rounded=true]{block body}
+    \hspace{0.5ex}\begin{minipage}{0.9\textwidth}
+  }
+  {\end{minipage}\end{beamercolorbox}\vskip\smallskipamount}
+
+
+% use triangles in itemize:
+\defbeamertemplate*{itemize item}{mytriangle}{$\triangleright$}
+
+
+\mode
+<all>

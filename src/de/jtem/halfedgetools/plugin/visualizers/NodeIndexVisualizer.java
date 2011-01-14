@@ -3,8 +3,6 @@ package de.jtem.halfedgetools.plugin.visualizers;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -14,7 +12,6 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
-import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Label;
 import de.jtem.halfedgetools.plugin.VisualizerPlugin;
@@ -115,8 +112,8 @@ public class NodeIndexVisualizer extends VisualizerPlugin implements ActionListe
 
 
 		@Override
-		public Set<? extends Adapter<?>> getAdapters() {
-			Set<Adapter<?>> result = new HashSet<Adapter<?>>();
+		public AdapterSet getAdapters() {
+			AdapterSet result = new AdapterSet();
 			result.add(new IndexLabelAdapter());
 			return result;
 		}

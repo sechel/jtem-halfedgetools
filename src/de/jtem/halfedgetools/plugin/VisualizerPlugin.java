@@ -31,9 +31,6 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin;
 
-import java.util.Collections;
-import java.util.Set;
-
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -42,7 +39,6 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
@@ -50,6 +46,9 @@ import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
 
 public abstract class VisualizerPlugin extends Plugin implements UIFlavor, Comparable<VisualizerPlugin> {
 
+	private AdapterSet
+		emptySet = new AdapterSet();
+	
 	public < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -59,8 +58,8 @@ public abstract class VisualizerPlugin extends Plugin implements UIFlavor, Compa
 		
 	}
 	
-	public Set<? extends Adapter<?>> getAdapters() {
-		return Collections.emptySet();
+	public AdapterSet getAdapters() {
+		return emptySet;
 	}
 	
 	public SceneGraphComponent getComponent() {

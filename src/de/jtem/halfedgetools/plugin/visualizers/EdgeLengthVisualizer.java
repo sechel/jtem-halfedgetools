@@ -35,8 +35,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.DecimalFormat;
-import java.util.Collections;
-import java.util.Set;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -51,7 +49,6 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
-import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Label;
 import de.jtem.halfedgetools.adapter.type.Position;
@@ -138,8 +135,10 @@ public class EdgeLengthVisualizer extends VisualizerPlugin implements ChangeList
 	
 	
 	@Override
-	public Set<? extends Adapter<?>> getAdapters() {
-		return Collections.singleton(new EdgeLengthAdapter());
+	public AdapterSet getAdapters() {
+		AdapterSet result = new AdapterSet();
+		result.add(new EdgeLengthAdapter());
+		return result;
 	}
 
 
