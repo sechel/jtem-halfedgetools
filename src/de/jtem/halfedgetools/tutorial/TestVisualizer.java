@@ -3,8 +3,10 @@ package de.jtem.halfedgetools.tutorial;
 
 import java.util.Random;
 
+import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
+import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Color;
@@ -22,9 +24,9 @@ public class TestVisualizer extends VisualizerPlugin {
 		private Random rnd = new Random();
 		@Override
 		public <
-			V extends de.jtem.halfedge.Vertex<V,E,F>,
-			E extends de.jtem.halfedge.Edge<V,E,F>, 
-			F extends de.jtem.halfedge.Face<V,E,F>
+			V extends Vertex<V,E,F>,
+			E extends Edge<V,E,F>, 
+			F extends Face<V,E,F>
 		> double[] getF(F v, AdapterSet a) {
 			return new double[]{rnd.nextDouble(), rnd.nextDouble(), rnd.nextDouble()};
 		}
