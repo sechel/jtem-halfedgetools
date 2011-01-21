@@ -1,15 +1,14 @@
 package de.jtem.halfedgetools.tutorial;
 
 import de.jreality.plugin.JRViewer;
-import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.Histogram;
 import de.jtem.halfedgetools.plugin.VectorFieldManager;
 
 public class TestApplication {
 
 	public static void main(String[] args) {
-		// Halfedge abstrakt
-		HalfEdgeDataStructure<?, ?, ?> hds = null;
 		
 		// Halfedge konkret
 		VHDS vhds = new VHDS();
@@ -33,7 +32,7 @@ public class TestApplication {
 		a.addAll(AdapterSet.createGenericAdapters());
 		
 		// Ein Beispiel Algorithmus
-		double area = TestAlgorithm.doSomething(vhds, a);
+		TestAlgorithm.doSomething(vhds, a);
 		
 		// Beispiel Applikation mit Plugin
 		JRViewer jv = new JRViewer();
@@ -41,6 +40,10 @@ public class TestApplication {
 		jv.registerPlugin(new TestPlugin());
 		jv.registerPlugin(new VectorFieldManager());
 		jv.registerPlugin(new TestVisualizer());
+		HalfedgeInterface hif = new HalfedgeInterface();
+		hif.addGlobalAdapter(new TestScalarFunction(), true);
+		jv.registerPlugin(hif);
+		jv.registerPlugin(new Histogram());
 		jv.startup();
 	}
 	
