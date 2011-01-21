@@ -2,7 +2,7 @@ package de.jtem.halfedgetools.nurbs;
 
 import java.util.Arrays;
 
-public class diffGeo {
+public class DiffGeo {
 	
 	protected double [] Su;
 	protected double [] Sv;
@@ -46,7 +46,7 @@ public class diffGeo {
 	
 
 
-	public diffGeo(double[][]cM,double[][]cD, double l, double m, double [][]W){
+	public DiffGeo(double[][]cM,double[][]cD, double l, double m, double [][]W){
 		curvatureDirectionsManifold = cM;
 		curvatureDirectionsDomain = cD;
 		lambda = l;
@@ -55,7 +55,7 @@ public class diffGeo {
 		
 	}
 	
-	public diffGeo(){
+	public DiffGeo(){
 		curvatureDirectionsManifold = null;
 		curvatureDirectionsDomain = null;
 		lambda = 0;

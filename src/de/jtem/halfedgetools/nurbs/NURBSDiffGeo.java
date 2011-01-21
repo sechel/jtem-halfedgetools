@@ -15,8 +15,8 @@ public class NURBSDiffGeo {
 	 * @return lambda my K H
 	 */
 	
-	public static diffGeo curvatureAndDirections(NURBSSurface ns, double u, double v){
-		diffGeo dG = new diffGeo();
+	public static DiffGeo curvatureAndDirections(NURBSSurface ns, double u, double v){
+		DiffGeo dG = new DiffGeo();
 		double [] FFs = new double[6];
 		double[] U = ns.U;
 		double[] V = ns.V;
@@ -123,8 +123,8 @@ public class NURBSDiffGeo {
 	}
 	
 	
-	public static diffGeo curvatureAndDirections1(NURBSSurface ns, double u, double v){
-		diffGeo dG = new diffGeo();
+	public static DiffGeo curvatureAndDirections1(NURBSSurface ns, double u, double v){
+		DiffGeo dG = new DiffGeo();
 		double [] FFs = new double[6];
 		double[] U = ns.U;
 		double[] V = ns.V;

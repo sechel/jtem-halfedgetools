@@ -1,7 +1,6 @@
 package de.jtem.halfedgetools.io;
 
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
@@ -10,13 +9,46 @@ import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.jtem.halfedgetools.nurbs.NURBSCtrlPoints;
 import de.jtem.halfedgetools.nurbs.NURBSCurve;
 import de.jtem.halfedgetools.nurbs.NURBSSurface;
 import de.jtem.halfedgetools.nurbs.NURBSTrimLoop;
 
 public class NurbsIO {
 
+	private static class NURBSCtrlPoints {
+		
+		private double[] point;
+		private int index;
+		
+		public NURBSCtrlPoints(double[] p, int i) {
+			point = p;
+			index = i;
+		}
+		
+		public double[] getPoint(){
+			return  point;
+		}
+		
+		public int getIndex(){
+			return index;
+		}
+		
+		public static String toString(double array[]) {
+			String str = new String("");
+			for (int i = 0; i < array.length; i++) {
+				str = str + " " + array[i];
+			}
+			return str;
+		}
+		
+		public String toString(){
+			
+			return "ctrl point: "+ NURBSCtrlPoints.toString(point) + " index: " + index ;
+		}
+
+	}
+	
+	
 	public static NURBSSurface readNURBS(Reader reader) {
 		LineNumberReader lnr = new LineNumberReader(reader);
 		NURBSSurface ns = new NURBSSurface();
