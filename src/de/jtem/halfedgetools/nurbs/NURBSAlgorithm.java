@@ -408,7 +408,7 @@ public class NURBSAlgorithm {
 	public static void main(String args[]) {
 
 		double []U = {0,0,0,1,1,1};
-		double[] U1 = {0,0,1,1};
+//		double[] U1 = {0,0,1,1};
 		double []V = {0,0,0,1,2,3,4,4,5,5,5};
 		
 	
@@ -432,21 +432,21 @@ public class NURBSAlgorithm {
 		}
 		System.out.println("end DersBasisFuns");
 		
-		double [] dersOne = new double[p+1];
-		 int i =2;
+//		double [] dersOne = new double[p+1];
+//		 int i =2;
 //		dersOneBasisFuns(p, 2, V, i, u, k, dersOne);
 //		System.out.println(Arrays.toString(dersOne));
-		
-		double [][][]P  = 
-				{{{ -1, 1, 0, 1},{0 ,1, 0, 1},{1, 1, 0, 1}},
-				{{ -1, 0, 0, 1},{0, 0, 4, 1},{1, 0, 0, 1}},
-				{{-1, -1, 0, 1},{0, -1, 0, 1},{1, -1, 0, 1}}};
+//		
+//		double [][][]P  = 
+//				{{{ -1, 1, 0, 1},{0 ,1, 0, 1},{1, 1, 0, 1}},
+//				{{ -1, 0, 0, 1},{0, 0, 4, 1},{1, 0, 0, 1}},
+//				{{-1, -1, 0, 1},{0, -1, 0, 1},{1, -1, 0, 1}}};
 		double [][][]P1  = 
 				{{{ -1, 1, 0},{0 ,1, 0},{1, 1, 0}},
 				{{ -1, 0, 0},{0, 0, 4},{1, 0, 0}},
 				{{-1, -1, 0},{0, -1, 0},{1, -1, 0}}};
-		double [][][]SKL  = new double[3][3][4];
-		int d = 4;
+//		double [][][]SKL  = new double[3][3][4];
+//		int d = 4;
 //		SurfaceDerivatives(m, p, U, m, p, U, P, u, u, d, SKL);
 //		for (int K = 0; K < 3; K++) {
 //			for (int l = 0; l < 3; l++) {
@@ -455,13 +455,13 @@ public class NURBSAlgorithm {
 //			
 //		}
 		
-		double[][][] Cylinder = 
-				{{{1,1,0,1},{-1,1,0,1}},
-				{{ 1,1,1,1},{-1,1,1,1}},
-				{{2,0,2,2},{-2,0,2,2}}};
-		double [][][]SKLr = new double [3][2][3]; 
-		double [][] wders = new double[3][2];
-		double [][][] Aders = new double[3][2][3];
+//		double[][][] Cylinder = 
+//				{{{1,1,0,1},{-1,1,0,1}},
+//				{{ 1,1,1,1},{-1,1,1,1}},
+//				{{2,0,2,2},{-2,0,2,2}}};
+//		double [][][]SKLr = new double [3][2][3]; 
+//		double [][] wders = new double[3][2];
+//		double [][][] Aders = new double[3][2][3];
 		double [][][]SKLc = new double[3][3][3];
 		System.out.println("rational:");
 		SurfaceDerivatives(m, 2, U, 1, 2, U, P1, u, v, 2, SKLc);
@@ -476,7 +476,6 @@ public class NURBSAlgorithm {
 //				System.out.println("w"+j+j2+": "+wders[j][j2]);
 			}
 		}
-		System.out.println();
 		
 //		RatSurfaceDerivs(Aders, wders, 3, SKLr);
 //		System.out.println("fertig");
