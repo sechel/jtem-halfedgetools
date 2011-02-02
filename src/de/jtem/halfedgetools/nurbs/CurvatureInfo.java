@@ -2,16 +2,39 @@ package de.jtem.halfedgetools.nurbs;
 
 import java.util.Arrays;
 
-public class DiffGeo {
+public class CurvatureInfo {
 	
 	protected double [] Su;
 	protected double [] Sv;
 	protected double [] Suu;
 	protected double [] Suv;
 	protected double [] Svv;
-	
-	
 
+	protected double [][] curvatureDirectionsManifold;
+	protected double [][] curvatureDirectionsDomain;
+	protected double minCurvature;
+	protected double maxCurvature;
+	protected double [][] Weingartenoperator;
+	protected double GaussCurvature;
+	protected double MainCurvature;
+	
+	public CurvatureInfo(double[][]cM,double[][]cD, double l, double m, double [][]W){
+		curvatureDirectionsManifold = cM;
+		curvatureDirectionsDomain = cD;
+		minCurvature = l;
+		maxCurvature = m;
+		Weingartenoperator = W;
+		
+	}
+	
+	public CurvatureInfo(){
+		curvatureDirectionsManifold = null;
+		curvatureDirectionsDomain = null;
+		minCurvature = 0;
+		maxCurvature = 0;
+		Weingartenoperator = null;
+	}
+	
 	public double[] getSuu() {
 		return Suu;
 	}
@@ -36,33 +59,6 @@ public class DiffGeo {
 		Svv = svv;
 	}
 
-	protected double [][] curvatureDirectionsManifold;
-	protected double [][] curvatureDirectionsDomain;
-	protected double lambda;
-	protected double my;
-	protected double [][] Weingartenoperator;
-	protected double GaussCurvature;
-	protected double MainCurvature;
-	
-
-
-	public DiffGeo(double[][]cM,double[][]cD, double l, double m, double [][]W){
-		curvatureDirectionsManifold = cM;
-		curvatureDirectionsDomain = cD;
-		lambda = l;
-		my = m;
-		Weingartenoperator = W;
-		
-	}
-	
-	public DiffGeo(){
-		curvatureDirectionsManifold = null;
-		curvatureDirectionsDomain = null;
-		lambda = 0;
-		my = 0;
-		Weingartenoperator = null;
-	}
-	
 	public double[] getSu() {
 		return Su;
 	}
@@ -95,27 +91,27 @@ public class DiffGeo {
 		this.curvatureDirectionsDomain = cuvatureDirectionsDomain;
 	}
 
-	public double getLambda() {
-		return lambda;
+	public double getMinCurvature() {
+		return minCurvature;
 	}
 
-	public void setLambda(double lambda) {
-		this.lambda = lambda;
+	public void setMinCurvature(double lambda) {
+		this.minCurvature = lambda;
 	}
 
-	public double getMy() {
-		return my;
+	public double getMaxCurvature() {
+		return maxCurvature;
 	}
 
-	public void setMy(double my) {
-		this.my = my;
+	public void setMaxCurvature(double my) {
+		this.maxCurvature = my;
 	}
 
-	public double[][] getWeingartenoperator() {
+	public double[][] getWeingartenOperator() {
 		return Weingartenoperator;
 	}
 
-	public void setWeingartenoperator(double[][] weingartenoperator) {
+	public void setWeingartenOperator(double[][] weingartenoperator) {
 		Weingartenoperator = weingartenoperator;
 	}
 	
@@ -127,11 +123,11 @@ public class DiffGeo {
 		GaussCurvature = gaussCurvature;
 	}
 
-	public double getMainCurvature() {
+	public double getMeanCurvature() {
 		return MainCurvature;
 	}
 
-	public void setMainCurvature(double mainCurvature) {
+	public void setMeanCurvature(double mainCurvature) {
 		MainCurvature = mainCurvature;
 	}
 	
@@ -143,22 +139,22 @@ public class DiffGeo {
 		System.out.println("Suv = "+Arrays.toString(Suv));
 		System.out.println("Svv = "+Arrays.toString(Svv));
 		System.out.println("curvature directions at the manifold:");
-		if(Weingartenoperator[0][1] == 0 && lambda == my){
+		if(Weingartenoperator[0][1] == 0 && minCurvature == maxCurvature){
 			System.out.println("umbilic point");
-		}else{
-		System.out.println(Arrays.toString(curvatureDirectionsManifold[0]));
-		System.out.println(Arrays.toString(curvatureDirectionsManifold[1]));
+		} else {
+			System.out.println(Arrays.toString(curvatureDirectionsManifold[0]));
+			System.out.println(Arrays.toString(curvatureDirectionsManifold[1]));
 		}
 		System.out.println("curvature directions in the domain:");
-		if(Weingartenoperator[0][1] == 0 && lambda == my){
+		if(Weingartenoperator[0][1] == 0 && minCurvature == maxCurvature){
 			System.out.println("umbilic point");
 		}else{
 		System.out.println(Arrays.toString(curvatureDirectionsDomain[0]));
 		System.out.println(Arrays.toString(curvatureDirectionsDomain[1]));
 		}
 		System.out.println("curvatures:");
-		System.out.println("lambda: "+lambda);
-		System.out.println("my: "+my);
+		System.out.println("lambda: "+minCurvature);
+		System.out.println("my: "+maxCurvature);
 		System.out.println("shapeoperator:");
 		System.out.println(Weingartenoperator[0][0]+"  "+Weingartenoperator[0][1]);
 		System.out.println(Weingartenoperator[1][0]+"  "+Weingartenoperator[1][1]);

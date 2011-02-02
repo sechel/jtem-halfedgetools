@@ -1,13 +1,9 @@
 package de.jtem.halfedgetools.nurbs;
 
-import java.util.Arrays;
-
 import de.jreality.math.Rn;
 
 public class NURBSAlgorithm {
 	
-	
-
 	private static long binomialCoefficient(int n, int k) {
 		if (n - k == 1 || k == 1)
 			return n;
@@ -202,7 +198,6 @@ public class NURBSAlgorithm {
 				N[j][0] = 0.0;
 				
 			}
-			System.out.println(N[j][0]);
 		}
 		// compute full triangular table
 		for (int k = 1; k <= p; k++) {
@@ -221,8 +216,6 @@ public class NURBSAlgorithm {
 					N[j][k] = saved + (Uright - u) * temp;
 					saved = (u - Uleft) * temp;
 				}
-	
-				System.out.println("N"+j+","+k+"("+u+")"+" = "+N[j][k]);
 			}
 		}
 		ders[0] = N[0][p];
@@ -306,12 +299,6 @@ public class NURBSAlgorithm {
 		int uspan = FindSpan(n,p,u,U);
 		double [][] Nu = new double[du + 1][p + 1];
 		DersBasisFuns(uspan, u, p, du, U, Nu);
-		for (int i = 0; i < Nu.length; i++) {
-			for (int j = 0; j < Nu[0].length; j++) {
-				//System.err.println(Nu[i][j]);
-				
-			}
-		}
 		int vspan = FindSpan(m,q,v,V);
 		double [][] Nv = new double[dv + 1][q + 1];
 		DersBasisFuns(vspan, v, q, dv, V, Nv);
@@ -355,11 +342,14 @@ public class NURBSAlgorithm {
 		BasisFuns(uspan, u, p, U, Nu);
 		BasisFuns(vspan, v, q, V, Nv);
 		double[][] temp = new double[q + 1][4];
-		for (int l = 0; l <= q; l++)
-			for (int k = 0; k <= p; k++)
+		for (int l = 0; l <= q; l++) {
+			for (int k = 0; k <= p; k++) {
 				Rn.add(temp[l], temp[l],Rn.times(null, Nu[k], Pw[uspan - p + k][vspan - q + l]));
-		for (int l = 0; l <= q; l++)
+			}
+		}
+		for (int l = 0; l <= q; l++) {
 			Rn.add(S, S, Rn.times(null, Nv[l], temp[l]));
+		}
 	}
 
 	/**
@@ -370,24 +360,13 @@ public class NURBSAlgorithm {
 	 * @param d
 	 * @param SKL
 	 */
-
 	public static void RatSurfaceDerivs(double[][][] Aders, double[][] wders, int d, double[][][] SKL) {
 		int a = wders.length-1;
-//		System.out.println("a: "+a);
 		int b = wders[0].length-1;
-//		System.out.println("b: "+b);
 		for (int k = 0; k <= a; k++) {
-			
 			for (int l = 0; l <= b; l++) {
-				
 				double [] v = Aders[k][l];
-//				System.out.println("A"+l+k+": "+Arrays.toString(v));
-//				System.out.println("l: "+l);
 				for (int j = 1; j <= l; j++) {
-//					System.out.println("j: "+j);
-//					System.out.println("wders0"+j+": "+wders[0][j]);
-//					System.out.println("SKL"+k+(l-j)+": "+Arrays.toString(SKL[k][l - j]));
-//					System.out.println("v: "+Arrays.toString(Rn.times(null, - binomialCoefficient(l, j) * wders[0][j], SKL[k][l - j])));
 					v = Rn.add(v, v, Rn.times(null, - binomialCoefficient(l, j) * wders[0][j], SKL[k][l - j]));
 				}
 				for (int i = 1; i <= k; i++) {
@@ -399,93 +378,7 @@ public class NURBSAlgorithm {
 					v = Rn.add(v, v, Rn.times(null, - binomialCoefficient(k, i) ,v2));
 				}
 				SKL[k][l] = Rn.times(null, 1/wders[0][0], v);
-//				System.out.println("SKL"+k+l+": "+Arrays.toString(SKL[k][l]));
 				}
-				
 		}
-	}
-
-	public static void main(String args[]) {
-
-		double []U = {0,0,0,1,1,1};
-//		double[] U1 = {0,0,1,1};
-		double []V = {0,0,0,1,2,3,4,4,5,5,5};
-		
-	
-		
-		int p = 2; // degree
-		int n  = V.length -2;
-		int m= U.length - 2;
-		double [] N = new double[p+1]; //empty array
-		
-		double u = 0.25;
-		double v = 0.125;
-		BasisFuns(FindSpan(n, p, u, V), u, p,  V,  N);
-		System.out.println(Arrays.toString(N));
-		System.out.println("end BasisFuns");
-		
-		int k = 1;
-		double[][] ders = new double[k+1][p+1];
-		DersBasisFuns(FindSpan(m, p, u, U), u, p, k, U, ders);
-		for (int i = 0; i < ders.length; i++) {
-			System.out.println(Arrays.toString(ders[i]));
-		}
-		System.out.println("end DersBasisFuns");
-		
-//		double [] dersOne = new double[p+1];
-//		 int i =2;
-//		dersOneBasisFuns(p, 2, V, i, u, k, dersOne);
-//		System.out.println(Arrays.toString(dersOne));
-//		
-//		double [][][]P  = 
-//				{{{ -1, 1, 0, 1},{0 ,1, 0, 1},{1, 1, 0, 1}},
-//				{{ -1, 0, 0, 1},{0, 0, 4, 1},{1, 0, 0, 1}},
-//				{{-1, -1, 0, 1},{0, -1, 0, 1},{1, -1, 0, 1}}};
-		double [][][]P1  = 
-				{{{ -1, 1, 0},{0 ,1, 0},{1, 1, 0}},
-				{{ -1, 0, 0},{0, 0, 4},{1, 0, 0}},
-				{{-1, -1, 0},{0, -1, 0},{1, -1, 0}}};
-//		double [][][]SKL  = new double[3][3][4];
-//		int d = 4;
-//		SurfaceDerivatives(m, p, U, m, p, U, P, u, u, d, SKL);
-//		for (int K = 0; K < 3; K++) {
-//			for (int l = 0; l < 3; l++) {
-//				System.out.println("k= "+K+" l ="+l+" "+Arrays.toString(SKL[K][l]));
-//			}
-//			
-//		}
-		
-//		double[][][] Cylinder = 
-//				{{{1,1,0,1},{-1,1,0,1}},
-//				{{ 1,1,1,1},{-1,1,1,1}},
-//				{{2,0,2,2},{-2,0,2,2}}};
-//		double [][][]SKLr = new double [3][2][3]; 
-//		double [][] wders = new double[3][2];
-//		double [][][] Aders = new double[3][2][3];
-		double [][][]SKLc = new double[3][3][3];
-		System.out.println("rational:");
-		SurfaceDerivatives(m, 2, U, 1, 2, U, P1, u, v, 2, SKLc);
-		for (int j = 0; j < SKLc.length; j++) {
-			for (int j2 = 0; j2 < SKLc[0].length; j2++) {
-				System.out.println("SKLc"+j2+j+":"+Arrays.toString(SKLc[j][j2]));
-//				wders[j][j2]=SKLc[j][j2][3];
-//				Aders[j][j2][0] = SKLc[j][j2][0];
-//				Aders[j][j2][1] = SKLc[j][j2][1];
-//				Aders[j][j2][2] = SKLc[j][j2][2];
-//				System.out.println("A"+j+j2+": "+Arrays.toString(Aders[j][j2]));
-//				System.out.println("w"+j+j2+": "+wders[j][j2]);
-			}
-		}
-		
-//		RatSurfaceDerivs(Aders, wders, 3, SKLr);
-//		System.out.println("fertig");
-//		for (int j = 0; j < SKLr.length; j++) {
-//			for (int j2 = 0; j2 < SKLr[0].length; j2++) {
-//				System.out.println("S"+j+j2+": "+Arrays.toString(SKLr[j][j2]));
-//			}
-//			
-//		}
-		
-
 	}
 }

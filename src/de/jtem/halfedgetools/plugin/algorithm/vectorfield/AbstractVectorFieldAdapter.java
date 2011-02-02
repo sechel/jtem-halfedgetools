@@ -11,14 +11,14 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.VectorField;
 
 @VectorField
-public abstract class AbstractVectorFielAdapter extends AbstractAdapter<double[]> {
+public abstract class AbstractVectorFieldAdapter extends AbstractAdapter<double[]> {
 
 	private Map<? extends Node<?, ?, ?>, double[]> 
 		vecMap = null;
 	private String
 		name = "";
 	
-	public AbstractVectorFielAdapter(
+	public AbstractVectorFieldAdapter(
 		Map<? extends Node<?, ?, ?>, double[]> vecMap, 
 		String name
 	) {

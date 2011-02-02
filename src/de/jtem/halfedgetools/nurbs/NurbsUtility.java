@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import de.jreality.math.Rn;
 
-public class NURBSDiffGeo {
+public class NurbsUtility {
 		
 	
 	/**
@@ -15,8 +15,8 @@ public class NURBSDiffGeo {
 	 * @return lambda my K H
 	 */
 	
-	public static DiffGeo curvatureAndDirections(NURBSSurface ns, double u, double v){
-		DiffGeo dG = new DiffGeo();
+	public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double u, double v){
+		CurvatureInfo dG = new CurvatureInfo();
 		double [] FFs = new double[6];
 		double[] U = ns.U;
 		double[] V = ns.V;
@@ -74,18 +74,18 @@ public class NURBSDiffGeo {
 		W[0][1] = a12;
 		W[1][0] = a21;
 		W[1][1] = a22;
-		dG.setWeingartenoperator(W);
+		dG.setWeingartenOperator(W);
 		
 		//lambda
 		double lambda = (a11 + a22)/2 + Math.sqrt((a11-a22) * (a11-a22) + 4 * a12 * a21) / 2;
-		dG.setLambda(lambda);
+		dG.setMinCurvature(lambda);
 		//my
 		double my = (a11 + a22)/2 - Math.sqrt((a11-a22) * (a11-a22) + 4 * a12 * a21) / 2;
-		dG.setMy(my);
+		dG.setMaxCurvature(my);
 		//K	
 		dG.setGaussCurvature(a11*a22-a12*a21);
 		//H
-		dG.setMainCurvature((a11 + a22) / 2);
+		dG.setMeanCurvature((a11 + a22) / 2);
 		
 		double[][] curvatureVectorDomain = new double[2][2];
 		if(a12 != 0){
@@ -123,16 +123,17 @@ public class NURBSDiffGeo {
 	}
 	
 	
-	public static DiffGeo curvatureAndDirections1(NURBSSurface ns, double u, double v){
-		DiffGeo dG = new DiffGeo();
-		double [] FFs = new double[6];
+	public static CurvatureInfo curvatureAndDirections1(NURBSSurface ns, double u, double v){
+		CurvatureInfo dG = new CurvatureInfo();
+		
+		double[] FFs = new double[6];
 		double[] U = ns.U;
 		double[] V = ns.V;
 		int p = ns.p;
 		int q = ns.q;
+		
 		double[][][]SKL1 = new double[p+1][q+1][4];
 		double[][][]SKL = new double[p+1][q+1][3];
-		
 
 		NURBSAlgorithm.SurfaceDerivatives(1, p, U, 1, q, V, ns.controlMesh, u, v, 4, SKL1);
 		double [][][] Aders = new double[SKL1.length][SKL1[0].length][3];
@@ -151,47 +152,49 @@ public class NURBSDiffGeo {
 		dG.setSuu(SKL[2][0]);
 		dG.setSuv(SKL[1][1]);
 		dG.setSvv(SKL[0][2]);
-		System.out.println("S "+ Arrays.toString(SKL[0][0]));
-		System.out.println("norm: "+ Math.sqrt(Rn.innerProduct(SKL[0][0], SKL[0][0])));
-		System.out.println("Su "+ Arrays.toString(SKL[1][0]));
-		System.out.println("Sv "+ Arrays.toString(SKL[0][1]));
-		System.out.println("Suv "+ Arrays.toString(SKL[1][1]));
+//		System.out.println("S "+ Arrays.toString(SKL[0][0]));
+//		System.out.println("norm: "+ Math.sqrt(Rn.innerProduct(SKL[0][0], SKL[0][0])));
+//		System.out.println("Su "+ Arrays.toString(SKL[1][0]));
+//		System.out.println("Sv "+ Arrays.toString(SKL[0][1]));
+//		System.out.println("Suv "+ Arrays.toString(SKL[1][1]));
 		double E = Rn.innerProduct(SKL[1][0], SKL[1][0]);
-		System.out.println("E "+ E);
+//		System.out.println("E "+ E);
 	
 		double F = Rn.innerProduct(SKL[1][0], SKL[0][1]);
-		System.out.println("F "+ F);
+//		System.out.println("F "+ F);
 		double G = Rn.innerProduct(SKL[0][1], SKL[0][1]);
-		System.out.println("G "+ G);
-		double[] N = new double[3];
+//		System.out.println("G "+ G);
+		
+		double[] normal = new double[3];
 	
-		N =	Rn.crossProduct(N, SKL[1][0], SKL[0][1]);
-		N= Rn.normalize(null, N);
-		System.out.println("N "+ Arrays.toString(N));
+		Rn.crossProduct(normal, SKL[1][0], SKL[0][1]);
+		Rn.normalize(normal, normal);
+//		System.out.println("N "+ Arrays.toString(N));
+		
 		double l;
 		if(SKL.length < 3){
 			l = 0;
 		}else{
-			l = Rn.innerProduct(N, SKL[2][0]);
+			l = Rn.innerProduct(normal, SKL[2][0]);
 		}
-		System.out.println("l "+ l);
-		double m = Rn.innerProduct(N, SKL[1][1]);
-		System.out.println("m "+ m);
+//		System.out.println("l "+ l);
+		double m = Rn.innerProduct(normal, SKL[1][1]);
+//		System.out.println("m "+ m);
 		double n;
 		if(SKL[0].length < 3){
 			n = 0;
 		}else{
-			n = Rn.innerProduct(N, SKL[0][2]);
+			n = Rn.innerProduct(normal, SKL[0][2]);
 		}
 		
-		System.out.println("n "+ n);
+//		System.out.println("n "+ n);
 		FFs[0] = E;
 		FFs[1] = F;
 		FFs[2] = G;
 		FFs[3] = l;
 		FFs[4] = m;
 		double[][] W = new double[2][2];
-		System.out.println("factor: " +1/(E*G-F*F));
+//		System.out.println("factor: " +1/(E*G-F*F));
 		double a11 = (G*l-F*m)/(E*G-F*F);
 		double a12 = (G*m-F*n)/(E*G-F*F);
 		double a21 = (E*m-F*l)/(E*G-F*F);
@@ -200,24 +203,23 @@ public class NURBSDiffGeo {
 		W[0][1] = a12;
 		W[1][0] = a21;
 		W[1][1] = a22;
-		dG.setWeingartenoperator(W);
+		dG.setWeingartenOperator(W);
 		
 		//lambda
 		double lambda = (a11 + a22)/2 + Math.sqrt((a11-a22) * (a11-a22) + 4 * a12 * a21) / 2;
-		dG.setLambda(lambda);
+		dG.setMinCurvature(lambda);
 		//my
 		double my = (a11 + a22)/2 - Math.sqrt((a11-a22) * (a11-a22) + 4 * a12 * a21) / 2;
-		dG.setMy(my);
+		dG.setMaxCurvature(my);
 		//K	
 		dG.setGaussCurvature(a11*a22-a12*a21);
 		//H
-		dG.setMainCurvature((a11 + a22) / 2);
+		dG.setMeanCurvature((a11 + a22) / 2);
 		
 		double[][] curvatureVectorDomain = new double[2][2];
 		if(a12 != 0){
 			curvatureVectorDomain[0][0] = 1; 
 			curvatureVectorDomain[0][1] = (lambda - a11) / a12; 
-	
 		}
 		else if(a22 != lambda ){
 			curvatureVectorDomain[0][0] = 1; 

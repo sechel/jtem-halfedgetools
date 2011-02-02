@@ -9,9 +9,9 @@ import de.jtem.halfedgetools.adapter.type.VectorField;
 
 @VectorField
 @CurvatureField
-public class VertexVectorFielAdapter extends AbstractVectorFielAdapter {
+public class VertexVectorFieldAdapter extends AbstractVectorFieldAdapter {
 
-	public VertexVectorFielAdapter(
+	public VertexVectorFieldAdapter(
 		Map<? extends Node<?, ?, ?>, double[]> vecMap, String name) {
 		super(vecMap, name);
 	}

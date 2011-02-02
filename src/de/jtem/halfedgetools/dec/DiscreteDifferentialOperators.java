@@ -1,13 +1,15 @@
 package de.jtem.halfedgetools.dec;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import no.uib.cipr.matrix.Matrix;
 import no.uib.cipr.matrix.MatrixEntry;
 import no.uib.cipr.matrix.sparse.CompColMatrix;
 import no.uib.cipr.matrix.sparse.CompDiagMatrix;
-import no.uib.cipr.matrix.sparse.FlexCompColMatrix;
+import no.uib.cipr.matrix.sparse.CompRowMatrix;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -135,12 +137,17 @@ public class DiscreteDifferentialOperators
 				return new CompDiagMatrix(heds.numVertices(),1); 			
 			case 0:
 			{
-				
-				return getBoundaryOperator(heds,adapters,0).transpose();
+				Matrix bd = getBoundaryOperator(heds,adapters,0);
+				Matrix d0 = new CompRowMatrix(bd.numColumns(),bd.numRows(),getColumnNonZeros(bd)); 
+				bd.transpose(d0);
+				return d0;
 			}
 			case 1:
 			{
-				return getBoundaryOperator(heds,adapters,1).transpose();
+				Matrix bd = getBoundaryOperator(heds,adapters,1);
+				Matrix d1 = new CompRowMatrix(bd.numColumns(),bd.numRows(),getColumnNonZeros(bd));
+				bd.transpose(d1);
+				return d1;
 			}
 			case 2:
 				return new CompDiagMatrix(1,heds.numFaces()); 
@@ -157,7 +164,6 @@ public class DiscreteDifferentialOperators
 		if(dim < -1 || dim > 2) {
 			throw new IllegalArgumentException("No differential for dimension "+dim);
 		}
-		Matrix M = null;
 		switch (dim) {
 			case -1:
 			{
@@ -165,24 +171,18 @@ public class DiscreteDifferentialOperators
 			}
 			case 0:
 			{
-				Matrix cD0 = new FlexCompColMatrix(heds.numVertices(),heds.numEdges()/2);
-				calculateCodifferential(heds, adapters, dim, cD0);
-				M = cD0;
-				break;
+				return calculateCodifferential(heds, adapters, dim);
 			}
 			case 1:
 			{
-				Matrix cD1 = new FlexCompColMatrix(heds.numEdges()/2,heds.numFaces());
-				calculateCodifferential(heds, adapters, dim, cD1);
-				M = cD1;
-				break;
+				return calculateCodifferential(heds, adapters, dim);
 			}
 			case 2:
 			{
 				return new CompDiagMatrix(heds.numFaces(),1);
 			}
 		}
- 		return M;
+ 		return null; //unreachable
 	}
 
 	private static <
@@ -190,12 +190,42 @@ public class DiscreteDifferentialOperators
 		E extends Edge<V,E,F>,
 		F extends Face<V,E,F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void calculateCodifferential(HDS heds, AdapterSet adapters, int dim, Matrix M) {
+	> Matrix calculateCodifferential(HDS heds, AdapterSet adapters, int dim) {
 		Matrix hs0inv = invertDiagonalMatrix(getHodgeStar(heds, adapters, dim));
 		Matrix hs1 = getHodgeStar(heds, adapters, dim+1);
-		Matrix tmp = new FlexCompColMatrix(M);
-		getBoundaryOperator(heds, adapters, dim).mult(-1.0, hs1, tmp);
-		hs0inv.mult(tmp,M);
+		Matrix bd = getBoundaryOperator(heds, adapters, dim);
+		
+		int[][] nz = getColumnNonZeros(bd);
+		Matrix M = new CompColMatrix(bd.numRows(),bd.numColumns(),nz);
+		M.set(bd);
+		for(MatrixEntry me : M) {
+			double val = me.get();
+			me.set(-1.0*hs0inv.get(me.row(), me.row())*hs1.get(me.column(), me.column())*val);
+		}
+		return M;
+	}
+
+	private static int[][] getColumnNonZeros(Matrix A) {
+		ArrayList< List<Integer> > nzList = new ArrayList<List<Integer>>(A.numColumns());
+		for(int i = 0; i < A.numColumns(); ++i) {
+			nzList.add(new LinkedList<Integer>());
+		}
+		for(MatrixEntry me : A) {
+			int r = me.row(), c = me.column();
+			nzList.get(c).add(r);
+		}
+		int[][] nz = new int[A.numColumns()][];
+		int i = 0;
+		for(List<Integer> cl : nzList) {
+			nz[i] = new int[cl.size()];
+			int j = 0;
+			for(Integer mi : cl) {
+				nz[i][j] = mi;
+				++j;
+			}
+			++i;
+		}
+		return nz;
 	}
 	
 	public static <
@@ -210,20 +240,11 @@ public class DiscreteDifferentialOperators
 		Matrix M = null;
 		switch (dim) {
 		case 0:
-			Matrix L0 = new FlexCompColMatrix(heds.numVertices(),heds.numVertices());
-				calculateLaplaceOperator(heds, adapters, dim, L0);		
-			M = L0;
-			break;
+			return calculateLaplaceOperator(heds, adapters, dim);		
 		case 1:
-			Matrix L1 = new FlexCompColMatrix(heds.numEdges()/2,heds.numEdges()/2);
-			calculateLaplaceOperator(heds, adapters, dim, L1);
-			M = L1;
-			break;
+			return calculateLaplaceOperator(heds, adapters, dim);
 		case 2:
-			Matrix L2 = new FlexCompColMatrix(heds.numFaces(),heds.numFaces());
-			calculateLaplaceOperator(heds, adapters, dim, L2);
-			M = L2;
-			break;
+			return calculateLaplaceOperator(heds, adapters, dim);
 		}
 		return M;
 	}
@@ -233,9 +254,74 @@ public class DiscreteDifferentialOperators
 		E extends Edge<V,E,F>,
 		F extends Face<V,E,F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void calculateLaplaceOperator(HDS heds, AdapterSet adapters, int dim, Matrix M) {
-		getCoDifferential(heds, adapters, dim).mult(getDifferential(heds, adapters, dim), M);
-		getDifferential(heds, adapters, dim-1).multAdd(getCoDifferential(heds, adapters, dim-1), M);
+	> Matrix calculateLaplaceOperator(HDS heds, AdapterSet adapters, int dim) {
+		Matrix cdk = getCoDifferential(heds, adapters, dim);
+		Matrix dk = getDifferential(heds, adapters, dim);
+		Matrix dk_1 = getDifferential(heds, adapters, dim-1);
+		Matrix cdk_1 = getCoDifferential(heds, adapters, dim-1);
+		
+		int size = cdk.numRows();
+		int[][] nz = new int[size][];
+		switch (dim) {
+			case 0: {
+				for(V v : heds.getVertices()) {
+					List<E> inEdges = HalfEdgeUtils.incomingEdges(v);
+					nz[v.getIndex()] = new int[inEdges.size()];
+					int i = 0;
+					for(E e : inEdges) {
+						nz[v.getIndex()][i++] = e.getStartVertex().getIndex();
+					}
+				}
+				break;
+			}	
+			case 1: {
+				for(E e : heds.getEdges()) {
+					List<E> 
+						tInEdges = HalfEdgeUtils.incomingEdges(e.getTargetVertex()),
+						sInEdges = HalfEdgeUtils.incomingEdges(e.getStartVertex());
+					int eIndex = adapters.get(EdgeIndex.class, e, Integer.class);
+					nz[eIndex] = new int[tInEdges.size()+sInEdges.size()-1];
+					
+					nz[eIndex][0] = eIndex;
+					int i = 1;
+					for(E ie : tInEdges) {
+						Integer index = adapters.get(EdgeIndex.class, ie, Integer.class);
+						if(index == eIndex) {
+							continue;
+						}
+						nz[eIndex][i++] = index;
+					}
+					for(E ie : sInEdges) {
+						Integer index = adapters.get(EdgeIndex.class, ie, Integer.class);
+						if(index == eIndex) {
+							continue;
+						}
+						nz[eIndex][i++] = index;
+					}
+				}
+				break;
+			}
+			case 2: {
+				for(F f : heds.getFaces()) {
+					List<E> bdEdges = HalfEdgeUtils.boundaryEdges(f);
+					nz[f.getIndex()] = new int[bdEdges.size()];
+					int i = 0;
+					for(E be : bdEdges) {
+						F rightFace = be.getRightFace();
+						if(rightFace == null) {
+							continue;
+						}
+						nz[f.getIndex()][i++] = rightFace.getIndex();
+					}
+				}
+				break;
+			}
+		}	
+		Matrix M = new CompColMatrix(size,size,nz);
+		
+		// cdk*dk + dk_1*cdk_1
+		cdk.mult(dk, M);
+		return dk_1.multAdd(cdk_1, M);
 	}
 	
 	private static CompDiagMatrix invertDiagonalMatrix(Matrix m) {
@@ -270,7 +356,7 @@ public class DiscreteDifferentialOperators
 				nz[j][0] = e.getStartVertex().getIndex();
 				nz[j][1] = e.getTargetVertex().getIndex();
 			}
-			Matrix d0 = new CompColMatrix(heds.numVertices(), heds.numEdges()/2, nz);
+			CompColMatrix d0 = new CompColMatrix(heds.numVertices(), heds.numEdges()/2, nz);
 			for(E e : heds.getPositiveEdges()) {
 				int j = adapters.get(EdgeIndex.class,e,Integer.class);
 				d0.set(e.getStartVertex().getIndex(),j,-1.0);
@@ -292,7 +378,7 @@ public class DiscreteDifferentialOperators
 					i++;
 				}
 			}
-			Matrix d1 = new CompColMatrix(heds.numEdges()/2,heds.numFaces(),nz);
+			CompColMatrix d1 = new CompColMatrix(heds.numEdges()/2,heds.numFaces(),nz);
 			for(F f : heds.getFaces()) {
 				int j = f.getIndex();
 				E e = f.getBoundaryEdge();

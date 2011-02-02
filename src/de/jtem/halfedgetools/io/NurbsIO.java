@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -283,17 +282,16 @@ public class NurbsIO {
 				curves.get(i).setCtrlPoints(pts);
 			}
 			// hier wird das surf kontrollgitter mit index definiert
-			for (int i = 0; i < vList.size(); i++) {
-				System.out.println("vList: " + Arrays.toString(vList.get(i)));
-			}
-			System.out.println(surfIndex);
+//			for (int i = 0; i < vList.size(); i++) {
+//				System.out.println("vList: " + Arrays.toString(vList.get(i)));
+//			}
+//			System.out.println(surfIndex);
 			for (int i = 0; i < surfIndex.size(); i++) {
-				System.out.println(i);
+//				System.out.println(i);
 				ctrlPoints.add(vList.get(surfIndex.get(i) - 1));
 			}
 			for (int i = 0; i < ctrlPoints.size(); i++) {
-				System.out
-						.println("ctrl " + Arrays.toString(ctrlPoints.get(i)));
+//				System.out.println("ctrl " + Arrays.toString(ctrlPoints.get(i)));
 			}
 			// hier werden trimkurven definiert
 			for (int i = 0; i < trimCurvesList.size(); i++) {
@@ -320,40 +318,32 @@ public class NurbsIO {
 				// holeC.add(loop);
 			}
 
-			for (NURBSTrimLoop loop : trimC) {
-				System.out.println("TRIMLOOP " + (trimC.indexOf(loop) + 1)
-						+ "\n" + loop);
-			}
-			for (NURBSTrimLoop loop : holeC) {
-				System.out.println("HOLELOOP " + (holeC.indexOf(loop) + 1)
-						+ "\n" + loop);
-			}
 			double[] U = new double[surfKnotU.size()];
 			double[] V = new double[surfKnotV.size()];
 			for (int i = 0; i < U.length; i++) {
 				U[i] = surfKnotU.get(i);
 			}
-			System.out.println("Knotvector U: " + Arrays.toString(U));
+//			System.out.println("Knotvector U: " + Arrays.toString(U));
 			for (int i = 0; i < V.length; i++) {
 				V[i] = surfKnotV.get(i);
 			}
-			System.out.println("Knotvector V: " + Arrays.toString(V));
+//			System.out.println("Knotvector V: " + Arrays.toString(V));
 			int p = d[0];
-			System.out.println("P: " + p);
+//			System.out.println("P: " + p);
 			int q = d[1];
-			System.out.println("Q: " + q);
+//			System.out.println("Q: " + q);
 			int m = U.length - p - 1;
 			int n = V.length - q - 1;
-			System.out.println("MESH U " + m);
-			System.out.println("MESH V " + n);
+//			System.out.println("MESH U " + m);
+//			System.out.println("MESH V " + n);
 			double[][][] controlMesh = new double[m][n][4];
 			for (int i = 0; i < m; i++) {
 				for (int j = 0; j < n; j++) {
 					controlMesh[i][j] = ctrlPoints.get(i * n + j);
-					System.out.println("i: " + j);
-					System.out.println("j: " + i);
-
-					System.out.println(Arrays.toString(controlMesh[i][j]));
+//					System.out.println("i: " + j);
+//					System.out.println("j: " + i);
+//
+//					System.out.println(Arrays.toString(controlMesh[i][j]));
 				}
 			}
 			ns.setControlMesh(controlMesh);

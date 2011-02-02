@@ -8,7 +8,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.TypedAdapterSet;
-import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.functional.FunctionalUtils;
 
 public class AngleUtilities {
@@ -62,11 +62,11 @@ public class AngleUtilities {
 		TypedAdapterSet<double[]> tas = as.querySet(double[].class);
 		double[] 
 		       lec = Rn.subtract(null,
-		    		   tas.get(Position.class,e1.getTargetVertex()), 
-		    		   tas.get(Position.class,e1.getStartVertex())),
+		    		   tas.get(Position3d.class,e1.getTargetVertex()), 
+		    		   tas.get(Position3d.class,e1.getStartVertex())),
 		       rec = Rn.subtract(null,
-		    		   tas.get(Position.class,e2.getTargetVertex()), 
-		    		   tas.get(Position.class,e2.getStartVertex()));
+		    		   tas.get(Position3d.class,e2.getTargetVertex()), 
+		    		   tas.get(Position3d.class,e2.getStartVertex()));
 		
 		return FunctionalUtils.angle(lec, rec);	
 	}

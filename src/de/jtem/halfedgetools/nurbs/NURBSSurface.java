@@ -11,6 +11,7 @@ import java.util.LinkedList;
 		protected LinkedList<NURBSTrimLoop> holeC = new LinkedList<NURBSTrimLoop>();
 		protected double[][][] controlMesh;
 		protected int p, q;
+		private String name = "Nurbs Surface";
 
 		public NURBSSurface() {
 			
@@ -137,6 +138,14 @@ import java.util.LinkedList;
 				}
 			}
 			return weights;
+		}
+
+		public void setName(String aValue) {
+			name  = aValue;
+		}
+
+		public String getName() {
+			return name;
 		}
 	
 }

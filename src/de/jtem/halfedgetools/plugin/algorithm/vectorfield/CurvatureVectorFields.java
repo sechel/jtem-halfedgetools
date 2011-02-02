@@ -133,15 +133,15 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 			}
 		}
 		
-		AbstractVectorFielAdapter k1Adapter = null;
-		AbstractVectorFielAdapter k2Adapter = null;
-		AbstractVectorFielAdapter nAdapter = null;
+		AbstractVectorFieldAdapter k1Adapter = null;
+		AbstractVectorFieldAdapter k2Adapter = null;
+		AbstractVectorFieldAdapter nAdapter = null;
 		
 		switch (nodeTypeCombo.getSelectedIndex()) {
 			case 0: default: 
-				k1Adapter = new VertexVectorFielAdapter(k1Map, "K1 on Vertices"); 
-				k2Adapter = new VertexVectorFielAdapter(k2Map, "K2 on Vertices"); 
-				nAdapter = new VertexVectorFielAdapter(nMap, "Vertex Normals"); 
+				k1Adapter = new VertexVectorFieldAdapter(k1Map, "K1 on Vertices"); 
+				k2Adapter = new VertexVectorFieldAdapter(k2Map, "K2 on Vertices"); 
+				nAdapter = new VertexVectorFieldAdapter(nMap, "Vertex Normals"); 
 				break;
 			case 1: 
 				k1Adapter = new EdgeVectorFielAdapter(k1Map, "K1 on Edges"); 

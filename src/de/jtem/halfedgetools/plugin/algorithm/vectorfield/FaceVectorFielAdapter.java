@@ -9,7 +9,7 @@ import de.jtem.halfedgetools.adapter.type.VectorField;
 
 @VectorField
 @CurvatureField
-public class FaceVectorFielAdapter extends AbstractVectorFielAdapter {
+public class FaceVectorFielAdapter extends AbstractVectorFieldAdapter {
 
 	public FaceVectorFielAdapter(
 		Map<? extends Node<?, ?, ?>, double[]> vecMap, String name) {
