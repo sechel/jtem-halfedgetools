@@ -14,17 +14,20 @@ public class NURBSCurvatureUtility {
 	 */
 	public static CurvatureInfo curvatureAndDirections(NURBSSurface ns, double u, double v){
 		CurvatureInfo dG = new CurvatureInfo();
-		double [] FFs = new double[6];
+		
+		double[] FFs = new double[6];
 		double[] U = ns.U;
 		double[] V = ns.V;
 		int p = ns.p;
 		int q = ns.q;
+		
 		double[][][]SKL1 = new double[p+1][q+1][4];
 		double[][][]SKL = new double[p+1][q+1][3];
+
 		
 		int nl = ns.controlMesh.length - 1;
 		int ml = ns.controlMesh[0].length - 1;
-		NURBSAlgorithm.SurfaceDerivatives(ml, p, U, nl, q, V, ns.controlMesh, u, v, 4, SKL1);
+		NURBSAlgorithm.SurfaceDerivatives(ml, p, U, nl, q, V, ns.controlMesh, u, v, 4, SKL1);		
 		double [][][] Aders = new double[SKL1.length][SKL1[0].length][3];
 		double [][] wders = new double[SKL1.length][SKL1[0].length];
 		for (int i = 0; i < SKL1.length; i++) {
@@ -38,29 +41,32 @@ public class NURBSCurvatureUtility {
 		NURBSAlgorithm.RatSurfaceDerivs(Aders, wders, p+q, SKL);
 		dG.setSu(SKL[1][0]);
 		dG.setSv(SKL[0][1]);
+		
+		
 		dG.setSuv(SKL[1][1]);
-		dG.setSvv(SKL[0][2]);
+		if(p <= 1) {
+			dG.setSuu(new double[]{0,0,0});
+		} else {
+			dG.setSuu(SKL[2][0]);
+		}
+		if(p <= 1) {
+			dG.setSvv(new double[]{0,0,0});
+		} else {
+			dG.setSvv(SKL[0][2]);
+		}
 		double E = Rn.innerProduct(SKL[1][0], SKL[1][0]);
 		double F = Rn.innerProduct(SKL[1][0], SKL[0][1]);
 		double G = Rn.innerProduct(SKL[0][1], SKL[0][1]);
-		double[] N = new double[3];
-	
-		N =	Rn.crossProduct(N, SKL[1][0], SKL[0][1]);
-		N= Rn.normalize(null, N);
-		double l;
-		if(SKL.length < 3){
-			l = 0;
-		}else{
-			l = Rn.innerProduct(N, SKL[2][0]);
-		}
-		double m = Rn.innerProduct(N, SKL[1][1]);
-		double n;
-		if(SKL[0].length < 3){
-			n = 0;
-		}else{
-			n = Rn.innerProduct(N, SKL[0][2]);
-		}
 		
+		double[] normal = new double[3];
+	
+		Rn.crossProduct(normal, SKL[1][0], SKL[0][1]);
+		Rn.normalize(normal, normal);
+		
+		double l = Rn.innerProduct(normal,dG.getSuu());
+		double m = Rn.innerProduct(normal, SKL[1][1]);
+		double n = Rn.innerProduct(normal,dG.getSvv());
+
 		FFs[0] = E;
 		FFs[1] = F;
 		FFs[2] = G;
@@ -76,9 +82,10 @@ public class NURBSCurvatureUtility {
 		W[1][0] = a21;
 		W[1][1] = a22;
 		dG.setWeingartenOperator(W);
-
+		
 		//lambda
 		double lambda = (a11 + a22)/2 + Math.sqrt((a11-a22) * (a11-a22) + 4 * a12 * a21) / 2;
+		
 		//my
 		double my = (a11 + a22)/2 - Math.sqrt((a11-a22) * (a11-a22) + 4 * a12 * a21) / 2;
 		if(lambda > my) {
@@ -86,7 +93,6 @@ public class NURBSCurvatureUtility {
 			my = lambda;
 			lambda = tmp;
 		}
-		
 		dG.setMinCurvature(lambda);
 		dG.setMaxCurvature(my);
 		//K	
