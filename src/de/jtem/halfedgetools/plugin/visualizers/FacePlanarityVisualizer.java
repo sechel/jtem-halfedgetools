@@ -253,7 +253,7 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 			E extends Edge<V, E, F>,
 			F extends Face<V, E, F>
 		> Double getF(F f, AdapterSet a) {
-			return getRelativeUnevenness(f, a);
+			return getRelativeUnevenness(f, a) * 100;
 		}
 		
 	}

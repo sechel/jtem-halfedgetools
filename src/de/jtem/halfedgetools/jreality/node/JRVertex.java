@@ -70,7 +70,7 @@ public abstract class JRVertex <
 		if (v.color != null) {
 			color = v.color.clone();
 		}
-		if (v.normal != null) {
+		if (v.textCoord != null) {
 			textCoord = v.textCoord.clone();
 		}
 		this.label = v.label;
