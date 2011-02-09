@@ -1,6 +1,7 @@
 package de.jtem.halfedgetools.plugin.algorithm.vectorfield;
 
 import static de.jtem.halfedgetools.util.CurvatureUtility.getCurvatureTensor;
+import static de.jtem.halfedgetools.util.CurvatureUtility.getSortedEigenValues;
 import static de.jtem.halfedgetools.util.CurvatureUtility.getSortedEigenVectors;
 
 import java.awt.GridBagConstraints;
@@ -92,6 +93,8 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 		EVD evd = null;
 		Map<Node<V, E, F>, double[]> k1Map = new HashMap<Node<V, E, F>, double[]>();
 		Map<Node<V, E, F>, double[]> k2Map = new HashMap<Node<V, E, F>, double[]>();
+		Map<Node<V, E, F>, Double> k1AbsMap = new HashMap<Node<V, E, F>, Double>();
+		Map<Node<V, E, F>, Double> k2AbsMap = new HashMap<Node<V, E, F>, Double>();
 		Map<Node<V, E, F>, double[]> nMap = new HashMap<Node<V, E, F>, double[]>();
 		
 		Collection<? extends Node<V, E, F>> nodes = null;
@@ -116,11 +119,12 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 		}
 		
 		for (Node<V, E, F> node : nodes) {
-			double[] p = a.get(BaryCenter3d.class, node, double[].class);
+			double[] p = a.getD(BaryCenter3d.class, node);
 			try {
 				evd = getCurvatureTensor(p, scale * radius, kd, a);
-				double[] n = a.get(Normal.class, node, double[].class);
+				double[] n = a.getD(Normal.class, node);
 				double[][] vecs = getSortedEigenVectors(evd);
+				double[] values = getSortedEigenValues(evd);
 				Rn.projectOntoComplement(vecs[0], vecs[0], n);
 				Rn.projectOntoComplement(vecs[1], vecs[1], n);
 				Rn.normalize(vecs[0], vecs[0]);
@@ -128,6 +132,8 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 				k1Map.put(node, vecs[0]);
 				k2Map.put(node, vecs[1]);
 				nMap.put(node, n);
+				k1AbsMap.put(node, values[0]);
+				k2AbsMap.put(node, values[1]);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -136,30 +142,40 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 		AbstractVectorFieldAdapter k1Adapter = null;
 		AbstractVectorFieldAdapter k2Adapter = null;
 		AbstractVectorFieldAdapter nAdapter = null;
+		AbstractDoubleMapAdapter k1AbsAdapter = null;
+		AbstractDoubleMapAdapter k2AbsAdapter = null;
 		
 		switch (nodeTypeCombo.getSelectedIndex()) {
-			case 0: default: 
-				k1Adapter = new VertexVectorFieldAdapter(k1Map, "K1 on Vertices"); 
-				k2Adapter = new VertexVectorFieldAdapter(k2Map, "K2 on Vertices"); 
-				nAdapter = new VertexVectorFieldAdapter(nMap, "Vertex Normals"); 
+			case 0: default:
+				k2Adapter = new VertexVectorFieldMaxAdapter(k1Map, "Kmin on Vertices");
+				k1Adapter = new VertexVectorFieldMinAdapter(k2Map, "Kmax on Vertices");
+				nAdapter = new VertexVectorFieldAdapter(nMap, "Vertex Normals");
+				k2AbsAdapter = new VertexPrincipalCurvaturesMinAdapter(k1AbsMap, "Kmin on Vertices");
+				k1AbsAdapter = new VertexPrincipalCurvaturesMaxAdapter(k2AbsMap, "Kmax on Vertices");
 				break;
 			case 1: 
-				k1Adapter = new EdgeVectorFielAdapter(k1Map, "K1 on Edges"); 
-				k2Adapter = new EdgeVectorFielAdapter(k2Map, "K2 on Edges"); 
-				nAdapter = new EdgeVectorFielAdapter(nMap, "Edge Normals"); 
+				k2Adapter = new EdgeVectorFieldMaxAdapter(k1Map, "Kmin on Edges"); 
+				k1Adapter = new EdgeVectorFieldMinAdapter(k2Map, "Kmax on Edges"); 
+				nAdapter = new EdgeVectorFieldAdapter(nMap, "Edge Normals"); 
+				k2AbsAdapter = new EdgePrincipalCurvaturesMinAdapter(k1AbsMap, "Kmin on Edges");
+				k1AbsAdapter = new EdgePrincipalCurvaturesMaxAdapter(k2AbsMap, "Kmax on Edges");
 				break;
 			case 2: 
-				k1Adapter = new FaceVectorFielAdapter(k1Map, "K1 on Faces"); 
-				k2Adapter = new FaceVectorFielAdapter(k2Map, "K2 on Faces"); 
-				nAdapter = new FaceVectorFielAdapter(nMap, "Face Normals"); 
+				k2Adapter = new FaceVectorFieldMaxAdapter(k1Map, "Kmin on Faces"); 
+				k1Adapter = new FaceVectorFieldMinAdapter(k2Map, "Kmax on Faces"); 
+				nAdapter = new FaceVectorFieldAdapter(nMap, "Face Normals"); 
+				k2AbsAdapter = new FacePrincipalCurvaturesMinAdapter(k1AbsMap, "Kmin on Vertices");
+				k1AbsAdapter = new FacePrincipalCurvaturesMaxAdapter(k2AbsMap, "Kmax on Vertices");
 				break;
 		}
 		
 		if (k1Radio.isSelected()) {
 			hcp.addLayerAdapter(k1Adapter, false);
+			hcp.addLayerAdapter(k1AbsAdapter, false);
 		}
 		if (k2Radio.isSelected()) {
 			hcp.addLayerAdapter(k2Adapter, false);
+			hcp.addLayerAdapter(k2AbsAdapter, false);
 		}
 		if (nRadio.isSelected()) {
 			hcp.addLayerAdapter(nAdapter, false);
