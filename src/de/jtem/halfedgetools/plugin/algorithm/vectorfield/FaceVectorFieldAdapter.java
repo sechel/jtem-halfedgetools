@@ -7,7 +7,7 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedgetools.adapter.type.VectorField;
 
 @VectorField
-public class FaceVectorFieldAdapter extends AbstractVectorFieldAdapter {
+public class FaceVectorFieldAdapter extends AbstractVectorFieldMapAdapter {
 
 	public FaceVectorFieldAdapter(
 		Map<? extends Node<?, ?, ?>, double[]> vecMap, String name) {

@@ -139,9 +139,9 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 			}
 		}
 		
-		AbstractVectorFieldAdapter k1Adapter = null;
-		AbstractVectorFieldAdapter k2Adapter = null;
-		AbstractVectorFieldAdapter nAdapter = null;
+		AbstractVectorFieldMapAdapter k1Adapter = null;
+		AbstractVectorFieldMapAdapter k2Adapter = null;
+		AbstractVectorFieldMapAdapter nAdapter = null;
 		AbstractDoubleMapAdapter k1AbsAdapter = null;
 		AbstractDoubleMapAdapter k2AbsAdapter = null;
 		

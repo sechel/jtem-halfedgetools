@@ -7,7 +7,7 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedgetools.adapter.type.VectorField;
 
 @VectorField
-public class EdgeVectorFieldAdapter extends AbstractVectorFieldAdapter {
+public class EdgeVectorFieldAdapter extends AbstractVectorFieldMapAdapter {
 
 	public EdgeVectorFieldAdapter(Map<? extends Node<?, ?, ?>, double[]> vecMap, String name) {
 		super(vecMap, name);
