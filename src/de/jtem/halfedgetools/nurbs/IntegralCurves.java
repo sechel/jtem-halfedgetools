@@ -2,7 +2,6 @@ package de.jtem.halfedgetools.nurbs;
 
 import java.util.Arrays;
 import java.util.LinkedList;
-
 import de.jreality.math.Rn;
 
 public class IntegralCurves {
@@ -15,7 +14,7 @@ public class IntegralCurves {
 		}
 	}
 
-	public static LinkedList<double[]> rungeKuttaSmallKappa(NURBSSurface ns, double[] tspan, double[] y0, double tol, boolean max) {
+	public static LinkedList<double[]> rungeKutta(NURBSSurface ns, double[] tspan, double[] y0, double tol, boolean max) {
 		double[][] A = { { 0, 0, 0, 0 }, { 0.5, 0, 0, 0 }, { 0, 0.75, 0, 0 },{ 2 / 9., 1 / 3., 4 / 9., 0 } };
 		double[] c1 = { 2 / 9., 1 / 3., 4 / 9., 0 };
 		double[] c2 = { 7 / 24., 0.25, 1 / 3., 1 / 8. };
@@ -131,5 +130,15 @@ public class IntegralCurves {
 			}
 		}
 		return u;
+	}
+	
+	public static void main(String[] args){
+		NURBSSurface ns = new NURBSSurface();
+		double[]tspan = {0,1.527};
+		double[]y0 = {0.25,0.5};
+		double tol = 0.001;
+		IntegralCurves.rungeKutta(ns, tspan, y0, tol, true);
+
+		
 	}
 }
