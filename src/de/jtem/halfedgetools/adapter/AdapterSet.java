@@ -238,7 +238,11 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		if (a != null && a.isGetter()) {
 			return a.get(n, this);
 		}
-		throw new AdapterException("AdapterSet.get()");
+		throw new AdapterException(
+			"Adapter \"" + type.getSimpleName() + 
+			"\" for node " + n.getClass().getSimpleName() + 
+			" not found"
+		);
 	}
 	
 	public <		
@@ -253,19 +257,23 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		if (a != null && a.isGetter()) {
 			return a.get(n, this);
 		}
-		throw new AdapterException("AdapterSet.get()");
+		throw new AdapterException(
+			"Adapter \"" + type.getSimpleName() + 
+			"\" for node " + n.getClass().getSimpleName() + 
+			" not found"
+		);
 	}
 	
 	
 	public <		
-		A extends Adapter<VAL>,
-		T extends Annotation, 
+		AC extends Adapter<VAL>,
+		A extends Annotation, 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,		
 		N extends Node<V, E, F>,
 		VAL
-	> VAL get(Class<A> adapterClass, Class<T> type, N n, Class<VAL> typeClass) {
+	> VAL get(Class<AC> adapterClass, Class<A> type, N n, Class<VAL> typeClass) {
 		Adapter<VAL> a = query(adapterClass);
 		if (a == null) {
 			a = query(type, n.getClass(), typeClass);
@@ -273,7 +281,11 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		if (a != null && a.isGetter()) {
 			return a.get(n, this);
 		}
-		throw new AdapterException("AdapterSet.get()");
+		throw new AdapterException(
+			"Adapter \"" + type.getSimpleName() + 
+			"\" for node " + n.getClass().getSimpleName() + 
+			" not found"
+		);
 	}
 	
 	

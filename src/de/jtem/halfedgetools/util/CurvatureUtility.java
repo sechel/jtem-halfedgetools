@@ -144,6 +144,14 @@ public class CurvatureUtility {
 		return r;
 	}
 	
+	
+	/**
+	 * The Eigenvector for the absolutely smallest Eigenvalue
+	 * is sorted to the back. The two other vectors are sorted
+	 * such that their Eigenvalues are ascending
+	 * @param evd
+	 * @return
+	 */
 	public static double[][] getSortedEigenVectors(EVD evd){
 		double[] eigVal = evd.getRealEigenvalues();
 		DenseMatrix eigVec = evd.getRightEigenvectors();
@@ -163,6 +171,21 @@ public class CurvatureUtility {
 		r[0] = k1 < k2 ? eigVecArr[i1] : eigVecArr[i2];
 		r[1] = k1 < k2 ? eigVecArr[i2] : eigVecArr[i1];
 		r[2] = eigVecArr[i3];
+		return r;
+	}
+	
+	public static double[] getSortedEigenValues(EVD evd){
+		double[] eigVal = evd.getRealEigenvalues();
+		//get minimal magnitude
+		int i3 = getIndexOfMinMagnitude(eigVal);
+		int i1 = (i3 + 1) % 3;
+		int i2 = (i3 + 2) % 3;
+		double k1 = eigVal[i1];
+		double k2 = eigVal[i2];
+		double[] r = new double[3];
+		r[0] = k1 < k2 ? k1 : k2;
+		r[1] = k1 < k2 ? k2 : k1;
+		r[2] = eigVal[i3];
 		return r;
 	}
 
