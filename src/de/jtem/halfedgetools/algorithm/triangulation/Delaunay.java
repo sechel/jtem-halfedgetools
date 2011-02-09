@@ -1,5 +1,9 @@
 package de.jtem.halfedgetools.algorithm.triangulation;
 
+import static de.jtem.halfedge.util.HalfEdgeUtils.isBoundaryEdge;
+import static java.lang.Math.cos;
+import static java.lang.Math.sqrt;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,7 +31,6 @@ public class Delaunay {
 	
 	/**
 	 * Calculates the angle between edge and edge.getNextEdge()
-	 * Sets the angle property of edge to the result
 	 * @param edge
 	 * @return the angle at edge
 	 * @throws TriangulationException
@@ -40,8 +43,9 @@ public class Delaunay {
 		Double a = el.get(Length.class, edge, Double.class);
 		Double b = el.get(Length.class, edge.getNextEdge(), Double.class);
 		Double c = el.get(Length.class, edge.getPreviousEdge(), Double.class);
-		if ((a*a + b*b - c*c) / (2*a*b) > 1)
+		if ((a*a + b*b - c*c) / (2*a*b) > 1) {
 			throw new TriangulationException("Triangle inequation doesn't hold for " + edge);
+		}
 		Double result = Math.abs(StrictMath.acos((a*a + b*b - c*c) / (2*a*b)));
 		return result;
 	}
@@ -115,7 +119,7 @@ public class Delaunay {
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
-	> void flip(E e) throws TriangulationException{
+	> void flip(E e, AdapterSet a) throws TriangulationException{
 		F leftFace = e.getLeftFace();
 		F rightFace = e.getRightFace();
 		if (leftFace == rightFace)
@@ -130,6 +134,12 @@ public class Delaunay {
 		V v3 = a1.getTargetVertex();
 		V v4 = b1.getTargetVertex();
 
+		// new length
+		double la2 = a.get(Length.class, a2, Double.class);
+		double lb1 = a.get(Length.class, b1, Double.class);
+		double alpha = getAngle(e, a) + getAngle(a2, a);
+		double flipLength = sqrt(la2*la2 + lb1*lb1 - 2*lb1*la2*cos(alpha));
+		
 		//new connections
 		e.linkNextEdge(a2);
 		e.linkPreviousEdge(b1);
@@ -149,6 +159,10 @@ public class Delaunay {
 		a2.setTargetVertex(v2);
 		a1.setTargetVertex(v3);
 		b1.setTargetVertex(v4);
+		
+		// set new length
+		a.set(Length.class, e, flipLength);
+		a.set(Length.class, e.getOppositeEdge(), flipLength);
 	}
 	
 	
@@ -172,14 +186,15 @@ public class Delaunay {
 		HashSet<E> markSet = new HashSet<E>();
 		Stack<E> stack = new Stack<E>();
 		for (E positiveEdge : graph.getPositiveEdges()){
+			if (isBoundaryEdge(positiveEdge)) continue;
 			markSet.add(positiveEdge);
 			stack.push(positiveEdge);
 		}
-		while (!stack.isEmpty()){
+		while (!stack.isEmpty()) {
 			E ab = stack.pop();
 			markSet.remove(ab);
 			if (!isDelaunay(ab, a)){
-				flip(ab);
+				flip(ab, a);
 				for (E xy : getPositiveKiteBorder(ab)){
 					if (!markSet.contains(xy)){
 						markSet.add(xy);
