@@ -104,12 +104,18 @@ public class NURBSCurvatureUtility {
 		if(a12 != 0){
 			curvatureVectorDomain[0][0] = 1; 
 			curvatureVectorDomain[0][1] = (lambda - a11) / a12; 
+	
 		}
-		else if(a22 != lambda ){
+		else if(a21 != 0){
+			curvatureVectorDomain[0][0] = (lambda - a22)/a21; 
+			curvatureVectorDomain[0][1] = 1; 
+	
+		}
+		else if(Math.abs(a11 - lambda) < Math.abs(a22 - lambda) ){
 			curvatureVectorDomain[0][0] = 1; 
 			curvatureVectorDomain[0][1] = 0; 
 		}
-		else if(a11 != lambda){
+		else if(Math.abs(a22 - lambda) < Math.abs(a11 - lambda)){
 			curvatureVectorDomain[0][0] = 0; 
 			curvatureVectorDomain[0][1] = 1;
 		}
@@ -117,13 +123,18 @@ public class NURBSCurvatureUtility {
 			curvatureVectorDomain[1][0] = 1; 
 			curvatureVectorDomain[1][1] = (my - a11) / a12; 
 		}
-		else if(a11 != my){
-			curvatureVectorDomain[1][0] = 0; 
+		else if(a21 != 0){
+			curvatureVectorDomain[1][0] = (my - a22)/a21; 
 			curvatureVectorDomain[1][1] = 1; 
+	
 		}
-		else if(a22 != my){
+		else if(Math.abs(a11 - my) < Math.abs(a22 - my)){
 			curvatureVectorDomain[1][0] = 1; 
 			curvatureVectorDomain[1][1] = 0; 
+		}
+		else if(Math.abs(a22 - my) < Math.abs(a11 - my)){
+			curvatureVectorDomain[1][0] = 0; 
+			curvatureVectorDomain[1][1] = 1; 
 		}
 		dG.setCurvatureDirectionsDomain(curvatureVectorDomain);
 		double[][] curvatureVectorManifold = new double[2][3];
