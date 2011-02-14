@@ -31,7 +31,7 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.algorithm.adaptivesubdivision.node;
 
-import de.jtem.halfedgetools.algorithm.delaunay.decorations.HasLengthSquared;
+import de.jtem.halfedgetools.algorithm.alexandrov.delaunay.decorations.HasLengthSquared;
 import de.jtem.halfedgetools.jreality.node.JREdge;
 
 /** Teil der Datenstruktur die fuer die Verwaltung des Subdividers genutzt wird.

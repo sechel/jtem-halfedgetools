@@ -29,26 +29,20 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.algorithm.delaunay.decorations;
-
-import de.jtem.halfedgetools.util.TriangulationException;
+package de.jtem.halfedgetools.algorithm.alexandrov.delaunay.decorations;
 
 
 
 /**
- * Implementers will have the flip, getFlipCount and resetFlipCount methods. 
- * It's supposed to work for delaunay flips.
- * <p>
- * Copyright 2005 <a href="http://www.sechel.de">Stefan Sechelmann</a>
- * <a href="http://www.math.tu-berlin.de/geometrie">TU-Berlin</a> 
- * @author Stefan Sechelmann
- */
-public interface IsFlippable  {
+ * Implementers will have the getLengthSquared and setLengthSquared methods 
 
-	public void flip() throws TriangulationException;
+ */
+public interface HasLengthSquared {
+
+	public Double getLengthSquared(); 
 	
-	public int getFlipCount();
+	public void setLengthSquared(Double length);
 	
-	public void resetFlipCount();
+
 	
 }

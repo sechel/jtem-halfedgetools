@@ -173,16 +173,19 @@ public class Delaunay {
 	 * @param graph must be a triangulation
 	 * @throws TriangulationException if the given graph is no triangulation or 
 	 * if the trangle inequation doesn't hold for some triangle
+	 * @return The new delaunay edge lengths as adapter
 	 */
 	public static <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void constructDelaunay(HDS graph, AdapterSet a) throws TriangulationException{
+	> DelaunayLengthAdapter constructDelaunay(HDS graph, AdapterSet a) throws TriangulationException{
 		if (!ConsistencyCheck.isTriangulation(graph)) {
 			throw new TriangulationException("Graph is no triangulation!");
 		}
+		DelaunayLengthAdapter la = new DelaunayLengthAdapter();
+		a.add(la);
 		HashSet<E> markSet = new HashSet<E>();
 		Stack<E> stack = new Stack<E>();
 		for (E positiveEdge : graph.getPositiveEdges()){
@@ -203,5 +206,7 @@ public class Delaunay {
 				}
 			}
 		}
+		a.remove(la);
+		return la;
 	}	
 }

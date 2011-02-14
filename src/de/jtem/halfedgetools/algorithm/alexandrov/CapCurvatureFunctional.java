@@ -51,9 +51,9 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasRadius;
 import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasXYZW;
 import de.jtem.halfedgetools.algorithm.alexandrov.decorations.IsBoundary;
-import de.jtem.halfedgetools.algorithm.delaunay.Delaunay;
-import de.jtem.halfedgetools.algorithm.delaunay.decorations.HasLength;
-import de.jtem.halfedgetools.algorithm.delaunay.decorations.IsFlippable;
+import de.jtem.halfedgetools.algorithm.alexandrov.delaunay.Delaunay;
+import de.jtem.halfedgetools.algorithm.alexandrov.delaunay.decorations.HasLength;
+import de.jtem.halfedgetools.algorithm.alexandrov.delaunay.decorations.IsFlippable;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.halfedgetools.util.TriangulationException;
 

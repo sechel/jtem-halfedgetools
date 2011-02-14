@@ -40,7 +40,7 @@ package de.jtem.halfedgetools.util;
  * @see halfedge.HalfEdgeDataStructure
  * @see alexandrov.Alexandrov
  */
-public class TriangulationException extends Exception {
+public class TriangulationException extends RuntimeException {
 
 	private static final long 
 		serialVersionUID = 1L;

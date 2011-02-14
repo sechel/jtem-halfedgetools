@@ -45,7 +45,7 @@ import de.jtem.halfedgetools.algorithm.adaptivesubdivision.interpolators.LinearE
 import de.jtem.halfedgetools.algorithm.adaptivesubdivision.interpolators.ModButterflyAlg;
 import de.jtem.halfedgetools.algorithm.adaptivesubdivision.interpolators.SplineInterpolator;
 import de.jtem.halfedgetools.algorithm.adaptivesubdivision.util.Calculator;
-import de.jtem.halfedgetools.algorithm.delaunay.decorations.HasLengthSquared;
+import de.jtem.halfedgetools.algorithm.alexandrov.delaunay.decorations.HasLengthSquared;
 import de.jtem.halfedgetools.jreality.node.JREdge;
 import de.jtem.halfedgetools.jreality.node.JRFace;
 import de.jtem.halfedgetools.jreality.node.JRVertex;
