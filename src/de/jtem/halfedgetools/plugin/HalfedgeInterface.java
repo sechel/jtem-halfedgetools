@@ -90,6 +90,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.UndirectedEdgeIndex;
 import de.jtem.halfedgetools.adapter.generic.BaryCenter3dAdapter;
 import de.jtem.halfedgetools.adapter.generic.BaryCenter4dAdapter;
 import de.jtem.halfedgetools.adapter.generic.BaryCenterAdapter;
@@ -202,6 +203,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		persistentAdapters.add(new TexturePosition4dAdapter());
 		persistentAdapters.add(new EdgeVectorAdapter());
 		persistentAdapters.add(new EdgeLengthAdapter());
+		persistentAdapters.add(new UndirectedEdgeIndex());
+		
 		persistentAdapters.add(new JRNormalAdapter());
 		persistentAdapters.add(new JRPositionAdapter());
 		persistentAdapters.add(new JRTexturePositionAdapter());
