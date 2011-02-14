@@ -31,7 +31,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 
 public class HalfedgeSelection {
 
@@ -227,7 +227,7 @@ public class HalfedgeSelection {
 			int index = 0;
 			double[][] vertexVerts = new double[vSet.size()][];
 			for (Vertex<?,?,?> v : vSet) {
-				double[] pos = a.get(Position.class, v, double[].class);
+				double[] pos = a.getD(Position3d.class, v);
 				vertexVerts[index++] = pos;
 			}
 			PointSetFactory psf = new PointSetFactory();
@@ -239,23 +239,31 @@ public class HalfedgeSelection {
 			root.addChild(pc);
 		}
 		if (eSet.size() > 0) {
-			double[][] edgeVerts = new double[eSet.size()][];
-			int[][] edgeIndices = new int[eSet.size() / 2][2];
-			int index = 0;
+			Set<Edge<?,?,?>> drawSet = new HashSet<Edge<?,?,?>>();
 			for (Edge<?, ?, ?> e : eSet) {
-				if (e.isPositive()) continue;
+				if (drawSet.contains(e.getOppositeEdge())) {
+					continue;
+				} else {
+					drawSet.add(e);
+				}
+			}
+			
+			double[][] edgeVerts = new double[drawSet.size() * 2][];
+			int[][] edgeIndices = new int[drawSet.size()][2];
+			int index = 0;
+			for (Edge<?, ?, ?> e : drawSet) {
 				Vertex<?,?,?> s = e.getStartVertex();
 				Vertex<?,?,?> t = e.getTargetVertex();
-				double[] sp = a.get(Position.class, s, double[].class);
-				double[] tp = a.get(Position.class, t, double[].class);
+				double[] sp = a.getD(Position3d.class, s);
+				double[] tp = a.getD(Position3d.class, t);
 				edgeVerts[index++] = sp;
 				edgeVerts[index++] = tp;
 				edgeIndices[index/2 - 1][0] = index - 2;
 				edgeIndices[index/2 - 1][1] = index - 1;
 			}
 			IndexedLineSetFactory lsf = new IndexedLineSetFactory();
-			lsf.setVertexCount(edgeVerts.length);
-			lsf.setEdgeCount(edgeIndices.length);
+			lsf.setVertexCount(index);
+			lsf.setEdgeCount(index / 2);
 			lsf.setVertexCoordinates(edgeVerts);
 			lsf.setEdgeIndices(edgeIndices);
 			lsf.update();
@@ -272,15 +280,15 @@ public class HalfedgeSelection {
 			List<double[]> vList = new LinkedList<double[]>();
 			for (Face<?,?,?> f : fSet) {
 				Edge<?, ?, ?> b0 = f.getBoundaryEdge();
-				double[] v1 = a.get(Position.class, b0.getStartVertex(), double[].class);
-				double[] v2 = a.get(Position.class, b0.getTargetVertex(), double[].class);
+				double[] v1 = a.getD(Position3d.class, b0.getStartVertex());
+				double[] v2 = a.getD(Position3d.class, b0.getTargetVertex());
 				double dist = Rn.euclideanDistance(v1, v2);
 				Edge<?, ?, ?> b = b0;
 				List<double[]> fvList = new LinkedList<double[]>();
 				do {
-					double[] s1 = a.get(Position.class, b.getStartVertex(), double[].class);
-					double[] s2 = a.get(Position.class, b.getNextEdge().getTargetVertex(), double[].class);
-					double[] t = a.get(Position.class, b.getTargetVertex(), double[].class);
+					double[] s1 = a.getD(Position3d.class, b.getStartVertex());
+					double[] s2 = a.getD(Position3d.class, b.getNextEdge().getTargetVertex());
+					double[] t = a.getD(Position3d.class, b.getTargetVertex());
 					if (s1.length > 3) {
 						Pn.dehomogenize(s1, s1);
 						Pn.dehomogenize(s2, s2);
