@@ -131,6 +131,7 @@ public class CurvatureInfo {
 		MainCurvature = mainCurvature;
 	}
 	
+	@Override
 	public String toString(){
 		String str = new String();
 		System.out.println("Su =  "+Arrays.toString(Su));

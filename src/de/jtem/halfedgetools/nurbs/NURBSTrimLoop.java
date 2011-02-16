@@ -30,6 +30,7 @@ public class NURBSTrimLoop {
 	}
 	
 	
+	@Override
 	public String toString(){
 		String str = "TRIMM LOOP: " + "\n";
 		for (NURBSCurve c : curves) {

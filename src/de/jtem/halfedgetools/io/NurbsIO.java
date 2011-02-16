@@ -40,8 +40,8 @@ public class NurbsIO {
 			return str;
 		}
 		
+		@Override
 		public String toString(){
-			
 			return "ctrl point: "+ NURBSCtrlPoints.toString(point) + " index: " + index ;
 		}
 

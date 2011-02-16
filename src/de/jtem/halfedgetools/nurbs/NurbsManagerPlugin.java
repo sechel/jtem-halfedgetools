@@ -196,27 +196,33 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 
 		private String[] columnNames = new String[]{"Name"};
 		
+		@Override
 		public String getColumnName(int col) {
 	        return columnNames[col].toString();
 	    }
 		
-	    public int getRowCount() { 
+	    @Override
+		public int getRowCount() { 
 	    	return (surfaces==null)?0:surfaces.size();
 	    }
 	    
-	    public int getColumnCount() { 
+	    @Override
+		public int getColumnCount() { 
 	    	return 1; 
 	    }
 	    
-	    public Object getValueAt(int row, int col) {
+	    @Override
+		public Object getValueAt(int row, int col) {
 	        return surfaces.get(row).getName();
 	    }
 	    
-	    public boolean isCellEditable(int row, int col) {
+	    @Override
+		public boolean isCellEditable(int row, int col) {
 	    	return true; 
 	    }
 	    
-	    public void setValueAt(Object value, int row, int col) {
+	    @Override
+		public void setValueAt(Object value, int row, int col) {
 	        surfaces.get(row).setName((String)value);
 	    }
 	}
@@ -226,6 +232,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		surfacesTable.getSelectionModel().setSelectionInterval(activeSurfaceIndex,activeSurfaceIndex);
 	}
 	
+	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);

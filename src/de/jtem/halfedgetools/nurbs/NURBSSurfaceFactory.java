@@ -68,6 +68,7 @@ public class NURBSSurfaceFactory extends QuadMeshFactory{
 		return new NurbsUVAdapter(indexUVMap);
 	}
 	
+	@Override
 	public IndexedFaceSet getIndexedFaceSet() {
 		return (IndexedFaceSet)getGeometry();
 	}

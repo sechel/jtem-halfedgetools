@@ -34,6 +34,7 @@ public class VectorFieldMapAdapter extends AbstractAdapter<double[]> {
 		return Face.class.isAssignableFrom(nodeClass);
 	}
 
+	@Override
 	public <
 		V extends Vertex<V,E,F>, 
 		E extends Edge<V,E,F>, 
@@ -46,6 +47,7 @@ public class VectorFieldMapAdapter extends AbstractAdapter<double[]> {
 		}
 	}
 
+	@Override
 	public <
 		V extends Vertex<V,E,F>, 
 		E extends Edge<V,E,F>, 

@@ -2,6 +2,7 @@ package de.jtem.halfedgetools.nurbs;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+
 import de.jreality.math.Rn;
 
 public class IntegralCurves {

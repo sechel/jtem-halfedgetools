@@ -94,7 +94,7 @@ public class SymmetricBaryCenterAdapter extends AbstractTypedAdapter<SVertex, SE
 //			faceIgnore = true;
 //		}
 		
-		SymmetricEdge<?,?,?> se = (SymmetricEdge<?,?,?>)e;
+		SymmetricEdge<?,?,?> se = e;
 		if(se.isSymmetryHalfEdge()){
 			faceIgnore = true;
 		}

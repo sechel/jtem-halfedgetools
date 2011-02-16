@@ -72,6 +72,7 @@ public class NURBSCurve {
 	}
 
 
+	@Override
 	public String toString() {
 		String str = new String("");
 		str = str + "dimension ambient space : " + getAmbientDim() + "\n"

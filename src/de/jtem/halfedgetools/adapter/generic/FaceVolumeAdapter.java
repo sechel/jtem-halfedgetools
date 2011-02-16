@@ -25,6 +25,7 @@ public class FaceVolumeAdapter extends AbstractAdapter<Double> {
 		return Face.class.isAssignableFrom(nodeClass);
 	}
 
+	@Override
 	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>> Double getF(
 			F f, AdapterSet a) {
 

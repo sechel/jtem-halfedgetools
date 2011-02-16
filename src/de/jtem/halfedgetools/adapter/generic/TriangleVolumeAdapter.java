@@ -22,6 +22,7 @@ public class TriangleVolumeAdapter extends AbstractAdapter<Double> {
 		return Face.class.isAssignableFrom(nodeClass);
 	}
 
+	@Override
 	public <
 		V extends Vertex<V,E,F>, 
 		E extends Edge<V,E,F>, 
