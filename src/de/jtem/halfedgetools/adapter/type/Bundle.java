@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.jtem.halfedgetools.adapter;
+package de.jtem.halfedgetools.adapter.type;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

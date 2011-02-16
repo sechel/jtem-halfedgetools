@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.adapter;
+package de.jtem.halfedgetools.adapter.generic;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -8,6 +8,8 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.adapter.AbstractAdapter;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.GaussCurvature;
 import de.jtem.halfedgetools.util.AngleUtilities;
 

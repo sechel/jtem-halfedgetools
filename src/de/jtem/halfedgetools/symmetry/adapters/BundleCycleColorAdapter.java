@@ -41,9 +41,9 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.Bundle;
-import de.jtem.halfedgetools.adapter.Bundle.DisplayType;
+import de.jtem.halfedgetools.adapter.type.Bundle;
 import de.jtem.halfedgetools.adapter.type.Color;
+import de.jtem.halfedgetools.adapter.type.Bundle.DisplayType;
 
 @Color
 public class BundleCycleColorAdapter extends AbstractAdapter<double[]> {

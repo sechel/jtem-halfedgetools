@@ -2,6 +2,7 @@ package de.jtem.halfedgetools.plugin;
 
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -213,8 +214,15 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 
 		@Override
 		public Paint getItemPaint(int row, int column) {
-			// TODO: use nodes color here
-			return super.getItemPaint(row, column);
+			int maxIndex = dataSet.getItemCount(row) - 1;
+			float min = dataSet.getX(row, 0).floatValue();
+			float max = dataSet.getX(row, maxIndex).floatValue();
+			System.out.println("min " + min + ", max " + max);
+			
+			float x = dataSet.getX(row, column).floatValue();
+			float xRel = (x - min)/(max - min);
+			Color c = new Color(xRel, 1 - xRel, 0);
+			return c;
 		}
 		
 	}

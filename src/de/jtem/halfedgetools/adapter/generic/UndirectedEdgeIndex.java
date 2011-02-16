@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.adapter;
+package de.jtem.halfedgetools.adapter.generic;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +8,8 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.AbstractAdapter;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.EdgeIndex;
 
 
@@ -27,7 +29,8 @@ public class UndirectedEdgeIndex extends AbstractAdapter<Integer> {
 		E extends Edge<V,E,F>, 
 		F extends Face<V,E,F>
 	> Integer getE(E e, AdapterSet a) {
-		if(!valid || edgeMap.size() == e.getHalfEdgeDataStructure().numEdges()) {
+		HalfEdgeDataStructure<V, E, F> hds = e.getHalfEdgeDataStructure();
+		if(!valid || edgeMap.size() != hds.numEdges()) {
 			initEdgeMap(e.getHalfEdgeDataStructure());
 			valid = true;
 		}

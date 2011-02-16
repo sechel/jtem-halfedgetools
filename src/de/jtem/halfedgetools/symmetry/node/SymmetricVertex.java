@@ -34,9 +34,9 @@ package de.jtem.halfedgetools.symmetry.node;
 import java.util.Set;
 
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedgetools.adapter.Bundle;
-import de.jtem.halfedgetools.adapter.Bundle.BundleType;
-import de.jtem.halfedgetools.adapter.Bundle.DisplayType;
+import de.jtem.halfedgetools.adapter.type.Bundle;
+import de.jtem.halfedgetools.adapter.type.Bundle.BundleType;
+import de.jtem.halfedgetools.adapter.type.Bundle.DisplayType;
 import de.jtem.halfedgetools.util.PathUtility;
 
 public abstract class SymmetricVertex <

@@ -1,10 +1,12 @@
-package de.jtem.halfedgetools.adapter;
+package de.jtem.halfedgetools.adapter.generic;
 
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.AbstractAdapter;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Volume;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 
