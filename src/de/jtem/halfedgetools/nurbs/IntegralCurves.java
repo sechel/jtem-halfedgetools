@@ -15,7 +15,7 @@ public class IntegralCurves {
 		}
 	}
 
-	public static LinkedList<double[]> rungeKutta(NURBSSurface ns, double[] tspan, double[] y0, double tol, boolean max) {
+	public static LinkedList<double[]> rungeKutta(NURBSSurface ns, double[] tspan, double[] y0, double tol, boolean max,double eps) {
 		double[][] A = { { 0, 0, 0, 0 }, { 0.5, 0, 0, 0 }, { 0, 0.75, 0, 0 },{ 2 / 9., 1 / 3., 4 / 9., 0 } };
 		double[] c1 = { 2 / 9., 1 / 3., 4 / 9., 0 };
 		double[] c2 = { 7 / 24., 0.25, 1 / 3., 1 / 8. };
@@ -35,8 +35,12 @@ public class IntegralCurves {
 		double v1 = Vdomain[0];
 		double v2 = Vdomain[1];
 		double[] orientation = IntegralCurves.getMaxMinCurv(ns, y0[0],y0[1], max);
+		boolean inDomain = true;
+		boolean nearBy = false;
+		boolean first = true;
+		double dist;
 
-		while ((t.getLast() < tspan[1]) && (t.getLast() + h > t.getLast())) {
+		while (!nearBy) {
 			double[] v = new double[dim];
 			double[] sumA = new double[dim];
 			for (int i = 0; i < dim; i++) {
@@ -59,7 +63,7 @@ public class IntegralCurves {
 				if (v[0] + h * sumA[0] >= u2 || v[0] + h * sumA[0] <= u1
 						|| v[1] + h * sumA[1] >= v2 || v[1] + h * sumA[1] <= v1) {
 					System.out.println("out of domain");
-					// return u;
+					 return u;
 				}
 				if (v[0] + h * sumA[0] >= u2 && v[1] + h * sumA[1] > v1 && v[1] + h * sumA[1] < v2) {
 					k[l] = Rn.normalize(null,IntegralCurves.getMaxMinCurv(ns,u2 - 0.00000001, v[1] + h * sumA[1],max));
@@ -129,6 +133,19 @@ public class IntegralCurves {
 			if ((tau <= tol * vau / 2.) || (tau >= tol * vau)) {
 				h = h * StrictMath.pow(tol * vau / tau, 1 / 2.);
 			}
+			if(u.getLast()[0] >= u2 || u.getLast()[0] <= u1 ||u.getLast()[1] >= v2 || u.getLast()[1] <= v1){
+				inDomain = false;
+			}
+			dist = Rn.euclideanDistance(u.getLast(), y0);
+			if(!(dist < eps) && first){
+				first = false;
+			}
+			
+			if(dist < eps && !first){
+				
+				nearBy = true;
+				System.out.println("first = "+ first);
+			}
 		}
 		return u;
 	}
@@ -138,7 +155,7 @@ public class IntegralCurves {
 		double[]tspan = {0,1.527};
 		double[]y0 = {0.25,0.5};
 		double tol = 0.001;
-		IntegralCurves.rungeKutta(ns, tspan, y0, tol, true);
+		IntegralCurves.rungeKutta(ns, tspan, y0, tol, true,0.01);
 
 		
 	}

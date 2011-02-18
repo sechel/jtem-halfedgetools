@@ -17,6 +17,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -298,12 +299,26 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		} else if(src == integralCurveButton) {
 			double[] tspan = {0,1.527};
 			double[] y0 = {0.25,0.5};
-			double tol = 0.001;
-//			IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), tspan, y0, tol, true);
+			double tol = 0.0001;
+			LinkedList<double[]> uList = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), tspan, y0, tol, false,0.01);
 			PointSetFactory psf = new PointSetFactory();
-			psf.setVertexCount(1);
-			psf.setVertexCoordinates(new double[]{0,0,0});
-			
+			int p = surfaces.get(surfacesTable.getSelectedRow()).p;
+			int q = surfaces.get(surfacesTable.getSelectedRow()).q;
+			double[] U = surfaces.get(surfacesTable.getSelectedRow()).U;
+			double[] V = surfaces.get(surfacesTable.getSelectedRow()).V;
+			double[][][]Pw = surfaces.get(surfacesTable.getSelectedRow()).getControlMesh();
+			double[][] u = new double[uList.size()][];
+			double[][] points = new double[uList.size()][];
+			for (int i = 0; i < u.length; i++) {
+				u[i] = uList.get(i);
+			}
+			psf.setVertexCount(u.length);
+			for (int i = 0; i < u.length; i++) {
+				double[] S = new double[3];
+				NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, u[i][0], u[i][1], S);
+				points[i] = S;
+			}
+			psf.setVertexCoordinates(points);
 			psf.update();
 			SceneGraphComponent sgc = new SceneGraphComponent("Integral Curves");
 			SceneGraphComponent minCurveComp = new SceneGraphComponent("Min Curve");

@@ -38,6 +38,7 @@ public class CurvatureInfo {
 	public double[] getSuu() {
 		return Suu;
 	}
+	
 
 	public void setSuu(double[] suu) {
 		Suu = suu;
@@ -74,7 +75,7 @@ public class CurvatureInfo {
 	public void setSv(double[] sv) {
 		Sv = sv;
 	}
-
+	
 	public double[][] getCurvatureDirectionsManifold() {
 		return curvatureDirectionsManifold;
 	}
