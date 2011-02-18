@@ -34,7 +34,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
+import de.jreality.geometry.PointSetFactory;
 import de.jreality.plugin.basic.View;
+import de.jreality.scene.SceneGraphComponent;
 import de.jtem.halfedgetools.io.NurbsIO;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
@@ -56,7 +58,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	
 	private JButton
 		importButton = new JButton(importAction),
-		updateButton = new JButton("update");
+		updateButton = new JButton("update"),
+		integralCurveButton = new JButton("Curve");
 
 	private JTable
 		surfacesTable= new JTable(new SurfaceTableModel());
@@ -94,6 +97,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		importButton.addActionListener(this);
 		importButton.setToolTipText("Load Nurbs surface");
 		updateButton.addActionListener(this);
+		integralCurveButton.addActionListener(this);
 		
 		JPanel tablePanel = new JPanel();
 		tablePanel.setLayout(new GridLayout());
@@ -117,6 +121,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		shrinkPanel.add(surfaceToolbar, c);
 		c.weighty = 1.0;
 		shrinkPanel.add(tablePanel, c);
+		c.weighty = 0.0;
+		shrinkPanel.add(integralCurveButton,c);
 	}
 
 	private void configureFileChooser() {
@@ -270,22 +276,40 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		NURBSSurfaceFactory qmf = new NURBSSurfaceFactory();
-		qmf.setGenerateVertexNormals(true);
-		qmf.setGenerateFaceNormals(true);
-		qmf.setGenerateEdgesFromFaces(true);
-		qmf.setULineCount(uSpinnerModel.getNumber().intValue());
-		qmf.setVLineCount(vSpinnerModel.getNumber().intValue());
-		qmf.setSurface(surfaces.get(surfacesTable.getSelectedRow()));
-		qmf.update();
+	public void actionPerformed(ActionEvent ae) {
+		Object src = ae.getSource();
+		if(src == updateButton) {
+			NURBSSurfaceFactory qmf = new NURBSSurfaceFactory();
+			qmf.setGenerateVertexNormals(true);
+			qmf.setGenerateFaceNormals(true);
+			qmf.setGenerateEdgesFromFaces(true);
+			qmf.setULineCount(uSpinnerModel.getNumber().intValue());
+			qmf.setVLineCount(vSpinnerModel.getNumber().intValue());
+			qmf.setSurface(surfaces.get(surfacesTable.getSelectedRow()));
+			qmf.update();
 
-		hif.set(qmf.getGeometry());
-		hif.update();
-		hif.addLayerAdapter(qmf.getUVAdapter(), false);
-		if(vectorFieldBox.isSelected()) {
-			hif.addLayerAdapter(qmf.getMinCurvatureVectorField(),false);
-			hif.addLayerAdapter(qmf.getMaxCurvatureVectorField(),false);
+			hif.set(qmf.getGeometry());
+			hif.update();
+			hif.addLayerAdapter(qmf.getUVAdapter(), false);
+			if(vectorFieldBox.isSelected()) {
+				hif.addLayerAdapter(qmf.getMinCurvatureVectorField(),false);
+				hif.addLayerAdapter(qmf.getMaxCurvatureVectorField(),false);
+			}
+		} else if(src == integralCurveButton) {
+			double[] tspan = {0,1.527};
+			double[] y0 = {0.25,0.5};
+			double tol = 0.001;
+//			IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), tspan, y0, tol, true);
+			PointSetFactory psf = new PointSetFactory();
+			psf.setVertexCount(1);
+			psf.setVertexCoordinates(new double[]{0,0,0});
+			
+			psf.update();
+			SceneGraphComponent sgc = new SceneGraphComponent("Integral Curves");
+			SceneGraphComponent minCurveComp = new SceneGraphComponent("Min Curve");
+			sgc.addChild(minCurveComp);
+			sgc.setGeometry(psf.getGeometry());
+			hif.getActiveLayer().addTemporaryGeometry(sgc);
 		}
 	}
 }
