@@ -25,8 +25,8 @@ public class NURBSCurvatureUtility {
 		double[][][]SKL = new double[p+1][q+1][3];
 
 		
-		int nl = ns.controlMesh.length - 1;
-		int ml = ns.controlMesh[0].length - 1;
+		int nl = ns.controlMesh.length-1;
+		int ml = ns.controlMesh[0].length-1;
 		NURBSAlgorithm.SurfaceDerivatives(ml, p, U, nl, q, V, ns.controlMesh, u, v, 4, SKL1);		
 		double [][][] Aders = new double[SKL1.length][SKL1[0].length][3];
 		double [][] wders = new double[SKL1.length][SKL1[0].length];
@@ -49,7 +49,7 @@ public class NURBSCurvatureUtility {
 		} else {
 			dG.setSuu(SKL[2][0]);
 		}
-		if(p <= 1) {
+		if(q <= 1) {
 			dG.setSvv(new double[]{0,0,0});
 		} else {
 			dG.setSvv(SKL[0][2]);
