@@ -19,8 +19,8 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.adapter.TypedAdapterSet;
-import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 
 /**
  * Implements the ConvexHull algorithm from 
@@ -42,7 +42,7 @@ public class ConvexHull {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void convexHull(
 		HDS hds,
-		TypedAdapterSet<double[]> vp,
+		AdapterSet vp,
 		double tolerance
 	) { 
 		if (hds.numFaces() > 0) {
@@ -223,15 +223,15 @@ public class ConvexHull {
 	> Plane getPlaneForFace(
 		F f,
 		Map<F, Plane> planeMap,
-		TypedAdapterSet<double[]> vp
+		AdapterSet vp
 	) {
 		if (!planeMap.containsKey(f)) {
 			V v1 = f.getBoundaryEdge().getPreviousEdge().getTargetVertex();
 			V v2 = f.getBoundaryEdge().getTargetVertex();
 			V v3 = f.getBoundaryEdge().getNextEdge().getTargetVertex();
-			double[] p1 = vp.get(Position.class, v1);
-			double[] p2 = vp.get(Position.class, v2);
-			double[] p3 = vp.get(Position.class, v3);
+			double[] p1 = vp.getD(Position3d.class, v1);
+			double[] p2 = vp.getD(Position3d.class, v2);
+			double[] p3 = vp.getD(Position3d.class, v3);
 			Plane result = new Plane(p1, p2, p3);
 			planeMap.put(f, result);
 		}
@@ -247,10 +247,10 @@ public class ConvexHull {
 		F f,
 		V v,
 		Map<F, Plane> planeMap,
-		TypedAdapterSet<double[]> vp
+		AdapterSet vp
 	) {
 		Plane plane = getPlaneForFace(f, planeMap, vp);
-		double[] pos = vp.get(Position.class, v); 
+		double[] pos = vp.getD(Position3d.class, v); 
 		return plane.isAbove(pos);
 	}
 
@@ -263,16 +263,16 @@ public class ConvexHull {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> Set<V> createInitialTetrahedron(
 		HDS hds,
-		TypedAdapterSet<double[]> pos,
+		AdapterSet pos,
 		double tolerance
 	) {
 		 Set<V> result = new HashSet<V>();
 		 V v1 = hds.getVertex(rnd.nextInt(hds.numVertices()));
-		 double[] v1p = pos.get(Position.class, v1);
+		 double[] v1p = pos.getD(Position3d.class, v1);
 		 V v2 = null;
 		 double[] v2p = null;
 		 for (V v : hds.getVertices()) {
-			 double[] vp = pos.get(Position.class, v);
+			 double[] vp = pos.getD(Position3d.class, v);
 			 if (!Rn.equals(vp, v1p, tolerance)) {
 				 v2 = v;
 				 v2p = vp;
@@ -285,9 +285,9 @@ public class ConvexHull {
 		 V v3 = null;
 		 V v4 = null;
 		 for (V v : hds.getVertices()) {
-			 double[] vp = pos.get(Position.class, v);
+			 double[] vp = pos.getD(Position3d.class, v);
 			 for (V vv : hds.getVertices()) {
-				 double[] vvp = pos.get(Position.class, vv);
+				 double[] vvp = pos.getD(Position3d.class, vv);
 				 double[][] m = {
 					{v1p[0], v1p[1], v1p[2], 1}, 
 					{v2p[0], v2p[1], v2p[2], 1}, 
