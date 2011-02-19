@@ -5,6 +5,8 @@ import static de.jreality.math.Rn.innerProduct;
 import static de.jreality.math.Rn.normalize;
 import static de.jreality.math.Rn.subtract;
 import static java.lang.Math.abs;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,7 +15,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import de.jreality.math.Matrix;
+import de.jreality.math.MatrixBuilder;
 import de.jreality.math.Rn;
+import de.jreality.plugin.JRViewer;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -21,6 +26,10 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
+import de.jtem.halfedgetools.jreality.adapter.JRPositionAdapter;
+import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
+import de.jtem.halfedgetools.jreality.node.DefaultJRVertex;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 
 /**
  * Implements the ConvexHull algorithm from 
@@ -65,7 +74,7 @@ public class ConvexHull {
 		for (V v : hds.getVertices()) {
 			if (v.getIncomingEdge() != null) continue;
 			for (F f : hds.getFaces()) {
-				if (isFaceVisibleFrom(f, v, planeMap, vp)) {
+				if (isFaceVisibleFrom(f, v, planeMap, vp, tolerance)) {
 					Set<F> conflictFaces = getConflictFaces(v, pMap);
 					Set<V> conflictVertices = getConflictVertices(f, fMap);
 					conflictFaces.add(f);
@@ -156,7 +165,7 @@ public class ConvexHull {
 //					fMap.put(f, Pconflicts); // :TODO fix me here
 //				} else {
 					for (V v : PconflictMap.get(horizon)) {
-						if (isFaceVisibleFrom(f, v, planeMap, vp)) {
+						if (isFaceVisibleFrom(f, v, planeMap, vp, tolerance)) {
 							getConflictFaces(v, pMap).add(f);
 							getConflictVertices(f, fMap).add(v);
 						}
@@ -247,11 +256,12 @@ public class ConvexHull {
 		F f,
 		V v,
 		Map<F, Plane> planeMap,
-		AdapterSet vp
+		AdapterSet vp,
+		double eps
 	) {
 		Plane plane = getPlaneForFace(f, planeMap, vp);
 		double[] pos = vp.getD(Position3d.class, v); 
-		return plane.isAbove(pos);
+		return plane.isAbove(pos, eps);
 	}
 
 	
@@ -346,8 +356,8 @@ public class ConvexHull {
 			return isInPlane(p, 1E-8);
 		}
 		
-		public boolean isAbove(double[] p){
-			return Rn.innerProduct(n, p) >= -d;
+		public boolean isAbove(double[] p, double eps){
+			return Rn.innerProduct(n, p) > -d + eps;
 		}
 		
 		@Override
@@ -356,6 +366,46 @@ public class ConvexHull {
 		}
 
 	}
+	
+	
+	
+	
+	public static void main(String[] args) {
+		// Construction of an error
+		DefaultJRHDS hds = new DefaultJRHDS();
+		int numPoints = 50;
+		
+		Matrix T = MatrixBuilder.euclidean().rotate(0.3, 1, 1, 1).getMatrix();
+		
+		for (int i = 0; i < numPoints; i++) {
+			DefaultJRVertex v = hds.addNewVertex();
+			double phi = i * Math.PI * 2 / numPoints;
+			v.position = new double[] {cos(phi), sin(phi), 0};
+			T.transformVector(v.position);
+			v = hds.addNewVertex();
+			v.position = new double[] {cos(phi), sin(phi), 1};
+			T.transformVector(v.position);
+		}
+
+		AdapterSet a = AdapterSet.createGenericAdapters();
+		a.add(new JRPositionAdapter());
+		convexHull(hds, a, 1E-15);
+		
+		System.out.println(HalfEdgeUtils.getGenus(hds));
+		
+		JRViewer v = new JRViewer();
+		v.addContentUI();
+		v.addBasicUI();
+		v.registerPlugin(HalfedgeInterface.class);
+		v.startup();
+		v.getPlugin(HalfedgeInterface.class).set(hds);
+	}
+	
+	
+	
+	
+	
+	
 	
 	
 }
