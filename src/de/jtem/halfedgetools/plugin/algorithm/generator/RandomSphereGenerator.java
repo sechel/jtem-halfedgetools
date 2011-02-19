@@ -10,7 +10,6 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.algorithm.computationalgeometry.ConvexHull;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
@@ -40,7 +39,6 @@ public class RandomSphereGenerator extends AlgorithmPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
 		String numString = JOptionPane.showInputDialog(getOptionParent(), "Number of points", 20);
-		TypedAdapterSet<double[]> ad = a.querySet(double[].class);
 		if (numString == null) return;
 		int extraPoints = Integer.parseInt(numString);
 		HDS r = hi.createEmpty(hds);
@@ -48,9 +46,9 @@ public class RandomSphereGenerator extends AlgorithmPlugin {
 			double[] pos = {rnd.nextGaussian(), rnd.nextGaussian(), rnd.nextGaussian()};
 			Rn.normalize(pos, pos);
 			V v = r.addNewVertex();
-			ad.set(Position.class, v, pos);
+			a.set(Position.class, v, pos);
 		}
-		ConvexHull.convexHull(r, ad, 1E-8);
+		ConvexHull.convexHull(r, a, 1E-8);
 		hi.set(r);
 	}
 
