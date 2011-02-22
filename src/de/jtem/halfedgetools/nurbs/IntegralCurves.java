@@ -35,7 +35,7 @@ public class IntegralCurves {
 		double v1 = Vdomain[0];
 		double v2 = Vdomain[1];
 		double[] orientation = IntegralCurves.getMaxMinCurv(ns, y0[0],y0[1], max);
-		boolean inDomain = true;
+//		boolean inDomain = true;
 		boolean nearBy = false;
 		boolean first = true;
 		double dist;
@@ -134,7 +134,7 @@ public class IntegralCurves {
 				h = h * StrictMath.pow(tol * vau / tau, 1 / 2.);
 			}
 			if(u.getLast()[0] >= u2 || u.getLast()[0] <= u1 ||u.getLast()[1] >= v2 || u.getLast()[1] <= v1){
-				inDomain = false;
+//				inDomain = false;
 			}
 			dist = Rn.euclideanDistance(u.getLast(), y0);
 			if(!(dist < eps) && first){
