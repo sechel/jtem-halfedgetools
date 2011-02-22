@@ -8,10 +8,13 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+
+import de.jreality.util.LoggingSystem;
 
 /**
  * An image loader for jar files
@@ -22,6 +25,8 @@ import javax.swing.ImageIcon;
  */
 public class ImageHook { 
 
+	private static Logger
+		log = LoggingSystem.getLogger(ImageHook.class);
 
 	public static Image getImage(String filename){ 
 		InputStream in = ImageHook.class.getResourceAsStream(filename);
@@ -30,9 +35,18 @@ public class ImageHook {
 		Image result = null;
 		try {
 			result = ImageIO.read(in);
-		} catch (IOException e) {}
+		} catch (IOException e) {
+			log.warning(e.getLocalizedMessage());
+		} finally {
+			try {
+				in.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		return result;
 	}
+	
 
 	public static Image getImage(String filename, int width, int height) {
 		Image image = getImage(filename);
