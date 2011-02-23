@@ -17,7 +17,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -38,6 +40,8 @@ import javax.swing.table.DefaultTableModel;
 import de.jreality.geometry.PointSetFactory;
 import de.jreality.plugin.basic.View;
 import de.jreality.scene.SceneGraphComponent;
+import de.jtem.halfedge.Vertex;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.io.NurbsIO;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
@@ -298,7 +302,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			}
 		} else if(src == integralCurveButton) {
 			double[] tspan = {0,1.527};
-			double[] y0 = {0.25,0.5};
+			Set<Vertex<?,?,?>> verts = hif.getSelection().getVertices();
+			AdapterSet as = hif.getAdapters();
+			double[] y0 = as.getD(NurbsUVCoordinate.class, verts.iterator().next());
+			System.out.println(Arrays.toString(y0));
 			double tol = 0.0001;
 			LinkedList<double[]> uList = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), tspan, y0, tol, false,0.01);
 			PointSetFactory psf = new PointSetFactory();
