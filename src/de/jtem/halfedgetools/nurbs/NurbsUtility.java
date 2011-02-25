@@ -152,49 +152,31 @@ public class NurbsUtility {
 		dG.setSuu(SKL[2][0]);
 		dG.setSuv(SKL[1][1]);
 		dG.setSvv(SKL[0][2]);
-//		System.out.println("S "+ Arrays.toString(SKL[0][0]));
-//		System.out.println("norm: "+ Math.sqrt(Rn.innerProduct(SKL[0][0], SKL[0][0])));
-//		System.out.println("Su "+ Arrays.toString(SKL[1][0]));
-//		System.out.println("Sv "+ Arrays.toString(SKL[0][1]));
-//		System.out.println("Suv "+ Arrays.toString(SKL[1][1]));
 		double E = Rn.innerProduct(SKL[1][0], SKL[1][0]);
-//		System.out.println("E "+ E);
-	
 		double F = Rn.innerProduct(SKL[1][0], SKL[0][1]);
-//		System.out.println("F "+ F);
 		double G = Rn.innerProduct(SKL[0][1], SKL[0][1]);
-//		System.out.println("G "+ G);
-		
 		double[] normal = new double[3];
-	
 		Rn.crossProduct(normal, SKL[1][0], SKL[0][1]);
 		Rn.normalize(normal, normal);
-//		System.out.println("N "+ Arrays.toString(N));
-		
 		double l;
 		if(SKL.length < 3){
 			l = 0;
 		}else{
 			l = Rn.innerProduct(normal, SKL[2][0]);
 		}
-//		System.out.println("l "+ l);
 		double m = Rn.innerProduct(normal, SKL[1][1]);
-//		System.out.println("m "+ m);
 		double n;
 		if(SKL[0].length < 3){
 			n = 0;
 		}else{
 			n = Rn.innerProduct(normal, SKL[0][2]);
 		}
-		
-//		System.out.println("n "+ n);
 		FFs[0] = E;
 		FFs[1] = F;
 		FFs[2] = G;
 		FFs[3] = l;
 		FFs[4] = m;
 		double[][] W = new double[2][2];
-//		System.out.println("factor: " +1/(E*G-F*F));
 		double a11 = (G*l-F*m)/(E*G-F*F);
 		double a12 = (G*m-F*n)/(E*G-F*F);
 		double a21 = (E*m-F*l)/(E*G-F*F);
