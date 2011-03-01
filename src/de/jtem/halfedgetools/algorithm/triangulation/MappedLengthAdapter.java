@@ -14,12 +14,12 @@ import de.jtem.halfedgetools.adapter.type.Length;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 
 @Length
-public class DelaunayLengthAdapter extends AbstractAdapter<Double> {
+public class MappedLengthAdapter extends AbstractAdapter<Double> {
 
 	private Map<Edge<?, ?, ?>, Double>
 		lMap = new HashMap<Edge<?,?,?>, Double>();
 	
-	public DelaunayLengthAdapter() {
+	public MappedLengthAdapter() {
 		super(Double.class, true, true);
 	}
 	

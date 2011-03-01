@@ -180,11 +180,11 @@ public class Delaunay {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> DelaunayLengthAdapter constructDelaunay(HDS graph, AdapterSet a) throws TriangulationException{
+	> MappedLengthAdapter constructDelaunay(HDS graph, AdapterSet a) throws TriangulationException{
 		if (!ConsistencyCheck.isTriangulation(graph)) {
 			throw new TriangulationException("Graph is no triangulation!");
 		}
-		DelaunayLengthAdapter la = new DelaunayLengthAdapter();
+		MappedLengthAdapter la = new MappedLengthAdapter();
 		a.add(la);
 		HashSet<E> markSet = new HashSet<E>();
 		Stack<E> stack = new Stack<E>();
