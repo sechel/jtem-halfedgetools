@@ -2,7 +2,6 @@ package de.jtem.halfedgetools.plugin;
 
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -37,6 +36,8 @@ import org.jfree.data.statistics.HistogramDataset;
 
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.View;
+import de.jreality.scene.SceneGraphComponent;
+import de.jreality.util.SceneGraphUtility;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedgetools.adapter.Adapter;
@@ -52,14 +53,15 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 	private HalfedgeInterface
 		hif = null;
 	private HistogramDataset
-		dataSet = new HistogramDataset();
+		plotDataSet = new HistogramDataset(),
+		pointsDataSet = new HistogramDataset();
 	private NumberAxis 
 		domainAxis = new NumberAxis(),
 		rangeAxis = new NumberAxis();
 	private XYBarRenderer
 		barRenderer = new ColoredXYBarRenderer();
 	private XYPlot
-		plot = new XYPlot(dataSet, domainAxis, rangeAxis, barRenderer);
+		plot = new XYPlot(plotDataSet, domainAxis, rangeAxis, barRenderer);
 	private JFreeChart
 		chart = new JFreeChart(plot);
 	private ChartPanel
@@ -79,7 +81,11 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 	
 	private List<Adapter<Number>>
 		availableSet = new ArrayList<Adapter<Number>>(),
-		activeSet = new ArrayList<Adapter<Number>>();
+		activeSet = new ArrayList<Adapter<Number>>(),
+		showPointSet = new ArrayList<Adapter<Number>>();
+	
+	private SceneGraphComponent 
+		scalarFunctionComponent = new SceneGraphComponent();
 	
 	public Histogram() {
 		shrinkPanel.setTitle("Histogram");
@@ -126,6 +132,8 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 		
 		numBinsSpinner.addChangeListener(this);
 		scaleExpSpinner.addChangeListener(this);
+		
+		scalarFunctionComponent.setName("Scalar Functions");
 	}
 	
 	
@@ -141,13 +149,14 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 		
 		@Override
 		public int getColumnCount() {
-			return 2;
+			return 3;
 		}
 		
 		@Override
 		public Class<?> getColumnClass(int columnIndex) {
 			switch (columnIndex) {
 				case 0: return Boolean.class;
+				case 1: return Boolean.class;
 				default: return String.class;
 			}
 		}
@@ -163,6 +172,8 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 				case 0: 
 					return activeSet.contains(op);
 				case 1:
+					return showPointSet.contains(op);
+				case 2:
 					return op.toString().replace("Adapter", "");
 				default: 
 					value = "-";
@@ -175,6 +186,8 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 		public boolean isCellEditable(int row, int column) {
 			switch (column) {
 				case 0:
+					return true;
+				case 1:
 					return true;
 				default: 
 					return false;
@@ -193,14 +206,28 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 		@Override
 		public void editingStopped(ChangeEvent e) {
 			int row = adapterTable.getSelectedRow();
+			int col = adapterTable.getSelectedColumn();
+			
 			if (adapterTable.getRowSorter() != null) {
 				row = adapterTable.getRowSorter().convertRowIndexToModel(row);
 			}
-			Adapter<Number> op = availableSet.get(row);
-			if (activeSet.contains(op)) {
-				activeSet.remove(op);
-			} else {
-				activeSet.add(op);
+			
+			if(col == 0) {
+				Adapter<Number> op = availableSet.get(row);
+				if (activeSet.contains(op)) {
+					activeSet.remove(op);
+				} else {
+					activeSet.add(op);
+				}
+			}
+			
+			if(col == 1) {
+				Adapter<Number> op = availableSet.get(row);
+				if (showPointSet.contains(op)) {
+					showPointSet.remove(op);
+				} else {
+					showPointSet.add(op);
+				}
 			}
 			updateActive(hif.getActiveLayer());
 			adapterTable.revalidate();
@@ -212,17 +239,16 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 		
 		private static final long serialVersionUID = 1L;
 
+		private ColorMap colorMap = new RedGreenColorMap();
+		
 		@Override
 		public Paint getItemPaint(int row, int column) {
-			int maxIndex = dataSet.getItemCount(row) - 1;
-			float min = dataSet.getX(row, 0).floatValue();
-			float max = dataSet.getX(row, maxIndex).floatValue();
-			System.out.println("min " + min + ", max " + max);
-			
-			float x = dataSet.getX(row, column).floatValue();
-			float xRel = (x - min)/(max - min);
-			Color c = new Color(xRel, 1 - xRel, 0);
-			return c;
+			int maxIndex = plotDataSet.getItemCount(row) - 1;
+			float min = plotDataSet.getX(row, 0).floatValue();
+			float max = plotDataSet.getX(row, maxIndex).floatValue();
+//			System.out.println("min " + min + ", max " + max);
+			float x = plotDataSet.getX(row, column).floatValue();
+			return colorMap.getColor(x, min, max);
 		}
 		
 	}
@@ -237,54 +263,78 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 	private void updateAdapterTable() {
 		adapterTable.setModel(new DataTableModel());
 		adapterTable.getColumnModel().getColumn(0).setMaxWidth(30);
+		adapterTable.getColumnModel().getColumn(1).setMaxWidth(30);
 	}
 	
 	private void updateActive(HalfedgeLayer l) {
-		int numBins = numBinsModel.getNumber().intValue();
 		HalfEdgeDataStructure<?, ?, ?> hds = l.get();
 		AdapterSet aSet = l.getEffectiveAdapters();
-		dataSet = new HistogramDataset();
-		if (activeSet.size() == 0 ||
-			hds.numVertices() == 0 ||
-			hds.numEdges() == 0 ||
-			hds.numFaces() == 0
-		) {
-			plot.setDataset(dataSet);
-			chartPanel.restoreAutoBounds();
-			updateAdapterTable();
-			return;
+		plotDataSet = createDataSet(hds,aSet,activeSet);
+		plot.setDataset(plotDataSet);
+		chartPanel.restoreAutoBounds();
+		pointsDataSet = createDataSet(hds,aSet,showPointSet);
+		if(scalarFunctionComponent  != null) {
+			SceneGraphUtility.removeChildren(scalarFunctionComponent);
 		}
-		for (Adapter<? extends Number> a : activeSet) {
+		if(pointsDataSet.getSeriesCount() != 0) {
+			createPointSets(hds,aSet);
+		}
+		updateAdapterTable();
+	}
+
+	private void createPointSets(HalfEdgeDataStructure<?, ?, ?> hds, AdapterSet as) {
+		for(Adapter<Number> na : showPointSet) {
+			ScalarFunctionPointSet sfps = new ScalarFunctionPointSet(hds, na, as);
+			sfps.setColorMap(new HueColorMap());
+			scalarFunctionComponent.addChild(sfps.getComponent());
+		}
+	}
+	
+	private HistogramDataset createDataSet(HalfEdgeDataStructure<?, ?, ?> hds, AdapterSet aSet, List<Adapter<Number>> set) {
+		HistogramDataset histData = new HistogramDataset();
+		if (	set.size() == 0 ||
+				hds.numVertices() == 0 ||
+				hds.numEdges() == 0 ||
+				hds.numFaces() == 0
+			) {
+			return histData;
+		}
+		int numBins = numBinsModel.getNumber().intValue();
+		
+		for (Adapter<? extends Number> a : set) {
 			String name = a.toString().replace("Adapter", "");
 			if (a.canAccept(hds.getVertexClass())) { // create vertex histogram
 				double[] data = getData(hds.getVertices(), (Adapter<?>)a, aSet);
 				if (data.length > 0) {
-					dataSet.addSeries(name, data, numBins);
+					histData.addSeries(name, data, numBins);
 				}
 			}
 			if (a.canAccept(hds.getEdgeClass())) { // create edge histogram
 				double[] data = getData(hds.getEdges(), (Adapter<?>)a, aSet);
 				if (data.length > 0) {
-					dataSet.addSeries(name, data, numBins);
+					histData.addSeries(name, data, numBins);
 				}
+				
 			}
 			if (a.canAccept(hds.getFaceClass())) { // create face histogram
 				double[] data = getData(hds.getFaces(), (Adapter<?>)a, aSet);
 				if (data.length > 0) {
-					dataSet.addSeries(name, data, numBins);
+					histData.addSeries(name, data, numBins);
 				}
 			}
 		}
-		plot.setDataset(dataSet);
-		chartPanel.restoreAutoBounds();
-		updateAdapterTable();
+		return histData;
 	}
 
-	
+
+
 	@SuppressWarnings("unchecked")
 	private void updateAvailable(HalfedgeLayer l) {
 		availableSet.clear();
 		activeSet.clear();
+		showPointSet.clear();
+		scalarFunctionComponent = new SceneGraphComponent("Scalar Functions");
+		l.addTemporaryGeometry(scalarFunctionComponent);
 		HalfEdgeDataStructure<?, ?, ?> hds = l.get();
 		AdapterSet aSet = l.getEffectiveAdapters();
 		TypedAdapterSet<Number> numSet = aSet.querySet(Number.class);
@@ -323,6 +373,8 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 	
 	@Override
 	public void activeLayerChanged(HalfedgeLayer old, HalfedgeLayer active) {
+		//TODO: do something with the scalarFunctionComponent
+		old.removeTemporaryGeometry(scalarFunctionComponent);
 		updateAvailable(active);
 	}
 	@Override
