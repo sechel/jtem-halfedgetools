@@ -18,7 +18,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -39,6 +38,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
 import de.jreality.geometry.PointSetFactory;
+import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.View;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.SceneGraphComponent;
@@ -369,7 +369,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			LinkedList<double[]> umb = IntegralCurves.umbilicPoints(surfaces.get(surfacesTable.getSelectedRow()), n);
 			double[][]umbPoints = new double[umb.size()][];
 			for (int i = 0; i < umb.size(); i++) {
-				System.out.println(Arrays.toString(umb.get(i)));
 				umbPoints[i] = umb.get(i);
 				
 			}
@@ -402,5 +401,12 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				hif.getActiveLayer().addTemporaryGeometry(sgcu);
 			}
 		}
+	}
+	
+	public static void main(String[] args) {
+		JRViewer v = new JRViewer();
+		v.addContentUI();
+		v.registerPlugin(new NurbsManagerPlugin());
+		v.startup();
 	}
 }
