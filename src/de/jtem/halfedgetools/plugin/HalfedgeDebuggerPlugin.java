@@ -59,7 +59,6 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.generic.IndexLabelAdapter;
 import de.jtem.java2dx.beans.Viewer2DWithInspector;
-import de.jtem.java2dx.modelling.GraphicsModeller2D;
 import de.jtem.java2dx.modelling.SimpleModeller2D;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -71,7 +70,7 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 	private HalfedgeInterface
 		hcp = null;
 	private SimpleModeller2D
-		moddeller = new GraphicsModeller2D();
+		moddeller = new SimpleModeller2D();
 	private Viewer2DWithInspector
 		viewer = moddeller.getViewer();
 	private boolean
