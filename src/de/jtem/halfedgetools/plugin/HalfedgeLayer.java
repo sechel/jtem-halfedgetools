@@ -70,6 +70,7 @@ public class HalfedgeLayer implements ActionListener {
 		geometry = new IndexedFaceSet();
 	private AdapterSet
 		persistentAdapters = new AdapterSet(),
+		activeVolatileAdapters = new AdapterSet(),
 		volatileAdapters = new AdapterSet();
 	private SceneGraphComponent
 		layerRoot = new SceneGraphComponent("Default Layer"),
@@ -189,14 +190,24 @@ public class HalfedgeLayer implements ActionListener {
 		return r;
 	}
 	
+	/**
+	 * Gather the effective adapters for a convert operation. This contains 
+	 * all adapters of the half-edge interface, all adapters of the layer and the 
+	 * adapters provided by any active visualizer. The active volatile adapters are
+	 * excluded since they belong to the last convert operation.
+	 * @return An {@link AdapterSet} containing the effective adapters for the next convert.
+	 */
 	protected AdapterSet getEffectiveAdapters() {
 		AdapterSet effectiveAdapters = new AdapterSet();
 		effectiveAdapters.addAll(hif.getPersistantAdapters());
 		effectiveAdapters.addAll(hif.getVolatileAdapters());
 		effectiveAdapters.addAll(getAllAdapters());
 		effectiveAdapters.addAll(getVisualizerAdapters());
+		// we don't need the volatiles from the last convert
+		effectiveAdapters.removeAll(activeVolatileAdapters);
 		return effectiveAdapters;
 	}
+	
 	
 	private void initVisualizers(AdapterSet a) {
 		for (VisualizerPlugin vp : visualizers) {
@@ -363,7 +374,7 @@ public class HalfedgeLayer implements ActionListener {
 		createDisplayGeometry();
 		updateBoundingBox();
 		resetTemporaryGeometry();
-		volatileAdapters.clear();
+		clearVolatileAdapters();
 	}
 	
 	
@@ -376,8 +387,16 @@ public class HalfedgeLayer implements ActionListener {
 		updateVisualizersGeometry(ea);
 		updateBoundingBox();
 		resetTemporaryGeometry();
+		clearVolatileAdapters();
+	}
+	
+	
+	private void clearVolatileAdapters() {
+		activeVolatileAdapters.clear();
+		activeVolatileAdapters.addAll(volatileAdapters);
 		volatileAdapters.clear();
 	}
+	
 	
 	
 	private void createDisplayGeometry() {
@@ -673,6 +692,7 @@ public class HalfedgeLayer implements ActionListener {
 	public AdapterSet getAllAdapters() {
 		AdapterSet adapters = new AdapterSet();
 		adapters.addAll(persistentAdapters);
+		adapters.addAll(activeVolatileAdapters);
 		adapters.addAll(volatileAdapters);
 		return adapters;
 	}

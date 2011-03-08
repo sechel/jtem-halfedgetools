@@ -167,6 +167,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	private AdapterSet
 		persistentAdapters = new AdapterSet(),
+		activeVolatileAdapters = new AdapterSet(),
 		volatileAdapters = new AdapterSet();
 	
 	private List<HalfedgeListener>
@@ -739,8 +740,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		activeLayer.set(hds);
 		updateStates();
 		checkContent();
+		clearVolatileAdapters();
 		fireDataChanged();
-		volatileAdapters.clear();
 	}
 	
 	public <
@@ -751,7 +752,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	> HDS get(HDS hds) {
 		HDS r = activeLayer.get(hds);
 		updateStates();
-//		fireDataChanged();
 		return r;
 	}
 	
@@ -759,6 +759,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	public void set(Geometry g) {
 		activeLayer.set(g);
 		updateStates();
+		clearVolatileAdapters();
 		fireDataChanged();
 	}
 	
@@ -766,7 +767,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	public HalfEdgeDataStructure<?, ?, ?> get() {
 		HalfEdgeDataStructure<?, ?, ?> r = activeLayer.get();
 		updateStates();
-		fireDataChanged();
 		return r;
 	}
 	
@@ -823,6 +823,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	public AdapterSet getAdapters() {
 		AdapterSet result = new AdapterSet();
 		result.addAll(persistentAdapters);
+		result.addAll(activeVolatileAdapters);
 		result.addAll(volatileAdapters);
 		result.addAll(activeLayer.getAllAdapters());
 		return result;
@@ -875,6 +876,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		return pa || va || la;
 	}
 	
+	
+	private void clearVolatileAdapters() {
+		activeVolatileAdapters.clear();
+		activeVolatileAdapters.addAll(volatileAdapters);
+		volatileAdapters.clear();
+	}
 	
 	@Override
 	public void storeStates(Controller c) throws Exception {
