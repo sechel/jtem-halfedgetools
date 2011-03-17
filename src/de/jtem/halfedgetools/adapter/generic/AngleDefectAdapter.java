@@ -44,7 +44,7 @@ public class AngleDefectAdapter extends AbstractAdapter<Double> {
 		F extends Face<V, E, F>
 	> Double getE(E e, AdapterSet a) {
 		if(HalfEdgeUtils.isBoundaryEdge(e)) {
-			return null;
+			return 0.0;
 		}
 		if(!angleDefectMap.containsKey(e)) {
 			double angleDefect = 0.0;

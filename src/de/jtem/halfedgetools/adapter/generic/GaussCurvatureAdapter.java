@@ -37,7 +37,7 @@ public class GaussCurvatureAdapter extends AbstractAdapter<Double> {
 		F extends Face<V, E, F>
 	> Double getV(V v, AdapterSet a) {
 		if(HalfEdgeUtils.isBoundaryVertex(v)) {
-			return null;
+			return 0.0;
 		}
 		E e = v.getIncomingEdge();
 		List<E> dualPath = new LinkedList<E>();

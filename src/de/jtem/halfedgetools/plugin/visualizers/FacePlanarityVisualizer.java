@@ -61,6 +61,7 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
+import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Color;
 import de.jtem.halfedgetools.adapter.type.Label;
@@ -84,6 +85,10 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 		panel = new JPanel();
 	private double
 		maxUnevenness = 0.0;
+	private Adapter<?>
+		colorAdapter = new PlanarityColorAdapter(),
+		labelAdapter = new PlanarityLabelAdapter(),
+		valueAdapter = new PlanarityValueAdapter();
 	
 	
 	public FacePlanarityVisualizer() {
@@ -335,13 +340,9 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 	@Override
 	public AdapterSet getAdapters() {
 		AdapterSet result = new AdapterSet();
-		if (showColors.isSelected()) {
-			result.add(new PlanarityColorAdapter());
-		}
-		if (showLabels.isSelected()) {
-			result.add(new PlanarityLabelAdapter());
-		}
-		result.add(new PlanarityValueAdapter());
+		if (showColors.isSelected()) result.add(colorAdapter);
+		if (showLabels.isSelected()) result.add(labelAdapter);
+		result.add(valueAdapter);
 		return result;
 	}
 

@@ -292,11 +292,11 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 	
 	private HistogramDataset createDataSet(HalfEdgeDataStructure<?, ?, ?> hds, AdapterSet aSet, List<Adapter<Number>> set) {
 		HistogramDataset histData = new HistogramDataset();
-		if (	set.size() == 0 ||
-				hds.numVertices() == 0 ||
-				hds.numEdges() == 0 ||
-				hds.numFaces() == 0
-			) {
+		if (set.size() == 0 ||
+			hds.numVertices() == 0 ||
+			hds.numEdges() == 0 ||
+			hds.numFaces() == 0
+		) {
 			return histData;
 		}
 		int numBins = numBinsModel.getNumber().intValue();
@@ -331,8 +331,6 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 	@SuppressWarnings("unchecked")
 	private void updateAvailable(HalfedgeLayer l) {
 		availableSet.clear();
-		activeSet.clear();
-		showPointSet.clear();
 		scalarFunctionComponent = new SceneGraphComponent("Scalar Functions");
 		l.addTemporaryGeometry(scalarFunctionComponent);
 		HalfEdgeDataStructure<?, ?, ?> hds = l.get();
@@ -354,6 +352,8 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 				availableSet.add((Adapter<Number>)a);
 			}
 		}
+		activeSet.retainAll(availableSet);
+		showPointSet.retainAll(availableSet);
 		updateActive(l);
 	}
 	

@@ -64,6 +64,8 @@ public class EdgeLengthVisualizer extends VisualizerPlugin implements ChangeList
 		placesSpinner = new JSpinner(placesModel);
 	private JPanel
 		panel = new JPanel();
+	private EdgeLengthAdapter
+		edgeLengthAdapter = new EdgeLengthAdapter();
 	
 	
 	public EdgeLengthVisualizer() {
@@ -136,9 +138,7 @@ public class EdgeLengthVisualizer extends VisualizerPlugin implements ChangeList
 	
 	@Override
 	public AdapterSet getAdapters() {
-		AdapterSet result = new AdapterSet();
-		result.add(new EdgeLengthAdapter());
-		return result;
+		return new AdapterSet(edgeLengthAdapter);
 	}
 
 
