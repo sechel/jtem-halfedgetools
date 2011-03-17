@@ -240,6 +240,10 @@ public class HalfedgeLayer implements ActionListener {
 	
 	/**
 	 * Update the vertex positions for a previously set mesh
+	 * TODO: Decide on whether this should include visualizers. Or
+	 * convert at all. Converting feels natural as colors like
+	 * planar faces are displayed correctly after updateGeometry
+	 * In this case this is just a convenience method
 	 * @param positionAdapter the vertex position adapter
 	 */
 	public void updateGeometryNoUndo(Adapter<double[]> positionAdapter) {
