@@ -1,7 +1,6 @@
 package de.jtem.halfedgetools.plugin;
 
 import static de.jreality.scene.Appearance.INHERITED;
-import static de.jreality.scene.data.Attribute.COORDINATES;
 import static de.jreality.shader.CommonAttributes.DEPTH_FUDGE_FACTOR;
 import static de.jreality.shader.CommonAttributes.DIFFUSE_COLOR;
 import static de.jreality.shader.CommonAttributes.EDGE_DRAW;
@@ -39,8 +38,6 @@ import de.jreality.scene.IndexedLineSet;
 import de.jreality.scene.PointSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.Transformation;
-import de.jreality.scene.data.DataList;
-import de.jreality.scene.data.DoubleArrayArray;
 import de.jreality.scene.pick.PickResult;
 import de.jreality.scene.tool.ToolContext;
 import de.jreality.tools.ActionTool;
@@ -247,23 +244,25 @@ public class HalfedgeLayer implements ActionListener {
 	 */
 	public void updateGeometryNoUndo(Adapter<double[]> positionAdapter) {
 		AdapterSet adapters = getEffectiveAdapters();
-		double[][] posArr = new double[hds.numVertices()][];
+//		double[][] posArr = new double[hds.numVertices()][];
 		for (Vertex<?,?,?> v : hds.getVertices()) {
 			double[] pos = positionAdapter.get(v, adapters);
 			if (pos != null) {
 				adapters.set(Position.class, v, pos);
-				posArr[v.getIndex()] = pos;
-			} else {
-				posArr[v.getIndex()] = new double[3];
+//				posArr[v.getIndex()] = pos;
 			}
+//			else {
+//				posArr[v.getIndex()] = new double[3];
+//			}
 		}
-		DataList vData = new DoubleArrayArray.Array(posArr);
-		geometry.setVertexCountAndAttributes(COORDINATES, vData);
-		IndexedFaceSetUtility.calculateAndSetNormals(geometry);
-		createDisplayGeometry();
-		updateBoundingBox();
-		resetTemporaryGeometry();
-		updateSelection();
+		updateNoUndo();
+//		DataList vData = new DoubleArrayArray.Array(posArr);
+//		geometry.setVertexCountAndAttributes(COORDINATES, vData);
+//		IndexedFaceSetUtility.calculateAndSetNormals(geometry);
+//		createDisplayGeometry();
+//		updateBoundingBox();
+//		resetTemporaryGeometry();
+//		updateSelection();
 	}
 	
 	/**
