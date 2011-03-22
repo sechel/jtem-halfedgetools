@@ -36,6 +36,8 @@ import java.util.Set;
 
 import de.jtem.halfedgetools.plugin.algorithm.generator.ConvexHullGenerator;
 import de.jtem.halfedgetools.plugin.algorithm.generator.RandomSphereGenerator;
+import de.jtem.halfedgetools.plugin.algorithm.geometry.CopyVertexPositions;
+import de.jtem.halfedgetools.plugin.algorithm.geometry.PasteVertexPositions;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.PerturbPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.ProjectPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.selection.BoundaryEdgeSelection;
@@ -112,6 +114,8 @@ public class HalfedgePluginFactory {
 		Set<Plugin> hs = new HashSet<Plugin>();
 		hs.add(new PerturbPlugin());
 		hs.add(new ProjectPlugin());
+		hs.add(new CopyVertexPositions());
+		hs.add(new PasteVertexPositions());
 		return hs;
 	}
 	
