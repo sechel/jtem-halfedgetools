@@ -379,6 +379,7 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 	}
 	@Override
 	public void adaptersChanged(HalfedgeLayer layer) {
+		activeLayerChanged(layer, layer);
 	}
 	@Override
 	public void dataChanged(HalfedgeLayer layer) {
