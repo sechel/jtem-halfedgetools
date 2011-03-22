@@ -1,28 +1,45 @@
 package de.jtem.halfedgetools.nurbs;
 
+import java.util.LinkedList;
+
 public class Refinement {
 	
-	protected double[][][] point;
+	protected LinkedList<double[]>umbilcs;
+	protected NURBSSurface ns;
+	protected double[][] point;
 	protected double hu;
 	protected double hv;
 	protected int depth;
-	protected double eps;
 	int indexI;
 	int indexJ;
 	double u1;
 	double v1;
+	int counter;
 	
 	public Refinement(){
 		
 	}
 	
-	public Refinement(double[][][] p,double u, double v,int d,double e, int i, int j){
+	public Refinement(LinkedList<double[]> umb,NURBSSurface n,double u, double v,double[][] p,double hhu, double hhv,int d, int i, int j,int c){
+		umbilcs = umb;
+		ns = n;
+		u1 =u;
+		v1 = v;
 		point =p;
-		hu = u;
-		hv = v;
+		hu = hhu;
+		hv = hhv;
 		depth = d;
-		eps = e;
 		indexI = i;
 		indexJ = j;
+		counter = c;
 	}
+
+	public LinkedList<double[]> getUmbilcs() {
+		return umbilcs;
+	}
+
+	public void setUmbilcs(LinkedList<double[]> umbilcs) {
+		this.umbilcs = umbilcs;
+	}
+
 }
