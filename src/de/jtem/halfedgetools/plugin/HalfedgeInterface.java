@@ -827,7 +827,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	public AdapterSet getAdapters() {
 		AdapterSet result = new AdapterSet();
 		result.addAll(persistentAdapters);
-		result.addAll(activeVolatileAdapters);
 		result.addAll(volatileAdapters);
 		result.addAll(activeLayer.getAllAdapters());
 		return result;
@@ -844,6 +843,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		AdapterSet result = new AdapterSet();
 		result.addAll(volatileAdapters);
 		result.addAll(activeLayer.getVolatileAdapters());
+		return result;
+	}
+	
+	public AdapterSet getActiveVolatileAdapters() {
+		AdapterSet result = new AdapterSet();
+		result.addAll(result);
 		return result;
 	}
 	

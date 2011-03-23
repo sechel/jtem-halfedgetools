@@ -190,8 +190,7 @@ public class HalfedgeLayer implements ActionListener {
 	/**
 	 * Gather the effective adapters for a convert operation. This contains 
 	 * all adapters of the half-edge interface, all adapters of the layer and the 
-	 * adapters provided by any active visualizer. The active volatile adapters are
-	 * excluded since they belong to the last convert operation.
+	 * adapters provided by any active visualizer.
 	 * @return An {@link AdapterSet} containing the effective adapters for the next convert.
 	 */
 	protected AdapterSet getEffectiveAdapters() {
@@ -200,8 +199,6 @@ public class HalfedgeLayer implements ActionListener {
 		effectiveAdapters.addAll(hif.getVolatileAdapters());
 		effectiveAdapters.addAll(getAllAdapters());
 		effectiveAdapters.addAll(getVisualizerAdapters());
-		// we don't need the volatiles from the last convert
-		effectiveAdapters.removeAll(activeVolatileAdapters);
 		return effectiveAdapters;
 	}
 	
@@ -461,6 +458,8 @@ public class HalfedgeLayer implements ActionListener {
 	protected void updateSelection() {
 		layerRoot.removeChild(selectionRoot);
 		AdapterSet a = hif.getAdapters();
+		a.addAll(activeVolatileAdapters);
+		a.addAll(hif.getActiveVolatileAdapters());
 		selectionRoot = selection.createSelectionGeometry(a);
 		selectionRoot.setPickable(false);
 		Appearance app = selectionRoot.getAppearance();
@@ -695,7 +694,6 @@ public class HalfedgeLayer implements ActionListener {
 	public AdapterSet getAllAdapters() {
 		AdapterSet adapters = new AdapterSet();
 		adapters.addAll(persistentAdapters);
-		adapters.addAll(activeVolatileAdapters);
 		adapters.addAll(volatileAdapters);
 		return adapters;
 	}
