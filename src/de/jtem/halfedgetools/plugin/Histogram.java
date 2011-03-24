@@ -115,7 +115,7 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 		c.weightx = 1;
 		shrinkPanel.add(chartPanel, c);
 		
-		adapterScrollPane.setMinimumSize(new Dimension(150, 250));
+		adapterScrollPane.setMinimumSize(new Dimension(250, 250));
 		adapterTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
 		TableCellEditor boolEditor = adapterTable.getDefaultEditor(Boolean.class);
 		boolEditor.addCellEditorListener(new DataActivationListener());	
