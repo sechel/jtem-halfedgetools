@@ -59,7 +59,11 @@ public class ScalarFunctionPointSet {
 			psf.setVertexColors(colors);
 		}
 		psf.setVertexCoordinates(coords);
-		psf.setVertexRelativeRadii(radii);
+		double[] absradii=new double[radii.length];
+		for (int i = 0; i < absradii.length; i++) {
+			absradii[i]= Math.abs(radii[i]);
+		}
+		psf.setVertexRelativeRadii(absradii);
 		Appearance appearance = new Appearance();
 		appearance.setAttribute(CommonAttributes.SPHERES_DRAW, true);
 		appearance.setAttribute(CommonAttributes.VERTEX_DRAW, true);

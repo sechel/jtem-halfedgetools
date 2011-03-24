@@ -239,7 +239,7 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 		
 		private static final long serialVersionUID = 1L;
 
-		private ColorMap colorMap = new RedGreenColorMap();
+		private ColorMap colorMap = new HueColorMap();
 		
 		@Override
 		public Paint getItemPaint(int row, int column) {
