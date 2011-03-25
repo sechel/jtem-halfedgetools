@@ -335,6 +335,7 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 		l.addTemporaryGeometry(scalarFunctionComponent);
 		HalfEdgeDataStructure<?, ?, ?> hds = l.get();
 		AdapterSet aSet = l.getEffectiveAdapters();
+		aSet.addAll(hif.getActiveVolatileAdapters());
 		TypedAdapterSet<Number> numSet = aSet.querySet(Number.class);
 		if (numSet.isEmpty() || 
 			hds.numVertices() == 0 ||

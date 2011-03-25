@@ -41,7 +41,7 @@ public class TestApplication {
 		jv.registerPlugin(new VectorFieldManager());
 		jv.registerPlugin(new TestVisualizer());
 		HalfedgeInterface hif = new HalfedgeInterface();
-		hif.addGlobalAdapter(new TestScalarFunction(), true);
+		hif.addAdapter(new TestScalarFunction(), true);
 		jv.registerPlugin(hif);
 		jv.registerPlugin(new Histogram());
 		jv.startup();

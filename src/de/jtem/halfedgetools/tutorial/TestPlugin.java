@@ -29,7 +29,7 @@ public class TestPlugin extends ShrinkPanelPlugin implements ActionListener {
 		System.out.println("Got data structure:\n" + hds);
 		double area = TestAlgorithm.doSomething(hds, hif.getAdapters());
 		System.out.println("Area is " + area);
-		hif.addGlobalAdapter(new TestVectorField(), false);
+		hif.addAdapter(new TestVectorField(), false);
 		hif.update();
 	}
 	
@@ -37,7 +37,7 @@ public class TestPlugin extends ShrinkPanelPlugin implements ActionListener {
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
-		hif.addGlobalAdapter(new TestPositionAdapter(), true);
+		hif.addAdapter(new TestPositionAdapter(), true);
 	}
 	
 	@Override

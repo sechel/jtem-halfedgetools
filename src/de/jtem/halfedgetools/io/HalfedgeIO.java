@@ -70,7 +70,6 @@ public class HalfedgeIO {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void writeOBJ(HDS hds, AdapterSet adapters, String file) {
-		
 		try {
 			FileOutputStream fos = new FileOutputStream(file);
 			ConverterHeds2JR converter = new ConverterHeds2JR();

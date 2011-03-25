@@ -84,6 +84,8 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ActionListe
 		fieldTable = new JTable();
 	private JScrollPane
 		fieldScrollPane = new JScrollPane(fieldTable);
+	private List<Adapter<double[]>> 
+		fields = new LinkedList<Adapter<double[]>>();
 	private Map<Adapter<double[]>, SceneGraphComponent>
 		activeFields = new HashMap<Adapter<double[]>, SceneGraphComponent>();
 	private JButton
@@ -149,12 +151,14 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ActionListe
 	
 	
 	private void updateStates() {
-		List<Adapter<double[]>> adapters = hif.getAdapters().queryAll(VectorField.class, double[].class);
-		Collections.sort(adapters);
+		AdapterSet all = hif.getAdapters();
+		all.addAll(hif.getVolatileAdapters());
+		fields = all.queryAll(VectorField.class, double[].class);
+		Collections.sort(fields);
 		Map<Adapter<double[]>, SceneGraphComponent> active = new HashMap<Adapter<double[]>, SceneGraphComponent>();
 		for (Adapter<double[]> a : activeFields.keySet()) {
 			SceneGraphComponent c = activeFields.get(a);
-			if (adapters.contains(a)) {
+			if (fields.contains(a)) {
 				active.put(a, c);
 			}
 		}
@@ -266,9 +270,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ActionListe
 		
 		@Override
 		public int getRowCount() {
-			AdapterSet a = hif.getAdapters();
-			a.queryAll(VectorField.class, double[].class);
-			return a.queryAll(VectorField.class, double[].class).size();
+			return fields.size();
 		}
 		
 		@Override
@@ -287,11 +289,10 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ActionListe
 		
 		@Override
 		public Object getValueAt(int row, int column) {
-			List<Adapter<double[]>> vectorFields = hif.getAdapters().queryAll(VectorField.class, double[].class);
-			if (row < 0 || row >= vectorFields.size()) {
+			if (row < 0 || row >= fields.size()) {
 				return "-";
 			}
-			Adapter<double[]> a = vectorFields.get(row);
+			Adapter<double[]> a = fields.get(row);
 			Object value = null;
 			switch (column) {
 				case 0: 
@@ -328,8 +329,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ActionListe
 		@Override
 		public void editingStopped(ChangeEvent e) {
 			int row = fieldTable.getSelectedRow();
-			List<Adapter<double[]>> vf = hif.getAdapters().queryAll(VectorField.class, double[].class);
-			Adapter<double[]> a = vf.get(row);
+			Adapter<double[]> a = fields.get(row);
 			setActive(a, !isActive(a));
 			fieldTable.revalidate();
 		}

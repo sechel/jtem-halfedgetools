@@ -617,7 +617,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				if(file.getName().toLowerCase().endsWith(".heml")) {
 					HalfedgeIO.writeHDS(hds, file.getAbsolutePath());
 				} else if(file.getName().toLowerCase().endsWith(".obj")) {
-					HalfedgeIO.writeOBJ(hds, persistentAdapters, file.getAbsolutePath());
+					HalfedgeIO.writeOBJ(hds, getAdapters(), file.getAbsolutePath());
 				}
 			} catch (Exception ex) {
 				JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
@@ -821,17 +821,25 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	
 	/**
-	 * Returns a collection of cached and normal adapters
+	 * Returns the persistent adapters of the interface and of the active
+	 * layer. In addition the this the adapters are returned that have been volatile
+	 * during the last conversion (active adapters).
+	 * last conversion
 	 * @param a
 	 */
 	public AdapterSet getAdapters() {
 		AdapterSet result = new AdapterSet();
 		result.addAll(persistentAdapters);
-		result.addAll(volatileAdapters);
-		result.addAll(activeLayer.getAllAdapters());
+		result.addAll(activeVolatileAdapters);
+		result.addAll(activeLayer.getActiveAdapters());
 		return result;
 	}
 	
+	/**
+	 * Returns the persistent adapters of the interface and 
+	 * of the active layer
+	 * @return
+	 */
 	public AdapterSet getPersistantAdapters() {
 		AdapterSet result = new AdapterSet();
 		result.addAll(persistentAdapters);
@@ -839,6 +847,11 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		return result;
 	}
 	
+	/**
+	 * Returns the adapters that will be volatile during
+	 * the next conversion
+	 * @return
+	 */
 	public AdapterSet getVolatileAdapters() {
 		AdapterSet result = new AdapterSet();
 		result.addAll(volatileAdapters);
@@ -846,20 +859,32 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		return result;
 	}
 	
+	/**
+	 * Returns the adapters that have been volatile during the last 
+	 * conversion
+	 * @return
+	 */
 	public AdapterSet getActiveVolatileAdapters() {
 		AdapterSet result = new AdapterSet();
-		result.addAll(result);
+		result.addAll(activeVolatileAdapters);
+		result.addAll(activeLayer.getActiveVolatileAdapters());
 		return result;
 	}
 	
-	protected AdapterSet getGlobalAdapters() {
+	/**
+	 * Returns the adapters of the interface and of the active layer 
+	 * that will be used during the next conversion
+	 * @return
+	 */
+	public AdapterSet getCurrentAdapters() {
 		AdapterSet result = new AdapterSet();
 		result.addAll(persistentAdapters);
 		result.addAll(volatileAdapters);
+		result.addAll(activeLayer.getCurrentAdapters());
 		return result;
 	}
 	
-	public boolean addGlobalAdapter(Adapter<?> a, boolean persistent) {
+	public boolean addAdapter(Adapter<?> a, boolean persistent) {
 		boolean result = false;
 		if(persistent) {
 			result = persistentAdapters.add(a);

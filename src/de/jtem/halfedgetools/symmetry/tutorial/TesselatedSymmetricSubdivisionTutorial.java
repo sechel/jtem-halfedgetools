@@ -191,11 +191,11 @@ public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent {
 		viewer.setShowToolBar(true);
 		
 		HalfedgeInterface hif = new HalfedgeInterface();
-		hif.addGlobalAdapter(new SymmetricPositionAdapter(), true);
-		hif.addGlobalAdapter(new SymmetryEdgeColorAdapter(), true);
-		hif.addGlobalAdapter(new SymmetryFaceColorAdapter(), true);
-		hif.addGlobalAdapter(new BundleCycleColorAdapter(), true);
-		hif.addGlobalAdapter(new SymmetricBaryCenterAdapter(), true);
+		hif.addAdapter(new SymmetricPositionAdapter(), true);
+		hif.addAdapter(new SymmetryEdgeColorAdapter(), true);
+		hif.addAdapter(new SymmetryFaceColorAdapter(), true);
+		hif.addAdapter(new BundleCycleColorAdapter(), true);
+		hif.addAdapter(new SymmetricBaryCenterAdapter(), true);
 		
 		tc = new TesselatedSymmetricSubdivisionTutorial();
 		viewer.registerPlugin(tc);

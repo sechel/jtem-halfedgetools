@@ -195,9 +195,8 @@ public class HalfedgeLayer implements ActionListener {
 	 */
 	protected AdapterSet getEffectiveAdapters() {
 		AdapterSet effectiveAdapters = new AdapterSet();
-		effectiveAdapters.addAll(hif.getPersistantAdapters());
-		effectiveAdapters.addAll(hif.getVolatileAdapters());
-		effectiveAdapters.addAll(getAllAdapters());
+		effectiveAdapters.addAll(hif.getCurrentAdapters());
+		effectiveAdapters.addAll(getCurrentAdapters());
 		effectiveAdapters.addAll(getVisualizerAdapters());
 		return effectiveAdapters;
 	}
@@ -458,7 +457,6 @@ public class HalfedgeLayer implements ActionListener {
 	protected void updateSelection() {
 		layerRoot.removeChild(selectionRoot);
 		AdapterSet a = hif.getAdapters();
-		a.addAll(activeVolatileAdapters);
 		a.addAll(hif.getActiveVolatileAdapters());
 		selectionRoot = selection.createSelectionGeometry(a);
 		selectionRoot.setPickable(false);
@@ -691,10 +689,17 @@ public class HalfedgeLayer implements ActionListener {
 		this.stepsPerEdge = stepsPerEdge;
 	}
 	
-	public AdapterSet getAllAdapters() {
+	public AdapterSet getCurrentAdapters() {
 		AdapterSet adapters = new AdapterSet();
 		adapters.addAll(persistentAdapters);
 		adapters.addAll(volatileAdapters);
+		return adapters;
+	}
+	
+	public AdapterSet getActiveAdapters() {
+		AdapterSet adapters = new AdapterSet();
+		adapters.addAll(persistentAdapters);
+		adapters.addAll(activeVolatileAdapters);
 		return adapters;
 	}
 	
@@ -704,6 +709,10 @@ public class HalfedgeLayer implements ActionListener {
 	
 	public AdapterSet getVolatileAdapters() {
 		return volatileAdapters;
+	}
+	
+	public AdapterSet getActiveVolatileAdapters() {
+		return activeVolatileAdapters;
 	}
 	
 	public double[][] getProfileCurve() {
