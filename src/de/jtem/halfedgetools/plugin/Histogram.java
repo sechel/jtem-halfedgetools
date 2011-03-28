@@ -10,6 +10,7 @@ import java.awt.Paint;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -365,10 +366,12 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 		double[] data = new double[nodes.size()];
 		int i = 0;
 		for (Object n : nodes) {
-			double value = ((Number)a.get((Node<?,?,?>)n, aSet)).doubleValue();
+			Object val = a.get((Node<?,?,?>)n, aSet);
+			if (val == null) continue;
+			double value = ((Number)val).doubleValue();
 			data[i++] = value * scale;
 		}
-		return data;
+		return Arrays.copyOf(data, i);
 	}
 	
 	

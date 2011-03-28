@@ -554,6 +554,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		public void actionPerformed(ActionEvent e) {
 			getActiveLayer().undo();
 			updateStates();
+			fireDataChanged();
 			checkContent();
 		}
 		
@@ -575,6 +576,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		public void actionPerformed(ActionEvent e) {
 			getActiveLayer().redo();
 			updateStates();
+			fireDataChanged();
 			checkContent();
 		}
 		
@@ -817,23 +819,22 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		fireDataChanged();
 	}
 	
-
-	
 	
 	/**
 	 * Returns the persistent adapters of the interface and of the active
 	 * layer. In addition the this the adapters are returned that have been volatile
-	 * during the last conversion (active adapters).
+	 * during the last conversion.
 	 * last conversion
 	 * @param a
 	 */
 	public AdapterSet getAdapters() {
 		AdapterSet result = new AdapterSet();
 		result.addAll(persistentAdapters);
-		result.addAll(activeVolatileAdapters);
-		result.addAll(activeLayer.getActiveAdapters());
+		result.addAll(volatileAdapters);
+		result.addAll(activeLayer.getCurrentAdapters());
 		return result;
 	}
+	
 	
 	/**
 	 * Returns the persistent adapters of the interface and 
@@ -876,11 +877,11 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	 * that will be used during the next conversion
 	 * @return
 	 */
-	public AdapterSet getCurrentAdapters() {
+	public AdapterSet getActiveAdapters() {
 		AdapterSet result = new AdapterSet();
 		result.addAll(persistentAdapters);
-		result.addAll(volatileAdapters);
-		result.addAll(activeLayer.getCurrentAdapters());
+		result.addAll(activeVolatileAdapters);
+		result.addAll(activeLayer.getActiveAdapters());
 		return result;
 	}
 	
