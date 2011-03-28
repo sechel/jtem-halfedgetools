@@ -10,6 +10,7 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Window;
@@ -26,6 +27,7 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -45,6 +47,7 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jreality.shader.DefaultGeometryShader;
 import de.jreality.shader.DefaultPointShader;
 import de.jreality.shader.ShaderUtility;
+import de.jreality.ui.LayoutFactory;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.io.NurbsIO;
@@ -54,8 +57,11 @@ import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
+import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 
 public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListener{
+	
+	
 
 	private HalfedgeInterface 
 		hif = null;
@@ -66,10 +72,13 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	private Action
 		importAction = new ImportAction();
 	
+	private GeodesicPanel
+		geodesicPanel = new GeodesicPanel();
+	
 	private JButton
 		importButton = new JButton(importAction),
 		updateButton = new JButton("update"),
-		integralCurveButton = new JButton("Curve");
+		integralCurveButton = new JButton("Integral curve");
 
 	private JTable
 		surfacesTable= new JTable(new SurfaceTableModel());
@@ -95,6 +104,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		vectorFieldBox = new JCheckBox("vf");
 	
 	private int activeSurfaceIndex = 0;
+	
+	
+
 	
 	public NurbsManagerPlugin() {
 		GridBagConstraints c = new GridBagConstraints();
@@ -132,7 +144,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		c.weighty = 1.0;
 		shrinkPanel.add(tablePanel, c);
 		c.weighty = 0.0;
-		shrinkPanel.add(integralCurveButton,c);
+		shrinkPanel.add(integralCurveButton, c);
+		c.weighty = 0.0;
+		shrinkPanel.add(geodesicPanel, c);
 	}
 
 	private void configureFileChooser() {
@@ -204,6 +218,99 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			}
 			updateStates();
 		}
+	}
+	
+	private class GeodesicPanel extends ShrinkPanel implements ActionListener{
+		
+		private static final long 
+			serialVersionUID = 1L;
+		private SpinnerNumberModel
+			tolExpModel = new SpinnerNumberModel(-3, -30.0, 0, 1),
+			epsExpModel = new SpinnerNumberModel(-3, -30.0, 0, 1),
+			dirXModel = new SpinnerNumberModel(1.0, -100.0, 100.0, 0.01),
+			dirYModel = new SpinnerNumberModel(0.0, -100.0, 100.0, 0.01);
+		private JSpinner
+			tolSpinner = new JSpinner(tolExpModel),
+			epsSpinner = new JSpinner(epsExpModel),
+			xSpinner = new JSpinner(dirXModel),
+			ySpinner = new JSpinner(dirYModel);
+		private JButton
+			goButton = new JButton("Go");
+		
+		public GeodesicPanel() {
+			super("Geodesic");
+			setShrinked(true);
+			setLayout(new GridBagLayout());
+			GridBagConstraints lc = LayoutFactory.createLeftConstraint();
+			GridBagConstraints rc = LayoutFactory.createRightConstraint();
+			add(new JLabel("Direction X"), lc);
+			add(xSpinner, rc);
+			add(new JLabel("Direction Y"), lc);
+			add(ySpinner, rc);
+			add(new JLabel("Tolerance Exp"), lc);
+			add(tolSpinner, rc);
+			add(new JLabel("Eps Exp"), lc);
+			add(epsSpinner, rc);
+			add(goButton, rc);
+			
+			goButton.addActionListener(this);
+		}
+		
+		public void actionPerformed(ActionEvent e){
+			double tol = tolExpModel.getNumber().doubleValue();
+			tol = Math.pow(10, tol);
+			double eps = epsExpModel.getNumber().doubleValue();
+			eps = Math.pow(10, eps);
+			double dirX = dirXModel.getNumber().doubleValue();
+			double dirY = dirYModel.getNumber().doubleValue();
+			
+			Set<Vertex<?,?,?>> verts = hif.getSelection().getVertices();
+			AdapterSet as = hif.getAdapters();
+			for(Vertex<?,?,?> v : verts) {
+				double[] y0 = new double[4];
+					y0[0] = as.getD(NurbsUVCoordinate.class, v)[0];
+					y0[1] = as.getD(NurbsUVCoordinate.class, v)[1];
+					y0[2] = dirX;
+					y0[3] = dirY;
+				LinkedList<double[]> all = new LinkedList<double[]>();
+				
+				LinkedList<double[]> pts = IntegralCurves.geodesicExponential(surfaces.get(surfacesTable.getSelectedRow()), y0, 0.01, tol);
+				all.addAll(pts);
+				PointSetFactory psf = new PointSetFactory();
+				int p = surfaces.get(surfacesTable.getSelectedRow()).p;
+				int q = surfaces.get(surfacesTable.getSelectedRow()).q;
+				double[] U = surfaces.get(surfacesTable.getSelectedRow()).U;
+				double[] V = surfaces.get(surfacesTable.getSelectedRow()).V;
+				double[][][]Pw = surfaces.get(surfacesTable.getSelectedRow()).getControlMesh();
+				double[][] u = new double[all.size()][];
+				double[][] points = new double[all.size()][];
+				for (int i = 0; i < u.length; i++) {
+					u[i] = all.get(i);
+				}
+
+				psf.setVertexCount(u.length);
+				for (int i = 0; i < u.length; i++) {
+					double[] S = new double[4];
+					NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, u[i][0], u[i][1], S);
+					points[i] = S;
+//						System.out.println(Arrays.toString(points[i]));
+				}
+				psf.setVertexCoordinates(points);
+				psf.update();
+				SceneGraphComponent sgc = new SceneGraphComponent("Integral Curves");
+				SceneGraphComponent minCurveComp = new SceneGraphComponent("Geodesic");
+				sgc.addChild(minCurveComp);
+				sgc.setGeometry(psf.getGeometry());
+				Appearance labelAp = new Appearance();
+				sgc.setAppearance(labelAp);
+				DefaultGeometryShader dgs = ShaderUtility.createDefaultGeometryShader(labelAp, false);
+				DefaultPointShader pointShader = (DefaultPointShader)dgs.getPointShader();
+					pointShader.setDiffuseColor(Color.orange);
+				hif.getActiveLayer().addTemporaryGeometry(sgc);
+			}
+	
+		}
+		
 	}
 
 	private class SurfaceTableModel extends DefaultTableModel {
@@ -334,8 +441,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					double[][][]Pw = surfaces.get(surfacesTable.getSelectedRow()).getControlMesh();
 					double[][] u = new double[all.size()][];
 					double[][] points = new double[all.size()][];
-					double[] T = new double[4];
-					NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, y0[0], y0[1], T);
 					for (int i = 0; i < u.length; i++) {
 						u[i] = all.get(i);
 					}
@@ -365,42 +470,51 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				}
 	
 			}
-			int n = 401;
-			LinkedList<double[]> umb = IntegralCurves.umbilicPoints(surfaces.get(surfacesTable.getSelectedRow()), n);
-			double[][]umbPoints = new double[umb.size()][];
-			for (int i = 0; i < umb.size(); i++) {
-				umbPoints[i] = umb.get(i);
-				
-			}
-			if(umbPoints.length > 0){
-				PointSetFactory psfu = new PointSetFactory();
-				int pu = surfaces.get(surfacesTable.getSelectedRow()).p;
-				int qu = surfaces.get(surfacesTable.getSelectedRow()).q;
-				double[] Uu = surfaces.get(surfacesTable.getSelectedRow()).U;
-				double[] Vu = surfaces.get(surfacesTable.getSelectedRow()).V;
-				double[][][]Pwu = surfaces.get(surfacesTable.getSelectedRow()).getControlMesh();
-				double[][] surfaceUmbilics = new double[umb.size()][];
-				psfu.setVertexCount(umbPoints.length);
-				for (int i = 0; i < umbPoints.length; i++) {
-					double[] S = new double[4];
-					NURBSAlgorithm.SurfacePoint(pu, Uu, qu, Vu, Pwu, umbPoints[i][0], umbPoints[i][1], S);
-					surfaceUmbilics[i] = S;
-				}
-				psfu.setVertexCoordinates(surfaceUmbilics);
-				psfu.update();
-				SceneGraphComponent sgcu = new SceneGraphComponent("Umbilics");
-				SceneGraphComponent uPointComp = new SceneGraphComponent("U points");
-				sgcu.addChild(uPointComp);
-				sgcu.setGeometry(psfu.getGeometry());
-				Appearance labelApu = new Appearance();
-				sgcu.setAppearance(labelApu);
-				DefaultGeometryShader dgsu = ShaderUtility.createDefaultGeometryShader(labelApu, false);
-				DefaultPointShader pointShaderu = (DefaultPointShader)dgsu.getPointShader();
-				pointShaderu.setDiffuseColor(Color.black);
-				pointShaderu.setPointRadius(0.08);
-				hif.getActiveLayer().addTemporaryGeometry(sgcu);
-			}
-		}
+		} 
+
+//			int n = 151;
+//			LinkedList<double[]> umb = IntegralCurves.umbilicPoints1(surfaces.get(surfacesTable.getSelectedRow()), n);
+//			double[][]umbPoints = new double[umb.size()][];
+//			for (int i = 0; i < umb.size(); i++) {
+//				//System.out.println(Arrays.toString(umb.get(i)));
+//
+//				umbPoints[i] = umb.get(i);
+//				
+//			}
+//			if(umbPoints.length > 0){
+//				PointSetFactory psfu = new PointSetFactory();
+//				int pu = surfaces.get(surfacesTable.getSelectedRow()).p;
+//				int qu = surfaces.get(surfacesTable.getSelectedRow()).q;
+//				double[] Uu = surfaces.get(surfacesTable.getSelectedRow()).U;
+//				double[] Vu = surfaces.get(surfacesTable.getSelectedRow()).V;
+//				double[][][]Pwu = surfaces.get(surfacesTable.getSelectedRow()).getControlMesh();
+//				double[][] surfaceUmbilics = new double[umb.size()][];
+//				psfu.setVertexCount(umbPoints.length);
+//				for (int i = 0; i < umbPoints.length; i++) {
+//					double[] S = new double[4];
+//					NURBSAlgorithm.SurfacePoint(pu, Uu, qu, Vu, Pwu, umbPoints[i][0], umbPoints[i][1], S);
+//					surfaceUmbilics[i] = S;
+//				}
+//				psfu.setVertexCoordinates(surfaceUmbilics);
+//				psfu.update();
+//				SceneGraphComponent sgcu = new SceneGraphComponent("Umbilics");
+//				SceneGraphComponent uPointComp = new SceneGraphComponent("U points");
+//				sgcu.addChild(uPointComp);
+//				sgcu.setGeometry(psfu.getGeometry());
+//				Appearance labelApu = new Appearance();
+//				sgcu.setAppearance(labelApu);
+//				DefaultGeometryShader dgsu = ShaderUtility.createDefaultGeometryShader(labelApu, false);
+//				DefaultPointShader pointShaderu = (DefaultPointShader)dgsu.getPointShader();
+//				pointShaderu.setDiffuseColor(Color.black);
+//				pointShaderu.setPointRadius(0.08);
+//				hif.getActiveLayer().addTemporaryGeometry(sgcu);
+//			}
+	}
+	
+	@Override
+	public void mainUIChanged(String uiClass) {
+		super.mainUIChanged(uiClass);
+		SwingUtilities.updateComponentTreeUI(chooser);
 	}
 	
 	public static void main(String[] args) {
