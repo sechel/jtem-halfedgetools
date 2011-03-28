@@ -405,12 +405,12 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			qmf.setSurface(surfaces.get(surfacesTable.getSelectedRow()));
 			qmf.update();
 			hif.set(qmf.getGeometry());
-			hif.update();
 			hif.addLayerAdapter(qmf.getUVAdapter(), false);
 			if(vectorFieldBox.isSelected()) {
 				hif.addLayerAdapter(qmf.getMinCurvatureVectorField(),false);
 				hif.addLayerAdapter(qmf.getMaxCurvatureVectorField(),false);
 			}
+			hif.update();
 		} else if(src == integralCurveButton) {
 	
 			Set<Vertex<?,?,?>> verts = hif.getSelection().getVertices();
