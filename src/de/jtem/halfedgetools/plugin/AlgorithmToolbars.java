@@ -34,6 +34,16 @@ public final class AlgorithmToolbars {
 		}
 		
 	}
+
+	
+	public static class TextureRemeshingCategoryToolbar extends ToolBarAggregator {
+
+		@Override
+		public Class<? extends PerspectiveFlavor> getPerspective() {
+			return View.class;
+		}
+		
+	}
 	
 	public static class SimplificationCategoryToolbar extends ToolBarAggregator {
 

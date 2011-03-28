@@ -11,6 +11,7 @@ public enum AlgorithmCategory {
 	Topology,
 	Geometry,
 	VectorField,
+	TextureRemeshing,
 	Custom;
 	
 }

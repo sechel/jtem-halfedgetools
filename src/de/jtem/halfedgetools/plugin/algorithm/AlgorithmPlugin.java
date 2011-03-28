@@ -55,6 +55,7 @@ import de.jtem.halfedgetools.plugin.AlgorithmToolbars.GeometryCategoryToolbar;
 import de.jtem.halfedgetools.plugin.AlgorithmToolbars.SelectionCategoryToolbar;
 import de.jtem.halfedgetools.plugin.AlgorithmToolbars.SimplificationCategoryToolbar;
 import de.jtem.halfedgetools.plugin.AlgorithmToolbars.SubdivisionCategoryToolbar;
+import de.jtem.halfedgetools.plugin.AlgorithmToolbars.TextureRemeshingCategoryToolbar;
 import de.jtem.halfedgetools.plugin.AlgorithmToolbars.TopologyCategoryToolbar;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeToolBar;
@@ -153,6 +154,9 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 			break;
 		case Selection:
 			toolbar = c.getPlugin(SelectionCategoryToolbar.class);
+			break;
+		case TextureRemeshing:
+			toolbar = c.getPlugin(TextureRemeshingCategoryToolbar.class);
 			break;
 		default:
 			toolbar = c.getPlugin(HalfedgeToolBar.class); 
