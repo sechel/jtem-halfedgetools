@@ -47,6 +47,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -56,8 +57,9 @@ import javax.swing.table.DefaultTableModel;
 import de.jtem.halfedgetools.plugin.swing.IconCellRenderer;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
 
-public class VisualizersManager extends Plugin implements ListSelectionListener {
+public class VisualizersManager extends Plugin implements ListSelectionListener, UIFlavor {
 
 	private HalfedgeInterface
 		hif = null;
@@ -257,6 +259,12 @@ public class VisualizersManager extends Plugin implements ListSelectionListener 
 	protected void removeVisualizerPlugin(VisualizerPlugin vp) {
 		visualizers.remove(vp);
 		updatePluginTable();
+	}
+
+	@Override
+	public void mainUIChanged(String uiClass) {
+		SwingUtilities.updateComponentTreeUI(optionsPanel);
+		SwingUtilities.updateComponentTreeUI(pluginScroller);
 	}
 
 }
