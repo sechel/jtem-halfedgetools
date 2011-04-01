@@ -24,6 +24,9 @@ public class IconCellRenderer extends DefaultTableCellRenderer {
 		if (value instanceof Icon) {
 			l.setIcon((Icon)value);
 			l.setText("");
+		} else {
+			l.setIcon(null);
+			l.setText("");
 		}
 		return l;
 	}
