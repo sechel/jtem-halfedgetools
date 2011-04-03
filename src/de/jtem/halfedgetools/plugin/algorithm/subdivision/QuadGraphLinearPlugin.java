@@ -39,7 +39,6 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.algorithm.subdivision.QuadGraphLinear;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -61,9 +60,9 @@ public class QuadGraphLinearPlugin extends AlgorithmPlugin {
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
 		HDS hds2 = hcp.createEmpty(hds);
 		Map<V, V> vMap = new HashMap<V, V>();
+		Map<E, V> eMap = new HashMap<E, V>();
 		Map<F, V> fMap = new HashMap<F, V>();
-		TypedAdapterSet<double[]> da = a.querySet(double[].class);
-		subdivider.execute(hds, hds2, vMap, fMap, da);
+		subdivider.execute(hds, hds2, vMap, eMap, fMap, a);
 		hcp.set(hds2);
 	}
 	

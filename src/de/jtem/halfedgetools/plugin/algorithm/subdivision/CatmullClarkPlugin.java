@@ -34,20 +34,22 @@ package de.jtem.halfedgetools.plugin.algorithm.subdivision;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import de.jreality.ui.LayoutFactory;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.TypedAdapterSet;
-import de.jtem.halfedgetools.algorithm.subdivision.CatmullClarkAll;
+import de.jtem.halfedgetools.algorithm.subdivision.CatmullClark;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
@@ -68,8 +70,6 @@ public class CatmullClarkPlugin extends AlgorithmDialogPlugin {
 		BoundaryGroup = new ButtonGroup();
 	private ButtonGroup
 		LinesGroup = new ButtonGroup();
-	private boolean
-		b1,b3,b4;
 
 	private JRadioButton
 		NoBoundary = new JRadioButton("Delete"),
@@ -77,24 +77,16 @@ public class CatmullClarkPlugin extends AlgorithmDialogPlugin {
 		FixedButton = new JRadioButton("Fixed Boundary"),
 		BSplineLines = new JRadioButton("B-Spline Lines"),
 		NoLines = new JRadioButton("No featured Lines");
+	private JCheckBox
+		useLinearChecker = new JCheckBox("Use Linear Interpolation");
 
-	private CatmullClarkAll 
-		cc = new CatmullClarkAll();
+	private CatmullClark 
+		cc = new CatmullClark();
 
 	
 	public CatmullClarkPlugin() {
 		panel.setLayout(new GridBagLayout());
-		GridBagConstraints gbc1 = new GridBagConstraints();
-		gbc1.fill = GridBagConstraints.BOTH;
-		gbc1.weightx = 1.0;
-		gbc1.gridwidth = GridBagConstraints.RELATIVE;
-		gbc1.insets = new Insets(2, 2, 2, 2);
-		GridBagConstraints gbc2 = new GridBagConstraints();
-		gbc2.fill = GridBagConstraints.BOTH;
-		gbc2.weightx = 1.0;
-		gbc2.gridwidth = GridBagConstraints.REMAINDER;
-		gbc2.insets = new Insets(2, 2, 2, 2);
-		
+		GridBagConstraints c = LayoutFactory.createRightConstraint();
 		boundaryPanel.setLayout(new GridBagLayout());
 		boundaryPanel.setPreferredSize(new Dimension(250, 120));
 		boundaryPanel.setBorder(BorderFactory.createTitledBorder("boundary"));
@@ -104,9 +96,9 @@ public class CatmullClarkPlugin extends AlgorithmDialogPlugin {
 		BoundaryGroup.add(FixedButton);
 		BoundaryGroup.add(NoBoundary);
 		
-		boundaryPanel.add(BSplineButton,gbc2);
-		boundaryPanel.add(FixedButton,gbc2);
-		boundaryPanel.add(NoBoundary,gbc2);
+		boundaryPanel.add(BSplineButton,c);
+		boundaryPanel.add(FixedButton,c);
+		boundaryPanel.add(NoBoundary,c);
 		
 		featuredLines.setLayout(new GridBagLayout());
 		featuredLines.setPreferredSize(new Dimension(250, 120));
@@ -116,11 +108,12 @@ public class CatmullClarkPlugin extends AlgorithmDialogPlugin {
 		LinesGroup.add(BSplineLines);
 		LinesGroup.add(NoLines);
 		
-		featuredLines.add(BSplineLines,gbc2);
-		featuredLines.add(NoLines,gbc2);
+		featuredLines.add(BSplineLines,c);
+		featuredLines.add(NoLines,c);
 		
-		panel.add(boundaryPanel,gbc2);
-		panel.add(featuredLines,gbc2);
+		panel.add(boundaryPanel,c);
+		panel.add(featuredLines,c);
+		panel.add(useLinearChecker, c);
 	}
 		
 	@Override
@@ -131,12 +124,28 @@ public class CatmullClarkPlugin extends AlgorithmDialogPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
 		HDS hds2 = hcp.createEmpty(hds);
-		b4 = BSplineLines.isSelected();
-		b1 = BSplineButton.isSelected();
-		b3 = NoBoundary.isSelected();
+		boolean bSplineFeatures = BSplineLines.isSelected();
+		boolean bSplineBoundary = BSplineButton.isSelected();
+		boolean removeBoundary = NoBoundary.isSelected();
+		boolean linearInterpolation = useLinearChecker.isSelected();
 		HalfedgeSelection sel = new HalfedgeSelection(hcp.getSelection());
-		TypedAdapterSet<double[]> da = a.querySet(double[].class);
-		cc.subdivide(hds, hds2, da, sel, b1, b3, b4);
+		
+		Map<F, V> oldFnewVMap = new HashMap<F, V>();
+		Map<E, V> oldEnewVMap = new HashMap<E, V>();
+		Map<V, V> oldVnewVMap = new HashMap<V, V>();
+		cc.subdivide(
+			hds, 
+			hds2, 
+			a, 
+			sel, 
+			bSplineBoundary,
+			bSplineFeatures, 
+			removeBoundary,
+			linearInterpolation,
+			oldFnewVMap, 
+			oldEnewVMap, 
+			oldVnewVMap
+		);
 		hcp.set(hds2);
 		hcp.setSelection(sel);
 	}
