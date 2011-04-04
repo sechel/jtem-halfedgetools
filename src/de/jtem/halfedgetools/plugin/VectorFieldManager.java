@@ -239,6 +239,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ActionListe
 	
 	@Override
 	public void storeStates(Controller c) throws Exception {
+		super.storeStates(c);
 		c.storeProperty(getClass(), "length", lengthModel.getNumber());
 		c.storeProperty(getClass(), "thickness", thicknessModel.getNumber());
 		c.storeProperty(getClass(), "directed", directedChecker.isSelected());
@@ -248,6 +249,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ActionListe
 	
 	@Override
 	public void restoreStates(Controller c) throws Exception {
+		super.restoreStates(c);
 		lengthModel.setValue(c.getProperty(getClass(), "normalLength", lengthModel.getNumber()));
 		thicknessModel.setValue(c.getProperty(getClass(), "thickness", thicknessModel.getNumber()));
 		directedChecker.setSelected(c.getProperty(getClass(), "directed", directedChecker.isSelected()));
