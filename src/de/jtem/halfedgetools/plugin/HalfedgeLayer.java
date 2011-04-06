@@ -179,7 +179,7 @@ public class HalfedgeLayer implements ActionListener {
 	}
 	
 	
-	private AdapterSet getVisualizerAdapters() {
+	public AdapterSet getVisualizerAdapters() {
 		AdapterSet r = new AdapterSet();
 		for (VisualizerPlugin p : visualizers) {
 			r.addAll(p.getAdapters());

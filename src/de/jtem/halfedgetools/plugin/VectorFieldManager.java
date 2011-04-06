@@ -153,6 +153,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ActionListe
 	private void updateStates() {
 		AdapterSet all = hif.getAdapters();
 		all.addAll(hif.getVolatileAdapters());
+		all.addAll(hif.getActiveLayer().getVisualizerAdapters());
 		fields = all.queryAll(VectorField.class, double[].class);
 		Collections.sort(fields);
 		Map<Adapter<double[]>, SceneGraphComponent> active = new HashMap<Adapter<double[]>, SceneGraphComponent>();
@@ -206,7 +207,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ActionListe
 			vData.add(Rn.add(null, p, v));
 			Rn.times(v, -1, v);
 			vData.add(Rn.add(null, p, v));
-			iData.add(new int[] {vData.size() - 2, vData.size() - 1});
+			iData.add(new int[] {vData.size() - 1, vData.size() - 2});
 		}
 		ilf.setVertexCount(vData.size());
 		ilf.setEdgeCount(vData.size() / 2);
