@@ -15,6 +15,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Color;
 import de.jtem.halfedgetools.adapter.type.Label;
@@ -151,6 +152,9 @@ public class ConverterJR2Heds {
 		DualHashMap<Integer, Integer, E> vertexEdgeMap = new DualHashMap<Integer, Integer, E>();
 		for (int i = 0; i < numF; i++){
 			int[] f = indices[2][i];
+			if (f.length < 3) {
+				continue;
+			}
 			for (int j = 0; j < f.length; j++){
 				Integer s=f[j];
 				Integer t=f[(j + 1) % f.length];
@@ -221,6 +225,7 @@ public class ConverterJR2Heds {
 		// faces, linkage, and boundary edges
 		for (int i = 0; i < numF; i++){
 			int[] face = indices[2][i];
+			if (face.length < 3) continue;
 			F f = heds.addNewFace();
 			for (int j = 0; j < face.length; j++){
 //				V s = heds.getVertex(face[j]);
@@ -267,6 +272,7 @@ public class ConverterJR2Heds {
 			e.linkNextEdge(temp);
 		}		
 		
+		HalfEdgeUtils.isValidSurface(heds);
 	}
 
 
