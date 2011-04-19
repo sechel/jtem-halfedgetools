@@ -371,6 +371,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ActionListe
 				vecApp.setAttribute(LINE_SHADER + "." + TUBES_DRAW, false);
 				vecApp.setAttribute(LINE_SHADER + "." + LINE_WIDTH, 1.0);
 				vecApp.setAttribute(LINE_SHADER + "." + PICKABLE, false);
+				vecApp.setAttribute(DEPTH_FUDGE_FACTOR, 0.9999);
 				c = new SceneGraphComponent();
 				c.setAppearance(vecApp);
 				c.setGeometry(ils);

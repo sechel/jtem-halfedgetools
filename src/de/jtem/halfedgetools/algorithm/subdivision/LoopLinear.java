@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -45,7 +46,9 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.TexturePosition;
 import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
+import de.jtem.halfedgetools.adapter.type.generic.TexturePosition4d;
 
 /**
  * @author Kristoffer Josefsson, Andre Heydt 
@@ -64,6 +67,7 @@ public class LoopLinear {
 		TypedAdapterSet<double[]> a
 	){
 		Map<E, double[]> oldEtoPos = new HashMap<E, double[]>();
+		Map<E, double[]> oldEtoTex = new HashMap<E, double[]>();
 		Map<V,E> newVtoOldE = new HashMap<V,E>();
 		Map<E, Set<E>> oldEtoNewEs = new HashMap<E,Set<E>>();
 		
@@ -87,20 +91,29 @@ public class LoopLinear {
 			a.setParameter("ignore", true);
 			double[] m = a.get(BaryCenter4d.class, e);
 			oldEtoPos.put(e, m);
+			
+			double[] sTex = a.get(TexturePosition4d.class, e.getStartVertex());
+			double[] tTex = a.get(TexturePosition4d.class, e.getTargetVertex());
+			double[] mt = Rn.linearCombination(null, 0.5, sTex, 0.5, tTex);
+			oldEtoTex.put(e, mt);
 		}
 		
 		dyadicSubdiv(oldHeds, newHeds, newVtoOldE, oldEtoNewEs);
 		
 		for(V ov : oldHeds.getVertices()) {
 			double[] pos = a.get(BaryCenter4d.class, ov);
+			double[] tex = a.get(TexturePosition4d.class, ov);
 			V newV = newHeds.getVertex(ov.getIndex());
 			a.set(Position.class, newV, pos);
+			a.set(TexturePosition.class, newV, tex);
 		}
 		
 		for(V nv : newVtoOldE.keySet()) {
 			E oe = newVtoOldE.get(nv);
 			double[] pos = oldEtoPos.get(oe);
+			double[] tex = oldEtoTex.get(oe);
 			a.set(Position.class, nv, pos);
+			a.set(TexturePosition.class, nv, tex);
 		}
 		
 		return oldEtoNewEs;
