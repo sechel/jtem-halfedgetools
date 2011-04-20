@@ -381,6 +381,7 @@ public class HalfedgeLayer implements ActionListener {
 		clearSelection();
 		AdapterSet ea = getEffectiveAdapters();
 		initVisualizers(ea);
+		ea = getEffectiveAdapters();
 		geometry = converterToIFS.heds2ifs(hds, ea, edgeMap);
 		createDisplayGeometry();
 		updateVisualizersGeometry(ea);

@@ -67,6 +67,8 @@ public class EdgeSplitterPlugin extends AlgorithmPlugin {
 		HalfedgeSelection s = new HalfedgeSelection(hif.getSelection());
 		List<E> edges = new LinkedList<E>(s.getEdges(hds));
 		if (edges.isEmpty()) return;
+		a.setParameter("alpha", 0.5);
+		a.setParameter("ignore", true);
 		for (E e : edges) {
 			if(e.isPositive()){ 
 				double[] p = a.get(BaryCenter3d.class, e, double[].class);

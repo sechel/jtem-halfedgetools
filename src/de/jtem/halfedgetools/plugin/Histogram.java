@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.plugin;
 
+import static java.lang.Math.sqrt;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
 import java.awt.Dimension;
@@ -309,24 +310,53 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 				if (data.length > 0) {
 					histData.addSeries(name, data, numBins);
 				}
+				printStatistics(data, a.toString());
 			}
 			if (a.canAccept(hds.getEdgeClass())) { // create edge histogram
 				double[] data = getData(hds.getEdges(), (Adapter<?>)a, aSet);
 				if (data.length > 0) {
 					histData.addSeries(name, data, numBins);
 				}
-				
+				printStatistics(data, a.toString());
 			}
 			if (a.canAccept(hds.getFaceClass())) { // create face histogram
 				double[] data = getData(hds.getFaces(), (Adapter<?>)a, aSet);
 				if (data.length > 0) {
 					histData.addSeries(name, data, numBins);
 				}
+				printStatistics(data, a.toString());
 			}
 		}
 		return histData;
 	}
 
+	
+	private void printStatistics(double[] values, String name) {
+		double mean = 0;
+		double max = -Double.MAX_VALUE;
+		double min = Double.MAX_VALUE;
+		for (int j = 0; j < values.length; j++) {
+			double v = values[j];
+			mean += v;
+			if (v > max) max = v;
+			if (v < min) min = v;
+		}
+		mean /= values.length;
+		double var = 0;
+		for (int j = 0; j < values.length; j++) {
+			double val = values[j];
+			double v = mean - val;
+			var += v*v;
+		}	
+		var /= values.length;
+		System.out.println("Mean of series " + name + ": " + mean);
+		System.out.println("Min of series " + name + ": " + min);
+		System.out.println("Max of series " + name + ": " + max);
+		System.out.println("Variance of series " + name + ": " + var);
+		System.out.println("Deviation of series " + name + ": " + sqrt(var));
+	}
+	
+	
 
 
 	@SuppressWarnings("unchecked")
