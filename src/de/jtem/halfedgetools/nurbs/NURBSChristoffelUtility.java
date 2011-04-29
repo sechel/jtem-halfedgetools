@@ -1,7 +1,5 @@
 package de.jtem.halfedgetools.nurbs;
 
-import java.util.Arrays;
-
 import de.jreality.math.Rn;
 
 public class NURBSChristoffelUtility {
