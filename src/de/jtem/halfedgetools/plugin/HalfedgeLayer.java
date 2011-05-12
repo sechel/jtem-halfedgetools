@@ -193,7 +193,7 @@ public class HalfedgeLayer implements ActionListener {
 	 * adapters provided by any active visualizer.
 	 * @return An {@link AdapterSet} containing the effective adapters for the next convert.
 	 */
-	protected AdapterSet getEffectiveAdapters() {
+	public AdapterSet getEffectiveAdapters() {
 		AdapterSet effectiveAdapters = new AdapterSet();
 		effectiveAdapters.addAll(hif.getAdapters());
 		effectiveAdapters.addAll(getCurrentAdapters());

@@ -78,6 +78,7 @@ import de.jtem.halfedgetools.plugin.algorithm.topology.FillHolesPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.RemoveVertexFillPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.VertexRemoverPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.vectorfield.CurvatureVectorFields;
+import de.jtem.halfedgetools.plugin.data.HalfedgeDataInterface;
 import de.jtem.halfedgetools.plugin.modes.EditMode;
 import de.jtem.halfedgetools.plugin.modes.SelectionMode;
 import de.jtem.halfedgetools.plugin.visualizers.DirichletEnergyVisualizer;
@@ -205,7 +206,7 @@ public class HalfedgePluginFactory {
 		s.add(new VectorFieldManager());
 		s.add(new CurvatureVectorFields());
 		s.add(new HalfedgePreferencePage());
-		s.add(new Histogram());
+		s.add(new HalfedgeDataInterface());
 		return s;
 	}
 	

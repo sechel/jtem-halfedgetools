@@ -10,6 +10,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.plugin.basic.View;
 import de.jreality.scene.PointSet;
@@ -25,6 +26,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
@@ -102,7 +104,7 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 		HalfEdgeDataStructure<?, ?, ?> hds = hif.get();
 		AdapterSet adapters = hif.getAdapters();
 		final Vertex<?,?,?> v = hds.getVertex(e.getIndex());
-		double[] oldPos = adapters.get(Position.class, v, double[].class);
+		double[] oldPos = adapters.getD(Position3d.class, v);
 		double[] translation = Rn.subtract(null, position, oldPos);
 		TranslatedPositionAdapter posAdapter = new TranslatedPositionAdapter(translation, selectedVertices);
 		hif.getActiveLayer().updateGeometry(posAdapter);
@@ -122,6 +124,7 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 		if (e.getIndex() < 0) return;
 		PointSet ps = e.getPointSet();
 		position = e.getPosition();
+		Pn.dehomogenize(position, position);
 		double[][] coords = ps.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(null);
 		double[] xyz = coords[e.getIndex()];
 		position[0] = (xBox.isSelected())?xyz[0]:position[0];

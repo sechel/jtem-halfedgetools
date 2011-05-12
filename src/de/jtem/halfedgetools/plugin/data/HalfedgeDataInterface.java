@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.plugin;
+package de.jtem.halfedgetools.plugin.data;
 
 import static java.lang.Math.sqrt;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
@@ -45,12 +45,18 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.TypedAdapterSet;
+import de.jtem.halfedgetools.plugin.ColorMap;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeLayer;
+import de.jtem.halfedgetools.plugin.HalfedgeListener;
+import de.jtem.halfedgetools.plugin.HueColorMap;
+import de.jtem.halfedgetools.plugin.ScalarFunctionPointSet;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
-public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, ChangeListener {
+public class HalfedgeDataInterface extends ShrinkPanelPlugin implements HalfedgeListener, ChangeListener {
 
 	private HalfedgeInterface
 		hif = null;
@@ -89,7 +95,7 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 	private SceneGraphComponent 
 		scalarFunctionComponent = new SceneGraphComponent();
 	
-	public Histogram() {
+	public HalfedgeDataInterface() {
 		shrinkPanel.setTitle("Histogram");
 		selectionPanel.setLayout(new GridBagLayout());
 		chartPanel.setMinimumSize(new Dimension(300, 250));
@@ -461,7 +467,7 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 
 	public static void main(String[] args) {
 		JRViewer v = new JRViewer();
-		v.registerPlugin(new Histogram());
+		v.registerPlugin(new HalfedgeDataInterface());
 		v.startup();
 	}
 	

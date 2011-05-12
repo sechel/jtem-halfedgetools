@@ -43,6 +43,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JCheckBox;
@@ -210,28 +211,31 @@ public class FacePlanarityVisualizer extends VisualizerPlugin implements ChangeL
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> double getRelativeUnevenness(F f, AdapterSet ad) {
-		List<E> boundary = HalfEdgeUtils.boundaryEdges(f);
-		if (boundary.size() != 4)
-			return 0.0;
-		double[] a = ad.get(Position.class, boundary.get(0).getTargetVertex(), double[].class);
-		double[] b = ad.get(Position.class, boundary.get(1).getTargetVertex(), double[].class);
-		double[] c = ad.get(Position.class, boundary.get(2).getTargetVertex(), double[].class);
-		double[] d = ad.get(Position.class, boundary.get(3).getTargetVertex(), double[].class);
+		List<V> boundary = HalfEdgeUtils.boundaryVertices(f);
+		if (boundary.size() != 4) return 0.0;
+		Iterator<V> vIt = boundary.iterator();
+		double[] a = ad.getD(Position.class, vIt.next());
+		double[] b = ad.getD(Position.class, vIt.next());
+		double[] c = ad.getD(Position.class, vIt.next());
+		double[] d = ad.getD(Position.class, vIt.next());
 		double[] Mtetraeder = {c[0] - a[0], c[1] - a[1], c[2] - a[2], b[0] - a[0], b[1] - a[1], b[2] - a[2], d[0] - a[0], d[1] - a[1], d[2] - a[2]};
 		double vol = determinant(Mtetraeder);
 		double[][] point = {a,b,c,d};
 		double maxHeight = 0.0;
 		double meanLength = 0.0;
+		int meanCount = 0;
 		for (int i = 1; i <= 4; i++) {
 			meanLength += Rn.euclideanDistance(point[i - 1], point[i % 4]);
 			double[] v = crossProduct(null, subtract(null, point[i - 1], point[i % 4]), subtract(null, point[(i + 1) % 4], point[i % 4]));
 			double area = euclideanNorm(v);
-			if (area == 0.0) continue;
+			if (area < 1E-5) continue;
 			double offset = abs(vol / area);
-			if (offset > maxHeight)
+			if (offset > maxHeight) {
 				maxHeight = offset;
+			}
+			meanCount++;
 		}
-		meanLength /= 4;
+		meanLength /= meanCount;
 		return maxHeight / meanLength;
 	}
 	

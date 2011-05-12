@@ -41,14 +41,12 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		int result = OK_OPTION;
 		executeBeforeDialog(hds, a, hi);
 		if (getDialogPanel() != null) {
-			result = JOptionPane.showOptionDialog(
+			result = JOptionPane.showConfirmDialog(
 				w, getDialogPanel(), 
 				getPluginInfo().name, 
 				OK_CANCEL_OPTION, 
 				PLAIN_MESSAGE, 
-				icon, 
-				new String[] {"Ok", "Cancel"}, 
-				"Edit"
+				icon
 			);
 		}
 		if (result == OK_OPTION) {
