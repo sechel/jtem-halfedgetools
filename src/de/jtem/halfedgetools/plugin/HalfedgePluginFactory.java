@@ -130,7 +130,6 @@ public class HalfedgePluginFactory {
 		s.add(new LoopPlugin());
 		s.add(new LoopLinearPlugin());
 		s.add(new QuadGraphLinearPlugin());
-		s.add(new GarlandHeckbertPlugin());
 		s.add(new Sqrt3LinearPlugin());
 		s.add(new Sqrt3Plugin());
 		s.add(new StellarLinearPlugin());
@@ -203,6 +202,7 @@ public class HalfedgePluginFactory {
 		s.addAll(createVisualizerPlugins());
 		s.addAll(createWidgetPlugins());
 		s.addAll(createEditorModePlugins());
+		s.add(new GarlandHeckbertPlugin());
 		s.add(new VectorFieldManager());
 		s.add(new CurvatureVectorFields());
 		s.add(new HalfedgePreferencePage());
