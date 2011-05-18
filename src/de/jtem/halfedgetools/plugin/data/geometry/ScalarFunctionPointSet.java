@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.plugin;
+package de.jtem.halfedgetools.plugin.data.geometry;
 
 import java.awt.Color;
 import java.util.Collection;
@@ -14,6 +14,7 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
+import de.jtem.halfedgetools.plugin.data.color.ColorMap;
 
 public class ScalarFunctionPointSet {
 

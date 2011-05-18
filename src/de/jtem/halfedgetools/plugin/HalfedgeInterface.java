@@ -1022,6 +1022,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		layers.add(0, layer);
 		root.addChild(layer.getLayerRoot());
 		updateStates();
+		fireLayerAdded(layer);
 	}
 	
 	public void removeLayer(HalfedgeLayer layer) {
@@ -1034,6 +1035,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			activateLayer(layer);
 		}
 		updateStates();
+		fireLayerRemoved(layer);
 	}
 	
 	public void encompassAll() {
@@ -1170,6 +1172,17 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	protected void fireAdaptersChanged() {
 		for (HalfedgeListener l : listeners) {
 			l.adaptersChanged(getActiveLayer());
+		}
+	}
+	
+	protected void fireLayerAdded(HalfedgeLayer layer) {
+		for (HalfedgeListener l : listeners) {
+			l.layerCreated(layer);
+		}
+	}
+	protected void fireLayerRemoved(HalfedgeLayer layer) {
+		for (HalfedgeListener l : listeners) {
+			l.layerRemoved(layer);
 		}
 	}
 	

@@ -78,7 +78,14 @@ import de.jtem.halfedgetools.plugin.algorithm.topology.FillHolesPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.RemoveVertexFillPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.VertexRemoverPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.vectorfield.CurvatureVectorFields;
-import de.jtem.halfedgetools.plugin.data.HalfedgeDataInterface;
+import de.jtem.halfedgetools.plugin.data.VisualizationInterface;
+import de.jtem.halfedgetools.plugin.data.source.FacePlanarityDataSource;
+import de.jtem.halfedgetools.plugin.data.visualizer.ColoredBeadsVisualizer;
+import de.jtem.halfedgetools.plugin.data.visualizer.LabelVisualizer;
+import de.jtem.halfedgetools.plugin.data.visualizer.NodeColorVisualizer;
+import de.jtem.halfedgetools.plugin.data.visualizer.HistogramVisualizer;
+import de.jtem.halfedgetools.plugin.data.visualizer.TableDataVisualizer;
+import de.jtem.halfedgetools.plugin.data.visualizer.TextDumpVisualizer;
 import de.jtem.halfedgetools.plugin.modes.EditMode;
 import de.jtem.halfedgetools.plugin.modes.SelectionMode;
 import de.jtem.halfedgetools.plugin.visualizers.DirichletEnergyVisualizer;
@@ -174,6 +181,21 @@ public class HalfedgePluginFactory {
 	}
 	
 	
+	public static Set<Plugin> createDataVisualizationPlugins() {
+		Set<Plugin> s = new HashSet<Plugin>();
+		s.add(new VisualizationInterface());
+		
+		s.add(new LabelVisualizer());
+		s.add(new TableDataVisualizer());
+		s.add(new TextDumpVisualizer());
+		s.add(new FacePlanarityDataSource());
+		s.add(new NodeColorVisualizer());
+		s.add(new ColoredBeadsVisualizer());
+		s.add(new HistogramVisualizer());		
+		return s;
+	}
+	
+	
 	public static Set<Plugin> createWidgetPlugins() {
 		Set<Plugin> s = new HashSet<Plugin>();
 		s.add(new MarqueeWidget());
@@ -202,11 +224,12 @@ public class HalfedgePluginFactory {
 		s.addAll(createVisualizerPlugins());
 		s.addAll(createWidgetPlugins());
 		s.addAll(createEditorModePlugins());
+		s.addAll(createDataVisualizationPlugins());
 		s.add(new GarlandHeckbertPlugin());
 		s.add(new VectorFieldManager());
 		s.add(new CurvatureVectorFields());
 		s.add(new HalfedgePreferencePage());
-		s.add(new HalfedgeDataInterface());
+//		s.add(new Histogram());
 		return s;
 	}
 	

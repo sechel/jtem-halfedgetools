@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.plugin;
+package de.jtem.halfedgetools.plugin.data.color;
 
 import java.awt.Color;
 

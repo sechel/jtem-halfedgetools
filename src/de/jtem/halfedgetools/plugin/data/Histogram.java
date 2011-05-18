@@ -45,18 +45,18 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.TypedAdapterSet;
-import de.jtem.halfedgetools.plugin.ColorMap;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
-import de.jtem.halfedgetools.plugin.HueColorMap;
-import de.jtem.halfedgetools.plugin.ScalarFunctionPointSet;
+import de.jtem.halfedgetools.plugin.data.color.ColorMap;
+import de.jtem.halfedgetools.plugin.data.color.HueColorMap;
+import de.jtem.halfedgetools.plugin.data.geometry.ScalarFunctionPointSet;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
-public class HalfedgeDataInterface extends ShrinkPanelPlugin implements HalfedgeListener, ChangeListener {
+public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, ChangeListener {
 
 	private HalfedgeInterface
 		hif = null;
@@ -95,7 +95,7 @@ public class HalfedgeDataInterface extends ShrinkPanelPlugin implements Halfedge
 	private SceneGraphComponent 
 		scalarFunctionComponent = new SceneGraphComponent();
 	
-	public HalfedgeDataInterface() {
+	public Histogram() {
 		shrinkPanel.setTitle("Histogram");
 		selectionPanel.setLayout(new GridBagLayout());
 		chartPanel.setMinimumSize(new Dimension(300, 250));
@@ -425,6 +425,12 @@ public class HalfedgeDataInterface extends ShrinkPanelPlugin implements Halfedge
 	public void dataChanged(HalfedgeLayer layer) {
 		updateAvailable(layer);
 	}
+	@Override
+	public void layerCreated(HalfedgeLayer layer) {
+	}
+	@Override
+	public void layerRemoved(HalfedgeLayer layer) {
+	}
 	
 	@Override
 	public void storeStates(Controller c) throws Exception {
@@ -467,7 +473,7 @@ public class HalfedgeDataInterface extends ShrinkPanelPlugin implements Halfedge
 
 	public static void main(String[] args) {
 		JRViewer v = new JRViewer();
-		v.registerPlugin(new HalfedgeDataInterface());
+		v.registerPlugin(new Histogram());
 		v.startup();
 	}
 	

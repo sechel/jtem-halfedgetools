@@ -134,15 +134,19 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ActionListe
 	public void activeLayerChanged(HalfedgeLayer old, HalfedgeLayer active) {
 		updateStates();
 	}
-	
 	@Override
 	public void dataChanged(HalfedgeLayer layer) {
 		updateStates();
 	}
-	
 	@Override
 	public void adaptersChanged(HalfedgeLayer layer) {
 		updateStates();
+	}
+	@Override
+	public void layerCreated(HalfedgeLayer layer) {
+	}
+	@Override
+	public void layerRemoved(HalfedgeLayer layer) {
 	}
 	
 	@Override

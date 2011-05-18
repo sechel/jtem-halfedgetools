@@ -1,21 +1,21 @@
 package de.jtem.halfedgetools.plugin.data;
 
+import javax.swing.Icon;
 import javax.swing.JPanel;
 
 import de.jtem.halfedgetools.adapter.Adapter;
-import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.jrworkspace.plugin.Plugin;
 
-public abstract class DataVisualizer extends Plugin {
+public interface DataVisualizer {
 
-	public JPanel getUserInterface() {
-		return null;
-	}
+	public static enum NodeType {Vertex, Edge, Face}
 	
-	public boolean canVisualize(Adapter<?> a) {
-		return false;
-	}
+	public String getName();
+	public Icon getIcon();
 	
-	public abstract void visualize(Adapter<?> a, HalfedgeInterface hi);
+	public boolean canRead(Adapter<?> a, NodeType type);
+	
+	public JPanel connectUserInterfaceFor(DataVisualization visualization);
+	
+	public DataVisualization createVisualization(NodeType type, Adapter<?> source);
 	
 }

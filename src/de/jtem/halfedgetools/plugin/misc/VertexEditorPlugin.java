@@ -180,18 +180,20 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 
 	@Override
 	public void dataChanged(HalfedgeLayer layer) {
-		
 	}
-
 	@Override
 	public void adaptersChanged(HalfedgeLayer layer) {
-		
 	}
-
 	@Override
 	public void activeLayerChanged(HalfedgeLayer old, HalfedgeLayer active) {
 		old.getLayerRoot().removeTool(tool);
 		active.getLayerRoot().addTool(tool);
+	}
+	@Override
+	public void layerCreated(HalfedgeLayer layer) {
+	}
+	@Override
+	public void layerRemoved(HalfedgeLayer layer) {
 	}
 	
 }
