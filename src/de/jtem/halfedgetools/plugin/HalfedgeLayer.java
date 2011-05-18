@@ -88,6 +88,8 @@ public class HalfedgeLayer implements ActionListener {
 	
 	private List<IndexedFaceSet> 
 		undoHistory = new ArrayList<IndexedFaceSet>();
+	private List<AdapterSet>
+		adapterHistory = new ArrayList<AdapterSet>();
 	private int
 		undoIndex = -1,
 		undoSize = 10;
@@ -584,8 +586,10 @@ public class HalfedgeLayer implements ActionListener {
 	private void updateUndoList() {
 		undoHistory = undoHistory.subList(0, undoIndex + 1);
 		undoHistory.add(geometry);
+		adapterHistory.add(new AdapterSet(persistentAdapters));
 		if(undoHistory.size() > undoSize) {
 			undoHistory.remove(0);
+			adapterHistory.remove(0);
 		}
 		undoIndex = undoHistory.size() - 1;		
 	}
@@ -594,6 +598,7 @@ public class HalfedgeLayer implements ActionListener {
 		if (!canUndo()) return;
 		undoIndex--;
 		geometry = undoHistory.get(undoIndex);
+		persistentAdapters = adapterHistory.get(undoIndex);
 		geometryRoot.setGeometry(geometry);
 		convertFaceSet();
 		convertHDS();
@@ -603,6 +608,7 @@ public class HalfedgeLayer implements ActionListener {
 		if (!canRedo()) return;
 		undoIndex++;
 		geometry = undoHistory.get(undoIndex);
+		persistentAdapters = adapterHistory.get(undoIndex);
 		geometryRoot.setGeometry(geometry);
 		convertFaceSet();
 		convertHDS();
