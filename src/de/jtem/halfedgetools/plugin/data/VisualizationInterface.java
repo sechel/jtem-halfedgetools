@@ -25,6 +25,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -74,6 +75,13 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 	private Map<HalfedgeLayer, Set<DataVisualization>>
 		activeMap = new HashMap<HalfedgeLayer, Set<DataVisualization>>();
 	
+	private ButtonCellRenderer
+		createCellRenderer = new ButtonCellRenderer(),
+		removeCellRenderer = new ButtonCellRenderer();
+	private ButtonCellEditor
+		createCellEditor = new ButtonCellEditor(),
+		removeCellEditor = new ButtonCellEditor();
+	
 	public VisualizationInterface() {
 		shrinkPanel.setTitle("Halfedge Data Visualitazion");
 		setInitialPosition(SHRINKER_TOP);
@@ -101,8 +109,8 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		visualizerScroller.setBorder(BorderFactory.createEtchedBorder());
 		visualizerTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
 		visualizerTable.setRowHeight(22);
-		visualizerTable.setDefaultRenderer(JButton.class, new ButtonCellRenderer());
-		visualizerTable.setDefaultEditor(JButton.class, new ButtonCellEditor());
+		visualizerTable.setDefaultRenderer(JButton.class, createCellRenderer);
+		visualizerTable.setDefaultEditor(JButton.class, createCellEditor);
 		visualizerTable.setCellSelectionEnabled(false);
 		shrinkPanel.add(visualizerScroller, c1);
 		
@@ -113,8 +121,8 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		activeTable.setRowHeight(22);
 		activeTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
 		activeTable.getSelectionModel().addListSelectionListener(this);
-		activeTable.setDefaultRenderer(JButton.class, new ButtonCellRenderer());
-		activeTable.setDefaultEditor(JButton.class, new ButtonCellEditor());
+		activeTable.setDefaultRenderer(JButton.class, removeCellRenderer);
+		activeTable.setDefaultEditor(JButton.class, removeCellEditor);
 		c1.weighty = 1.0;
 		c1.weightx = 1.0;
 		c1.gridwidth = GridBagConstraints.REMAINDER;
@@ -151,6 +159,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		visualizerTable.getColumnModel().getColumn(3).setMaxWidth(25);
 		visualizerTable.getColumnModel().getColumn(4).setMaxWidth(25);
 		visualizerTable.revalidate();
+		visualizerTable.updateUI();
 	}
 	
 	private void updateActiveTable() {
@@ -160,6 +169,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		activeTable.getColumnModel().getColumn(1).setMaxWidth(25);
 		activeTable.getColumnModel().getColumn(4).setMaxWidth(25);
 		activeTable.revalidate();
+		activeTable.updateUI();
 		updateVisualizationOptions();
 	}
 	
@@ -207,7 +217,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		if (ui != null) {
 			optionsPanel.add(ui);
 		}
-		optionsPanel.updateUI();
+		SwingUtilities.updateComponentTreeUI(optionsPanel);
 	}
 	
 	private void updateActiveVisualizations() {
@@ -250,11 +260,6 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		for (DataSourceProvider dsp : controller.getPlugins(DataSourceProvider.class)) {
 			aSet.addAll(dsp.getDataSources());
 		}
-		if (aSet.isEmpty() || 
-			hds.numVertices() == 0 ||
-			hds.numEdges() == 0 ||
-			hds.numFaces() == 0
-		) return;
 		for (Adapter<?> a : aSet) {
 			if (a.canAccept(hds.getVertexClass())) {
 				sourceSet.add((Adapter<Number>)a);
@@ -527,6 +532,11 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 			}
 		}
 		
+		public void updateUI() {
+			renderButton.updateUI();
+			nullRenderer.updateUI();
+		}
+		
 	}
 	
 	private class ButtonCellEditor implements TableCellEditor {
@@ -640,4 +650,11 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		}
 		
 	}
+	
+	@Override
+	public void mainUIChanged(String uiClass) {
+		super.mainUIChanged(uiClass);
+		createCellRenderer.updateUI();
+	}
+	
 }
