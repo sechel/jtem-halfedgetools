@@ -20,6 +20,7 @@ import org.jfree.data.statistics.HistogramDataset;
 
 import de.jreality.ui.LayoutFactory;
 import de.jtem.halfedgetools.adapter.Adapter;
+import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.data.AbstractDataVisualization;
 import de.jtem.halfedgetools.plugin.data.DataVisualization;
 import de.jtem.halfedgetools.plugin.data.DataVisualizer;
@@ -101,11 +102,12 @@ public class HistogramVisualizer extends DataVisualizerPlugin implements ChangeL
 			exp = 0;
 		
 		public HistogrammVisualization(
+			HalfedgeLayer layer,
 			Adapter<?> source,
 			DataVisualizer visualizer, 
 			NodeType type
 		) {
-			super(source, visualizer, type);
+			super(layer, source, visualizer, type);
 		}
 
 		@Override
@@ -152,8 +154,8 @@ public class HistogramVisualizer extends DataVisualizerPlugin implements ChangeL
 	}
 
 	@Override
-	public DataVisualization createVisualization(NodeType type, Adapter<?> source) {
-		return new HistogrammVisualization(source, this, type);
+	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source) {
+		return new HistogrammVisualization(layer, source, this, type);
 	}
 
 }

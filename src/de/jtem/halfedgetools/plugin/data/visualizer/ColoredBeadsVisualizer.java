@@ -1,17 +1,25 @@
 package de.jtem.halfedgetools.plugin.data.visualizer;
 
 import de.jtem.halfedgetools.adapter.Adapter;
+import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.data.AbstractDataVisualization;
 import de.jtem.halfedgetools.plugin.data.DataVisualization;
 import de.jtem.halfedgetools.plugin.data.DataVisualizer;
 import de.jtem.halfedgetools.plugin.data.DataVisualizerPlugin;
+import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class ColoredBeadsVisualizer extends DataVisualizerPlugin {
 
 	private class ColoredBeadsVisualization extends AbstractDataVisualization {
 		
-		public ColoredBeadsVisualization(Adapter<?> source, DataVisualizer visualizer, NodeType type) {
-			super(source, visualizer, type);
+		public ColoredBeadsVisualization(
+			HalfedgeLayer layer, 
+			Adapter<?> source, 
+			DataVisualizer visualizer, 
+			NodeType type
+		) {
+			super(layer, source, visualizer, type);
 		}
 
 		@Override
@@ -34,13 +42,20 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin {
 	}
 	
 	@Override
+	public PluginInfo getPluginInfo() {
+		PluginInfo info = super.getPluginInfo();
+		info.icon = ImageHook.getIcon("bullets.png");
+		return info;
+	}
+	
+	@Override
 	public String getName() {
 		return "Colored Beads";
 	}
 
 	@Override
-	public DataVisualization createVisualization(NodeType type, Adapter<?> source) {
-		return new ColoredBeadsVisualization(source, this, type);
+	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source) {
+		return new ColoredBeadsVisualization(layer, source, this, type);
 	}
 
 }

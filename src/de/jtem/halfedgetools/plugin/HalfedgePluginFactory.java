@@ -86,6 +86,7 @@ import de.jtem.halfedgetools.plugin.data.visualizer.NodeColorVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.HistogramVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.TableDataVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.TextDumpVisualizer;
+import de.jtem.halfedgetools.plugin.data.visualizer.VectorFieldVisualizer;
 import de.jtem.halfedgetools.plugin.modes.EditMode;
 import de.jtem.halfedgetools.plugin.modes.SelectionMode;
 import de.jtem.halfedgetools.plugin.visualizers.DirichletEnergyVisualizer;
@@ -191,7 +192,8 @@ public class HalfedgePluginFactory {
 		s.add(new FacePlanarityDataSource());
 		s.add(new NodeColorVisualizer());
 		s.add(new ColoredBeadsVisualizer());
-		s.add(new HistogramVisualizer());		
+		s.add(new HistogramVisualizer());	
+		s.add(new VectorFieldVisualizer());
 		return s;
 	}
 	

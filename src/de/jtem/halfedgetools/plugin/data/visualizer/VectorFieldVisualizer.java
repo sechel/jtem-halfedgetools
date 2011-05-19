@@ -9,11 +9,11 @@ import de.jtem.halfedgetools.plugin.data.DataVisualizerPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class NodeColorVisualizer extends DataVisualizerPlugin {
+public class VectorFieldVisualizer extends DataVisualizerPlugin {
 
-	private class NodeColorVisualization extends AbstractDataVisualization {
+	private class VectorFieldVisualization extends AbstractDataVisualization {
 		
-		public NodeColorVisualization(
+		public VectorFieldVisualization(
 			HalfedgeLayer layer, 
 			Adapter<?> source, 
 			DataVisualizer visualizer, 
@@ -32,27 +32,26 @@ public class NodeColorVisualizer extends DataVisualizerPlugin {
 		
 	}
 	
-	
 	@Override
 	public boolean canRead(Adapter<?> a, NodeType type) {
-		return a.checkType(Number.class);
+		return a.checkType(double[].class);
 	}
 	
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = super.getPluginInfo();
-		info.icon = ImageHook.getIcon("color_swatch.png");
+		info.icon = ImageHook.getIcon("arrow_out.png");
 		return info;
 	}
 	
 	@Override
 	public String getName() {
-		return "Node Colors";
+		return "Vector Field";
 	}
 
 	@Override
 	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source) {
-		return new NodeColorVisualization(layer, source, this, type);
+		return new VectorFieldVisualization(layer, source, this, type);
 	}
 	
 }

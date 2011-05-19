@@ -4,6 +4,7 @@ import javax.swing.Icon;
 import javax.swing.JPanel;
 
 import de.jtem.halfedgetools.adapter.Adapter;
+import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 
 public interface DataVisualizer {
 
@@ -17,6 +18,6 @@ public interface DataVisualizer {
 	public JPanel connectUserInterfaceFor(DataVisualization visualization);
 	public JPanel getDataDisplay();
 	
-	public DataVisualization createVisualization(NodeType type, Adapter<?> source);
+	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source);
 	
 }

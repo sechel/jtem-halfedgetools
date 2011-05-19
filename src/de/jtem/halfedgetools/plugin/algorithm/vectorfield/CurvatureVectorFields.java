@@ -147,25 +147,25 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 		
 		switch (nodeTypeCombo.getSelectedIndex()) {
 			case 0: default:
-				k2Adapter = new VertexVectorFieldMaxAdapter(k1Map, "Kmin on Vertices");
-				k1Adapter = new VertexVectorFieldMinAdapter(k2Map, "Kmax on Vertices");
+				k2Adapter = new VertexVectorFieldMaxAdapter(k1Map, "Kmin Vec V");
+				k1Adapter = new VertexVectorFieldMinAdapter(k2Map, "Kmax Vec V");
 				nAdapter = new VertexVectorFieldAdapter(nMap, "Vertex Normals");
-				k2AbsAdapter = new VertexPrincipalCurvaturesMinAdapter(k1AbsMap, "Kmin on Vertices");
-				k1AbsAdapter = new VertexPrincipalCurvaturesMaxAdapter(k2AbsMap, "Kmax on Vertices");
+				k2AbsAdapter = new VertexPrincipalCurvaturesMinAdapter(k1AbsMap, "Kmin V");
+				k1AbsAdapter = new VertexPrincipalCurvaturesMaxAdapter(k2AbsMap, "Kmax V");
 				break;
 			case 1: 
-				k2Adapter = new EdgeVectorFieldMaxAdapter(k1Map, "Kmin on Edges"); 
-				k1Adapter = new EdgeVectorFieldMinAdapter(k2Map, "Kmax on Edges"); 
+				k2Adapter = new EdgeVectorFieldMaxAdapter(k1Map, "Kmin Vec E"); 
+				k1Adapter = new EdgeVectorFieldMinAdapter(k2Map, "Kmax Vec E"); 
 				nAdapter = new EdgeVectorFieldAdapter(nMap, "Edge Normals"); 
-				k2AbsAdapter = new EdgePrincipalCurvaturesMinAdapter(k1AbsMap, "Kmin on Edges");
-				k1AbsAdapter = new EdgePrincipalCurvaturesMaxAdapter(k2AbsMap, "Kmax on Edges");
+				k2AbsAdapter = new EdgePrincipalCurvaturesMinAdapter(k1AbsMap, "Kmin E");
+				k1AbsAdapter = new EdgePrincipalCurvaturesMaxAdapter(k2AbsMap, "Kmax E");
 				break;
 			case 2: 
-				k2Adapter = new FaceVectorFieldMaxAdapter(k1Map, "Kmin on Faces"); 
-				k1Adapter = new FaceVectorFieldMinAdapter(k2Map, "Kmax on Faces"); 
+				k2Adapter = new FaceVectorFieldMaxAdapter(k1Map, "Kmin Vec F"); 
+				k1Adapter = new FaceVectorFieldMinAdapter(k2Map, "Kmax Vec F"); 
 				nAdapter = new FaceVectorFieldAdapter(nMap, "Face Normals"); 
-				k2AbsAdapter = new FacePrincipalCurvaturesMinAdapter(k1AbsMap, "Kmin on Vertices");
-				k1AbsAdapter = new FacePrincipalCurvaturesMaxAdapter(k2AbsMap, "Kmax on Vertices");
+				k2AbsAdapter = new FacePrincipalCurvaturesMinAdapter(k1AbsMap, "Kmin F");
+				k1AbsAdapter = new FacePrincipalCurvaturesMaxAdapter(k2AbsMap, "Kmax F");
 				break;
 		}
 		

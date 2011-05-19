@@ -484,16 +484,19 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 	private class CreateVisualizerButton extends JButton implements ActionListener {
 		
 		private static final long serialVersionUID = 1L;
+		private HalfedgeLayer layer = null;
 		private Adapter<?> source = null;
 		private DataVisualizer visualizer = null;
 		private NodeType type = NodeType.Vertex;
 		
 		public CreateVisualizerButton(
+			HalfedgeLayer layer,
 			Adapter<?> adapter,
 			DataVisualizer visualizer, 
 			NodeType type
 		) {
 			super();
+			this.layer = layer;
 			this.source = adapter;
 			this.visualizer = visualizer;
 			this.type = type;
@@ -513,7 +516,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 			if (visualizerTable.getCellEditor() != null) {
 				visualizerTable.getCellEditor().stopCellEditing();
 			}
-			DataVisualization dv = visualizer.createVisualization(type, source);
+			DataVisualization dv = visualizer.createVisualization(layer, type, source);
 			activateVisualization(dv);
 		}
 		
@@ -626,7 +629,8 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 			if (row < 0 || row >= visualizerSet.size()) {
 				return "-";
 			}
-			HalfEdgeDataStructure<?, ?, ?> hds = hif.get();
+			HalfedgeLayer layer = hif.getActiveLayer();
+			HalfEdgeDataStructure<?, ?, ?> hds = layer.get();
 			Adapter<?> source = getSelectedSource();
 			assert source != null;
 			Object[] objects = visualizerSet.toArray();
@@ -636,19 +640,19 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 				case 1: return v.getName();
 				case 2: 
 					if (v.canRead(source, NodeType.Vertex) && source.canAccept(hds.getVertexClass())) {
-						return new CreateVisualizerButton(source, v, NodeType.Vertex);
+						return new CreateVisualizerButton(layer, source, v, NodeType.Vertex);
 					} else {
 						return noActionButton;
 					}
 				case 3: 					
 					if (v.canRead(source, NodeType.Edge) && source.canAccept(hds.getEdgeClass())) {
-						return new CreateVisualizerButton(source, v, NodeType.Edge);
+						return new CreateVisualizerButton(layer, source, v, NodeType.Edge);
 					} else {
 						return noActionButton;
 					}
 				case 4: 
 					if (v.canRead(source, NodeType.Face) && source.canAccept(hds.getFaceClass())) {
-						return new CreateVisualizerButton(source, v, NodeType.Face);
+						return new CreateVisualizerButton(layer, source, v, NodeType.Face);
 					} else {
 						return noActionButton;
 					}

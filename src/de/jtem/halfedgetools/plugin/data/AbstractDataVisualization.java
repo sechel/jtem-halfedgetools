@@ -1,6 +1,7 @@
 package de.jtem.halfedgetools.plugin.data;
 
 import de.jtem.halfedgetools.adapter.Adapter;
+import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.data.DataVisualizer.NodeType;
 
 public abstract class AbstractDataVisualization implements DataVisualization, Comparable<AbstractDataVisualization> {
@@ -8,8 +9,10 @@ public abstract class AbstractDataVisualization implements DataVisualization, Co
 	private Adapter<?> source = null;
 	private DataVisualizer visualizer = null;
 	private NodeType type = NodeType.Vertex;
+	private HalfedgeLayer layer = null;
 	
 	public AbstractDataVisualization(
+		HalfedgeLayer layer,
 		Adapter<?> source, 
 		DataVisualizer visualizer,
 		NodeType type
@@ -18,6 +21,7 @@ public abstract class AbstractDataVisualization implements DataVisualization, Co
 		this.source = source;
 		this.visualizer = visualizer;
 		this.type = type;
+		this.layer = layer;
 	}
 
 	@Override
@@ -33,6 +37,11 @@ public abstract class AbstractDataVisualization implements DataVisualization, Co
 	@Override
 	public NodeType getType() {
 		return type;
+	}
+	
+	@Override
+	public HalfedgeLayer getLayer() {
+		return layer;
 	}
 	
 	@Override
