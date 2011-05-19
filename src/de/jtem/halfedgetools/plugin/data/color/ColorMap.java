@@ -24,6 +24,7 @@ public enum ColorMap {
 			return Color.getHSBColor(2.0f * relativeValue / 3.0f, 1f, 1f);
 		}
 	}
+	
 	public String getName() {
 		return name;
 	}
