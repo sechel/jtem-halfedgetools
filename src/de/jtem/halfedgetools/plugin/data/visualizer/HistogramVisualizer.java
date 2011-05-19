@@ -2,6 +2,7 @@ package de.jtem.halfedgetools.plugin.data.visualizer;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Paint;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -10,12 +11,23 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
+import org.jfree.data.statistics.HistogramDataset;
+
 import de.jreality.ui.LayoutFactory;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.plugin.data.AbstractDataVisualization;
 import de.jtem.halfedgetools.plugin.data.DataVisualization;
 import de.jtem.halfedgetools.plugin.data.DataVisualizer;
 import de.jtem.halfedgetools.plugin.data.DataVisualizerPlugin;
+import de.jtem.halfedgetools.plugin.data.color.ColorMap;
+import de.jtem.halfedgetools.plugin.data.color.HueColorMap;
+import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class HistogramVisualizer extends DataVisualizerPlugin implements ChangeListener {
 
@@ -29,6 +41,20 @@ public class HistogramVisualizer extends DataVisualizerPlugin implements ChangeL
 		scaleExpSpinner = new JSpinner(scaleExpModel);
 	private HistogrammVisualization
 		activeVis = null;
+	
+	private HistogramDataset
+		plotDataSet = new HistogramDataset();
+	private NumberAxis 
+		domainAxis = new NumberAxis(),
+		rangeAxis = new NumberAxis();
+	private XYBarRenderer
+		barRenderer = new ColoredXYBarRenderer();
+	private XYPlot
+		plot = new XYPlot(plotDataSet, domainAxis, rangeAxis, barRenderer);
+	private JFreeChart
+		chart = new JFreeChart(plot);
+	private ChartPanel
+		chartPanel = new ChartPanel(chart);
 		
 	public HistogramVisualizer() {
 		panel.setLayout(new GridBagLayout());
@@ -49,6 +75,23 @@ public class HistogramVisualizer extends DataVisualizerPlugin implements ChangeL
 		activeVis.numBins = numBinsModel.getNumber().intValue();
 		activeVis.exp = scaleExpModel.getNumber().intValue();
 		activeVis.update();
+	}
+	
+	
+	private class ColoredXYBarRenderer extends XYBarRenderer {
+		
+		private static final long serialVersionUID = 1L;
+		private ColorMap colorMap = new HueColorMap();
+		
+		@Override
+		public Paint getItemPaint(int row, int column) {
+			int maxIndex = plotDataSet.getItemCount(row) - 1;
+			float min = plotDataSet.getX(row, 0).floatValue();
+			float max = plotDataSet.getX(row, maxIndex).floatValue();
+			float x = plotDataSet.getX(row, column).floatValue();
+			return colorMap.getColor(x, min, max);
+		}
+		
 	}
 	
 	private class HistogrammVisualization extends AbstractDataVisualization {
@@ -80,11 +123,22 @@ public class HistogramVisualizer extends DataVisualizerPlugin implements ChangeL
 	}
 	
 	@Override
+	public PluginInfo getPluginInfo() {
+		PluginInfo info = super.getPluginInfo();
+		info.icon = ImageHook.getIcon("chart_bar.png");
+		return info;
+	}
+	
+	@Override
 	public JPanel connectUserInterfaceFor(DataVisualization visualization) {
 		activeVis = (HistogrammVisualization)visualization;
 		numBinsModel.setValue(activeVis.numBins);
 		scaleExpModel.setValue(activeVis.exp);
 		return panel;
+	}
+	@Override
+	public JPanel getDataDisplay() {
+		return chartPanel;
 	}
 	
 	@Override
