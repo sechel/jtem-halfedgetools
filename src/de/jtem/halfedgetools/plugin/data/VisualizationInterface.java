@@ -10,7 +10,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.EventObject;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -26,12 +26,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
-import javax.swing.event.CellEditorListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
 
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.icon.ImageHook;
@@ -42,6 +41,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
 import de.jtem.halfedgetools.plugin.data.DataVisualizer.NodeType;
+import de.jtem.halfedgetools.plugin.swing.IconCellRenderer;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
@@ -67,6 +67,8 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		vertexIcon = ImageHook.getIcon("shape_handles.png"),
 		edgeIcon = ImageHook.getIcon("shape_edges.png"),
 		faceIcon = ImageHook.getIcon("shape_square.png");
+	private IconCellRenderer
+		iconCellRenderer = new IconCellRenderer();
 	
 	private Set<Adapter<?>>
 		sourceSet = new TreeSet<Adapter<?>>(new AdapterNameComparator());
@@ -81,6 +83,8 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 	private ButtonCellEditor
 		createCellEditor = new ButtonCellEditor(),
 		removeCellEditor = new ButtonCellEditor();
+	private JButton
+		noActionButton = new JButton();
 	
 	public VisualizationInterface() {
 		shrinkPanel.setTitle("Halfedge Data Visualitazion");
@@ -109,6 +113,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		visualizerScroller.setBorder(BorderFactory.createEtchedBorder());
 		visualizerTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
 		visualizerTable.setRowHeight(22);
+		visualizerTable.setDefaultRenderer(Icon.class, iconCellRenderer);
 		visualizerTable.setDefaultRenderer(JButton.class, createCellRenderer);
 		visualizerTable.setDefaultEditor(JButton.class, createCellEditor);
 		visualizerTable.setCellSelectionEnabled(false);
@@ -121,6 +126,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		activeTable.setRowHeight(22);
 		activeTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
 		activeTable.getSelectionModel().addListSelectionListener(this);
+		activeTable.setDefaultRenderer(Icon.class, iconCellRenderer);
 		activeTable.setDefaultRenderer(JButton.class, removeCellRenderer);
 		activeTable.setDefaultEditor(JButton.class, removeCellEditor);
 		c1.weighty = 1.0;
@@ -152,24 +158,20 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 	
 	
 	private void updateVisualizerTable() {
-		visualizerTable.setCellEditor(new ButtonCellEditor());
 		visualizerTable.setModel(new VisualizerModel());
 		visualizerTable.getColumnModel().getColumn(0).setMaxWidth(25);
 		visualizerTable.getColumnModel().getColumn(2).setMaxWidth(25);
 		visualizerTable.getColumnModel().getColumn(3).setMaxWidth(25);
 		visualizerTable.getColumnModel().getColumn(4).setMaxWidth(25);
 		visualizerTable.revalidate();
-		visualizerTable.updateUI();
 	}
 	
 	private void updateActiveTable() {
-		activeTable.setCellEditor(new ButtonCellEditor());
 		activeTable.setModel(new ActiveModel());
 		activeTable.getColumnModel().getColumn(0).setMaxWidth(25);
 		activeTable.getColumnModel().getColumn(1).setMaxWidth(25);
 		activeTable.getColumnModel().getColumn(4).setMaxWidth(25);
 		activeTable.revalidate();
-		activeTable.updateUI();
 		updateVisualizationOptions();
 	}
 	
@@ -513,69 +515,57 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 	}
 	
 	
-	private class ButtonCellRenderer implements TableCellRenderer {
+	private class ButtonCellRenderer extends DefaultTableCellRenderer {
 
+		private static final long serialVersionUID = 1L;
 		private JButton renderButton = new JButton();
-		private JLabel nullRenderer = new JLabel();
 		
 		@Override
 		public Component getTableCellRendererComponent(JTable table,
 				Object value, boolean isSelected, boolean hasFocus, int row,
 				int column) {
-			if (value instanceof JButton) {
+			if (value instanceof JButton && value != noActionButton) {
 				JButton buttonValue = (JButton)value;
 				renderButton.setIcon(buttonValue.getIcon());
 				renderButton.setText(buttonValue.getText());
 				return renderButton;
 			} else {
-				return nullRenderer;
+				return super.getTableCellRendererComponent(table, "", isSelected, hasFocus, row, column);
 			}
 		}
 		
 		public void updateUI() {
-			renderButton.updateUI();
-			nullRenderer.updateUI();
+			super.updateUI();
+			if (renderButton != null) {
+				renderButton.updateUI();
+			}
 		}
 		
 	}
 	
-	private class ButtonCellEditor implements TableCellEditor {
+	private class ButtonCellEditor extends AbstractCellEditor implements TableCellEditor {
 
+		private static final long 	
+			serialVersionUID = 1L;
+		private JLabel
+			defaultEditor = new JLabel("-");
+		private Object 
+			activeValue = null;
+		
 		@Override
 		public Component getTableCellEditorComponent(JTable table,
 				Object value, boolean isSelected, int row, int column) {
-			if (value instanceof JButton) {
-				return (JButton)value;
-			} else {
-				return new JLabel("");
+			this.activeValue = value;
+			if (value instanceof Component) {
+				return (Component)value;
 			}
+			return defaultEditor;
 		}
 		@Override
 		public Object getCellEditorValue() {
-			return new JButton();
+			return activeValue;
 		}
-		@Override
-		public boolean isCellEditable(EventObject anEvent) {
-			return true;
-		}
-		@Override
-		public boolean shouldSelectCell(EventObject anEvent) {
-			return false;
-		}
-		@Override
-		public boolean stopCellEditing() {
-			return true;
-		}
-		@Override
-		public void cancelCellEditing() {
-		}
-		@Override
-		public void addCellEditorListener(CellEditorListener l) {
-		}
-		@Override
-		public void removeCellEditorListener(CellEditorListener l) {
-		}
-
+		
 	}
 	
 	
@@ -623,20 +613,23 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 				case 2: 
 					if (v.canRead(source, NodeType.Vertex) && source.canAccept(hds.getVertexClass())) {
 						return new CreateVisualizerButton(source, v, NodeType.Vertex);
+					} else {
+						return noActionButton;
 					}
-					break;
 				case 3: 					
 					if (v.canRead(source, NodeType.Edge) && source.canAccept(hds.getEdgeClass())) {
 						return new CreateVisualizerButton(source, v, NodeType.Edge);
+					} else {
+						return noActionButton;
 					}
-					break;
 				case 4: 
 					if (v.canRead(source, NodeType.Face) && source.canAccept(hds.getFaceClass())) {
 						return new CreateVisualizerButton(source, v, NodeType.Face);
+					} else {
+						return noActionButton;
 					}
-					break;
+				default: return "-";
 			}
-			return "";
 		}
 		
 		@Override
@@ -649,12 +642,6 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 			}
 		}
 		
-	}
-	
-	@Override
-	public void mainUIChanged(String uiClass) {
-		super.mainUIChanged(uiClass);
-		createCellRenderer.updateUI();
 	}
 	
 }
