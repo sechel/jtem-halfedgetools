@@ -49,7 +49,6 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
 import de.jtem.halfedgetools.plugin.data.color.ColorMap;
-import de.jtem.halfedgetools.plugin.data.color.HueColorMap;
 import de.jtem.halfedgetools.plugin.data.geometry.ScalarFunctionPointSet;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -247,7 +246,7 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 		
 		private static final long serialVersionUID = 1L;
 
-		private ColorMap colorMap = new HueColorMap();
+		private ColorMap colorMap = ColorMap.Hue;
 		
 		@Override
 		public Paint getItemPaint(int row, int column) {
@@ -293,7 +292,7 @@ public class Histogram extends ShrinkPanelPlugin implements HalfedgeListener, Ch
 	private void createPointSets(HalfEdgeDataStructure<?, ?, ?> hds, AdapterSet as) {
 		for(Adapter<Number> na : showPointSet) {
 			ScalarFunctionPointSet sfps = new ScalarFunctionPointSet(hds, na, as);
-			sfps.setColorMap(new HueColorMap());
+			sfps.setColorMap(ColorMap.Hue);
 			scalarFunctionComponent.addChild(sfps.getComponent());
 		}
 	}

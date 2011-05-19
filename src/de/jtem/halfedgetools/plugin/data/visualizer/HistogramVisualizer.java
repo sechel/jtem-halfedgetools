@@ -26,7 +26,6 @@ import de.jtem.halfedgetools.plugin.data.DataVisualization;
 import de.jtem.halfedgetools.plugin.data.DataVisualizer;
 import de.jtem.halfedgetools.plugin.data.DataVisualizerPlugin;
 import de.jtem.halfedgetools.plugin.data.color.ColorMap;
-import de.jtem.halfedgetools.plugin.data.color.HueColorMap;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
@@ -82,7 +81,7 @@ public class HistogramVisualizer extends DataVisualizerPlugin implements ChangeL
 	private class ColoredXYBarRenderer extends XYBarRenderer {
 		
 		private static final long serialVersionUID = 1L;
-		private ColorMap colorMap = new HueColorMap();
+		private ColorMap colorMap = ColorMap.Hue;
 		
 		@Override
 		public Paint getItemPaint(int row, int column) {
