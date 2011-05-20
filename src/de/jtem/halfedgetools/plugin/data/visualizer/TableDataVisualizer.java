@@ -45,10 +45,6 @@ public class TableDataVisualizer extends DataVisualizerPlugin {
 		public void update() {
 		}
 		
-		@Override
-		public void remove() {
-		}
-		
 	}
 	
 	@Override
@@ -77,6 +73,10 @@ public class TableDataVisualizer extends DataVisualizerPlugin {
 	@Override
 	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source) {
 		return new TableVisualization(layer, source, this, type);
+	}
+	
+	@Override
+	public void disposeVisualization(DataVisualization vis) {
 	}
 	
 }

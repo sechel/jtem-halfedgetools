@@ -26,10 +26,6 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin {
 		public void update() {
 		}
 		
-		@Override
-		public void remove() {
-		}
-		
 	}
 	
 	@Override
@@ -52,6 +48,10 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin {
 	@Override
 	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source) {
 		return new VectorFieldVisualization(layer, source, this, type);
+	}
+	
+	@Override
+	public void disposeVisualization(DataVisualization vis) {
 	}
 	
 }

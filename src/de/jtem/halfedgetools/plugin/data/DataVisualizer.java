@@ -15,9 +15,10 @@ public interface DataVisualizer {
 	
 	public boolean canRead(Adapter<?> a, NodeType type);
 	
-	public JPanel connectUserInterfaceFor(DataVisualization visualization);
+	public JPanel connectUserInterfaceFor(DataVisualization vis);
 	public JPanel getDataDisplay();
 	
 	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source);
+	public void disposeVisualization(DataVisualization vis);
 	
 }

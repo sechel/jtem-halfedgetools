@@ -26,10 +26,6 @@ public class NodeColorVisualizer extends DataVisualizerPlugin {
 		public void update() {
 		}
 		
-		@Override
-		public void remove() {
-		}
-		
 	}
 	
 	
@@ -55,4 +51,8 @@ public class NodeColorVisualizer extends DataVisualizerPlugin {
 		return new NodeColorVisualization(layer, source, this, type);
 	}
 	
+	@Override
+	public void disposeVisualization(DataVisualization vis) {
+	}
+
 }

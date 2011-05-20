@@ -26,10 +26,6 @@ public class LabelVisualizer extends DataVisualizerPlugin {
 		public void update() {
 		}
 		
-		@Override
-		public void remove() {
-		}
-		
 	}
 	
 	@Override
@@ -52,6 +48,10 @@ public class LabelVisualizer extends DataVisualizerPlugin {
 	@Override
 	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source) {
 		return new LabelVisualization(layer, source, this, type);
+	}
+	
+	@Override
+	public void disposeVisualization(DataVisualization vis) {
 	}
 	
 }

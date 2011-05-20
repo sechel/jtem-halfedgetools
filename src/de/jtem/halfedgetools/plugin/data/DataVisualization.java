@@ -15,6 +15,5 @@ public interface DataVisualization {
 	public NodeType getType();
 	
 	public void update();
-	public void remove();
 
 }

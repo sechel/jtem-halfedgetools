@@ -4,6 +4,7 @@ import java.awt.Color;
 
 public enum ColorMap {
 
+	Mono("Mono"),
 	Hue("Hue"),
 	RedGreen("Red Green");
 	
@@ -19,6 +20,8 @@ public enum ColorMap {
 		case RedGreen:
 			float relativeValue = (float) ((val - minValue) / (maxValue - minValue));
 			return new Color(relativeValue, 1 - relativeValue, 0);
+		case Mono:
+			return Color.BLUE;
 		default:
 			relativeValue = (float) ((val - minValue) / (maxValue - minValue));
 			return Color.getHSBColor(2.0f * relativeValue / 3.0f, 1f, 1f);

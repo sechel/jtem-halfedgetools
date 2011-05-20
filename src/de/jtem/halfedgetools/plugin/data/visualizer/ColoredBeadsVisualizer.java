@@ -33,7 +33,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		optionsPanel.setLayout(new GridBagLayout());
 		GridBagConstraints cl = LayoutFactory.createLeftConstraint();
 		GridBagConstraints cr = LayoutFactory.createRightConstraint();
-		optionsPanel.add(new JLabel("Color Map"), cl);
+		optionsPanel.add(new JLabel("Colors"), cl);
 		optionsPanel.add(colorMapCombo, cr);
 		
 		colorMapCombo.addActionListener(this);
@@ -60,10 +60,6 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 
 		@Override
 		public void update() {
-		}
-		
-		@Override
-		public void remove() {
 		}
 		
 	}
@@ -96,5 +92,8 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source) {
 		return new ColoredBeadsVisualization(layer, source, this, type);
 	}
-
+	
+	@Override
+	public void disposeVisualization(DataVisualization vis) {
+	}
 }

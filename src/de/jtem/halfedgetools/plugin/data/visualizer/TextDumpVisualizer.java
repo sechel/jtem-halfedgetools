@@ -98,10 +98,6 @@ public class TextDumpVisualizer extends DataVisualizerPlugin implements ActionLi
 			System.out.println(n + "\t" + data.toString());
 		}
 		
-		@Override
-		public void remove() {
-		}
-		
 	}
 	
 	@Override
@@ -136,6 +132,10 @@ public class TextDumpVisualizer extends DataVisualizerPlugin implements ActionLi
 	@Override
 	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source) {
 		return new TextDumpVisualization(layer, source, this, type);
+	}
+	
+	@Override
+	public void disposeVisualization(DataVisualization vis) {
 	}
 	
 }
