@@ -53,6 +53,7 @@ public class TextDumpVisualizer extends DataVisualizerPlugin implements ActionLi
 
 		@Override
 		public void update() {
+			if (!isActive()) return;
 			System.out.println(this.toString() + " -------------------");
 			AdapterSet aSet = getLayer().getEffectiveAdapters();
 			HalfEdgeDataStructure<?, ?, ?> hds = getLayer().get();

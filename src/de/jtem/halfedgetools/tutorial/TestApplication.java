@@ -4,7 +4,6 @@ import de.jreality.plugin.JRViewer;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.VectorFieldManager;
-import de.jtem.halfedgetools.plugin.data.Histogram;
 
 public class TestApplication {
 
@@ -43,7 +42,6 @@ public class TestApplication {
 		HalfedgeInterface hif = new HalfedgeInterface();
 		hif.addAdapter(new TestScalarFunction(), true);
 		jv.registerPlugin(hif);
-		jv.registerPlugin(new Histogram());
 		jv.startup();
 	}
 	

@@ -27,6 +27,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -115,6 +117,8 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		activeTable.setDefaultRenderer(Icon.class, iconCellRenderer);
 		activeTable.setDefaultRenderer(JButton.class, removeCellRenderer);
 		activeTable.setDefaultEditor(JButton.class, removeCellEditor);
+		TableCellEditor boolEditor = activeTable.getDefaultEditor(Boolean.class);
+		boolEditor.addCellEditorListener(new ActivationListener());	
 		c1.weightx = 1.0;
 		c1.weighty = 1.0;
 		c1.gridwidth = GridBagConstraints.REMAINDER;
@@ -176,11 +180,15 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 	private void updateVisualizerTable() {
 		visualizerTable.setModel(new VisualizerModel());
 		visualizerTable.getColumnModel().getColumn(0).setMaxWidth(25);
+		visualizerTable.getColumnModel().getColumn(0).setMinWidth(25);
 		visualizerTable.getColumnModel().getColumn(1).setMaxWidth(150);
 		visualizerTable.getColumnModel().getColumn(1).setMinWidth(150);
 		visualizerTable.getColumnModel().getColumn(2).setMaxWidth(25);
+		visualizerTable.getColumnModel().getColumn(2).setMinWidth(25);
 		visualizerTable.getColumnModel().getColumn(3).setMaxWidth(25);
+		visualizerTable.getColumnModel().getColumn(3).setMinWidth(25);
 		visualizerTable.getColumnModel().getColumn(4).setMaxWidth(25);
+		visualizerTable.getColumnModel().getColumn(4).setMinWidth(25);
 		visualizerTable.revalidate();
 	}
 	
@@ -188,7 +196,8 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		activeTable.setModel(new ActiveModel());
 		activeTable.getColumnModel().getColumn(0).setMaxWidth(25);
 		activeTable.getColumnModel().getColumn(1).setMaxWidth(25);
-		activeTable.getColumnModel().getColumn(3).setMaxWidth(25);
+		activeTable.getColumnModel().getColumn(2).setMaxWidth(25);
+		activeTable.getColumnModel().getColumn(4).setMaxWidth(25);
 		activeTable.revalidate();
 		updateVisualizationOptions();
 	}
@@ -236,7 +245,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		c.weighty = 0.0;
 		DataVisualization vis = getSelectedVisualization();
 		if (vis == null) {
-			optionsPanel.revalidate();
+			optionsPanel.updateUI();
 			return;
 		}
 		DataVisualizer visualizer = vis.getVisualizer();
@@ -439,7 +448,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		
 		@Override
 		public int getColumnCount() {
-			return 4;
+			return 5;
 		}
 		
 		@Override
@@ -447,8 +456,9 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 			switch (columnIndex) {
 			case 0: return Icon.class;
 			case 1: return Icon.class;
-			case 3: return JButton.class;
+			case 2: return Boolean.class;
 			default: return String.class;
+			case 4: return JButton.class;
 			}
 		}
 		
@@ -468,8 +478,9 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 						case Edge: return edgeIcon;
 						case Face: return faceIcon;
 					}
-				case 2: return op.getSource().toString().replace("Adapter", "") + " " + op.getVisualizer().getName();
-				case 3: return new RemoveVisualizationButton(op);
+				case 2: return op.isActive();
+				case 3: return op.getSource().toString().replace("Adapter", "") + " " + op.getVisualizer().getName();
+				case 4: return new RemoveVisualizationButton(op);
 				default: 
 					return "-";
 			}
@@ -477,7 +488,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		
 		@Override
 		public boolean isCellEditable(int row, int column) {
-			return column == 3;
+			return column == 2 || column == 4;
 		}
 		
 	}
@@ -673,6 +684,24 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		}
 		
 	}
+	
+	
+	private class ActivationListener implements CellEditorListener {
+
+		@Override
+		public void editingCanceled(ChangeEvent e) {
+		}
+
+		@Override
+		public void editingStopped(ChangeEvent e) {
+			DataVisualization vis = getSelectedVisualization();
+			if (vis == null) return; 
+			vis.setActive(!vis.isActive());
+			updateActiveVisualizations();
+		}
+		
+	}
+	
 	
 	
 	public void addDataDisplayFor(DataVisualizer dv) {

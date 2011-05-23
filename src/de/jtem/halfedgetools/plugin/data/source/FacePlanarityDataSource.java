@@ -17,7 +17,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.plugin.data.DataSourceProvider;
 import de.jtem.jrworkspace.plugin.Plugin;
 
@@ -31,10 +31,10 @@ public class FacePlanarityDataSource extends Plugin implements DataSourceProvide
 		List<V> boundary = HalfEdgeUtils.boundaryVertices(f);
 		if (boundary.size() != 4) return 0.0;
 		Iterator<V> vIt = boundary.iterator();
-		double[] a = ad.getD(Position.class, vIt.next());
-		double[] b = ad.getD(Position.class, vIt.next());
-		double[] c = ad.getD(Position.class, vIt.next());
-		double[] d = ad.getD(Position.class, vIt.next());
+		double[] a = ad.getD(Position3d.class, vIt.next());
+		double[] b = ad.getD(Position3d.class, vIt.next());
+		double[] c = ad.getD(Position3d.class, vIt.next());
+		double[] d = ad.getD(Position3d.class, vIt.next());
 		double[] Mtetraeder = {c[0] - a[0], c[1] - a[1], c[2] - a[2], b[0] - a[0], b[1] - a[1], b[2] - a[2], d[0] - a[0], d[1] - a[1], d[2] - a[2]};
 		double vol = determinant(Mtetraeder);
 		double[][] point = {a,b,c,d};

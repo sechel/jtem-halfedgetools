@@ -10,6 +10,7 @@ public abstract class AbstractDataVisualization implements DataVisualization, Co
 	private DataVisualizer visualizer = null;
 	private NodeType type = NodeType.Vertex;
 	private HalfedgeLayer layer = null;
+	private boolean active = true;
 	
 	public AbstractDataVisualization(
 		HalfedgeLayer layer,
@@ -52,6 +53,15 @@ public abstract class AbstractDataVisualization implements DataVisualization, Co
 	@Override
 	public int compareTo(AbstractDataVisualization o) {
 		return toString().compareTo(o.toString());
+	}
+	
+	@Override
+	public boolean isActive() {
+		return active;
+	}
+	@Override
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 	
 }

@@ -15,5 +15,7 @@ public interface DataVisualization {
 	public NodeType getType();
 	
 	public void update();
+	public boolean isActive();
+	public void setActive(boolean active);
 
 }

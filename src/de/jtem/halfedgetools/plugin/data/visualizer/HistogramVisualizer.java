@@ -158,10 +158,10 @@ public class HistogramVisualizer extends DataVisualizerPlugin implements ChangeL
 	private class HistogrammVisualization extends AbstractDataVisualization {
 
 		private int 
-			numBins = 200,
+			numBins = 100,
 			exp = 0;
 		private ColorMap
-			colorMap = ColorMap.Hue;
+			colorMap = ColorMap.Mono;
 		private ColoredXYBarRenderer
 			renderer = new ColoredXYBarRenderer();
 		private double[]
@@ -181,6 +181,10 @@ public class HistogramVisualizer extends DataVisualizerPlugin implements ChangeL
 		@SuppressWarnings("unchecked")
 		@Override
 		public void update() {
+			if (!isActive()) {
+				updateHistograms();
+				return;
+			}
 			Adapter<Number> numSource = (Adapter<Number>)getSource();
 			dataSeries = createDataSeries(
 				getType(), 
@@ -194,6 +198,7 @@ public class HistogramVisualizer extends DataVisualizerPlugin implements ChangeL
 		
 		
 		public void addDataSeries(HistogramDataset dataSet) {
+			if (!isActive()) return;
 			String name = getSource().toString().replace("Adapter", "");
 			dataSet.addSeries(name, dataSeries, numBins);
 		}
