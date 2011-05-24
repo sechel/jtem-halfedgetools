@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -48,10 +49,12 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 	private JComboBox
 		colorMapCombo = new JComboBox(ColorMap.values());
 	private SpinnerNumberModel
-		rangeModel = new SpinnerNumberModel(1.0, 0.001, 1.0, 0.001),
-		scaleModel = new SpinnerNumberModel(1.0, 0.1, 1000.0, 0.1);
+		spanModel = new SpinnerNumberModel(1.0, 0.0, 1.0, 0.1),
+		scaleModel = new SpinnerNumberModel(1.0, 0.1, 100.0, 0.1);
+	private JCheckBox
+		invertChecker = new JCheckBox("Invert Scale");
 	private JSpinner
-		rangeSpinner = new JSpinner(rangeModel),
+		spanSpinner = new JSpinner(spanModel),
 		scaleSpinner = new JSpinner(scaleModel);
 	private JPanel
 		optionsPanel = new JPanel();
@@ -68,13 +71,15 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		GridBagConstraints cr = LayoutFactory.createRightConstraint();
 		optionsPanel.add(new JLabel("Scale"), cl);
 		optionsPanel.add(scaleSpinner, cr);
-		optionsPanel.add(new JLabel("Ramge"), cl);
-		optionsPanel.add(rangeSpinner, cr);
+		optionsPanel.add(new JLabel("Span"), cl);
+		optionsPanel.add(spanSpinner, cr);
+		optionsPanel.add(invertChecker, cr);
 		optionsPanel.add(new JLabel("Colors"), cl);
 		optionsPanel.add(colorMapCombo, cr);
 
 		scaleSpinner.addChangeListener(this);
-		rangeSpinner.addChangeListener(this);
+		spanSpinner.addChangeListener(this);
+		invertChecker.addActionListener(this);
 		colorMapCombo.addActionListener(this);
 		
 		appBeads.setAttribute(VERTEX_DRAW, true);
@@ -87,6 +92,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 	public void actionPerformed(ActionEvent e) {
 		if (actVis == null || listenersDisabled) return;
 		actVis.colorMap = (ColorMap)colorMapCombo.getSelectedItem();
+		actVis.invert = invertChecker.isSelected();
 		actVis.update();
 	}
 	
@@ -94,7 +100,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 	public void stateChanged(ChangeEvent e) {
 		if (actVis == null || listenersDisabled) return;
 		actVis.scale = scaleModel.getNumber().doubleValue();
-		actVis.range = rangeModel.getNumber().doubleValue();
+		actVis.range = spanModel.getNumber().doubleValue();
 		actVis.update();
 	}
 	
@@ -103,6 +109,8 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		private double
 			range = 1.0,
 			scale = 1.0;
+		private boolean
+			invert = false;
 		private ColorMap
 			colorMap = ColorMap.Hue;
 		private SceneGraphComponent
@@ -168,7 +176,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			for (Node<?,?,?> n : nodes) {
 				double v = numAdapter.get(n, aSet).doubleValue();
 				colorData[i] = colorMap.getColor(v, min, max);
-				sizeData[i++] = mapScale(v, scale, range, min, max, mean, meanEdgeLength);
+				sizeData[i++] = mapScale(v, scale, range, invert, min, max, mean, meanEdgeLength / 4);
 			}
 			psf.setVertexCount(nodes.size());
 			psf.setVertexCoordinates(vertexData);
@@ -178,16 +186,23 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			psf.update();
 			beadsComponent.setGeometry(psf.getPointSet());
 			beadsComponent.setName(getName());
+			updateBeadsComponent();
+		}
+		
+		private void updateBeadsComponent() {
+			HalfedgeLayer layer = getLayer();
+			layer.removeTemporaryGeometry(beadsComponent);
+			layer.addTemporaryGeometry(beadsComponent);
 		}
 		
 	}
 	
 	
-	private double mapScale(double val, double scale, double range, double min, double max, double mean, double resultMean) {
+	private double mapScale(double val, double scale, double span, boolean invert, double min, double max, double mean, double resultMean) {
 		double dist = max - min;
-		double result = resultMean * scale * (val - min) / dist;
-		double rangeResult = result * range;
-		return rangeResult + (result - rangeResult);
+		double offset = (1 - span) * resultMean * scale;
+		double nomaleVal = (val - min) / dist;
+		return offset + span * resultMean * scale * (invert ? 1 - nomaleVal : nomaleVal);
 	}
 	
 	
@@ -197,7 +212,8 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		listenersDisabled = true;
 		colorMapCombo.setSelectedItem(actVis.colorMap);
 		scaleModel.setValue(actVis.scale);
-		rangeModel.setValue(actVis.range);
+		spanModel.setValue(actVis.range);
+		invertChecker.setSelected(actVis.invert);
 		listenersDisabled = false;
 		return optionsPanel;
 	}
@@ -218,6 +234,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 	public String getName() {
 		return "Colored Beads";
 	}
+	
 
 	@Override
 	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source) {
