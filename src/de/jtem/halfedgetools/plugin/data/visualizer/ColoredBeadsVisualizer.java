@@ -148,7 +148,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			case Edge:
 				nodes = hds.getEdges();
 				break;
-			case Face:
+			default:
 				nodes = hds.getFaces();
 				break;
 			}
@@ -164,7 +164,11 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			double mean = 0;
 			for (Node<?,?,?> n : nodes) {
 				vertexData[i++] = aSet.getD(BaryCenter3d.class, n);
-				double v = numAdapter.get(n, aSet).doubleValue();
+				Number num = numAdapter.get(n, aSet);
+				double v = 0.0;
+				if (num != null) {
+					v = num.doubleValue();
+				}
 				if (v > max) max = v;
 				if (v < min) min = v;
 				mean += v;
@@ -174,7 +178,11 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			double[] sizeData = new double[nodes.size()];
 			i = 0;
 			for (Node<?,?,?> n : nodes) {
-				double v = numAdapter.get(n, aSet).doubleValue();
+				Number num = numAdapter.get(n, aSet);
+				double v = 0.0;
+				if (num != null) {
+					v = num.doubleValue();
+				}
 				colorData[i] = colorMap.getColor(v, min, max);
 				sizeData[i++] = mapScale(v, scale, range, invert, min, max, mean, meanEdgeLength / 4);
 			}
