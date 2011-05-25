@@ -122,6 +122,7 @@ public abstract class FunctionalTest <
 		f.evaluate(hds, xGrad, null, grad, null);
 
 		double normDif = 0.0;
+		double fdGrad = 0.0;
 		for (int i = 0; i < n; i++){
 			double xi = xGrad.get(i);
 			MyEnergy f1 = new MyEnergy();
@@ -132,7 +133,7 @@ public abstract class FunctionalTest <
 			xGrad.set(i, xi - eps);
 			f.evaluate(hds, xGrad, f2, null, null);
 			
-			double fdGrad = (f1.get() - f2.get()) / (2 * eps);
+			fdGrad = (f1.get() - f2.get()) / (2 * eps);
 			
 			normDif += (fdGrad - G.get(i)) * (fdGrad - G.get(i));
 			xGrad.set(i, xi);

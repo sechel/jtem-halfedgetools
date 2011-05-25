@@ -96,7 +96,7 @@ public class TextDumpVisualizer extends DataVisualizerPlugin implements ActionLi
 			if (data instanceof short[]) {
 				data = Arrays.toString((short[])data);
 			}
-			System.out.println(n + "\t" + data.toString());
+			System.out.println(n + "\t" + data);
 		}
 		
 	}
