@@ -31,6 +31,7 @@ import javax.swing.SwingUtilities;
 import de.jreality.geometry.BoundingBoxUtility;
 import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.geometry.ThickenedSurfaceFactory;
+import de.jreality.math.MatrixBuilder;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.Geometry;
 import de.jreality.scene.IndexedFaceSet;
@@ -76,7 +77,8 @@ public class HalfedgeLayer implements ActionListener {
 		selectionRoot = new SceneGraphComponent("Selection"),
 		visualizersRoot = new SceneGraphComponent("Visualizers"),
 		boundingBoxRoot = new SceneGraphComponent("Bounding Box"),
-		temporaryRoot = new SceneGraphComponent("Temporary Geometry");
+		temporaryRoot = new SceneGraphComponent("Temporary Geometry"),
+		pivotRoot = CoordinatesPivot.createPivot();
 	private Appearance
 		geometryAppearance = new Appearance("Geometry Appearance");
 	private Map<Integer, Edge<?,?,?>>
@@ -144,6 +146,7 @@ public class HalfedgeLayer implements ActionListener {
 		bBoxApp.setAttribute(LINE_SHADER + "." + Z_BUFFER_ENABLED, true);
 		bBoxApp.setAttribute(PICKABLE, false);
 		boundingBoxRoot.setAppearance(bBoxApp);
+		boundingBoxRoot.addChild(pivotRoot);
 		
 		Appearance facesAppearance = new Appearance("Faces Appearance");
 		facesAppearance.setAttribute(VERTEX_DRAW, false);
@@ -471,12 +474,18 @@ public class HalfedgeLayer implements ActionListener {
 	
 	protected void updateBoundingBox() {
 		boundingBoxRoot.setGeometry(null);
+		boundingBoxRoot.removeChild(pivotRoot);
 		Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(layerRoot);
 		BoundingBoxUtility.removeZeroExtends(bbox);
 		IndexedFaceSet ifs = IndexedFaceSetUtility.representAsSceneGraph(bbox);
 		ifs.setName("Bounding Box");
 		boundingBoxRoot.setGeometry(ifs);
 		boundingBoxRoot.setVisible(hif.isShowBoundingBox());
+		MatrixBuilder mb = MatrixBuilder.euclidean();
+		mb.translate(bbox.getMinX(), bbox.getMinY(), bbox.getMaxZ());
+		mb.scale(bbox.getMaxExtent() / 20);
+		mb.assignTo(pivotRoot);
+		boundingBoxRoot.addChild(pivotRoot);
 	}
 	
 	

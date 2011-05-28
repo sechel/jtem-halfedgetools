@@ -1213,5 +1213,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		this.showBoundingBox = showBoundingBox;
 		getActiveLayer().updateBoundingBox();
 	}
+	
+	protected SceneGraphComponent getHalfedgeRoot() {
+		return root;
+	}
 
 }
