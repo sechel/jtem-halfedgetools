@@ -33,6 +33,29 @@ public class FunctionalUtils {
 			G.add(startIndex+i, d[i]);
 		}
 	}
+	public  static void subtractVectorFromGradient(Gradient G, int startIndex, double[] d) {
+		for (int i = 0; i < d.length; i++) {
+			G.add(startIndex+i, -d[i]);
+		}
+	}
+	
+	public  static void addRowToHessian(Hessian H, int rowIndex, double[] d) {
+		for (int i = 0; i < d.length; i++) {
+			H.add(rowIndex,i, d[i]);
+		}
+	}
+	public  static void subtractRowFromHessian(Hessian H, int rowIndex, double[] d) {
+		for (int i = 0; i < d.length; i++) {
+			H.add(rowIndex,i, -d[i]);
+		}
+	}
+	
+	public  static void addToDiagonal(Hessian H, double[] d) {
+		for (int i = 0; i < d.length; i++) {
+			H.add(i, i, d[i]);
+		}
+	}
+	
 	public static double angle(double[] a, double[] b) {
 		return Math.atan2(Rn.euclideanNorm(Rn.crossProduct(null, a, b)),Rn.innerProduct(a, b));
 	}
