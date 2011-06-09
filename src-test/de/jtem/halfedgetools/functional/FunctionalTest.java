@@ -72,7 +72,7 @@ public abstract class FunctionalTest <
 		xHess = null;
 	
 	
-	public void setFuctional(Functional<V, E, F> f) {
+	public void setFunctional(Functional<V, E, F> f) {
 		this.f = f;
 	}
 	

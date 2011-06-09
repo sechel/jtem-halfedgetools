@@ -70,7 +70,7 @@ public class CPEuclideanFunctionalTest extends FunctionalTest<CPVertex, CPEdge, 
 		
 		MyDomainValue rho = new MyDomainValue(x);
 		
-		setFuctional(functional);
+		setFunctional(functional);
 		setXGradient(rho);
 		setXHessian(rho);
 		setHDS(hds);
