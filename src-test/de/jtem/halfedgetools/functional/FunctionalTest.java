@@ -35,9 +35,6 @@ import static de.jtem.halfedge.util.HalfEdgeUtils.constructFaceByVertices;
 import static java.lang.Math.sqrt;
 import static no.uib.cipr.matrix.Matrix.Norm.Frobenius;
 import static no.uib.cipr.matrix.Vector.Norm.TwoRobust;
-
-import javax.vecmath.Point3d;
-
 import junit.framework.Assert;
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Matrix;
@@ -51,6 +48,8 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
 
 
@@ -230,20 +229,20 @@ public abstract class FunctionalTest <
 	
 	
 	public static <
-		V extends Vertex<V, E, F> & HasPosition,
+		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void createTetrahedron(HDS hds) {
+	> void createTetrahedron(HDS hds, AdapterSet a) {
 		V v1 = hds.addNewVertex();
 		V v2 = hds.addNewVertex();
 		V v3 = hds.addNewVertex();
 		V v4 = hds.addNewVertex();
 		
-		v1.setPosition(new Point3d(0, 0, 0));
-		v2.setPosition(new Point3d(1, 0, 0));
-		v3.setPosition(new Point3d(0.5, 0.75, 0));
-		v4.setPosition(new Point3d(0.5, 0.5, 0.75));
+		a.set(Position.class, v1, new double[] {0, 0, 0});
+		a.set(Position.class, v2, new double[] {1, 0, 0});
+		a.set(Position.class, v3, new double[] {0.5, 0.75, 0});
+		a.set(Position.class, v4, new double[] {0.5, 0.5, 0.75});
 		
 		constructFaceByVertices(hds, v1, v2, v3);
 		constructFaceByVertices(hds, v3, v2, v4);
@@ -252,21 +251,22 @@ public abstract class FunctionalTest <
 	}
 	
 	public static <
-		V extends Vertex<V, E, F> & HasPosition,
+		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void createCube(HDS hds) {
+	> void createCube(HDS hds, AdapterSet a) {
 		HalfEdgeUtils.addCube(hds);
 		Triangulator.triangulate(hds);
-		hds.getVertex(0).setPosition(new Point3d(-0.5, -0.5, -0.5));
-		hds.getVertex(1).setPosition(new Point3d(0.5, -0.5, -0.5));
-		hds.getVertex(2).setPosition(new Point3d(-0.5, 0.5, -0.5));
-		hds.getVertex(3).setPosition(new Point3d(0.5, 0.5, -0.5));
-		hds.getVertex(4).setPosition(new Point3d(-0.5, -0.5, 0.5));
-		hds.getVertex(5).setPosition(new Point3d(0.5, -0.5, 0.5));
-		hds.getVertex(6).setPosition(new Point3d(-0.5, 0.5, 0.5));
-		hds.getVertex(7).setPosition(new Point3d(0.5, 0.5, 0.5));
+		
+		a.set(Position.class, hds.getVertex(0), new double[] {-0.5, -0.5, -0.5});
+		a.set(Position.class, hds.getVertex(1), new double[] {0.5, -0.5, -0.5});
+		a.set(Position.class, hds.getVertex(2), new double[] {-0.5, 0.5, -0.5});
+		a.set(Position.class, hds.getVertex(3), new double[] {0.5, 0.5, -0.5});
+		a.set(Position.class, hds.getVertex(4), new double[] {-0.5, -0.5, 0.5});
+		a.set(Position.class, hds.getVertex(5), new double[] {0.5, -0.5, 0.5});
+		a.set(Position.class, hds.getVertex(6), new double[] {-0.5, 0.5, 0.5});
+		a.set(Position.class, hds.getVertex(7), new double[] {0.5, 0.5, 0.5});
 	}
 	
 	
