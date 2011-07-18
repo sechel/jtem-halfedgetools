@@ -50,7 +50,6 @@ public class CatmullClarkLinear {
 			faceVertexMap.put(f, newVertex);
 		}
 		
-		int numLinks = 0;
 		// edges vertex connections
 		DualHashMap<V, V, E> quadEdgeMap = new DualHashMap<V, V, E>();
 		for (E e : graph.getPositiveEdges()){
@@ -82,7 +81,6 @@ public class CatmullClarkLinear {
 			e4.linkNextEdge(e5);
 			e6.linkNextEdge(e7);
 			e8.linkNextEdge(e1);
-			numLinks += 4;
 		
 			e1.linkOppositeEdge(e2);
 			e3.linkOppositeEdge(e4);
@@ -114,7 +112,6 @@ public class CatmullClarkLinear {
 				V vertex = edgeVertexMap.get(actEdge);
 				E edge =  quadEdgeMap.get(vertex, v);
 				edge.linkNextEdge(lastEdge.getOppositeEdge());
-				numLinks++;
 				lastEdge = edge;
 			} while (actEdge != bEdge);
 			readyFaces.add(f);
@@ -126,7 +123,6 @@ public class CatmullClarkLinear {
 			for (E edge : vStar){
 				E linkEdge = edge.getNextEdge().getNextEdge().getNextEdge(); 
 				linkEdge.linkNextEdge(edge);
-				numLinks++;
 			}
 		}
 		HalfEdgeUtils.fillAllHoles(quad);

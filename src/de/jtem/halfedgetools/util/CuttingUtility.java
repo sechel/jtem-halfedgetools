@@ -287,6 +287,9 @@ public class CuttingUtility {
 				}
 			}
 			assert (b != null);
+			if (b == null) {
+				throw new RuntimeException("Cannot find boundary edge in cutAtEdge()");
+			}
 			E b2 = b.getNextEdge();
 			List<E> newTargetEdges = new LinkedList<E>();
 			E actEdge = opp;
@@ -316,6 +319,9 @@ public class CuttingUtility {
 				}
 			}
 			assert (b != null);
+			if (b == null) {
+				throw new RuntimeException("Cannot find boundary edge in cutAtEdge()");
+			}
 			E b2 = b.getNextEdge();
 			List<E> newTargetEdges = new LinkedList<E>();
 			E actEdge = edge;
@@ -419,7 +425,9 @@ public class CuttingUtility {
 				}
 			}
 			assert be1 != null;
-			
+			if (be1 == null) {
+				throw new RuntimeException("Cannot find boundary edge in cutAtEdge()");
+			}
 			E be2 = be1.getNextEdge();
 			actEdge = be1;
 			do {

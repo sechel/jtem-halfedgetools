@@ -31,6 +31,9 @@ public class AngleUtilities {
 			previousEdge = e;
 		}
 		assert previousEdge != null;
+		if (previousEdge == null) {
+			throw new RuntimeException("Cannot find a previous edge in calculateRotationAngle()");
+		}
 		E e = dualPath.get(0);
 		if(e.getStartVertex() == previousEdge.getStartVertex()) {
 			totalAngle += angleAt(e.getLeftFace(),e.getStartVertex(),a);

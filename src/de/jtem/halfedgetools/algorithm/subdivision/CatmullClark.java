@@ -366,6 +366,9 @@ public class CatmullClark {
 				out.setLeftFace(lastFace);
 			}
 			assert firstIn != null;
+			if (firstIn == null) {
+				throw new RuntimeException("The first edge in null CatmullClark.createCombinatorics()");
+			}
 			firstIn.setLeftFace(lastFace);
 			firstIn.linkNextEdge(lastOut);
 		}

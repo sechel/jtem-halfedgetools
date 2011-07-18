@@ -58,13 +58,11 @@ F extends JRFace<V,E,F>
 		V v=e.getStartVertex();
 		E end=e;
 		e=e.getNextEdge().getOppositeEdge();
-		int i=0;
 		while(e!=end){			
 			e=e.getNextEdge().getOppositeEdge();
 			if(e.getStartVertex()==v){
 				n++;
 			}
-			i++;
 		}
 		return (n!=1);		
 	}

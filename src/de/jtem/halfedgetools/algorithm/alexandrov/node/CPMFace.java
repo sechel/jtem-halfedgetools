@@ -49,8 +49,6 @@ import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasXYZW;
  */
 public class CPMFace extends Face<CPMVertex, CPMEdge, CPMFace> implements HasXYZW, HasColor{
 
-	private static final long 
-		serialVersionUID = 1L;
 	private Point4d
 		pos = new Point4d();
 	private Color3f

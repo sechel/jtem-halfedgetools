@@ -182,6 +182,9 @@ public class TopologyAlgorithms {
 				}
 			}
 			assert be != null;
+			if (be == null) {
+				throw new RuntimeException("Cannot find a boundary edge in removeVertexFill()");
+			}
 			V v1 = be.getStartVertex();
 			V v2 = be.getNextEdge().getTargetVertex();
 			E e1int = be.getOppositeEdge().getNextEdge();

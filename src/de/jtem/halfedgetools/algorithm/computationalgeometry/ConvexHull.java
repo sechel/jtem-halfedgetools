@@ -126,7 +126,10 @@ public class ConvexHull {
 				e.linkNextEdge(next);
 			}
 			assert horizon != null;
-
+			if (horizon == null) {
+				throw new RuntimeException("Cannot find a horizon edge in ConvexHull()");
+			}
+			
 			E lastHorizon = horizon.getPreviousEdge();
 			E firstEdge = null;
 			E lastEdge = null;

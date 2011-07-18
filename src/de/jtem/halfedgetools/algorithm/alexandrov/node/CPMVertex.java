@@ -49,8 +49,6 @@ import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasXYZW;
  */
 public class CPMVertex extends Vertex<CPMVertex, CPMEdge, CPMFace> implements HasXYZW, HasXY, HasRadius, HasCurvature{
 
-	private static final long 
-		serialVersionUID = 1L;
 	private Point4d
 		pos4d = new Point4d();
 	private Point2d

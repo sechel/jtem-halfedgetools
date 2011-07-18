@@ -50,8 +50,6 @@ import de.jtem.halfedgetools.util.TriangulationException;
  */
 public class CPMEdge extends Edge<CPMVertex, CPMEdge, CPMFace> implements HasAngle, IsFlippable, IsBoundary, IsHidable, HasLength{
 
-	private static final long 
-		serialVersionUID = 1L;
 	private Double
 		length = 1.0,
 		gamma = 0.0;

@@ -86,15 +86,10 @@ F extends SymmetricFace<V, E, F>
 		List<E> boundary = HalfEdgeUtils.boundaryEdges(f);
 		E e = boundary.get(0);
 		
-		int n = boundary.size();
-		int i = n;
-		
 		if(e.isRightIncomingOfSymmetryCycle() == null) {
 			e = e.getNextEdge();
-			i--;
 		} if(e.isRightIncomingOfSymmetryCycle() == null) {
 			e = e.getNextEdge();
-			i--;
 		}
 		
 		return 0;
