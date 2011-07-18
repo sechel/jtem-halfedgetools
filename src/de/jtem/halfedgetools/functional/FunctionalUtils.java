@@ -49,6 +49,16 @@ public class FunctionalUtils {
 			H.add(rowIndex,i, -d[i]);
 		}
 	}
+	public  static void addColumnToHessian(Hessian H, int colIndex, double[] d) {
+		for (int i = 0; i < d.length; i++) {
+			H.add(i, colIndex, d[i]);
+		}
+	}
+	public  static void subtractColumnFromHessian(Hessian H, int colIndex, double[] d) {
+		for (int i = 0; i < d.length; i++) {
+			H.add(i, colIndex, -d[i]);
+		}
+	}	
 	
 	public  static void addToDiagonal(Hessian H, double[] d) {
 		for (int i = 0; i < d.length; i++) {
