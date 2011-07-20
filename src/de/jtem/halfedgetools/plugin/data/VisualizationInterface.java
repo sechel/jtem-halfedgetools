@@ -574,6 +574,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 			}
 		}
 		
+		@Override
 		public void updateUI() {
 			super.updateUI();
 			if (renderButton != null) {

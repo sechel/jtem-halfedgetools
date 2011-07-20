@@ -261,6 +261,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			
 		}
 		
+		@Override
 		public void actionPerformed(ActionEvent e){
 			double tol = tolExpModel.getNumber().doubleValue();
 			tol = Math.pow(10, tol);
@@ -409,6 +410,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			goButton.addActionListener(this);
 		}
 		
+		@Override
 		public void actionPerformed(ActionEvent e){
 			double tol = tolExpModel.getNumber().doubleValue();
 			tol = Math.pow(10, tol);
