@@ -14,6 +14,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JCheckBox;
@@ -34,8 +35,8 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.BeadPosition;
 import de.jtem.halfedgetools.adapter.type.Length;
-import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.data.AbstractDataVisualization;
 import de.jtem.halfedgetools.plugin.data.DataVisualization;
@@ -129,7 +130,6 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			beadsComponent.setAppearance(appBeads);
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public void update() {
 			if (!isActive()) {
@@ -138,9 +138,11 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			} else {
 				beadsComponent.setVisible(true);
 			}
-			Adapter<Number> numAdapter = (Adapter<Number>)getSource();
+			
 			HalfEdgeDataStructure<?, ?, ?> hds = getLayer().get();
 			AdapterSet aSet = getLayer().getEffectiveAdapters();
+			Adapter<?> genericAdapter = getSource();
+			
 			List<? extends Node<?,?,?>> nodes = null;
 			switch (getType()) {
 			case Vertex:
@@ -158,37 +160,45 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 				meanEdgeLength += aSet.get(Length.class, e, Double.class);
 			}
 			meanEdgeLength /= hds.numEdges() / 2;
-			double[][] vertexData = new double[nodes.size()][];
+			List<double[]> vertexData = new LinkedList<double[]>();
 			int i = 0;
 			double max = -Double.MAX_VALUE;
 			double min = Double.MAX_VALUE;
 			double mean = 0;
 			for (Node<?,?,?> n : nodes) {
-				vertexData[i++] = aSet.getD(BaryCenter3d.class, n);
-				Number num = numAdapter.get(n, aSet);
-				double v = 0.0;
-				if (num != null) {
-					v = num.doubleValue();
+				Object val = genericAdapter.get(n, aSet);
+				if (val == null) {
+					System.err.println("Null value in adapter " + genericAdapter + " for node " + n + " found.");
+					continue;
 				}
-				if (v > max) max = v;
-				if (v < min) min = v;
-				mean += v;
+				double[] numbers = convertValue(val);
+				for (int j = 0; j < numbers.length; j++) {
+					aSet.setParameter("beadsPerNode", numbers.length);
+					aSet.setParameter("beadIndex", j);
+					vertexData.add(aSet.getD(BeadPosition.class, n));
+					double num = numbers[j];
+					if (num > max) max = num;
+					if (num < min) min = num;
+					mean += num;
+				}
 			}
 			mean /= nodes.size();
-			Color[] colorData = new Color[nodes.size()];
-			double[] sizeData = new double[nodes.size()];
+			
+			double[][] vertexDataArr = vertexData.toArray(new double[0][0]);
+			Color[] colorData = new Color[vertexDataArr.length];
+			double[] sizeData = new double[vertexDataArr.length];
 			i = 0;
 			for (Node<?,?,?> n : nodes) {
-				Number num = numAdapter.get(n, aSet);
-				double v = 0.0;
-				if (num != null) {
-					v = num.doubleValue();
+				Object val = genericAdapter.get(n, aSet);
+				double[] numbers = convertValue(val);
+				for (int j = 0; j < numbers.length; j++) {
+					double v = numbers[j];
+					colorData[i] = colorMap.getColor(v, min, max);
+					sizeData[i++] = mapScale(v, scale, span, invert, min, max, mean, meanEdgeLength / 4);
 				}
-				colorData[i] = colorMap.getColor(v, min, max);
-				sizeData[i++] = mapScale(v, scale, span, invert, min, max, mean, meanEdgeLength / 4);
 			}
-			psf.setVertexCount(nodes.size());
-			psf.setVertexCoordinates(vertexData);
+			psf.setVertexCount(vertexDataArr.length);
+			psf.setVertexCoordinates(vertexDataArr);
 			psf.setVertexColors(colorData);
 			psf.setVertexRelativeRadii(sizeData);
 			psf.setVertexAttribute(POINT_SIZE, sizeData);
@@ -197,6 +207,31 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			beadsComponent.setName(getName());
 			updateBeadsComponent();
 		}
+		
+		
+		private double[] convertValue(Object val) {
+			double[] numbers = new double[0];
+			if (val instanceof Number) {
+				Number num = (Number)val;
+				numbers = new double[] {num.doubleValue()};
+			} else if (val instanceof double[]) {
+				numbers = (double[])val;
+			} else if (val instanceof float[]) {
+				float[] fVal = (float[])val;
+				numbers = new double[fVal.length];
+				System.arraycopy(fVal, 0, numbers, 0, fVal.length);
+			} else if (val instanceof long[]) {
+				long[] lVal = (long[])val;
+				numbers = new double[lVal.length];
+				System.arraycopy(lVal, 0, numbers, 0, lVal.length);
+			} else if (val instanceof int[]) {
+				int[] iVal = (int[])val;
+				numbers = new double[iVal.length];
+				System.arraycopy(iVal, 0, numbers, 0, iVal.length);
+			}
+			return numbers;
+		}
+		
 		
 		private void updateBeadsComponent() {
 			HalfedgeLayer layer = getLayer();
@@ -230,7 +265,13 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 	
 	@Override
 	public boolean canRead(Adapter<?> a, NodeType type) {
-		return a.checkType(Number.class);
+		boolean accept = false;
+		accept |= a.checkType(Number.class);
+		accept |= a.checkType(double[].class);
+		accept |= a.checkType(float[].class);
+		accept |= a.checkType(long[].class);
+		accept |= a.checkType(int[].class);
+		return accept;
 	}
 	
 	@Override
