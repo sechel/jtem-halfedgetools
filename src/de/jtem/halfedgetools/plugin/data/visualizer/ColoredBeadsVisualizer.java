@@ -141,6 +141,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			
 			HalfEdgeDataStructure<?, ?, ?> hds = getLayer().get();
 			AdapterSet aSet = getLayer().getEffectiveAdapters();
+			aSet.add(new SimpleBeadsPositionAdapter());
 			Adapter<?> genericAdapter = getSource();
 			
 			List<? extends Node<?,?,?>> nodes = null;
