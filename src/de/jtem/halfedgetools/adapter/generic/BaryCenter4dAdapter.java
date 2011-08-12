@@ -68,4 +68,9 @@ public class BaryCenter4dAdapter extends AbstractAdapter<double[]> {
 		return r;
 	}
 	
+	@Override
+	public String toString() {
+		return "Barycenter 4D";
+	}
+	
 }

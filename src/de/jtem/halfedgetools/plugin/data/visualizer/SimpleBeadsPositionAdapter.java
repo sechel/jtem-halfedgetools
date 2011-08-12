@@ -6,6 +6,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.Parameter;
 import de.jtem.halfedgetools.adapter.type.BeadPosition;
 import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
@@ -28,24 +29,42 @@ public class SimpleBeadsPositionAdapter extends AbstractAdapter<double[]> {
 		V extends Vertex<V,E,F>, 
 		E extends Edge<V,E,F>, 
 		F extends Face<V,E,F>
-	> double[] getE(
-			E e, de.jtem.halfedgetools.adapter.AdapterSet a) {
-		double[] p = a
-				.get(Position3d.class, e.getStartVertex(), double[].class);
-		double[] v = a.get(EdgeVector.class, e, double[].class);
-		double[] s = a.get(BaryCenter3d.class, e.getLeftFace(), double[].class);
+	> double[] getE(E e, AdapterSet a) {
+		double[] p = a.getD(Position3d.class, e.getStartVertex());
+		double[] v = a.getD(EdgeVector.class, e);
+		double[] s = null;
+		if (e.getLeftFace() == null) {
+			s = a.getD(BaryCenter3d.class, e);
+		} else {
+			s = a.getD(BaryCenter3d.class, e.getLeftFace());
+		}
 
 		double[][] points = new double[3][3];
-		points[0] = Rn.linearCombination(null, 1., p, ((double) beadIndex)
-				/ beadsPerNode, v);
-		points[1] = Rn.linearCombination(null, 1., p, ((double) beadIndex + 1.)
-				/ beadsPerNode, v);
+		points[0] = Rn.linearCombination(null, 1., p, ((double) beadIndex) / beadsPerNode, v);
+		points[1] = Rn.linearCombination(null, 1., p, ((double) beadIndex + 1.) / beadsPerNode, v);
 		points[2] = s;
 
 		return getBarycenter(points);
 	}
-	
+
 	// TODO: implement getV, getF
+	@Override
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	> double[] getV(V v, AdapterSet a) {
+		return a.getD(BaryCenter3d.class, v);
+	}
+	@Override
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	> double[] getF(F f, AdapterSet a) {
+		return a.getD(BaryCenter3d.class, f);
+	}
+
 	
 	public double[] getBarycenter(double[][] points) {
 		double[] pos= new double[3];
@@ -80,6 +99,11 @@ public class SimpleBeadsPositionAdapter extends AbstractAdapter<double[]> {
 	@Override
 	public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
 		return true; // can accept all
+	}
+	
+	@Override
+	public String toString() {
+		return "Simple Position";
 	}
 
 }

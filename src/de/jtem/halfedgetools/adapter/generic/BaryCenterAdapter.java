@@ -74,4 +74,9 @@ public class BaryCenterAdapter extends AbstractAdapter<double[]> {
 		this.edgeAlpha = edgeAlpha;
 	}
 	
+	@Override
+	public String toString() {
+		return "Barycenter";
+	}
+	
 }

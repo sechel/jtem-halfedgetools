@@ -14,9 +14,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -49,6 +53,7 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements ActionListener, ChangeListener {
 	
 	private JComboBox
+		beadsPosCombo = new JComboBox(),
 		colorMapCombo = new JComboBox(ColorMap.values());
 	private SpinnerNumberModel
 		spanModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.1),
@@ -66,6 +71,8 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		listenersDisabled = false;
 	private Appearance
 		appBeads = new Appearance("Beads Appearance");
+	private SimpleBeadsPositionAdapter
+		simpleBeadsPositionAdapter = new SimpleBeadsPositionAdapter();
 	
 	public ColoredBeadsVisualizer() {
 		optionsPanel.setLayout(new GridBagLayout());
@@ -78,11 +85,14 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		optionsPanel.add(invertChecker, cr);
 		optionsPanel.add(new JLabel("Colors"), cl);
 		optionsPanel.add(colorMapCombo, cr);
+		optionsPanel.add(new JLabel("Position"), cl);
+		optionsPanel.add(beadsPosCombo, cr);
 
 		scaleSpinner.addChangeListener(this);
 		spanSpinner.addChangeListener(this);
 		invertChecker.addActionListener(this);
 		colorMapCombo.addActionListener(this);
+		beadsPosCombo.addActionListener(this);
 		
 		appBeads.setAttribute(VERTEX_DRAW, true);
 		appBeads.setAttribute(POINT_SHADER + "." + SPHERES_DRAW, true);
@@ -90,11 +100,13 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		appBeads.setAttribute(POINT_SHADER + "." + POINT_RADIUS, 1.0);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (actVis == null || listenersDisabled) return;
 		actVis.colorMap = (ColorMap)colorMapCombo.getSelectedItem();
 		actVis.invert = invertChecker.isSelected();
+		actVis.beadPosAdapter = (Adapter<double[]>)beadsPosCombo.getSelectedItem();
 		actVis.update();
 	}
 	
@@ -119,6 +131,8 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			beadsComponent = new SceneGraphComponent("Beads");
 		private PointSetFactory 
 			psf = new PointSetFactory();
+		private Adapter<double[]>
+			beadPosAdapter = null;
 		
 		public ColoredBeadsVisualization(
 			HalfedgeLayer layer, 
@@ -141,7 +155,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			
 			HalfEdgeDataStructure<?, ?, ?> hds = getLayer().get();
 			AdapterSet aSet = getLayer().getEffectiveAdapters();
-			aSet.add(new SimpleBeadsPositionAdapter());
+			aSet.add(simpleBeadsPositionAdapter);
 			Adapter<?> genericAdapter = getSource();
 			
 			List<? extends Node<?,?,?>> nodes = null;
@@ -176,7 +190,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 				for (int j = 0; j < numbers.length; j++) {
 					aSet.setParameter("beadsPerNode", numbers.length);
 					aSet.setParameter("beadIndex", j);
-					vertexData.add(aSet.getD(BeadPosition.class, n));
+					vertexData.add(beadPosAdapter.get(n, aSet));
 					double num = numbers[j];
 					if (num > max) max = num;
 					if (num < min) min = num;
@@ -197,6 +211,12 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 					colorData[i] = colorMap.getColor(v, min, max);
 					sizeData[i++] = mapScale(v, scale, span, invert, min, max, mean, meanEdgeLength / 4);
 				}
+			}
+			if (vertexDataArr.length == 0) {
+				beadsComponent.setGeometry(null);
+				beadsComponent.setName(getName());
+				updateBeadsComponent();
+				return;
 			}
 			psf.setVertexCount(vertexDataArr.length);
 			psf.setVertexCoordinates(vertexDataArr);
@@ -261,6 +281,16 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		spanModel.setValue(actVis.span);
 		invertChecker.setSelected(actVis.invert);
 		listenersDisabled = false;
+		
+		AdapterSet aSet = visualization.getLayer().getEffectiveAdapters();
+		aSet.add(simpleBeadsPositionAdapter);
+		List<Adapter<?>> beadPosList = aSet.queryAll(BeadPosition.class);
+		Collections.sort(beadPosList);
+		Vector<Adapter<?>> beadPosVec = new Vector<Adapter<?>>(beadPosList);
+		ComboBoxModel beadPosModel = new DefaultComboBoxModel(beadPosVec);
+		beadsPosCombo.setModel(beadPosModel);
+		beadsPosCombo.setSelectedItem(actVis.beadPosAdapter);
+		
 		return optionsPanel;
 	}
 	
@@ -275,6 +305,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		return accept;
 	}
 	
+	
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = super.getPluginInfo();
@@ -288,6 +319,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 	}
 	
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source) {
 		ColoredBeadsVisualization vis = new ColoredBeadsVisualization(layer, source, this, type);
@@ -297,6 +329,13 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		vis.span = spanModel.getNumber().doubleValue();
 		vis.invert = invertChecker.isSelected();
 		layer.addTemporaryGeometry(vis.beadsComponent);
+		
+		AdapterSet aSet = layer.getEffectiveAdapters();
+		aSet.add(simpleBeadsPositionAdapter);
+		List<Adapter<?>> beadPosList = aSet.queryAll(BeadPosition.class);
+		Collections.sort(beadPosList);
+		vis.beadPosAdapter = (Adapter<double[]>)beadPosList.get(0);
+		
 		return vis;
 	}
 	
