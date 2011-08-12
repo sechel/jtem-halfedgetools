@@ -703,7 +703,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		if (disableListeners) return;
+		if (disableListeners || e.getValueIsAdjusting()) return;
 		int row = layersTable.getSelectedRow();
 		if (row < 0) return;
 		if (layersTable.getRowSorter() != null) {
@@ -734,6 +734,10 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		layersTable.getSelectionModel().setSelectionInterval(index, index);
 		disableListeners = false;
 		getAdapters().revalidateAdapters();
+		for (HalfedgeLayer l : layers) {
+			l.updateBoundingBox();
+			l.setShowBoundingBox(l.isActive() & isShowBoundingBox());
+		}
 	}
 	
 	
@@ -1018,8 +1022,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	public void addLayer(HalfedgeLayer layer) {
 		if (layers.contains(layer)) return;
-		layer.setActive(false);
 		layers.add(0, layer);
+		activateLayer(layer);
 		root.addChild(layer.getLayerRoot());
 		updateStates();
 		fireLayerAdded(layer);
@@ -1101,6 +1105,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		double maxExtend = bbox.getMaxExtent();		
 		mb.scale(10 / maxExtend);
 		rootTransform.setMatrix(mb.getArray());
+		for (HalfedgeLayer l : layers) {
+			l.updateBoundingBox();
+		}
 	}
 	
 	
@@ -1211,7 +1218,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	protected void setShowBoundingBox(boolean showBoundingBox) {
 		this.showBoundingBox = showBoundingBox;
-		getActiveLayer().updateBoundingBox();
+		updateStates();
 	}
 	
 	protected SceneGraphComponent getHalfedgeRoot() {

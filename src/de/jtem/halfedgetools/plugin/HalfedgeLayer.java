@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.plugin;
 
+import static de.jreality.math.Rn.euclideanNormSquared;
 import static de.jreality.scene.Appearance.INHERITED;
 import static de.jreality.shader.CommonAttributes.DEPTH_FUDGE_FACTOR;
 import static de.jreality.shader.CommonAttributes.DIFFUSE_COLOR;
@@ -449,14 +450,17 @@ public class HalfedgeLayer implements ActionListener {
 	public boolean isActive() {
 		return active;
 	}
-	public void setActive(final boolean active) {
+	public void setActive(boolean active) {
 		this.active = active;
-		boundingBoxRoot.setVisible(active);
 		if (active) {
 			geometryRoot.addTool(actionTool);
 		} else {
 			geometryRoot.removeTool(actionTool);
 		}
+	}
+	
+	public void setShowBoundingBox(boolean show) {
+		boundingBoxRoot.setVisible(show);
 	}
 	
 	
@@ -476,11 +480,11 @@ public class HalfedgeLayer implements ActionListener {
 		boundingBoxRoot.setGeometry(null);
 		boundingBoxRoot.removeChild(pivotRoot);
 		Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(layerRoot);
+		if (euclideanNormSquared(bbox.getExtent()) == 0) return;
 		BoundingBoxUtility.removeZeroExtends(bbox);
 		IndexedFaceSet ifs = IndexedFaceSetUtility.representAsSceneGraph(bbox);
 		ifs.setName("Bounding Box");
 		boundingBoxRoot.setGeometry(ifs);
-		boundingBoxRoot.setVisible(hif.isShowBoundingBox());
 		MatrixBuilder mb = MatrixBuilder.euclidean();
 		mb.translate(bbox.getMinX(), bbox.getMinY(), bbox.getMaxZ());
 		mb.scale(bbox.getMaxExtent() / 20);
