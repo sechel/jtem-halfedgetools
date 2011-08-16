@@ -226,7 +226,6 @@ public class VisualizersManager extends Plugin implements ListSelectionListener,
 		}
 	}
 	
-	
 	public void update() {
 		updatePluginTable();
 	}

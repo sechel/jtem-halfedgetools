@@ -17,12 +17,14 @@ public class GeometryUtility {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> double getMeanEdgeLength(HDS mesh, AdapterSet a) {
 		double result = 0.0;
+		int n= 0;
 		for (E e : mesh.getPositiveEdges()) {
 			double[] s = a.getD(Position3d.class, e.getStartVertex());
 			double[] t = a.getD(Position3d.class, e.getTargetVertex());
 			result += Rn.euclideanDistance(s, t);
+			n++;
 		}
-		return result / mesh.numEdges();
+		return result / n;
 	}
 	
 }

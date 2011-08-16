@@ -258,7 +258,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		SwingUtilities.updateComponentTreeUI(optionsPanel);
 	}
 	
-	private void updateActiveVisualizations() {
+	public void updateActiveVisualizations() {
 		for (DataVisualization vis : getActiveVisualizations()) {
 			updateVisualization(vis);
 		}
@@ -584,6 +584,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		
 	}
 	
+	
 	private class ButtonCellEditor extends AbstractCellEditor implements TableCellEditor {
 
 		private static final long 	
@@ -608,7 +609,6 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		}
 		
 	}
-	
 	
 	
 	private class VisualizerModel extends DefaultTableModel {
@@ -702,8 +702,6 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		}
 		
 	}
-	
-	
 	
 	public void addDataDisplayFor(DataVisualizer dv) {
 		JPanel display = dv.getDataDisplay();

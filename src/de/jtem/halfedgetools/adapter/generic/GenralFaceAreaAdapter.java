@@ -10,13 +10,14 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.Area;
 import de.jtem.halfedgetools.adapter.type.Volume;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 
-@Volume
-public class FaceVolumeAdapter extends AbstractAdapter<Double> {
+@Area
+public class GenralFaceAreaAdapter extends AbstractAdapter<Double> {
 
-	public FaceVolumeAdapter() {
+	public GenralFaceAreaAdapter() {
 		super(Double.class, true, false);
 	}
 

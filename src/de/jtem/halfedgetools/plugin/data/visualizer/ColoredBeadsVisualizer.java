@@ -180,10 +180,12 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			double max = -Double.MAX_VALUE;
 			double min = Double.MAX_VALUE;
 			double mean = 0;
+			aSet.setParameter("beadScale", scale);
 			for (Node<?,?,?> n : nodes) {
 				Object val = genericAdapter.get(n, aSet);
 				if (val == null) {
-					System.err.println("Null value in adapter " + genericAdapter + " for node " + n + " found.");
+					System.err.println("Null value in adapter "
+							+ genericAdapter + " for node " + n + " found.");
 					continue;
 				}
 				double[] numbers = convertValue(val);
@@ -253,7 +255,6 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			return numbers;
 		}
 		
-		
 		private void updateBeadsComponent() {
 			HalfedgeLayer layer = getLayer();
 			layer.removeTemporaryGeometry(beadsComponent);
@@ -263,7 +264,9 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 	}
 	
 	
-	private double mapScale(double val, double scale, double span, boolean invert, double min, double max, double mean, double resultMean) {
+	private double mapScale(double val, double scale, double span,
+			boolean invert, double min, double max, double mean,
+			double resultMean) {
 		double dist = max - min;
 		double offset = (1 - span) * resultMean * scale;
 		double nomaleVal = (val - min) / dist;
