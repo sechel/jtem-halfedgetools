@@ -11,7 +11,6 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Area;
-import de.jtem.halfedgetools.adapter.type.Volume;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 
 @Area
