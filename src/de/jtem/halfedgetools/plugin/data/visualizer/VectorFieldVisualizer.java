@@ -268,6 +268,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			}
 			List<double[]> vData = new LinkedList<double[]>();
 			List<int[]> iData = new LinkedList<int[]>();
+			aSet.setParameter("alpha", .5);
 			for (N node : nodes) {
 				double[] v = vec.get(node, aSet);
 				if (v == null){
