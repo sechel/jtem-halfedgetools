@@ -187,6 +187,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		layers = new ArrayList<HalfedgeLayer>();
 	private HalfedgeLayer
 		activeLayer = new HalfedgeLayer(this);
+	private HalfEdgeDataStructure<?, ?, ?>
+		templateHDS = null;
 	
 	private GeometryPreviewerPanel 
 		previewPanel = new GeometryPreviewerPanel();
@@ -1223,6 +1225,13 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	protected SceneGraphComponent getHalfedgeRoot() {
 		return root;
+	}
+	
+	public void setTemplateHDS(HalfEdgeDataStructure<?, ?, ?> templateHDS) {
+		this.templateHDS = templateHDS;
+	}
+	public HalfEdgeDataStructure<?, ?, ?> getTemplateHDS() {
+		return templateHDS;
 	}
 
 }
