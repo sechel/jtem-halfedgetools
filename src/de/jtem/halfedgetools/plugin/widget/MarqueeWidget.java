@@ -309,7 +309,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 			return;
 		}
 		
-		if(e.isControlDown()){
+		if(e.isShiftDown()){
 			for (Vertex<?,?,?> v : marqeeVertices) {
 				sel.setSelected(v, true);
 			}
@@ -320,7 +320,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 			}
 		}
 		
-		if(e.isShiftDown()){
+		if(e.isControlDown()){
 			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
 				sel.setSelected(face, true);
 			}
@@ -363,7 +363,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		HalfedgeSelection sel = new HalfedgeSelection();
 		contentTools.setRotationEnabled(true);
 		contentTools.setDragEnabled(true);
-		if (e.isControlDown()) {
+		if (e.isShiftDown()) {
 			for (Vertex<?,?,?> v : marqeeVertices) {
 				sel.setSelected(v, true);
 			}
@@ -373,7 +373,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 				sel.setSelected(edge, true);
 			}
 		}
-		if (e.isShiftDown()){
+		if (e.isControlDown()){
 			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
 				sel.setSelected(face, true);
 			}
