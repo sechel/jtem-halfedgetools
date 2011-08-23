@@ -6,11 +6,10 @@ import static de.jreality.shader.CommonAttributes.EDGE_DRAW;
 import static de.jreality.shader.CommonAttributes.LINE_SHADER;
 import static de.jreality.shader.CommonAttributes.LINE_WIDTH;
 import static de.jreality.shader.CommonAttributes.PICKABLE;
+import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
+import static de.jreality.shader.CommonAttributes.SMOOTH_SHADING;
 import static de.jreality.shader.CommonAttributes.TUBES_DRAW;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
-
-import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
-import static de.jreality.shader.CommonAttributes.TEXTURE_2D;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -29,12 +28,12 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.jreality.geometry.BallAndStickFactory;
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.math.Rn;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedLineSet;
 import de.jreality.scene.SceneGraphComponent;
+import de.jreality.scene.data.Attribute;
 import de.jreality.ui.LayoutFactory;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -68,7 +67,8 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 
 	private VectorFieldVisualization actVis = null;
 	private boolean listenersDisabled = false;
-	private Appearance vectorFieldApp = new Appearance("Vector Field Appearance");
+	private Appearance vectorFieldApp = new Appearance(
+			"Vector Field Appearance");
 
 	public VectorFieldVisualizer() {
 		initOptionPanel();
@@ -76,29 +76,36 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 	}
 
 	private void initLineAppearance() {
-		vectorFieldApp.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR, Color.RED);
-		vectorFieldApp.setAttribute(LINE_SHADER + "." + DEPTH_FUDGE_FACTOR, 0.88888);
+		vectorFieldApp.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR,
+				Color.RED);
+		vectorFieldApp.setAttribute(LINE_SHADER + "." + DEPTH_FUDGE_FACTOR,
+				0.88888);
 		vectorFieldApp.setAttribute(EDGE_DRAW, true);
 		vectorFieldApp.setAttribute(VERTEX_DRAW, false);
 		vectorFieldApp.setAttribute(LINE_SHADER + "." + TUBES_DRAW, false);
 		vectorFieldApp.setAttribute(LINE_SHADER + "." + LINE_WIDTH, 1.0);
 		vectorFieldApp.setAttribute(LINE_SHADER + "." + PICKABLE, false);
 		vectorFieldApp.setAttribute(DEPTH_FUDGE_FACTOR, 0.9999);
+
+		vectorFieldApp.setAttribute(LINE_SHADER + "." + POLYGON_SHADER + "."
+				+ SMOOTH_SHADING, true);
+		vectorFieldApp.setAttribute(POLYGON_SHADER + "." + SMOOTH_SHADING,
+				true);
 	}
 
 	private void initOptionPanel() {
 		optionsPanel.setLayout(new GridBagLayout());
 		GridBagConstraints cl = LayoutFactory.createLeftConstraint();
 		GridBagConstraints cr = LayoutFactory.createRightConstraint();
-		
+
 		optionsPanel.add(new JLabel("Scale"), cl);
 		optionsPanel.add(scaleSpinner, cr);
 		scaleSpinner.addChangeListener(this);
-		
+
 		optionsPanel.add(normalizeChecker, cl);
 		normalizeChecker.setSelected(true);
 		normalizeChecker.addActionListener(this);
-		
+
 		optionsPanel.add(tubesChecker, cr);
 		tubesChecker.addActionListener(this);
 
@@ -107,12 +114,12 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		thicknessSpinner.addChangeListener(this);
 
 		optionsPanel.add(directedChecker, cl);
-		directedChecker.addActionListener(this);		
+		directedChecker.addActionListener(this);
 
 		checkTubesEnabled();
 	}
-	
-	private void checkTubesEnabled(){
+
+	private void checkTubesEnabled() {
 		thicknessSpinner.setEnabled(tubesChecker.isSelected());
 		directedChecker.setEnabled(tubesChecker.isSelected());
 	}
@@ -133,24 +140,26 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 	public String getName() {
 		return "Vector Field";
 	}
-	
+
 	@Override
-	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source) {
-		VectorFieldVisualization vis = new VectorFieldVisualization(layer, source, this, type);
+	public DataVisualization createVisualization(HalfedgeLayer layer,
+			NodeType type, Adapter<?> source) {
+		VectorFieldVisualization vis = new VectorFieldVisualization(layer,
+				source, this, type);
 		// copy last values
-		vis.scale= scaleModel.getNumber().doubleValue();
-		vis.thickness= thicknessModel.getNumber().doubleValue();
-		vis.tubesenabled= tubesChecker.isSelected();
-		vis.directed= directedChecker.isSelected();
-		vis.normalize= normalizeChecker.isSelected();
+		vis.scale = scaleModel.getNumber().doubleValue();
+		vis.thickness = thicknessModel.getNumber().doubleValue();
+		vis.tubesenabled = tubesChecker.isSelected();
+		vis.directed = directedChecker.isSelected();
+		vis.normalize = normalizeChecker.isSelected();
 		layer.addTemporaryGeometry(vis.vectorsComponent);
-		
+
 		return vis;
 	}
 
 	@Override
 	public void disposeVisualization(DataVisualization vis) {
-		VectorFieldVisualization vfVis = (VectorFieldVisualization)vis;
+		VectorFieldVisualization vfVis = (VectorFieldVisualization) vis;
 		vis.getLayer().removeTemporaryGeometry(vfVis.vectorsComponent);
 	}
 
@@ -158,7 +167,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 	public void actionPerformed(ActionEvent e) {
 		updateGeometry();
 	}
-	
+
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		updateGeometry();
@@ -168,11 +177,11 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		checkTubesEnabled();
 		if (actVis == null || listenersDisabled)
 			return;
-		actVis.scale= scaleModel.getNumber().doubleValue();
-		actVis.thickness= thicknessModel.getNumber().doubleValue();
-		actVis.tubesenabled= tubesChecker.isSelected();
-		actVis.directed= directedChecker.isSelected();
-		actVis.normalize= normalizeChecker.isSelected();
+		actVis.scale = scaleModel.getNumber().doubleValue();
+		actVis.thickness = thicknessModel.getNumber().doubleValue();
+		actVis.tubesenabled = tubesChecker.isSelected();
+		actVis.directed = directedChecker.isSelected();
+		actVis.normalize = normalizeChecker.isSelected();
 		actVis.update();
 	}
 
@@ -182,31 +191,32 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 				"Vectors");
 
 		protected double scale = 1., thickness = 1.;
-		protected boolean tubesenabled = false, directed = false, normalize= true;
+		protected boolean tubesenabled = false, directed = false,
+				normalize = true;
 
 		public VectorFieldVisualization(HalfedgeLayer layer, Adapter<?> source,
 				DataVisualizer visualizer, NodeType type) {
 			super(layer, source, visualizer, type);
 			vectorsComponent.setAppearance(vectorFieldApp);
-		}		
+		}
 
 		@SuppressWarnings("unchecked")
 		@Override
 		public void update() {
-			
+
 			if (!isActive()) {
 				vectorsComponent.setVisible(false);
 				return;
 			} else {
 				vectorsComponent.setVisible(true);
 			}
-			
+
 			HalfEdgeDataStructure<?, ?, ?> hds = getLayer().get();
 			AdapterSet aSet = getLayer().getEffectiveAdapters();
 
 			Adapter<?> genericAdapter = getSource();
-			
-			List<? extends Node<?,?,?>> nodes = null;
+
+			List<? extends Node<?, ?, ?>> nodes = null;
 			switch (getType()) {
 			case Vertex:
 				nodes = hds.getVertices();
@@ -221,44 +231,37 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 
 			double meanEdgeLength = GeometryUtility
 					.getMeanEdgeLength(hds, aSet);
-			
+
 			IndexedLineSet ils = generateVectorLineSet(nodes,
 					(Adapter<double[]>) genericAdapter, aSet, meanEdgeLength);
-			
+
 			clearVectorsComponent();
 
-			if (tubesenabled) {
-				// TODO: stack overflow in awteventqueue
-				// (GeometryEventMulticaster.remove) for big geometries (random
-				// sphere with 5k vertices)
-				// Note: this problem already appeared for the vectorfieldmanager
-				vectorsComponent.addChild(generateVectorArrows(ils, directed));
-				
-				// TODO: use instead something like this below, but seems to be
-				// much to slow:
-				// BallAndStickFactory.sticks(vectorsComponent, ils,
-				// thickness*.01, 0);
-			}else
+			if (tubesenabled)
+				vectorsComponent
+						.setGeometry(generateVectorArrows(ils, directed));
+			else
 				vectorsComponent.setGeometry(ils);
 
 			vectorsComponent.setName(getName());
+			vectorsComponent.setVisible(true);
+
+			vectorFieldApp.setAttribute(LINE_SHADER + "." + TUBES_DRAW,
+					tubesenabled);
+
 			updateVectorsComponent();
 		}
 
 		private void clearVectorsComponent() {
 			vectorsComponent.setGeometry(null);
-			List<SceneGraphComponent> sgc= vectorsComponent.getChildComponents();
-			int n= sgc.size();
-			for(int i= 0; i< n; i++)
+			List<SceneGraphComponent> sgc = vectorsComponent
+					.getChildComponents();
+			int n = sgc.size();
+			for (int i = 0; i < n; i++)
 				vectorsComponent.removeChild(sgc.get(0));
 		}
-		
-		private < 
-			V extends Vertex<V, E, F>,
-			E extends Edge<V, E, F>,
-			F extends Face<V, E, F>,
-			N extends Node<V, E, F>
-		> IndexedLineSet generateVectorLineSet(
+
+		private <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, N extends Node<V, E, F>> IndexedLineSet generateVectorLineSet(
 				Collection<N> nodes, Adapter<double[]> vec, AdapterSet aSet,
 				double meanEdgeLength) {
 			IndexedLineSetFactory ilf = new IndexedLineSetFactory();
@@ -271,12 +274,13 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			aSet.setParameter("alpha", .5);
 			for (N node : nodes) {
 				double[] v = vec.get(node, aSet);
-				if (v == null){
-					System.err.println("Null value in adapter "
-							+ vec + " for node " + node + " found.");
+				if (v == null) {
+					System.err.println("Null value in adapter " + vec
+							+ " for node " + node + " found.");
 					continue;
 				} else if (v.length != 3) {
-					throw new RuntimeException("Adapter does not return vectors in 3-space.");
+					throw new RuntimeException(
+							"Adapter does not return vectors in 3-space.");
 				}
 				v = v.clone();
 				double[] p = aSet.getD(BaryCenter3d.class, node);
@@ -297,27 +301,100 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			ilf.update();
 			return ilf.getIndexedLineSet();
 		}
-	
-		private SceneGraphComponent generateVectorArrows(IndexedLineSet ils,
+
+		private IndexedLineSet generateVectorArrows(IndexedLineSet ils,
 				boolean arrows) {
-			BallAndStickFactory bsf = new BallAndStickFactory(ils);
-			bsf.setShowBalls(false);
 
-			bsf.setShowArrows(arrows);
-			bsf.setArrowScale(thickness * .02);
-			bsf.setArrowSlope(1.5);
-			bsf.setArrowPosition(1);
+			double[][] oldcoords = ils.getVertexAttributes(
+					Attribute.COORDINATES).toDoubleArrayArray(null);
+			int[][] oldedges = ils.getEdgeAttributes(Attribute.INDICES)
+					.toIntArrayArray(null);
 
-			bsf.setShowSticks(true);
-			bsf.setStickRadius(thickness * .01);
-			bsf.update();
+			int oldnumedges = oldedges.length;
 
-			SceneGraphComponent c = bsf.getSceneGraphComponent();
-			Appearance app = c.getAppearance();
-			app.setAttribute(POLYGON_SHADER + "." + TEXTURE_2D, Appearance.DEFAULT);
-			return c;
+			int numcoords = 5 * oldnumedges;
+			int numedges = 2 * oldnumedges;
+
+			double[][] coords = new double[numcoords][];
+			int[][] edges = new int[numedges][];
+			double[] radii = new double[numcoords];
+			Color[] edgecolors = new Color[numedges];
+
+			double[][] startVertexCoords = new double[numedges][];
+			double[][] targetVertexCoords = new double[numedges][];
+			double[][] edgevectors = new double[numedges][];
+
+			for (int i = 0; i < oldnumedges; i++) {
+				if (oldedges[i].length != 2)
+					throw new RuntimeException("cannot be a vector!");
+				int startid = oldedges[i][0];
+				int targetid = oldedges[i][1];
+
+				startVertexCoords[i] = oldcoords[startid].clone();
+				targetVertexCoords[i] = oldcoords[targetid].clone();
+
+				edgevectors[i] = Rn.subtract(null, targetVertexCoords[i],
+						startVertexCoords[i]);
+			}
+
+			for (int i = 0; i < oldnumedges; i++) {
+				coords[i + 0 * oldnumedges] = Rn.subtract(null,
+						startVertexCoords[i],
+						Rn.setEuclideanNorm(null, 0.001, edgevectors[i]));
+				coords[i + 1 * oldnumedges] = startVertexCoords[i].clone();
+				coords[i + 2 * oldnumedges] = targetVertexCoords[i].clone();
+
+				radii[i + 0 * oldnumedges] = 0.001;
+				radii[i + 1 * oldnumedges] = thickness;
+				radii[i + 2 * oldnumedges] = thickness;
+
+				edges[i] = new int[] { i + 0 * oldnumedges,
+						i + 1 * oldnumedges, i + 2 * oldnumedges };
+
+				edgecolors[i] = Color.yellow;
+
+				coords[i + 3 * oldnumedges] = Rn.add(null,
+						targetVertexCoords[i],
+						Rn.setEuclideanNorm(null, 0.001, edgevectors[i]));
+				if (arrows) {
+					radii[i + 3 * oldnumedges] = 1.5 * thickness;
+					coords[i + 4 * oldnumedges] = Rn.add(null,
+							targetVertexCoords[i],
+							Rn.times(null, .2, edgevectors[i]));
+					radii[i + 4 * oldnumedges] = 0.001;
+
+					edges[i + oldnumedges] = new int[] { i + 2 * oldnumedges,
+							i + 3 * oldnumedges, i + 4 * oldnumedges };
+
+					edgecolors[i + oldnumedges] = Color.red;
+				} else {
+					radii[i + 3 * oldnumedges] = 0.001;
+					coords[i + 4 * oldnumedges] = Rn.subtract(null,
+							targetVertexCoords[i],
+							Rn.setEuclideanNorm(null, 0.001, edgevectors[i]));
+					radii[i + 4 * oldnumedges] = 0.001;
+
+					edges[i + oldnumedges] = new int[] { i + 4 * oldnumedges,
+							i + 2 * oldnumedges, i + 3 * oldnumedges };
+
+					edgecolors[i + oldnumedges] = Color.yellow;
+				}
+
+			}
+
+			IndexedLineSetFactory ilsf = new IndexedLineSetFactory();
+			ilsf.setVertexCount(numcoords);
+			ilsf.setEdgeCount(numedges);
+
+			ilsf.setVertexCoordinates(coords);
+			ilsf.setVertexRelativeRadii(radii);
+			ilsf.setEdgeIndices(edges);
+			ilsf.setEdgeColors(edgecolors);
+
+			ilsf.update();
+			return ilsf.getIndexedLineSet();
 		}
-		
+
 		private void updateVectorsComponent() {
 			HalfedgeLayer layer = getLayer();
 			layer.removeTemporaryGeometry(vectorsComponent);
@@ -329,7 +406,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 	@Override
 	public JPanel connectUserInterfaceFor(DataVisualization visualization) {
 		actVis = (VectorFieldVisualization) visualization;
-		
+
 		listenersDisabled = true;
 		scaleModel.setValue(actVis.scale);
 		thicknessModel.setValue(actVis.thickness);
