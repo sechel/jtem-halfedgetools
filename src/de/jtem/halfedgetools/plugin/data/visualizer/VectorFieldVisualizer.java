@@ -10,6 +10,7 @@ import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
 import static de.jreality.shader.CommonAttributes.SMOOTH_SHADING;
 import static de.jreality.shader.CommonAttributes.TUBES_DRAW;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
+import static de.jreality.shader.CommonAttributes.TUBE_RADIUS;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -33,7 +34,6 @@ import de.jreality.math.Rn;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedLineSet;
 import de.jreality.scene.SceneGraphComponent;
-import de.jreality.scene.data.Attribute;
 import de.jreality.ui.LayoutFactory;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -84,13 +84,14 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		vectorFieldApp.setAttribute(VERTEX_DRAW, false);
 		vectorFieldApp.setAttribute(LINE_SHADER + "." + TUBES_DRAW, false);
 		vectorFieldApp.setAttribute(LINE_SHADER + "." + LINE_WIDTH, 1.0);
+		vectorFieldApp.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, 0.1);
 		vectorFieldApp.setAttribute(LINE_SHADER + "." + PICKABLE, false);
 		vectorFieldApp.setAttribute(DEPTH_FUDGE_FACTOR, 0.9999);
 
 		vectorFieldApp.setAttribute(LINE_SHADER + "." + POLYGON_SHADER + "."
 				+ SMOOTH_SHADING, true);
-		vectorFieldApp.setAttribute(POLYGON_SHADER + "." + SMOOTH_SHADING,
-				true);
+		vectorFieldApp
+				.setAttribute(POLYGON_SHADER + "." + SMOOTH_SHADING, true);
 	}
 
 	private void initOptionPanel() {
@@ -232,16 +233,15 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			double meanEdgeLength = GeometryUtility
 					.getMeanEdgeLength(hds, aSet);
 
-			IndexedLineSet ils = generateVectorLineSet(nodes,
-					(Adapter<double[]>) genericAdapter, aSet, meanEdgeLength);
+			IndexedLineSet ils = tubesenabled ? generateTubedVectorArrows(
+					nodes, (Adapter<double[]>) genericAdapter, aSet,
+					meanEdgeLength, directed) : generateSimpleVectorLineSet(
+					nodes, (Adapter<double[]>) genericAdapter, aSet,
+					meanEdgeLength);
 
 			clearVectorsComponent();
 
-			if (tubesenabled)
-				vectorsComponent
-						.setGeometry(generateVectorArrows(ils, directed));
-			else
-				vectorsComponent.setGeometry(ils);
+			vectorsComponent.setGeometry(ils);
 
 			vectorsComponent.setName(getName());
 			vectorsComponent.setVisible(true);
@@ -261,16 +261,143 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 				vectorsComponent.removeChild(sgc.get(0));
 		}
 
-		private <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, N extends Node<V, E, F>> IndexedLineSet generateVectorLineSet(
+		private <
+			V extends Vertex<V, E, F>, 
+			E extends Edge<V, E, F>, 
+			F extends Face<V, E, F>, 
+			N extends Node<V, E, F>
+		> IndexedLineSet generateSimpleVectorLineSet(
 				Collection<N> nodes, Adapter<double[]> vec, AdapterSet aSet,
 				double meanEdgeLength) {
+
 			IndexedLineSetFactory ilf = new IndexedLineSetFactory();
 			if (nodes.size() == 0) {
 				ilf.update();
 				return ilf.getIndexedLineSet();
 			}
+
 			List<double[]> vData = new LinkedList<double[]>();
 			List<int[]> iData = new LinkedList<int[]>();
+			getVectors(nodes, vec, aSet, meanEdgeLength, vData, iData);
+
+			ilf.setVertexCount(vData.size());
+			ilf.setEdgeCount(vData.size() / 2);
+			ilf.setVertexCoordinates(vData.toArray(new double[][] {}));
+			ilf.setEdgeIndices(iData.toArray(new int[][] {}));
+			ilf.update();
+			return ilf.getIndexedLineSet();
+		}
+
+		private <
+			V extends Vertex<V, E, F>, 
+			E extends Edge<V, E, F>, 
+			F extends Face<V, E, F>, 
+			N extends Node<V, E, F>
+		> IndexedLineSet generateTubedVectorArrows(
+				Collection<N> nodes, Adapter<double[]> vec, AdapterSet aSet,
+				double meanEdgeLength, boolean arrows) {
+
+			IndexedLineSetFactory ilsf = new IndexedLineSetFactory();
+			if (nodes.size() == 0) {
+				ilsf.update();
+				return ilsf.getIndexedLineSet();
+			}
+
+			List<double[]> vData = new LinkedList<double[]>();
+			List<int[]> iData = new LinkedList<int[]>();
+			getVectors(nodes, vec, aSet, meanEdgeLength, vData, iData);
+
+			int numOfVectors = vData.size() / 2;
+
+			int numcoords = arrows ? 6 * numOfVectors : 4 * numOfVectors;
+			int numedges = arrows ? 2 * numOfVectors : numOfVectors;
+
+			double[][] coords = new double[numcoords][];
+			int[][] edges = new int[numedges][];
+			double[] radii = new double[numcoords];
+			Color[] edgecolors = new Color[numedges];
+
+			double[] startcoords, targetcoords, vector;
+			int[] ids;
+			int startid, targetid;
+
+			for (int i = 0; i < numOfVectors; i++) {
+				ids = iData.get(i);
+				if (ids.length != 2)
+					throw new RuntimeException(
+							"Is not a single edge (= vector)!");
+				startid = ids[0];
+				targetid = ids[1];
+
+				startcoords = vData.get(startid);
+				targetcoords = vData.get(targetid);
+
+				vector = Rn.subtract(null, targetcoords, startcoords);
+
+				coords[i + 0 * numOfVectors] = Rn.subtract(null, startcoords,
+						Rn.setEuclideanNorm(null, 0.001, vector));
+				coords[i + 1 * numOfVectors] = startcoords.clone();
+				coords[i + 2 * numOfVectors] = targetcoords.clone();
+
+				radii[i + 0 * numOfVectors] = 0.001;
+				radii[i + 1 * numOfVectors] = thickness;
+				radii[i + 2 * numOfVectors] = thickness;
+
+				edgecolors[i] = Color.yellow;
+
+				if (arrows) {
+					edges[i] = new int[] { i + 0 * numOfVectors,
+							i + 1 * numOfVectors, i + 2 * numOfVectors };
+
+					coords[i + 3 * numOfVectors] = Rn.subtract(null,
+							targetcoords, Rn.times(null, 0.001, vector));
+					radii[i + 3 * numOfVectors] = 0.001;
+
+					coords[i + 4 * numOfVectors] = targetcoords.clone();
+					radii[i + 4 * numOfVectors] = 1.5 * thickness;
+
+					coords[i + 5 * numOfVectors] = Rn.add(null, targetcoords,
+							Rn.times(null, .2, vector));
+					radii[i + 5 * numOfVectors] = 0.001;
+
+					edges[i + numOfVectors] = new int[] { i + 3 * numOfVectors,
+							i + 4 * numOfVectors, i + 5 * numOfVectors };
+
+					edgecolors[i + numOfVectors] = Color.red;
+				} else {
+					coords[i + 3 * numOfVectors] = Rn.add(null, targetcoords,
+							Rn.setEuclideanNorm(null, 0.001, vector));
+
+					radii[i + 3 * numOfVectors] = 0.001;
+
+					edges[i] = new int[] { i + 0 * numOfVectors,
+							i + 1 * numOfVectors, i + 2 * numOfVectors,
+							i + 3 * numOfVectors };
+				}
+
+			}
+
+			ilsf.setVertexCount(numcoords);
+			ilsf.setEdgeCount(numedges);
+
+			ilsf.setVertexCoordinates(coords);
+			ilsf.setVertexRelativeRadii(radii);
+			ilsf.setEdgeIndices(edges);
+			ilsf.setEdgeColors(edgecolors);
+
+			ilsf.update();
+			return ilsf.getIndexedLineSet();
+			
+		}
+
+		private <
+			V extends Vertex<V, E, F>, 
+			E extends Edge<V, E, F>, 
+			F extends Face<V, E, F>, 
+			N extends Node<V, E, F>
+		> void getVectors(Collection<N> nodes, Adapter<double[]> vec,
+				AdapterSet aSet, double meanEdgeLength, List<double[]> vData,
+				List<int[]> iData) {
 			aSet.setParameter("alpha", .5);
 			for (N node : nodes) {
 				double[] v = vec.get(node, aSet);
@@ -294,105 +421,6 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 				vData.add(Rn.add(null, p, v));
 				iData.add(new int[] { vData.size() - 1, vData.size() - 2 });
 			}
-			ilf.setVertexCount(vData.size());
-			ilf.setEdgeCount(vData.size() / 2);
-			ilf.setVertexCoordinates(vData.toArray(new double[][] {}));
-			ilf.setEdgeIndices(iData.toArray(new int[][] {}));
-			ilf.update();
-			return ilf.getIndexedLineSet();
-		}
-
-		private IndexedLineSet generateVectorArrows(IndexedLineSet ils,
-				boolean arrows) {
-
-			double[][] oldcoords = ils.getVertexAttributes(
-					Attribute.COORDINATES).toDoubleArrayArray(null);
-			int[][] oldedges = ils.getEdgeAttributes(Attribute.INDICES)
-					.toIntArrayArray(null);
-
-			int oldnumedges = oldedges.length;
-
-			int numcoords = 5 * oldnumedges;
-			int numedges = 2 * oldnumedges;
-
-			double[][] coords = new double[numcoords][];
-			int[][] edges = new int[numedges][];
-			double[] radii = new double[numcoords];
-			Color[] edgecolors = new Color[numedges];
-
-			double[][] startVertexCoords = new double[numedges][];
-			double[][] targetVertexCoords = new double[numedges][];
-			double[][] edgevectors = new double[numedges][];
-
-			for (int i = 0; i < oldnumedges; i++) {
-				if (oldedges[i].length != 2)
-					throw new RuntimeException("cannot be a vector!");
-				int startid = oldedges[i][0];
-				int targetid = oldedges[i][1];
-
-				startVertexCoords[i] = oldcoords[startid].clone();
-				targetVertexCoords[i] = oldcoords[targetid].clone();
-
-				edgevectors[i] = Rn.subtract(null, targetVertexCoords[i],
-						startVertexCoords[i]);
-			}
-
-			for (int i = 0; i < oldnumedges; i++) {
-				coords[i + 0 * oldnumedges] = Rn.subtract(null,
-						startVertexCoords[i],
-						Rn.setEuclideanNorm(null, 0.001, edgevectors[i]));
-				coords[i + 1 * oldnumedges] = startVertexCoords[i].clone();
-				coords[i + 2 * oldnumedges] = targetVertexCoords[i].clone();
-
-				radii[i + 0 * oldnumedges] = 0.001;
-				radii[i + 1 * oldnumedges] = thickness;
-				radii[i + 2 * oldnumedges] = thickness;
-
-				edges[i] = new int[] { i + 0 * oldnumedges,
-						i + 1 * oldnumedges, i + 2 * oldnumedges };
-
-				edgecolors[i] = Color.yellow;
-
-				coords[i + 3 * oldnumedges] = Rn.add(null,
-						targetVertexCoords[i],
-						Rn.setEuclideanNorm(null, 0.001, edgevectors[i]));
-				if (arrows) {
-					radii[i + 3 * oldnumedges] = 1.5 * thickness;
-					coords[i + 4 * oldnumedges] = Rn.add(null,
-							targetVertexCoords[i],
-							Rn.times(null, .2, edgevectors[i]));
-					radii[i + 4 * oldnumedges] = 0.001;
-
-					edges[i + oldnumedges] = new int[] { i + 2 * oldnumedges,
-							i + 3 * oldnumedges, i + 4 * oldnumedges };
-
-					edgecolors[i + oldnumedges] = Color.red;
-				} else {
-					radii[i + 3 * oldnumedges] = 0.001;
-					coords[i + 4 * oldnumedges] = Rn.subtract(null,
-							targetVertexCoords[i],
-							Rn.setEuclideanNorm(null, 0.001, edgevectors[i]));
-					radii[i + 4 * oldnumedges] = 0.001;
-
-					edges[i + oldnumedges] = new int[] { i + 4 * oldnumedges,
-							i + 2 * oldnumedges, i + 3 * oldnumedges };
-
-					edgecolors[i + oldnumedges] = Color.yellow;
-				}
-
-			}
-
-			IndexedLineSetFactory ilsf = new IndexedLineSetFactory();
-			ilsf.setVertexCount(numcoords);
-			ilsf.setEdgeCount(numedges);
-
-			ilsf.setVertexCoordinates(coords);
-			ilsf.setVertexRelativeRadii(radii);
-			ilsf.setEdgeIndices(edges);
-			ilsf.setEdgeColors(edgecolors);
-
-			ilsf.update();
-			return ilsf.getIndexedLineSet();
 		}
 
 		private void updateVectorsComponent() {
