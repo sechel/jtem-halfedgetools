@@ -67,31 +67,9 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 
 	private VectorFieldVisualization actVis = null;
 	private boolean listenersDisabled = false;
-	private Appearance vectorFieldApp = new Appearance(
-			"Vector Field Appearance");
 
 	public VectorFieldVisualizer() {
 		initOptionPanel();
-		initLineAppearance();
-	}
-
-	private void initLineAppearance() {
-		vectorFieldApp.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR,
-				Color.RED);
-		vectorFieldApp.setAttribute(LINE_SHADER + "." + DEPTH_FUDGE_FACTOR,
-				0.88888);
-		vectorFieldApp.setAttribute(EDGE_DRAW, true);
-		vectorFieldApp.setAttribute(VERTEX_DRAW, false);
-		vectorFieldApp.setAttribute(LINE_SHADER + "." + TUBES_DRAW, false);
-		vectorFieldApp.setAttribute(LINE_SHADER + "." + LINE_WIDTH, 1.0);
-		vectorFieldApp.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, 0.1);
-		vectorFieldApp.setAttribute(LINE_SHADER + "." + PICKABLE, false);
-		vectorFieldApp.setAttribute(DEPTH_FUDGE_FACTOR, 0.9999);
-
-		vectorFieldApp.setAttribute(LINE_SHADER + "." + POLYGON_SHADER + "."
-				+ SMOOTH_SHADING, true);
-		vectorFieldApp
-				.setAttribute(POLYGON_SHADER + "." + SMOOTH_SHADING, true);
 	}
 
 	private void initOptionPanel() {
@@ -190,6 +168,8 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 
 		private SceneGraphComponent vectorsComponent = new SceneGraphComponent(
 				"Vectors");
+		private Appearance vectorFieldApp = new Appearance(
+				"Vector Field Appearance");
 
 		protected double scale = 1., thickness = 1.;
 		protected boolean tubesenabled = false, directed = false,
@@ -198,7 +178,27 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		public VectorFieldVisualization(HalfedgeLayer layer, Adapter<?> source,
 				DataVisualizer visualizer, NodeType type) {
 			super(layer, source, visualizer, type);
+			initLineAppearance();
 			vectorsComponent.setAppearance(vectorFieldApp);
+		}
+		
+		private void initLineAppearance() {
+			vectorFieldApp.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR,
+					Color.RED);
+			vectorFieldApp.setAttribute(LINE_SHADER + "." + DEPTH_FUDGE_FACTOR,
+					0.88888);
+			vectorFieldApp.setAttribute(EDGE_DRAW, true);
+			vectorFieldApp.setAttribute(VERTEX_DRAW, false);
+			vectorFieldApp.setAttribute(LINE_SHADER + "." + TUBES_DRAW, false);
+			vectorFieldApp.setAttribute(LINE_SHADER + "." + LINE_WIDTH, 1.0);
+			vectorFieldApp.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, 0.1);
+			vectorFieldApp.setAttribute(LINE_SHADER + "." + PICKABLE, false);
+			vectorFieldApp.setAttribute(DEPTH_FUDGE_FACTOR, 0.9999);
+
+			vectorFieldApp.setAttribute(LINE_SHADER + "." + POLYGON_SHADER + "."
+					+ SMOOTH_SHADING, true);
+			vectorFieldApp
+					.setAttribute(POLYGON_SHADER + "." + SMOOTH_SHADING, true);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -437,9 +437,11 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 
 		listenersDisabled = true;
 		scaleModel.setValue(actVis.scale);
-		thicknessModel.setValue(actVis.thickness);
 		tubesChecker.setSelected(actVis.tubesenabled);
 		directedChecker.setSelected(actVis.directed);
+		directedChecker.setEnabled(actVis.tubesenabled);
+		thicknessSpinner.setEnabled(actVis.tubesenabled);
+		thicknessModel.setValue(actVis.thickness);
 		normalizeChecker.setSelected(actVis.normalize);
 		listenersDisabled = false;
 
