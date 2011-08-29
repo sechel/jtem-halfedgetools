@@ -55,7 +55,7 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		ActionListener, ChangeListener {
 
-	private SpinnerNumberModel scaleModel = new SpinnerNumberModel(1.0, 0.0,
+	private SpinnerNumberModel scaleModel = new SpinnerNumberModel(1.0, -10.0,
 			10.0, 0.1), thicknessModel = new SpinnerNumberModel(1.0, 0.0, 10.0,
 			0.1);
 	private JSpinner scaleSpinner = new JSpinner(scaleModel),

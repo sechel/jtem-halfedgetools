@@ -14,9 +14,9 @@ import de.jtem.halfedgetools.adapter.type.Area;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 
 @Area
-public class GenralFaceAreaAdapter extends AbstractAdapter<Double> {
+public class GeneralFaceAreaAdapter extends AbstractAdapter<Double> {
 
-	public GenralFaceAreaAdapter() {
+	public GeneralFaceAreaAdapter() {
 		super(Double.class, true, false);
 	}
 
