@@ -31,6 +31,8 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.subdivision;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import de.jtem.halfedge.Edge;
@@ -40,6 +42,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
@@ -74,13 +77,18 @@ public class TriangulatePlugin extends AlgorithmPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
 		Set<F> faces = hi.getSelection().getFaces(hds);
+		List<E> addedEdges = new LinkedList<E>(); 
 		if(faces.size() == 0) {
-			Triangulator.triangulate(hds);
+			List<E> te = Triangulator.triangulate(hds);
+			addedEdges.addAll(te);
 		} else {
 			for(F f: faces) {
-				Triangulator.triangulateFace(f,hds);
+				List<E> te = Triangulator.triangulateFace(f,hds);
+				addedEdges.addAll(te);
 			}
 		}
 		hi.set(hds);
+		HalfedgeSelection s = new HalfedgeSelection(addedEdges);
+		hi.setSelection(s);
 	}
 }
