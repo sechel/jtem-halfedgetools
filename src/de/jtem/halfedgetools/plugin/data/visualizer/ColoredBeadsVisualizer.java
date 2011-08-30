@@ -192,6 +192,8 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 				for (int j = 0; j < numbers.length; j++) {
 					aSet.setParameter("beadsPerNode", numbers.length);
 					aSet.setParameter("beadIndex", j);
+					// TODO: find the right beadScale
+					aSet.setParameter("beadScale", meanEdgeLength);
 					vertexData.add(beadPosAdapter.get(n, aSet));
 					double num = numbers[j];
 					if (num > max) max = num;
