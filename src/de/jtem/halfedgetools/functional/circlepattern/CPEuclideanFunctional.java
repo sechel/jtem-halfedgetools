@@ -53,15 +53,6 @@ import de.jtem.halfedgetools.functional.circlepattern.CPAdapters.Phi;
 import de.jtem.halfedgetools.functional.circlepattern.CPAdapters.Theta;
 
 
-/**
- * The functional to be minimized for koebes polyhedron
- * <p>
- * Copyright 2005 <a href="http://www.sechel.de">Stefan Sechelmann</a>
- * <a href="http://www.math.tu-berlin.de/geometrie">TU-Berlin</a> 
- * @author Stefan Sechelmann
- * @see koebe.KoebePolyhedron
- * @see <br><a href="http://opus.kobv.de/tuberlin/volltexte/2003/668/">Variational principles for circle patterns</a>
- */
 public class CPEuclideanFunctional <
 	V extends Vertex<V, E, F>,
 	E extends Edge<V, E, F>,
