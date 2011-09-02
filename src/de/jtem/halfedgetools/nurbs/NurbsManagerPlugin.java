@@ -19,6 +19,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -54,6 +56,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.io.NurbsIO;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -261,7 +264,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			
 		}
 		
-		@Override
 		public void actionPerformed(ActionEvent e){
 			double tol = tolExpModel.getNumber().doubleValue();
 			tol = Math.pow(10, tol);
@@ -386,8 +388,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		private JButton
 			goButton = new JButton("Go");
 		private JRadioButton
-			maxButton = new JRadioButton("Max Curvature"),
-			minButton = new JRadioButton("Min Curvature"),
+			maxButton = new JRadioButton("Max Curvature (red)"),
+			minButton = new JRadioButton("Min Curvature (cyan)"),
 			intersectionButton = new JRadioButton("Intersection points");
 		
 		public CurvatureLinesPanel() {
@@ -410,7 +412,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			goButton.addActionListener(this);
 		}
 		
-		@Override
+		
 		public void actionPerformed(ActionEvent e){
 			double tol = tolExpModel.getNumber().doubleValue();
 			tol = Math.pow(10, tol);
@@ -422,7 +424,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			AdapterSet as = hif.getAdapters();
 			int n = 201;
 			LinkedList<double[]> umbilics = IntegralCurves.umbilicPoints(surfaces.get(surfacesTable.getSelectedRow()), n);
-//			umbilics.addAll(IntegralCurves.umbilicPoints(surfaces.get(surfacesTable.getSelectedRow()), n + 1));
 			PointSetFactory psfu = new PointSetFactory();
 			int p = surfaces.get(surfacesTable.getSelectedRow()).p;
 			int q = surfaces.get(surfacesTable.getSelectedRow()).q;
@@ -459,156 +460,77 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			boolean min = minButton.isSelected();
 			boolean inter = intersectionButton.isSelected();
 			LinkedList<LineSegmentIntersection> segments = new LinkedList<LineSegmentIntersection>();
-			int counter = 0;
+			int counter = 1;
+			LinkedList<Integer> umbilicIndex = new LinkedList<Integer>();
 			for(Vertex<?,?,?> v : verts) {
 				double[] y0 = as.getD(NurbsUVCoordinate.class, v);
-					
-					IntObjects intObj = new IntObjects();
-					int noSegment;
 					if (max){
-						LinkedList<double[]> all = new LinkedList<double[]>();
-						intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,false, true,eps,stepSize,umbilics);
-						all.addAll(intObj.getPoints());
-						noSegment = all.size();
-						if(!intObj.isNearby()){
-							intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,true, true,eps,stepSize, umbilics);
-							all.addAll(intObj.getPoints());
-						}
-
-				
-						int counterMax = 0;
-						double[] firstcurvePoint = all.getFirst();
-						for (double[] secondCurvePoint : all) {
-							counterMax = counterMax + 1;
-							if(counterMax != 1){
-								double[][]seg = new double[2][];
-								seg[0] = firstcurvePoint;
-								seg[1] = secondCurvePoint;
-								LineSegmentIntersection lsi = new  LineSegmentIntersection();
-								lsi.index = counterMax + counter - 1;
-								lsi.segment = seg;
-								if(counterMax != noSegment + 1){
-									segments.add(lsi);
-								}else{
-									System.out.println("count "+counterMax+ " stelle " + noSegment);
-								}
-								firstcurvePoint = secondCurvePoint;
-							}
-						}
-						counter = counter + counterMax;
-						PointSetFactory psf = new PointSetFactory();
-						double[][] u = new double[all.size()][];
-						double[][] points = new double[all.size()][];
-						for (int i = 0; i < u.length; i++) {
-							u[i] = all.get(i);
-						}
-
-						psf.setVertexCount(u.length);
-						for (int i = 0; i < u.length; i++) {
-							double[] S = new double[4];
-							NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, u[i][0], u[i][1], S);
-							points[i] = S;
-						}
-						psf.setVertexCoordinates(points);
-						psf.update();
-						SceneGraphComponent sgc = new SceneGraphComponent("Integral Curve");
-						SceneGraphComponent maxCurveComp = new SceneGraphComponent("Max Curve");
-						sgc.addChild(maxCurveComp);
-						sgc.setGeometry(psf.getGeometry());
-						Appearance labelAp = new Appearance();
-						sgc.setAppearance(labelAp);
-						DefaultGeometryShader dgs = ShaderUtility.createDefaultGeometryShader(labelAp, false);
-						DefaultPointShader pointShader = (DefaultPointShader)dgs.getPointShader();
-						pointShader.setDiffuseColor(Color.red);
-						hif.getActiveLayer().addTemporaryGeometry(sgc);
+						counter = curveLine(tol, eps, stepSize, umbilics, p, q,
+								U, V, Pw, segments, counter, umbilicIndex, y0, true);
 					}
 					if (min){
-						LinkedList<double[]> all = new LinkedList<double[]>();				
-						intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,false, false,eps,stepSize, umbilics);
-						all.addAll(intObj.getPoints());
-						noSegment = all.size();
-						if(!intObj.isNearby()){
-							intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,true, false,eps,stepSize, umbilics);
-							all.addAll(intObj.getPoints());
-						}
-						int counterMin = 0;
-						double[] firstcurvePoint = all.getFirst();
-						for (double[] secondCurvePoint : all) {
-							counterMin = counterMin + 1;
-							if(counterMin != 1 ){
-								double[][]seg = new double[2][];
-								seg[0] = firstcurvePoint;
-								seg[1] = secondCurvePoint;
-								LineSegmentIntersection lsi = new  LineSegmentIntersection();
-								lsi.index = counterMin + counter - 1;
-								lsi.segment = seg;
-								if(counterMin != noSegment + 1){
-									segments.add(lsi);
-								}
-								firstcurvePoint = secondCurvePoint;
-							}
-						}
-						counter = counter + counterMin;
-						PointSetFactory psf = new PointSetFactory();
-						double[][] u = new double[all.size()][];
-						double[][] points = new double[all.size()][];
-						for (int i = 0; i < u.length; i++) {
-							u[i] = all.get(i);
-						}
-
-						psf.setVertexCount(u.length);
-						for (int i = 0; i < u.length; i++) {
-							double[] S = new double[4];
-							NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, u[i][0], u[i][1], S);
-							points[i] = S;
-						}
-						psf.setVertexCoordinates(points);
-						psf.update();
-						SceneGraphComponent sgc = new SceneGraphComponent("Integral Curve");
-						SceneGraphComponent minCurveComp = new SceneGraphComponent("Min Curve");
-						sgc.addChild(minCurveComp);
-						sgc.setGeometry(psf.getGeometry());
-						Appearance labelAp = new Appearance();
-						sgc.setAppearance(labelAp);
-						DefaultGeometryShader dgs = ShaderUtility.createDefaultGeometryShader(labelAp, false);
-						DefaultPointShader pointShader = (DefaultPointShader)dgs.getPointShader();
-						pointShader.setDiffuseColor(Color.cyan);
-						hif.getActiveLayer().addTemporaryGeometry(sgc);
+						counter = curveLine(tol, eps, stepSize, umbilics, p, q,
+								U, V, Pw, segments, counter, umbilicIndex, y0, false);
 					}
-
-					
-				
 			}
+			hif.clearSelection();
 			if(inter){
-//				for (LineSegmentIntersection lSI : segments) {
-//					System.out.println(lSI.toString());
-//				}
-				LinkedList<LineSegmentIntersection> iP = LineSegmentIntersection.bruteForceIntersection(segments);
-				LinkedList<LineSegmentIntersection> intersectionPoints = new LinkedList<LineSegmentIntersection>();
-				int index = 0;
-				for (LineSegmentIntersection l : iP) {
-					if(index != l.index){
-						intersectionPoints.add(l);
-					}
-					index = l.index;
+				// default patch
+				LinkedList<LineSegmentIntersection> boundarySegments = new LinkedList<LineSegmentIntersection>();
+				double[][] seg1 = {{0.001,0.001},{0.999,0.001}};
+				LineSegmentIntersection b1 = new LineSegmentIntersection(seg1, 1, 1, true);
+				double[][] seg2 = {{0.999,0.001},{0.999,0.999}};
+				LineSegmentIntersection b2 = new LineSegmentIntersection(seg2, 1, 2, true);
+				double[][] seg3 = {{0.999,0.999},{0.001,0.999}};
+				LineSegmentIntersection b3 = new LineSegmentIntersection(seg3, 1, 3, true);
+				double[][] seg4 = {{0.001,0.999},{0.001,0.001}};
+				LineSegmentIntersection b4 = new LineSegmentIntersection(seg4, 1, 4, true);
+				boundarySegments.add(b1);
+				boundarySegments.add(b2);
+				boundarySegments.add(b3);
+				boundarySegments.add(b4);
+				int shiftedIndex = boundarySegments.size();
+				for (LineSegmentIntersection s : segments) {
+					s.setCurveIndex(s.curveIndex + shiftedIndex);
 				}
-				System.out.println("INTERSECTION points:");
-				for (LineSegmentIntersection lineSegmentIntersection : intersectionPoints) {
-					System.out.println(lineSegmentIntersection.toString());
-			//		System.out.println("length: " + Rn.euclideanDistance(lineSegmentIntersection.segment[0],lineSegmentIntersection.segment[1]));
+				segments.addAll(boundarySegments);
+				LinkedList<IntersectionPoint> curveCurveIntersections = LineSegmentIntersection.findIntersections(segments);
+				LinkedList<HalfedgePoint> hp1 = LineSegmentIntersection.findAllNbrs1(curveCurveIntersections);
+				curveCurveIntersections = LineSegmentIntersection.bruteForceCurveCurveIntersection(segments);
+				LinkedList<IntersectionPoint> intersections = new LinkedList<IntersectionPoint>();
+				intersections.addAll(curveCurveIntersections);
+				LinkedList<HalfedgePoint> hp = LineSegmentIntersection.findAllNbrs(intersections);
+				System.out.println("HALFEDGE points:");
+				for (HalfedgePoint halfedgePoints : hp) {
+					System.out.println(halfedgePoints.toString());
 				}
+				System.out.println("Fertige Punkte");
+//				LinkedList<HalfedgePoint> H = LineSegmentIntersection.orientedNbrs(hp);
+				LinkedList<HalfedgePoint> H1 = LineSegmentIntersection.orientedNbrs1(hp1);
+				System.out.println("INTERSECTION SIZE "+intersections.size());
+//				FaceSet fS = LineSegmentIntersection.createFaceSet(H);
+				FaceSet fS = LineSegmentIntersection.createFaceSet1(H1);
+				for (int i = 0; i < fS.verts.length; i++) {
+					double[] S = new double[4];
+					NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, fS.verts[i][0], fS.verts[i][1], S);
+					fS.verts[i] = S;
+				}
+				System.out.println("FACESET:");
+				System.out.println(fS.toString());
+				HalfedgeLayer hel = new HalfedgeLayer(hif);
+				hel.setName("Curvature Geometry");
+				hel.set(fS.getIndexedFaceSet());
+				hif.addLayer(hel);
+				hif.update();
 				PointSetFactory psfi = new PointSetFactory();
-				System.out.println("INTERSECTION SIZE "+intersectionPoints.size());
-				double[][] iu = new double[intersectionPoints.size()][];
-				double[][] ipoints = new double[intersectionPoints.size()][];
+				
+				double[][] iu = new double[intersections.size()][];
+				double[][] ipoints = new double[intersections.size()][];
 				int c = 0;
-				for (LineSegmentIntersection ip : intersectionPoints) {
-					iu[c] = ip.segment[0];
+				for (IntersectionPoint ip : intersections) {
+					iu[c] = ip.point;
 					c++;
 				}
-//				for (int i = 0; i < iu.length; i++) {
-//					iu[i] = intersectionPoints.get(i);
-//				}
 				psfi.setVertexCount(iu.length);
 
 				for (int i = 0; i < iu.length; i++) {
@@ -616,7 +538,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, iu[i][0], iu[i][1], S);
 					ipoints[i] = S;
 				}
-				if(intersectionPoints.size()>0){
+				if(curveCurveIntersections.size()>0){
 				psfi.setVertexCoordinates(ipoints);
 				psfi.update();
 				SceneGraphComponent sgci = new SceneGraphComponent("intersection");
@@ -632,8 +554,96 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				}
 			}
 		}
-		
+
+		private int curveLine(double tol, double eps, double stepSize,
+				LinkedList<double[]> umbilics, int p, int q, double[] U,
+				double[] V, double[][][] Pw,
+				LinkedList<LineSegmentIntersection> segments, int curveIndex,
+				LinkedList<Integer> umbilicIndex, double[] y0, boolean maxMin) {
+			IntObjects intObj;
+			int noSegment;
+			LinkedList<double[]> all = new LinkedList<double[]>();
+			intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,false, maxMin,eps,stepSize,umbilics);
+			if(intObj.umbilicIndex != 0){
+				umbilicIndex.add(intObj.umbilicIndex);
+			}
+			Collections.reverse(intObj.getPoints());
+			all.addAll(intObj.getPoints());
+			noSegment = all.size();
+			System.out.println("first size" + noSegment);
+			if(!intObj.isNearby()){
+				intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,true, maxMin,eps,stepSize, umbilics);
+				if(intObj.umbilicIndex != 0){
+					umbilicIndex.add(intObj.umbilicIndex);
+				}
+				all.addAll(intObj.getPoints());
+			}else{
+				//add the first element of a closed curve
+				System.out.println("add first");
+				double[] first = new double [2];
+				first[0] = all.getFirst()[0];
+				first[1] = all.getFirst()[1];
+				all.add(first);
+				noSegment = all.size();
+			}
+			int index = 0;
+			double[] firstcurvePoint = all.getFirst();
+			for (double[] secondCurvePoint : all) {
+				index ++;
+				if(index != 1){
+					double[][]seg = new double[2][];
+					seg[0] = firstcurvePoint;
+					seg[1] = secondCurvePoint;
+					LineSegmentIntersection lsi = new  LineSegmentIntersection();
+					lsi.indexOnCurve = index ;
+					lsi.segment = seg;
+					lsi.curveIndex = curveIndex;
+					lsi.max = maxMin;
+					if(index != noSegment + 1){
+						segments.add(lsi);
+						if(index == noSegment){
+							System.out.println("last segment " + segments.getLast().toString());
+						}
+					}else{
+						System.out.println("count "+index+ " stelle " + noSegment);
+					}
+					firstcurvePoint = secondCurvePoint;
+				}
+			}
+			curveIndex ++;
+			PointSetFactory psf = new PointSetFactory();
+			double[][] u = new double[all.size()][];
+			double[][] points = new double[all.size()][];
+			for (int i = 0; i < u.length; i++) {
+				u[i] = all.get(i);
+			}
+			psf.setVertexCount(u.length);
+			for (int i = 0; i < u.length; i++) {
+				double[] S = new double[4];
+				NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, u[i][0], u[i][1], S);
+				points[i] = S;
+			}
+			psf.setVertexCoordinates(points);
+			psf.update();
+			SceneGraphComponent sgc = new SceneGraphComponent("Integral Curve");
+			SceneGraphComponent maxCurveComp = new SceneGraphComponent("Max Curve");
+			sgc.addChild(maxCurveComp);
+			sgc.setGeometry(psf.getGeometry());
+			Appearance labelAp = new Appearance();
+			sgc.setAppearance(labelAp);
+			DefaultGeometryShader dgs = ShaderUtility.createDefaultGeometryShader(labelAp, false);
+			DefaultPointShader pointShader = (DefaultPointShader)dgs.getPointShader();
+			if(maxMin){
+				pointShader.setDiffuseColor(Color.red);
+			}else{
+				pointShader.setDiffuseColor(Color.cyan);
+			}
+			hif.getActiveLayer().addTemporaryGeometry(sgc);
+			return curveIndex;
+		}
 	}
+	
+
 
 	private class SurfaceTableModel extends DefaultTableModel {
 

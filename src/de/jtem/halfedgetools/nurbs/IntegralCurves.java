@@ -22,7 +22,7 @@ public class IntegralCurves {
 	 * @param tol
 	 * @param secondOrientation --> is true if we use the direction of the given vectorfield an false if we use the opposite direction 
 	 * @param max 
-	 * @param eps --> if we obtain a closed curve then eps is the distance between the start point and the last point
+	 * @param eps --> if we obtain a closed curve then eps is the maximal distance between the start point and the last point
 	 * @return
 	 */
 	public static IntObjects rungeKutta(NURBSSurface ns, double[] y0,double tol, boolean secondOrientation, boolean max, double eps, double stepSize, LinkedList<double[]> umbilics) {
@@ -73,13 +73,33 @@ public class IntegralCurves {
 					sumA = Rn.add(null, sumA, Rn.times(null, A[l][m], k[m]));
 				}
 				if ((v[0] + h * sumA[0]) >= u2 || (v[0] + h * sumA[0]) <= u1|| (v[1] + h * sumA[1]) >= v2|| (v[1] + h * sumA[1]) <= v1) {
-					System.out.println("out of domain");
+					System.out.println("out of domain 1");
+					double[] last = new double [2];//u.getLast();
+					System.out.println("letztes v"+Arrays.toString(v));
+					if((v[0] + h * sumA[0]) >= u2){
+						last[0] = u2;
+						last[1] = v[1];
+					}
+					else if((v[0] + h * sumA[0]) <= u1){
+						last[0] = u1;// - 0.1;
+						last[1] = v[1];
+					}
+					else if((v[1] + h * sumA[1]) >= v2){
+						last[0] = v[0];
+						last[1] = v2;// + 0.1;
+					}
+					else if((v[1] + h * sumA[1]) <= v1){
+						last[0] = v[0];
+						last[1] = v1;// - 0.1;
+					}
+					u.add(last);
 					IntObjects intObj = new IntObjects(u, ori, nearBy, max);
+					System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 					return intObj;
 				}
 				if (Rn.innerProduct(orientation,Rn.normalize(null,IntegralCurves.getMaxMinCurv(ns, v[0] + h* sumA[0], v[1] + h * sumA[1], max))) > 0) {
 					k[l] = Rn.normalize(null, IntegralCurves.getMaxMinCurv(ns,v[0] + h * sumA[0], v[1] + h * sumA[1], max));
-				} else {
+				} else  {
 					k[l] = Rn.times(null, -1, Rn.normalize(null, IntegralCurves.getMaxMinCurv(ns, v[0] + h * sumA[0], v[1] + h* sumA[1], max)));
 				}
 			}
@@ -94,18 +114,39 @@ public class IntegralCurves {
 				vau = Rn.euclideanNorm(u.getLast()) + 1;
 				if (tau <= tol * vau) {
 					u.add(Rn.add(null, u.getLast(), Rn.times(null, h, Phi1)));
-//					System.out.println(Arrays.toString(u.getLast()));
 					for (double[] umb : umbilics) {
 						if(Rn.euclideanDistance(u.getLast(), umb) < 0.001){
 							IntObjects intObj = new IntObjects(u, ori, nearBy, max);
+							intObj.umbilicIndex = umbilics.indexOf(umb);
+							System.out.println("near umbilic");
+							System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 							return intObj;
 						}
 					}
 					if (u.getLast()[0] >= u2 || u.getLast()[0] <= u1
 							|| u.getLast()[1] >= v2 || u.getLast()[1] <= v1) {
+						System.out.println("out of domain 2");
+						double[] last = new double [2];
+						if(u.getLast()[0] >= u2){
+							last[0] = u2;// + 0.1;
+							last[1] = v[1];
+						}
+						else if(u.getLast()[0] <= u1){
+							last[0] = u1;// - 0.1;
+							last[1] = v[1];
+						}
+						else if(u.getLast()[1] >= v2){
+							last[0] = v[0];
+							last[1] = v2;// + 0.1;
+						}
+						else if(u.getLast()[1] <= v1){
+							last[0] = v[0];
+							last[1] = v1;// - 0.1;
+						}
 						u.pollLast();
-						System.out.println("out of domain");
+						u.add(last);
 						IntObjects intObj = new IntObjects(u, ori, nearBy, max);
+						System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
 						return intObj;
 					}
 					if (Rn.innerProduct(orientation,IntegralCurves.getMaxMinCurv(ns, u.getLast()[0],u.getLast()[1], max)) > 0) {
@@ -116,7 +157,6 @@ public class IntegralCurves {
 				}
 				if ((tau > tol * vau)) {
 					h = h * StrictMath.pow(tol * vau / tau, 1 / 2.);
-//					System.out.println(Math.pow(tol * vau / tau, 1 / 2.));
 				}
 				dist = Rn.euclideanDistance(u.getLast(), y0);
 				if (!(dist < eps) && first) {
@@ -126,7 +166,6 @@ public class IntegralCurves {
 					nearBy = true;
 				}
 			}
-		
 		IntObjects intObj = new IntObjects(u, ori, nearBy, max);
 		return intObj;
 	}

@@ -9,7 +9,16 @@ public class IntObjects {
 	protected double[] orientation;
 	protected boolean nearby;
 	protected boolean maxMin;
+	protected int umbilicIndex;
 	
+	public int getUmbilicIndex() {
+		return umbilicIndex;
+	}
+
+	public void setUmbilicIndex(int umbilicIndex) {
+		this.umbilicIndex = umbilicIndex;
+	}
+
 	public IntObjects(){
 		points = null;
 		orientation = null;
