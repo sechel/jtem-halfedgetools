@@ -597,7 +597,7 @@ public class HalfEdgeUtilsExtra {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
     > List<F> getFaceStar(V v) {
-        List<F> faceStar = new ArrayList<F>();
+        List<F> faceStar = new LinkedList<F>();
         for (E e : getEdgeStar(v)){
         	if (e.getLeftFace() != null)
         		faceStar.add(e.getLeftFace());
