@@ -280,6 +280,9 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			List<int[]> iData = new LinkedList<int[]>();
 			getVectors(nodes, vec, aSet, meanEdgeLength, vData, iData);
 
+			if (vData.size() == 0) {
+				return ilf.getIndexedLineSet();
+			}
 			ilf.setVertexCount(vData.size());
 			ilf.setEdgeCount(vData.size() / 2);
 			ilf.setVertexCoordinates(vData.toArray(new double[][] {}));
@@ -377,6 +380,9 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 
 			}
 
+			if (numcoords == 0) {
+				return ilsf.getIndexedLineSet();
+			}
 			ilsf.setVertexCount(numcoords);
 			ilsf.setEdgeCount(numedges);
 
