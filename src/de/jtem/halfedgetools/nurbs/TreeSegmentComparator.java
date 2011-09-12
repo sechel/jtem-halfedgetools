@@ -2,10 +2,8 @@ package de.jtem.halfedgetools.nurbs;
  
 import static java.lang.Math.signum;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
-import java.util.Set;
 
 import de.jreality.math.Rn;
 

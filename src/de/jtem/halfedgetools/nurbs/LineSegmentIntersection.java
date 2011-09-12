@@ -1,21 +1,14 @@
 package de.jtem.halfedgetools.nurbs;
 
-import java.beans.EventSetDescriptor;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Set;
 import java.util.TreeSet;
 
-import com.sun.corba.se.internal.Interceptors.PIORB;
-
 import de.jreality.math.Rn;
-import de.jtem.jrworkspace.junitUtils.NbPlugin;
 
 public class LineSegmentIntersection {
 	
@@ -705,9 +698,9 @@ public class LineSegmentIntersection {
 //			System.out.println("Test Knoten");
 //			System.out.println(Arrays.toString(hP.point.point));
 //			System.out.println("nachbarn");
-			for (IntersectionPoint iP : orientedList) {
+//			for (IntersectionPoint iP : orientedList) {
 //				System.out.println(Arrays.toString(iP.point));
-			}
+//			}
 //			System.out.println();
 			IntersectionPoint before = null;
 			LinkedList<IntersectionPoint> ori = new LinkedList<IntersectionPoint>();
@@ -858,9 +851,9 @@ public class LineSegmentIntersection {
 			allNbrs.add(hP);
 		}
 		allAjacentNbrs.pollLast();
-		for (IntersectionPoint iP : allAjacentNbrs) {
+//		for (IntersectionPoint iP : allAjacentNbrs) {
 //			System.out.println(Arrays.toString(iP.point));
-		}
+//		}
 		return allAjacentNbrs;
 	}
 	
@@ -937,8 +930,8 @@ public class LineSegmentIntersection {
 		for (HalfedgePoint hP : orientedNbrs) {
 			if(!hP.maxNbrs.isEmpty()){
 //				System.out.println("out NBRS in ceateFaceSet " + hP.maxNbrs.toString());
-				for (IntersectionPoint  outNbrs : hP.maxNbrs) {
-					HalfedgePoint start = outNbrs.getParentHP();
+				for (@SuppressWarnings("unused") IntersectionPoint  outNbrs : hP.maxNbrs) {
+//					HalfedgePoint start = outNbrs.getParentHP();
 //					System.out.println("vom startpunkt weg"+ Arrays.toString(start.point.point));
 					LinkedList<IntersectionPoint> facePoints = allAjacentNbrs1(hP, orientedNbrs);
 					LinkedList<Integer> ind = new LinkedList<Integer>();
