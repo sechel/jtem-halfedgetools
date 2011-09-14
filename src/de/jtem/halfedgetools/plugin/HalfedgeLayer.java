@@ -477,7 +477,7 @@ public class HalfedgeLayer implements ActionListener {
 		selectionRoot = selection.createSelectionGeometry(a);
 		selectionRoot.setPickable(false);
 		Appearance app = selectionRoot.getAppearance();
-		hif.createSelectionAppearance(app, this);
+		hif.createSelectionAppearance(app, this, 0.1);
 		layerRoot.addChild(selectionRoot);
 	}
 	

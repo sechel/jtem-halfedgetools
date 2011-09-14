@@ -94,6 +94,8 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		colorMapCombo.addActionListener(this);
 		beadsPosCombo.addActionListener(this);
 		
+		colorMapCombo.setSelectedItem(ColorMap.RedGreen);
+		
 		appBeads.setAttribute(VERTEX_DRAW, true);
 		appBeads.setAttribute(POINT_SHADER + "." + SPHERES_DRAW, true);
 		appBeads.setAttribute(POINT_SHADER + "." + POLYGON_SHADER + "." + SMOOTH_SHADING, true);
@@ -126,7 +128,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		private boolean
 			invert = false;
 		private ColorMap
-			colorMap = ColorMap.Hue;
+			colorMap = ColorMap.RedGreen;
 		private SceneGraphComponent
 			beadsComponent = new SceneGraphComponent("Beads");
 		private PointSetFactory 

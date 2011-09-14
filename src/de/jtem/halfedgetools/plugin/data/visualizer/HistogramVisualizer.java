@@ -106,6 +106,8 @@ public class HistogramVisualizer extends DataVisualizerPlugin implements ChangeL
 		domainAxis.setNumberFormatOverride(numberFormat);
 		rangeAxis.setAutoRange(true);
 		
+		colorMapCombo.setSelectedItem(ColorMap.RedGreen);
+		
 		numBinsSpinner.addChangeListener(this);
 		scaleExpSpinner.addChangeListener(this);
 		colorMapCombo.addActionListener(this);
@@ -182,7 +184,7 @@ public class HistogramVisualizer extends DataVisualizerPlugin implements ChangeL
 			numBins = 100,
 			exp = 0;
 		private ColorMap
-			colorMap = ColorMap.Mono;
+			colorMap = ColorMap.RedGreen;
 		private ColoredXYBarRenderer
 			renderer = new ColoredXYBarRenderer();
 		private double[]

@@ -18,12 +18,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import de.jreality.geometry.IndexedFaceSetFactory;
-import de.jreality.geometry.IndexedLineSetFactory;
-import de.jreality.geometry.PointSetFactory;
-import de.jreality.math.Pn;
-import de.jreality.math.Rn;
 import de.jreality.scene.Appearance;
+import de.jreality.scene.IndexedFaceSet;
+import de.jreality.scene.IndexedLineSet;
+import de.jreality.scene.PointSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -31,7 +29,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.generic.Position3d;
+import de.jtem.halfedgetools.jreality.util.GeometryUtility;
 
 public class HalfedgeSelection {
 
@@ -218,119 +216,27 @@ public class HalfedgeSelection {
 		edgeAppearance.setAttribute(VERTEX_DRAW, false);
 		faceAppearance.setAttribute(VERTEX_DRAW, false);
 		
-		
 		SceneGraphComponent root = new SceneGraphComponent("Selection");
 		Set<Vertex<?, ?, ?>> vSet = getVertices();
 		Set<Edge<?, ?, ?>> eSet = getEdges();
 		Set<Face<?, ?, ?>> fSet = getFaces();
 		if (vSet.size() > 0) {
-			int index = 0;
-			double[][] vertexVerts = new double[vSet.size()][];
-			for (Vertex<?,?,?> v : vSet) {
-				double[] pos = a.getD(Position3d.class, v);
-				vertexVerts[index++] = pos;
-			}
-			PointSetFactory psf = new PointSetFactory();
-			psf.setVertexCount(vertexVerts.length);
-			psf.setVertexCoordinates(vertexVerts);
-			psf.update();
+			PointSet ps = GeometryUtility.createVertices(vSet, a, false);
 			SceneGraphComponent pc = new SceneGraphComponent("Point Selection");
-			pc.setGeometry(psf.getGeometry());
+			pc.setGeometry(ps);
 			root.addChild(pc);
 		}
 		if (eSet.size() > 0) {
-			Set<Edge<?,?,?>> drawSet = new HashSet<Edge<?,?,?>>();
-			for (Edge<?, ?, ?> e : eSet) {
-				if (drawSet.contains(e.getOppositeEdge())) {
-					continue;
-				} else {
-					drawSet.add(e);
-				}
-			}
-			
-			double[][] edgeVerts = new double[drawSet.size() * 2][];
-			int[][] edgeIndices = new int[drawSet.size()][2];
-			int index = 0;
-			for (Edge<?, ?, ?> e : drawSet) {
-				Vertex<?,?,?> s = e.getStartVertex();
-				Vertex<?,?,?> t = e.getTargetVertex();
-				double[] sp = a.getD(Position3d.class, s);
-				double[] tp = a.getD(Position3d.class, t);
-				edgeVerts[index++] = sp;
-				edgeVerts[index++] = tp;
-				edgeIndices[index/2 - 1][0] = index - 2;
-				edgeIndices[index/2 - 1][1] = index - 1;
-			}
-			IndexedLineSetFactory lsf = new IndexedLineSetFactory();
-			lsf.setVertexCount(index);
-			lsf.setEdgeCount(index / 2);
-			lsf.setVertexCoordinates(edgeVerts);
-			lsf.setEdgeIndices(edgeIndices);
-			lsf.update();
+			IndexedLineSet ils = GeometryUtility.createEdges(eSet, a, false);
 			SceneGraphComponent ec = new SceneGraphComponent("Edge Selection");
-			ec.setGeometry(lsf.getGeometry());
+			ec.setGeometry(ils);
 			ec.setAppearance(edgeAppearance);
 			root.addChild(ec);
 		}
 		if (fSet.size() > 0) {
-			double[][] faceVerts = null;
-			int[][] faceIndices = new int[fSet.size() * 2][];
-			int index = 0;
-			int vIndex = 0;
-			List<double[]> vList = new LinkedList<double[]>();
-			for (Face<?,?,?> f : fSet) {
-				Edge<?, ?, ?> b0 = f.getBoundaryEdge();
-				double[] v1 = a.getD(Position3d.class, b0.getStartVertex());
-				double[] v2 = a.getD(Position3d.class, b0.getTargetVertex());
-				double dist = Rn.euclideanDistance(v1, v2);
-				Edge<?, ?, ?> b = b0;
-				List<double[]> fvList = new LinkedList<double[]>();
-				do {
-					double[] s1 = a.getD(Position3d.class, b.getStartVertex());
-					double[] s2 = a.getD(Position3d.class, b.getNextEdge().getTargetVertex());
-					double[] t = a.getD(Position3d.class, b.getTargetVertex());
-					if (s1.length > 3) {
-						Pn.dehomogenize(s1, s1);
-						Pn.dehomogenize(s2, s2);
-						Pn.dehomogenize(t, t);
-					}
-					double[] vec1 = Rn.subtract(null, s1, t);
-					double[] vec2 = Rn.subtract(null, s2, t);
-					double[] n = Rn.crossProduct(null, vec1, vec2);
-					Rn.normalize(n, n);
-					double[] offset1 = Rn.times(null, dist / 100, n);
-					double[] offset2 = Rn.times(null, -1, offset1);
-					double[] vert1 = Rn.add(null, t, offset1);
-					double[] vert2 = Rn.add(null, t, offset2);
-					if (vert1.length > 3) {
-						vert1[3] = 1.0;
-						vert2[3] = 1.0;
-					}
-					fvList.add(vert1);
-					fvList.add(vert2);
-					b = b.getNextEdge();
-				} while (b != b0);
-				int[] indices1 = new int[fvList.size() / 2];
-				int[] indices2 = new int[fvList.size() / 2];
-				faceIndices[index++] = indices1;
-				faceIndices[index++] = indices2;
-				for (int i = 0; i < fvList.size() / 2; i++) {
-					indices1[i] = vIndex + i * 2;
-					indices2[i] = vIndex + i * 2 + 1;
-				}
-				vList.addAll(fvList);
-				vIndex += fvList.size();
-			}
-			faceVerts = vList.toArray(new double[][] {});
-			IndexedFaceSetFactory fsf = new IndexedFaceSetFactory();
-			fsf.setVertexCount(faceVerts.length);
-			fsf.setFaceCount(faceIndices.length);
-			fsf.setVertexCoordinates(faceVerts);
-			fsf.setFaceIndices(faceIndices);
-			fsf.setGenerateFaceNormals(true);
-			fsf.update();
+			IndexedFaceSet ifs = GeometryUtility.createOffsetFaces(fSet, a, 0.01, false);
 			SceneGraphComponent fc = new SceneGraphComponent("Face Selection");
-			fc.setGeometry(fsf.getGeometry());
+			fc.setGeometry(ifs);
 			fc.setAppearance(faceAppearance);
 			root.addChild(fc);
 		}		

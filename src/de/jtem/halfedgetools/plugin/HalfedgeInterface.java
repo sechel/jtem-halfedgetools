@@ -1006,7 +1006,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	
-	protected void createSelectionAppearance(Appearance app, HalfedgeLayer layer) {
+	public void createSelectionAppearance(Appearance app, HalfedgeLayer layer, double offset) {
 		if (scene == null) return;
 		SceneGraphComponent sceneRoot = scene.getSceneRoot();
 		List<SceneGraphPath> pathList = SceneGraphUtility.getPathsBetween(sceneRoot, layer.getLayerRoot());
@@ -1016,8 +1016,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		DefaultPointShader dps1 = (DefaultPointShader) dgs1.getPointShader();
 		DefaultLineShader dls1 = (DefaultLineShader) dgs1.getLineShader();
 		app.setAttribute(POINT_SHADER + "." + RADII_WORLD_COORDINATES, dps1.getRadiiWorldCoordinates());
-		app.setAttribute(POINT_SHADER + "." + POINT_RADIUS, dps1.getPointRadius() * 1.1);
-		app.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, dls1.getTubeRadius() * 1.1);
+		app.setAttribute(POINT_SHADER + "." + POINT_RADIUS, dps1.getPointRadius() * (1 + offset));
+		app.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, dls1.getTubeRadius() * (1 + offset));
 		app.setAttribute(LINE_SHADER + "." + RADII_WORLD_COORDINATES, dls1.getRadiiWorldCoordinates());
 	}
 	
