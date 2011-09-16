@@ -183,11 +183,11 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			double min = Double.MAX_VALUE;
 			double mean = 0;
 			aSet.setParameter("beadScale", scale);
+			int foundNullValues = 0;
 			for (Node<?,?,?> n : nodes) {
 				Object val = genericAdapter.get(n, aSet);
 				if (val == null) {
-					System.err.println("Null value in adapter "
-							+ genericAdapter + " for node " + n + " found.");
+					foundNullValues++;
 					continue;
 				}
 				double[] numbers = convertValue(val);
@@ -204,6 +204,9 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 				}
 			}
 			mean /= nodes.size();
+			if (foundNullValues > 0) {
+				System.err.println("Null value in adapter " + genericAdapter + " for " + foundNullValues + " nodes found.");
+			}
 			
 			double[][] vertexDataArr = vertexData.toArray(new double[0][0]);
 			Color[] colorData = new Color[vertexDataArr.length];

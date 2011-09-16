@@ -6,7 +6,7 @@ import static de.jreality.shader.CommonAttributes.FACE_DRAW;
 import static de.jreality.shader.CommonAttributes.LINE_SHADER;
 import static de.jreality.shader.CommonAttributes.POINT_SHADER;
 import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
-import static de.jreality.shader.CommonAttributes.TRANSPARENCY_ENABLED;
+import static de.jreality.shader.CommonAttributes.TRANSPARENCY;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 
 import java.awt.Color;
@@ -212,7 +212,7 @@ public class HalfedgeSelection {
 		selectionAppearance.setAttribute(POINT_SHADER + "." + DIFFUSE_COLOR, Color.RED);
 		selectionAppearance.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR, Color.RED);
 		selectionAppearance.setAttribute(POLYGON_SHADER + "." + DIFFUSE_COLOR, Color.RED);
-		selectionAppearance.setAttribute(TRANSPARENCY_ENABLED, false);
+		selectionAppearance.setAttribute(POLYGON_SHADER + "." + TRANSPARENCY, 0.1);
 		edgeAppearance.setAttribute(VERTEX_DRAW, false);
 		faceAppearance.setAttribute(VERTEX_DRAW, false);
 		

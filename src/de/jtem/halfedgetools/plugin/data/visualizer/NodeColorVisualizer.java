@@ -3,7 +3,6 @@ package de.jtem.halfedgetools.plugin.data.visualizer;
 import static de.jreality.shader.CommonAttributes.EDGE_DRAW;
 import static de.jreality.shader.CommonAttributes.FACE_DRAW;
 import static de.jreality.shader.CommonAttributes.PICKABLE;
-import static de.jreality.shader.CommonAttributes.TRANSPARENCY_ENABLED;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 import static de.jtem.halfedgetools.jreality.util.GeometryUtility.createEdges;
 import static de.jtem.halfedgetools.jreality.util.GeometryUtility.createOffsetFaces;
@@ -120,7 +119,6 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 			nodeAppearance.setAttribute(VERTEX_DRAW, true);
 			nodeAppearance.setAttribute(EDGE_DRAW, true);
 			nodeAppearance.setAttribute(FACE_DRAW, true);
-			nodeAppearance.setAttribute(TRANSPARENCY_ENABLED, false);
 			nodeAppearance.setAttribute(PICKABLE, false);
 			geomComponent.setAppearance(nodeAppearance);
 		}
