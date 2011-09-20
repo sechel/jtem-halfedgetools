@@ -21,6 +21,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -110,9 +111,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	private JCheckBox
 		vectorFieldBox = new JCheckBox("vf");
 	
+	private LinkedList<LineSegmentIntersection> 
+		segments = new LinkedList<LineSegmentIntersection>();
+	private int curveIndex = 1;
 	private int activeSurfaceIndex = 0;
-	
-	
 
 	
 	public NurbsManagerPlugin() {
@@ -390,8 +392,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			maxButton = new JRadioButton("Max Curvature (red)"),
 			minButton = new JRadioButton("Min Curvature (cyan)"),
 			intersectionButton = new JRadioButton("discrete curvature parametrization");
-		private LinkedList<LineSegmentIntersection> segments = new LinkedList<LineSegmentIntersection>();
-		private int curveIndex = 1;
+		
 		 
 		public CurvatureLinesPanel() {
 			super("Curvature Lines");
@@ -477,6 +478,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			hif.clearSelection();
 			if(inter){
 				// default patch
+				List<LineSegmentIntersection> allSegments = new LinkedList<LineSegmentIntersection>(segments);
 				LinkedList<LineSegmentIntersection> boundarySegments = new LinkedList<LineSegmentIntersection>();
 				double[][] seg1 = {{0.001,0.001},{0.999,0.001}};
 				LineSegmentIntersection b1 = new LineSegmentIntersection(seg1, 1, 1, true);
@@ -491,11 +493,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				boundarySegments.add(b3);
 				boundarySegments.add(b4);
 				int shiftedIndex = boundarySegments.size();
-				for (LineSegmentIntersection s : segments) {
+				for (LineSegmentIntersection s : allSegments) {
 					s.setCurveIndex(s.curveIndex + shiftedIndex);
 				}
-				segments.addAll(boundarySegments);
-				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.findIntersections(segments);
+				allSegments.addAll(boundarySegments);
+				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.findIntersections(allSegments);
 				LinkedList<HalfedgePoint> hp = LineSegmentIntersection.findAllNbrs(intersections);
 				LinkedList<HalfedgePoint> H = LineSegmentIntersection.orientedNbrs(hp);
 				System.out.println("INTERSECTION SIZE "+intersections.size());
@@ -529,18 +531,18 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					ipoints[i] = S;
 				}
 				if(intersections.size()>0){
-				psfi.setVertexCoordinates(ipoints);
-				psfi.update();
-				SceneGraphComponent sgci = new SceneGraphComponent("intersection");
-				SceneGraphComponent intersectionComp = new SceneGraphComponent("Intersection");
-				sgci.addChild(intersectionComp);
-				sgci.setGeometry(psfi.getGeometry());
-				Appearance iAp = new Appearance();
-				sgci.setAppearance(iAp);
-				DefaultGeometryShader idgs = ShaderUtility.createDefaultGeometryShader(iAp, false);
-				DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
-				ipointShader.setDiffuseColor(Color.black);
-				hif.getActiveLayer().addTemporaryGeometry(sgci);
+					psfi.setVertexCoordinates(ipoints);
+					psfi.update();
+					SceneGraphComponent sgci = new SceneGraphComponent("intersection");
+					SceneGraphComponent intersectionComp = new SceneGraphComponent("Intersection");
+					sgci.addChild(intersectionComp);
+					sgci.setGeometry(psfi.getGeometry());
+					Appearance iAp = new Appearance();
+					sgci.setAppearance(iAp);
+					DefaultGeometryShader idgs = ShaderUtility.createDefaultGeometryShader(iAp, false);
+					DefaultPointShader ipointShader = (DefaultPointShader)idgs.getPointShader();
+					ipointShader.setDiffuseColor(Color.black);
+					hif.getActiveLayer().addTemporaryGeometry(sgci);
 				}
 			}
 		}
@@ -733,11 +735,8 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				hif.addLayerAdapter(qmf.getMinCurvatureVectorField(),false);
 				hif.addLayerAdapter(qmf.getMaxCurvatureVectorField(),false);
 			}
-			
+			segments.clear();
 		} 
-	
-			
-		 
 
 //			int n = 151;
 //			LinkedList<double[]> umb = IntegralCurves.umbilicPoints1(surfaces.get(surfacesTable.getSelectedRow()), n);

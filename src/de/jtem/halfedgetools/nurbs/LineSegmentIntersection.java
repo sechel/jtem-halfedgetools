@@ -3,6 +3,7 @@ package de.jtem.halfedgetools.nurbs;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.TreeSet;
@@ -517,7 +518,7 @@ public class LineSegmentIntersection {
 		lower
 	}
 	
-	public static LinkedList<IntersectionPoint> findIntersections(LinkedList<LineSegmentIntersection> segments){
+	public static LinkedList<IntersectionPoint> findIntersections(List<LineSegmentIntersection> segments){
 		LinkedList<IntersectionPoint> interPoints = new LinkedList<IntersectionPoint>();
 		LinkedList<double[]> currentIntersections = new LinkedList<double[]>();
 		for (LineSegmentIntersection s : segments) {
