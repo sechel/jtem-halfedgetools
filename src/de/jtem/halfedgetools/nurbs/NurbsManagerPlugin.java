@@ -378,7 +378,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		private SpinnerNumberModel
 			tolExpModel = new SpinnerNumberModel(-2, -30.0, 0, 1),
 			epsExpModel = new SpinnerNumberModel(-2, -30.0, 0, 1),
-			stepSizeModel = new SpinnerNumberModel(-2, -30.0, 0, 1);
+			stepSizeModel = new SpinnerNumberModel(-3, -30.0, 0, 1);
 			
 		private JSpinner
 			tolSpinner = new JSpinner(tolExpModel),
@@ -389,8 +389,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		private JRadioButton
 			maxButton = new JRadioButton("Max Curvature (red)"),
 			minButton = new JRadioButton("Min Curvature (cyan)"),
-			intersectionButton = new JRadioButton("Intersection points");
-		
+			intersectionButton = new JRadioButton("discrete curvature parametrization");
+		private LinkedList<LineSegmentIntersection> segments = new LinkedList<LineSegmentIntersection>();
+		private int curveIndex = 1;
+		 
 		public CurvatureLinesPanel() {
 			super("Curvature Lines");
 			setShrinked(true);
@@ -458,20 +460,20 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			boolean max = maxButton.isSelected();
 			boolean min = minButton.isSelected();
 			boolean inter = intersectionButton.isSelected();
-			LinkedList<LineSegmentIntersection> segments = new LinkedList<LineSegmentIntersection>();
-			int counter = 1;
+			LinkedList<LineSegmentIntersection> currentSegments = new LinkedList<LineSegmentIntersection>();
 			LinkedList<Integer> umbilicIndex = new LinkedList<Integer>();
 			for(Vertex<?,?,?> v : verts) {
 				double[] y0 = as.getD(NurbsUVCoordinate.class, v);
 					if (max){
-						counter = curveLine(tol, eps, stepSize, umbilics, p, q,
-								U, V, Pw, segments, counter, umbilicIndex, y0, true);
+						curveIndex = curveLine(tol, eps, stepSize, umbilics, p, q,
+								U, V, Pw, currentSegments, curveIndex, umbilicIndex, y0, true);
 					}
 					if (min){
-						counter = curveLine(tol, eps, stepSize, umbilics, p, q,
-								U, V, Pw, segments, counter, umbilicIndex, y0, false);
+						curveIndex = curveLine(tol, eps, stepSize, umbilics, p, q,
+								U, V, Pw, currentSegments, curveIndex, umbilicIndex, y0, false);
 					}
 			}
+			segments.addAll(currentSegments);
 			hif.clearSelection();
 			if(inter){
 				// default patch
@@ -493,22 +495,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					s.setCurveIndex(s.curveIndex + shiftedIndex);
 				}
 				segments.addAll(boundarySegments);
-				LinkedList<IntersectionPoint> curveCurveIntersections = LineSegmentIntersection.findIntersections(segments);
-				LinkedList<HalfedgePoint> hp1 = LineSegmentIntersection.findAllNbrs1(curveCurveIntersections);
-				curveCurveIntersections = LineSegmentIntersection.bruteForceCurveCurveIntersection(segments);
-				LinkedList<IntersectionPoint> intersections = new LinkedList<IntersectionPoint>();
-				intersections.addAll(curveCurveIntersections);
+				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.findIntersections(segments);
 				LinkedList<HalfedgePoint> hp = LineSegmentIntersection.findAllNbrs(intersections);
-				System.out.println("HALFEDGE points:");
-				for (HalfedgePoint halfedgePoints : hp) {
-					System.out.println(halfedgePoints.toString());
-				}
-				System.out.println("Fertige Punkte");
-//				LinkedList<HalfedgePoint> H = LineSegmentIntersection.orientedNbrs(hp);
-				LinkedList<HalfedgePoint> H1 = LineSegmentIntersection.orientedNbrs1(hp1);
+				LinkedList<HalfedgePoint> H = LineSegmentIntersection.orientedNbrs(hp);
 				System.out.println("INTERSECTION SIZE "+intersections.size());
-//				FaceSet fS = LineSegmentIntersection.createFaceSet(H);
-				FaceSet fS = LineSegmentIntersection.createFaceSet1(H1);
+				FaceSet fS = LineSegmentIntersection.createFaceSet(H);
 				for (int i = 0; i < fS.verts.length; i++) {
 					double[] S = new double[4];
 					NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, fS.verts[i][0], fS.verts[i][1], S);
@@ -537,7 +528,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					NURBSAlgorithm.SurfacePoint(p, U, q, V, Pw, iu[i][0], iu[i][1], S);
 					ipoints[i] = S;
 				}
-				if(curveCurveIntersections.size()>0){
+				if(intersections.size()>0){
 				psfi.setVertexCoordinates(ipoints);
 				psfi.update();
 				SceneGraphComponent sgci = new SceneGraphComponent("intersection");
