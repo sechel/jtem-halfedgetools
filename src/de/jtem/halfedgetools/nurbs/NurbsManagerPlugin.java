@@ -17,6 +17,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,6 +53,7 @@ import de.jreality.shader.DefaultGeometryShader;
 import de.jreality.shader.DefaultPointShader;
 import de.jreality.shader.ShaderUtility;
 import de.jreality.ui.LayoutFactory;
+import de.jreality.writer.WriterOBJ;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.io.NurbsIO;
@@ -511,6 +513,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				System.out.println(fS.toString());
 				HalfedgeLayer hel = new HalfedgeLayer(hif);
 				hel.setName("Curvature Geometry");
+				try {
+					FileOutputStream fos = new FileOutputStream("test.obj");
+					WriterOBJ.write(fS.getIndexedFaceSet(), fos);
+					fos.close();
+				} catch (Exception e2) {}
 				hel.set(fS.getIndexedFaceSet());
 				hif.addLayer(hel);
 				hif.update();
