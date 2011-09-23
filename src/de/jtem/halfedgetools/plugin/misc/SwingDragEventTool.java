@@ -326,7 +326,11 @@ public class SwingDragEventTool extends AbstractTool {
 	public void deactivate(ToolContext tc) {
 		DeactiveRunnable run = new DeactiveRunnable();
 		try {
-			SwingUtilities.invokeAndWait(run);
+			if (SwingUtilities.isEventDispatchThread()) {
+				run.run();
+			} else {
+				SwingUtilities.invokeAndWait(run);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
