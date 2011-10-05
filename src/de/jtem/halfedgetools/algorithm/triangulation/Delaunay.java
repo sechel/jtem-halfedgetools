@@ -44,7 +44,7 @@ public class Delaunay {
 		Double b = el.get(Length.class, edge.getNextEdge(), Double.class);
 		Double c = el.get(Length.class, edge.getPreviousEdge(), Double.class);
 		if ((a*a + b*b - c*c) / (2*a*b) > 1) {
-			throw new TriangulationException("Triangle inequation doesn't hold for " + edge);
+			throw new TriangulationException("Triangle inequality doesn't hold for " + edge);
 		}
 		Double result = Math.abs(StrictMath.acos((a*a + b*b - c*c) / (2*a*b)));
 		return result;
@@ -209,4 +209,5 @@ public class Delaunay {
 		a.remove(la);
 		return la;
 	}	
+	
 }
