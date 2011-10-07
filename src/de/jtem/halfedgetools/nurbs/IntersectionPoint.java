@@ -9,7 +9,7 @@ public class IntersectionPoint {
 	protected double[] point = null;
 	protected double sameIndexDist;
 	protected HalfedgePoint parentHP = null;
-	protected LinkedList<LineSegmentIntersection> intersectingSegments;
+	protected LinkedList<LineSegment> intersectingSegments;
 
 	
 	public IntersectionPoint() {
@@ -35,13 +35,13 @@ public class IntersectionPoint {
 	}
 
 
-	public LinkedList<LineSegmentIntersection> getIntersectingSegments() {
+	public LinkedList<LineSegment> getIntersectingSegments() {
 		return intersectingSegments;
 	}
 
 
 	public void setIntersectingSegments(
-			LinkedList<LineSegmentIntersection> intersectingSegments) {
+			LinkedList<LineSegment> intersectingSegments) {
 		this.intersectingSegments = intersectingSegments;
 	}
 

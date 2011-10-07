@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.nurbs;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 public class HalfedgePoint {
@@ -53,7 +54,11 @@ public class HalfedgePoint {
 
 	@Override
 	public String toString() {
-		return "HalfedgePoints [point=" + point +  "]";
+		System.out.println("HalfedgePoint:");
+		for (IntersectionPoint n : nbrs) {
+			System.out.println(Arrays.toString(n.point));
+		}
+		return "HalfedgePoint [point=" + point +  "]";
 	}
 	
 	

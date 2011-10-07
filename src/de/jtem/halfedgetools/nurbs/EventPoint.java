@@ -1,20 +1,20 @@
 package de.jtem.halfedgetools.nurbs;
 
-import de.jtem.halfedgetools.nurbs.LineSegmentIntersection.PointStatus1;
+import de.jtem.halfedgetools.nurbs.LineSegmentIntersection.PointStatus;
 
 
 public class EventPoint {
 
 	double[] point;
-	PointStatus1 status = PointStatus1.upper;
-	LineSegmentIntersection segment;
+	PointStatus status = PointStatus.upper;
+	LineSegment segment;
 	
 	public EventPoint(){
 		
 	}
 
 
-	public EventPoint(double[] point, PointStatus1 status, LineSegmentIntersection segment) {
+	public EventPoint(double[] point, PointStatus status, LineSegment segment) {
 		this.point = point;
 		this.status = status;
 		this.segment = segment;
@@ -29,21 +29,21 @@ public class EventPoint {
 		this.point = point;
 	}
 
-	public PointStatus1 getStatus() {
+	public PointStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(PointStatus1 status) {
+	public void setStatus(PointStatus status) {
 		this.status = status;
 	}
 
 
-	public LineSegmentIntersection getSegment() {
+	public LineSegment getSegment() {
 		return segment;
 	}
 
 
-	public void setSegment(LineSegmentIntersection segment) {
+	public void setSegment(LineSegment segment) {
 		this.segment = segment;
 	}
 	

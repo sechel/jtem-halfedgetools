@@ -7,8 +7,8 @@ public class IntersectionPointIndexComparator implements Comparator<Intersection
 	public int curveIndex;
 	
 	public int compare(IntersectionPoint ip1, IntersectionPoint ip2) {
-		for (LineSegmentIntersection seg1 : ip1.intersectingSegments) {
-			for (LineSegmentIntersection seg2 : ip2.intersectingSegments) {
+		for (LineSegment seg1 : ip1.intersectingSegments) {
+			for (LineSegment seg2 : ip2.intersectingSegments) {
 				if(seg1.curveIndex == curveIndex && seg2.curveIndex == curveIndex){
 					return (int)Math.signum(seg1.indexOnCurve - seg2.indexOnCurve);
 				}

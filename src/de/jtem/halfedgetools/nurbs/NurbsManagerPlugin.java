@@ -19,7 +19,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +44,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
+
+import com.thoughtworks.xstream.XStream;
 
 import de.jreality.geometry.PointSetFactory;
 import de.jreality.math.Rn;
@@ -113,8 +117,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 	private JCheckBox
 		vectorFieldBox = new JCheckBox("vf");
 	
-	private LinkedList<LineSegmentIntersection> 
-		segments = new LinkedList<LineSegmentIntersection>();
+	private LinkedList<LineSegment> segments = new LinkedList<LineSegment>();
 	private int curveIndex = 1;
 	private int activeSurfaceIndex = 0;
 
@@ -463,7 +466,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			boolean max = maxButton.isSelected();
 			boolean min = minButton.isSelected();
 			boolean inter = intersectionButton.isSelected();
-			LinkedList<LineSegmentIntersection> currentSegments = new LinkedList<LineSegmentIntersection>();
+			LinkedList<LineSegment> currentSegments = new LinkedList<LineSegment>();
 			LinkedList<Integer> umbilicIndex = new LinkedList<Integer>();
 			for(Vertex<?,?,?> v : verts) {
 				double[] y0 = as.getD(NurbsUVCoordinate.class, v);
@@ -477,28 +480,57 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					}
 			}
 			segments.addAll(currentSegments);
+
 			hif.clearSelection();
 			if(inter){
 				// default patch
-				List<LineSegmentIntersection> allSegments = new LinkedList<LineSegmentIntersection>(segments);
-				LinkedList<LineSegmentIntersection> boundarySegments = new LinkedList<LineSegmentIntersection>();
+				List<LineSegment> allSegments = new LinkedList<LineSegment>(segments);
+				LinkedList<LineSegment> boundarySegments = new LinkedList<LineSegment>();
 				double[][] seg1 = {{0.001,0.001},{0.999,0.001}};
-				LineSegmentIntersection b1 = new LineSegmentIntersection(seg1, 1, 1, true);
+//				double[][] seg1 = {{0,0},{1,0}};
+				LineSegment b1 = new LineSegment(seg1, 1, 1, true);
 				double[][] seg2 = {{0.999,0.001},{0.999,0.999}};
-				LineSegmentIntersection b2 = new LineSegmentIntersection(seg2, 1, 2, true);
+//				double[][] seg2 = {{1,0},{1,0}};
+				LineSegment b2 = new LineSegment(seg2, 1, 2, true);
 				double[][] seg3 = {{0.999,0.999},{0.001,0.999}};
-				LineSegmentIntersection b3 = new LineSegmentIntersection(seg3, 1, 3, true);
+//				double[][] seg3 = {{1,1},{0,1}};
+				LineSegment b3 = new LineSegment(seg3, 1, 3, true);
 				double[][] seg4 = {{0.001,0.999},{0.001,0.001}};
-				LineSegmentIntersection b4 = new LineSegmentIntersection(seg4, 1, 4, true);
+//				double[][] seg4 = {{0,1},{0,0}};
+				LineSegment b4 = new LineSegment(seg4, 1, 4, true);
 				boundarySegments.add(b1);
 				boundarySegments.add(b2);
 				boundarySegments.add(b3);
 				boundarySegments.add(b4);
 				int shiftedIndex = boundarySegments.size();
-				for (LineSegmentIntersection s : allSegments) {
+				for (LineSegment s : allSegments) {
 					s.setCurveIndex(s.curveIndex + shiftedIndex);
 				}
 				allSegments.addAll(boundarySegments);
+//				try {
+//					System.out.println("PRINT OUT START");
+//					FileWriter testOut = new FileWriter("testSegments.xml");
+//					XStream xStream = new XStream();
+//					xStream.toXML(allSegments, testOut);
+//				} catch (Exception e1) {
+//					e1.printStackTrace();
+//				}
+//				for (LineSegment s : allSegments){
+//					System.out.println();
+//					System.out.println("LineSegment seg"+s.curveIndex+s.indexOnCurve+" = new LineSegment();");
+//					System.out.println("double[] s"+s.curveIndex+s.indexOnCurve+0+" = {"+s.segment[0][0]+", "+s.segment[0][1]+"};");
+//					System.out.println("double[] s"+s.curveIndex+s.indexOnCurve+1+" = {"+s.segment[1][0]+", "+s.segment[1][1]+"};");
+//					System.out.println("seg"+s.curveIndex+s.indexOnCurve+".segment = new double[2][];");
+//					System.out.println("seg"+s.curveIndex+s.indexOnCurve+".segment[0] = s"+s.curveIndex+s.indexOnCurve+0+";");
+//					System.out.println("seg"+s.curveIndex+s.indexOnCurve+".segment[1] = s"+s.curveIndex+s.indexOnCurve+1+";");
+//					System.out.println("seg"+s.curveIndex+s.indexOnCurve+".curveIndex = "+s.curveIndex+";");
+//					System.out.println("seg"+s.curveIndex+s.indexOnCurve+".indexOnCurve = "+s.indexOnCurve+";");
+//				}
+//				System.out.println("PRINT OUT END");
+				
+//				for (LineSegment s : allSegments) {
+//					System.out.println(Arrays.toString(s.segment[0]) +"  " + Arrays.toString(s.segment[1]) + "index: " + s.curveIndex);
+//				}
 				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.findIntersections(allSegments);
 				LinkedList<HalfedgePoint> hp = LineSegmentIntersection.findAllNbrs(intersections);
 				LinkedList<HalfedgePoint> H = LineSegmentIntersection.orientedNbrs(hp);
@@ -557,7 +589,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		private int curveLine(double tol, double eps, double stepSize,
 				LinkedList<double[]> umbilics, int p, int q, double[] U,
 				double[] V, double[][][] Pw,
-				LinkedList<LineSegmentIntersection> segments, int curveIndex,
+				LinkedList<LineSegment> segments, int curveIndex,
 				LinkedList<Integer> umbilicIndex, double[] y0, boolean maxMin) {
 			IntObjects intObj;
 			int noSegment;
@@ -571,6 +603,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			noSegment = all.size();
 			System.out.println("first size" + noSegment);
 			if(!intObj.isNearby()){
+				all.pollLast();
 				intObj = IntegralCurves.rungeKutta(surfaces.get(surfacesTable.getSelectedRow()), y0, tol,true, maxMin,eps,stepSize, umbilics);
 				if(intObj.umbilicIndex != 0){
 					umbilicIndex.add(intObj.umbilicIndex);
@@ -585,6 +618,11 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				all.add(first);
 				noSegment = all.size();
 			}
+			//only debugging
+//			for (double[] ds : all) {
+//				System.out.println(Arrays.toString(ds));
+//			}
+			//
 			int index = 0;
 			double[] firstcurvePoint = all.getFirst();
 			for (double[] secondCurvePoint : all) {
@@ -593,22 +631,30 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 					double[][]seg = new double[2][];
 					seg[0] = firstcurvePoint;
 					seg[1] = secondCurvePoint;
-					LineSegmentIntersection lsi = new  LineSegmentIntersection();
-					lsi.indexOnCurve = index ;
-					lsi.segment = seg;
-					lsi.curveIndex = curveIndex;
-					lsi.max = maxMin;
-					if(index != noSegment + 1){
-						segments.add(lsi);
-						if(index == noSegment){
-							System.out.println("last segment " + segments.getLast().toString());
-						}
-					}else{
-						System.out.println("count "+index+ " stelle " + noSegment);
-					}
+					LineSegment ls = new  LineSegment();
+					ls.indexOnCurve = index ;
+					ls.segment = seg;
+					ls.curveIndex = curveIndex;
+					ls.max = maxMin;
+//					if(index != noSegment + 1){
+						segments.add(ls);
+//						if(index == noSegment){
+//							System.out.println("last segment " + segments.getLast().toString());
+//						}
+//					}else{
+//						System.out.println("count "+index+ " stelle " + noSegment);
+//					}
 					firstcurvePoint = secondCurvePoint;
 				}
 			}
+			
+			//only debugging
+//			for (LineSegment s : segments) {
+//				System.out.println("curveIndex: " + s.curveIndex + " indexOnCurve: " + s.indexOnCurve);
+//				System.out.println("first " + Arrays.toString(s.segment[0]) + " last " + Arrays.toString(s.segment[1]));
+//			}
+			//
+			
 			curveIndex ++;
 			PointSetFactory psf = new PointSetFactory();
 			double[][] u = new double[all.size()][];

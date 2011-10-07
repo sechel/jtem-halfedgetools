@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.nurbs;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -8,71 +9,13 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.TreeSet;
 
+import junit.framework.Assert;
+
 import de.jreality.math.Rn;
 
 public class LineSegmentIntersection {
 	
-	protected double[][] segment;
-	protected int indexOnCurve = Integer.MIN_VALUE;
-	protected int curveIndex = Integer.MIN_VALUE;
-	protected LinkedList<double[]> ePoints;
-	boolean max;
-	
-	public LineSegmentIntersection(){
-		
-	}
-	
-	public LineSegmentIntersection(double[][] s , int iOC,int cI,  boolean m){
-		segment = s;
-		indexOnCurve = iOC;
-		curveIndex = cI;
-		max = m;
-	}
-	
-	
-	
 
-
-	
-	public LinkedList<double[]> getePoints() {
-		return ePoints;
-	}
-
-	public void setePoints(LinkedList<double[]> ePoints) {
-		this.ePoints = ePoints;
-	}
-
-	public double[][] getSegment() {
-		return segment;
-	}
-
-	public void setSegment(double[][] segment) {
-		this.segment = segment;
-	}
-
-	public int getIndexOnCurve() {
-		return indexOnCurve;
-	}
-
-	public void setIndexOnCurve(int indexOnCurve) {
-		this.indexOnCurve = indexOnCurve;
-	}
-
-	public int getCurveIndex() {
-		return curveIndex;
-	}
-
-	public void setCurveIndex(int curveIndex) {
-		this.curveIndex = curveIndex;
-	}
-
-	public boolean isMax() {
-		return max;
-	}
-
-	public void setMax(boolean max) {
-		this.max = max;
-	}
 	
 
 
@@ -104,14 +47,14 @@ public class LineSegmentIntersection {
 	 *    /   \
 	 *   d     b 
 	 */
-	public static boolean interchangedEndpoints(double[] a, double[] b, double[] c, double[]d, int i){
-		if(a[i] <= c[i] && d[i] <= b[i]){
-			return true;
-		}
-		return false;
-	}
+//	public static boolean interchangedEndpoints(double[] a, double[] b, double[] c, double[]d, int i){
+//		if(a[i] <= c[i] && d[i] <= b[i]){
+//			return true;
+//		}
+//		return false;
+//	}
 	
-	public static double[] intersectionPoint(LineSegmentIntersection first, LineSegmentIntersection second){
+	public static double[] intersectionPoint(LineSegment first, LineSegment second){
 		double s1 = first.segment[0][0];
 		double s2 = first.segment[0][1];
 		double t1 = first.segment[1][0];
@@ -120,53 +63,70 @@ public class LineSegmentIntersection {
 		double p2 = second.segment[0][1];
 		double q1 = second.segment[1][0];
 		double q2 = second.segment[1][1];
-		double lambda = ((p1 - s1) * (s2 - t2) - (p2 - s2) * (s1 - t1)) / ((q2 - p2) * (s1 - t1) - (q1 - p1) * (s2 - t2));
-		return Rn.add(null, second.segment[0],Rn.times(null, lambda, Rn.add(null, second.segment[1], Rn.times(null, -1, second.segment[0]))));
-	}
-	
-	
-	/*
-	 * 
-	 */
-	public static boolean twoSegmentIntersection(double[] p1, double[] p2, double[] p3, double[] p4){
-		if(Rn.equals(p1, p3) || Rn.equals(p1, p4) || Rn.equals(p2, p3) || Rn.equals(p2, p4)){
-			return true;
+		if(isHorizontal(second)){
+//			System.out.println("second "+ Arrays.toString(second.segment[0]) + " " + Arrays.toString(second.segment[1]));
+//			System.out.println("horizontal second");
+			double[] result = new double[2];
+			result[0] = s1 + ((t1 - s1) * (s2 - q2) / (s2 - t2));
+			result[1] = q2;
+			return result;
 		}
-		if(LineSegmentIntersection.counterClockWiseOrder(p1, p3, p4) == LineSegmentIntersection.counterClockWiseOrder(p2, p3, p4)){
-			return false;
-		}
-		else if(LineSegmentIntersection.counterClockWiseOrder(p1, p2, p3) == LineSegmentIntersection.counterClockWiseOrder(p1, p2, p4)){
-			return false;
-		}			
-		if(interchangedEndpoints(p1, p2, p3, p4, 0) && interchangedEndpoints(p2, p1, p3, p4, 1)){
-			return true;
-		}
-		else if(interchangedEndpoints(p1, p2, p4, p3, 0) && interchangedEndpoints(p2, p1, p4, p3, 1)){
-			return true;
-		}
-		else if(interchangedEndpoints(p2, p1, p3, p4, 0) && interchangedEndpoints(p1, p2, p3, p4, 1)){
-			return true;
-		}
-		else if(interchangedEndpoints(p2, p1, p4, p3, 0) && interchangedEndpoints(p1, p2, p4, p3, 1)){
-			return true;
-		}
-		else if(interchangedEndpoints(p3, p4, p1, p2, 0) && interchangedEndpoints(p4, p3, p1, p2, 1)){
-			return true;
-		}
-		else if(interchangedEndpoints(p3, p4, p2, p1, 0) && interchangedEndpoints(p4, p3, p2, p1, 1)){
-			return true;
-		}
-		else if(interchangedEndpoints(p4, p3, p1, p2, 0) && interchangedEndpoints(p3, p4, p1, p2, 1)){
-			return true;
-		}
-		else if(interchangedEndpoints(p4, p3, p2, p1, 0) && interchangedEndpoints(p3, p4, p2, p1, 1)){
-			return true;
+		else if(isHorizontal(first)){
+//			System.out.println("first "+ Arrays.toString(first.segment[0]) + " " + Arrays.toString(first.segment[1]));
+//			System.out.println("horizontal first");
+			double[] result = new double[2];
+			result[0] = p1 + ((q1 - p1) * (p2 - s2) / (p2 - q2));
+			result[1] = t2;
+			return result;
 		}
 		else{
+			double lambda = ((p1 - s1) * (s2 - t2) - (p2 - s2) * (s1 - t1)) / ((q2 - p2) * (s1 - t1) - (q1 - p1) * (s2 - t2));
+			return Rn.add(null, second.segment[0],Rn.times(null, lambda, Rn.add(null, second.segment[1], Rn.times(null, -1, second.segment[0]))));
+		}
+	}
+		
+	
+	
+
+	
+	public static boolean isHorizontal(LineSegment ls){
+		if(ls.segment[0][1] != ls.segment[1][1]){
 			return false;
-		}	
+		}
+		return true;
 	}
 	
+	
+
+	
+	public static boolean twoSegmentIntersection( LineSegment seg1, LineSegment seg2){
+		double[] p1 = seg1.segment[0];
+		double[] p2 = seg1.segment[1]; 
+		double[] p3 = seg2.segment[0]; 
+		double[] p4 = seg2.segment[1];
+		double lengthSeg1 = Rn.euclideanDistance(p1, p2);
+		double lengthSeg2 = Rn.euclideanDistance(p3, p4);
+		double[] p2MinusP1 = Rn.add(null, p2, Rn.times(null, -1, p1));
+		double[] q2 = Rn.add(null, p2, Rn.times(null, lengthSeg1 / 100, p2MinusP1));	
+//		System.out.println("p2 "+Arrays.toString(p2)+"q2 "+Arrays.toString(q2));
+		double[] q1 = Rn.add(null, p1, Rn.times(null, lengthSeg1 / -100, p2MinusP1));
+//		System.out.println("p1 "+Arrays.toString(p1)+"q1 "+Arrays.toString(q1));
+		double[] p4MinusP3 = Rn.add(null, p4, Rn.times(null, -1, p3));
+		double[] q4 = Rn.add(null, p4, Rn.times(null, lengthSeg2 / 100, p4MinusP3));	
+//		System.out.println("p4 "+Arrays.toString(p4)+"q4 "+Arrays.toString(q4));
+		double[] q3 = Rn.add(null, p3, Rn.times(null, lengthSeg2 / -100, p4MinusP3));
+//		System.out.println("p3 "+Arrays.toString(p3)+"q3 "+Arrays.toString(q3));
+		
+		if(LineSegmentIntersection.counterClockWiseOrder(q1, q3, q4) == LineSegmentIntersection.counterClockWiseOrder(q2, q3, q4)){
+			return false;
+		}
+		else if(LineSegmentIntersection.counterClockWiseOrder(q1, q2, q3) == LineSegmentIntersection.counterClockWiseOrder(q1, q2, q4)){
+			return false;
+		}
+		else{
+			return true;
+		}	
+	}
 
 	public static LinkedList<HalfedgePoint> findAllNbrs(LinkedList<IntersectionPoint> intersectionPoints){
 		LinkedList<HalfedgePoint> points = new LinkedList<HalfedgePoint>();
@@ -187,7 +147,21 @@ public class LineSegmentIntersection {
 					}
 				}
 			}
+			
+			// only debugging
+//			System.out.println("all curves intersecting this point unordered");
+//			System.out.println(iP1.toString());
+//			for (IndexedCurveList icl : iP1CurveList) {
+//				System.out.println("index: " + icl.getIndex());
+//				for (IntersectionPoint ip : icl.curveList) {
+//					System.out.println(Arrays.toString(ip.point));
+//				}
+//			}
+			//
+	
 			LinkedList<IntersectionPoint> nbrs = new LinkedList<IntersectionPoint>();
+			
+//			System.out.println("all curves intersecting this point ordered");
 			
 			for (IndexedCurveList icl : iP1CurveList) {
 				
@@ -196,6 +170,13 @@ public class LineSegmentIntersection {
 				IntersectionPointIndexComparator ipic = new IntersectionPointIndexComparator();
 				ipic.curveIndex = icl.index;
 				Collections.sort(icl.curveList, ipic);
+				
+				//only debugging
+//				System.out.println("index: " + icl.getIndex());
+//				for (IntersectionPoint ip : icl.curveList){
+//					System.out.println(Arrays.toString(ip.point));
+//				}
+				//
 				
 				// add for each indexOnCurve all IntersectionPoints with same index in a list
 				
@@ -210,11 +191,21 @@ public class LineSegmentIntersection {
 					indexOrderList.getLast().add(iP);
 				}
 				
+				//only debugging
+//				System.out.println("index: " + icl.getIndex());
+//					for (LinkedList<IntersectionPoint> linkedList : indexOrderList) {
+//						for (IntersectionPoint iP : linkedList) {
+//							System.out.println("indexOnCurve: " + getIndexOnCurveFromCurveIndexAndIntersectionPoint(icl.getIndex(), iP));
+//							System.out.println(Arrays.toString(iP.point));
+//						}
+//					}
+				//
+				
 				// sort all same indexed IntersectionPoints w.r.t. euclidian distance
 				
 				for (LinkedList<IntersectionPoint> sameList : indexOrderList) {
 					if(sameList.size() > 1){
-						sortSameIndex(sameList, icl.index);
+						sortSameIndex(sameList, icl.index, getIndexOnCurveFromCurveIndexAndIntersectionPoint(icl.index, sameList.getFirst()));
 					}
 				}
 				
@@ -224,6 +215,14 @@ public class LineSegmentIntersection {
 				for (LinkedList<IntersectionPoint> list : indexOrderList) {
 					mapList.addAll(list);
 				}
+				
+				//only debugging
+//				System.out.println("after distancesorting");
+//				System.out.println("index: " + icl.getIndex());
+//				for (IntersectionPoint ip : mapList) {
+//					System.out.println(Arrays.toString(ip.point));
+//				}
+				//
 				
 				// fill the map
 				
@@ -247,6 +246,7 @@ public class LineSegmentIntersection {
 				}
 			}
 			HalfedgePoint hp = new HalfedgePoint(iP1, nbrs);
+			System.out.println(hp.toString());
 			iP1.setParentHP(hp);
 			points.add(hp);
 		}
@@ -255,7 +255,7 @@ public class LineSegmentIntersection {
 	
 	private static int getIndexOnCurveFromCurveIndexAndIntersectionPoint(int curveIndex, IntersectionPoint iP){
 		int result = 0;
-		for (LineSegmentIntersection seg : iP.intersectingSegments) {
+		for (LineSegment seg : iP.intersectingSegments) {
 			if(seg.curveIndex == curveIndex && result < seg.indexOnCurve){
 				result = seg.indexOnCurve;
 			}
@@ -263,29 +263,48 @@ public class LineSegmentIntersection {
 		return result;
 	}
 	
-	private static double[] getFirstSegmentCoordsFromCurveIndexAndIntersectionPoint(int curveIndex, IntersectionPoint iP){
-		for (LineSegmentIntersection seg : iP.intersectingSegments) {
-			if(seg.curveIndex == curveIndex){
-				return seg.segment[0];
+	private static double[] getFirstSegmentCoordsFromCurveIndex_IndexOnCurveAndIntersectionPoint(int curveIndex,int indexOnCurve, IntersectionPoint iP){
+		for (LineSegment seg : iP.intersectingSegments) {
+			if(seg.curveIndex == curveIndex && seg.indexOnCurve == indexOnCurve){
+				return seg.segment[0];			
 			}
 		}
 		return null;
 	}
 	
-	private static LinkedList<IntersectionPoint> sortSameIndex(LinkedList<IntersectionPoint> sameIndex, int curveIndex){
-		for (IntersectionPoint iP : sameIndex) {
-			double[] firstCoordFromIndexedSegment = getFirstSegmentCoordsFromCurveIndexAndIntersectionPoint(curveIndex, iP);
+	private static LinkedList<IntersectionPoint> sortSameIndex(LinkedList<IntersectionPoint> sameIndexList, int curveIndex, int indexOnCurve){
+		for (IntersectionPoint iP : sameIndexList) {
+			double[] firstCoordFromIndexedSegment = getFirstSegmentCoordsFromCurveIndex_IndexOnCurveAndIntersectionPoint(curveIndex,indexOnCurve, iP);
 			iP.sameIndexDist = Rn.euclideanDistance(iP.point, firstCoordFromIndexedSegment);
+//			System.out.println("firstCoord "+Arrays.toString(firstCoordFromIndexedSegment)+" iP "+Arrays.toString(iP.point)+" iP.sameIndexDist " + iP.sameIndexDist);
 		}
-		Collections.sort(sameIndex, new IntersectionPointDistanceComparator());
-		return sameIndex;
+		Collections.sort(sameIndexList, new IntersectionPointDistanceComparator());
+		return sameIndexList;
 	}
-	
+
+//	private static double[] getFirstSegmentCoordsFromCurveIndex_IndexOnCurveAndIntersectionPoint(int curveIndex, IntersectionPoint iP){
+//		for (LineSegment seg : iP.intersectingSegments) {
+//			if(seg.curveIndex == curveIndex){
+//				return seg.segment[0];			
+//			}
+//		}
+//		return null;
+//	}
+//	
+//	private static LinkedList<IntersectionPoint> sortSameIndex(LinkedList<IntersectionPoint> sameIndexList, int curveIndex){
+//		for (IntersectionPoint iP : sameIndexList) {
+//			double[] firstCoordFromIndexedSegment = getFirstSegmentCoordsFromCurveIndex_IndexOnCurveAndIntersectionPoint(curveIndex, iP);
+//			iP.sameIndexDist = Rn.euclideanDistance(iP.point, firstCoordFromIndexedSegment);
+//			System.out.println("firstCoord "+Arrays.toString(firstCoordFromIndexedSegment)+" iP "+Arrays.toString(iP.point)+" iP.sameIndexDist " + iP.sameIndexDist);
+//		}
+//		Collections.sort(sameIndexList, new IntersectionPointDistanceComparator());
+//		return sameIndexList;
+//	}
 
 	
 	private static LinkedList<Integer> getIndexListFromIntersectionPoint(IntersectionPoint iP){
 		 LinkedList<Integer> indexList = new LinkedList<Integer>();
-		 for (LineSegmentIntersection seg : iP.intersectingSegments) {
+		 for (LineSegment seg : iP.intersectingSegments) {
 			if(!indexList.contains(seg.curveIndex)){
 				indexList.add(seg.curveIndex);
 			}
@@ -495,12 +514,8 @@ public class LineSegmentIntersection {
 	}
 	
 
-	@Override
-	public String toString() {
-		return //"LineSegmentIntersection [segment=" + Arrays.toString(segment[0]) + " " + Arrays.toString(segment[1])
-				//+ ", index=" + indexOnCurve +
-				" curveIndex = " +curveIndex+ " indexOnCurve = " + indexOnCurve;
-	}
+	
+
 	
 	public static enum PointStatus {
 		upper,
@@ -512,50 +527,59 @@ public class LineSegmentIntersection {
 	 *  plane sweep algorithm from "Computational Geometry"
 	 */
 	
-	public static enum PointStatus1 {
-		upper,
-		containsInterior,
-		lower
-	}
 	
-	public static LinkedList<IntersectionPoint> findIntersections(List<LineSegmentIntersection> segments){
+	
+	public static LinkedList<IntersectionPoint> findIntersections(List<LineSegment> segments){
 		LinkedList<IntersectionPoint> interPoints = new LinkedList<IntersectionPoint>();
 		LinkedList<double[]> currentIntersections = new LinkedList<double[]>();
-		for (LineSegmentIntersection s : segments) {
-//			System.out.println("s.segment[0][1] = " + s.segment[0][1] + " s.segment[1][1] = " + s.segment[1][1]);
-			if(s.segment[0][1] < s.segment[1][1] || (s.segment[0][1] == s.segment[1][1] && s.segment[0][0] > s.segment[1][0])){
-				double[] temp = s.segment[0];
-				s.segment[0] = s.segment[1];
-				s.segment[1] = temp;
-			}
-		}
+		
 		PriorityQueue<EventPoint> eventPoints = new PriorityQueue<EventPoint>(3 * segments.size(), new EventPointYComparator());
-		for (LineSegmentIntersection s : segments) {
-			LinkedList<LineSegmentIntersection> seg = new LinkedList<LineSegmentIntersection>();
-			seg.add(s);
-			EventPoint first = new EventPoint(s.segment[0], PointStatus1.upper, s);
-			EventPoint second = new EventPoint(s.segment[1], PointStatus1.lower, s);
+		
+//		for (LineSegment s : segments) {
+//			if(s.segment[0][1] < s.segment[1][1] || (s.segment[0][1] == s.segment[1][1] && s.segment[0][0] > s.segment[1][0])){
+//				double[] temp = s.segment[0];
+//				s.segment[0] = s.segment[1];
+//				s.segment[1] = temp;
+//			}
+//			EventPoint first = new EventPoint(s.segment[0], PointStatus.upper, s);
+//			EventPoint second = new EventPoint(s.segment[1], PointStatus.lower, s);
+//			eventPoints.add(first);
+//			eventPoints.add(second);
+//		}
+		
+		for (LineSegment s : segments) {
+			EventPoint first = new EventPoint();
+			EventPoint second = new EventPoint();
+			if(s.segment[0][1] < s.segment[1][1] || (s.segment[0][1] == s.segment[1][1] && s.segment[0][0] > s.segment[1][0])){
+				first = new EventPoint(s.segment[1], PointStatus.upper, s);
+				second = new EventPoint(s.segment[0], PointStatus.lower, s);
+			}
+			else{
+				first = new EventPoint(s.segment[0], PointStatus.upper, s);
+				second = new EventPoint(s.segment[1], PointStatus.lower, s);
+			}
 			eventPoints.add(first);
 			eventPoints.add(second);
 		}
 		TreeSegmentComparator tsc = new TreeSegmentComparator();
-		TreeSet<LineSegmentIntersection> T = new TreeSet<LineSegmentIntersection>(tsc);
+		TreeSet<LineSegment> T = new TreeSet<LineSegment>(tsc);
 		LinkedList<EventPointSegmentList> eventPointSegmentList = new LinkedList<EventPointSegmentList>();
 		tsc.eventPointSegmentList = eventPointSegmentList;
-		LinkedList<LineSegmentIntersection> Up = new LinkedList<LineSegmentIntersection>();
-		LinkedList<LineSegmentIntersection> Cp = new LinkedList<LineSegmentIntersection>();
-		LinkedList<LineSegmentIntersection> Lp = new LinkedList<LineSegmentIntersection>();
+		LinkedList<LineSegment> Up = new LinkedList<LineSegment>();
+		LinkedList<LineSegment> Cp = new LinkedList<LineSegment>();
+		LinkedList<LineSegment> Lp = new LinkedList<LineSegment>();
 		EventPoint testPoint = new EventPoint();
 		while(!eventPoints.isEmpty()){
 			EventPoint p = eventPoints.poll();
+//			System.out.println("EventPoint: " + Arrays.toString(p.point) + " curveIndex = " + p.segment.curveIndex + " indexOnCurve = " + p.segment.indexOnCurve);
 			tsc.p = p;
 			EventPoint next = eventPoints.peek();
 			if(next == null || p.point[0] != next.point[0] || p.point[1] != next.point[1]){
-				if(p.status == PointStatus1.upper){
+				if(p.status == PointStatus.upper){
 					Up.add(p.segment);
 					testPoint = p;
 				}
-				else if(p.status == PointStatus1.containsInterior){
+				else if(p.status == PointStatus.containsInterior){
 					Cp.add(p.segment);
 					testPoint = p;
 				}
@@ -567,11 +591,11 @@ public class LineSegmentIntersection {
 				Cp.clear();
 				Lp.clear();
 			}else{
-				if(p.status == PointStatus1.upper){
+				if(p.status == PointStatus.upper){
 					Up.add(p.segment);
 					testPoint = p;
 				}
-				else if(p.status == PointStatus1.containsInterior){
+				else if(p.status == PointStatus.containsInterior){
 					Cp.add(p.segment);
 					testPoint = p;
 				}
@@ -587,14 +611,18 @@ public class LineSegmentIntersection {
 		return interPoints;
 	}
 	
-	public static void handleEventPoint(EventPoint p, EventPoint testPoint, TreeSet<LineSegmentIntersection> T, PriorityQueue<EventPoint> eventPoints, LinkedList<LineSegmentIntersection> Up, LinkedList<LineSegmentIntersection> Cp, LinkedList<LineSegmentIntersection> Lp, LinkedList<IntersectionPoint> interPoints, LinkedList<double[]> currentIntersections, LinkedList<EventPointSegmentList> eventPointSegmentList){
-		LinkedList<LineSegmentIntersection> segments = new LinkedList<LineSegmentIntersection>();
-		if(Cp.size() + Up.size()  > 0){
+	public static void handleEventPoint(EventPoint p, EventPoint testPoint, TreeSet<LineSegment> T, PriorityQueue<EventPoint> eventPoints, LinkedList<LineSegment> Up, LinkedList<LineSegment> Cp, LinkedList<LineSegment> Lp, LinkedList<IntersectionPoint> interPoints, LinkedList<double[]> currentIntersections, LinkedList<EventPointSegmentList> eventPointSegmentList){
+		
+		
+		LinkedList<LineSegment> segments = new LinkedList<LineSegment>();
+		
+		//search for all EventPoints on the sweepline
+		if(Cp.size() + Up.size() > 0){
 			segments.addAll(Cp);
 			segments.addAll(Up);
 			EventPointSegmentList pSegments = new EventPointSegmentList();
 			pSegments.p = p;
-			pSegments.allSegments = new LinkedList<LineSegmentIntersection>();
+			pSegments.allSegments = new LinkedList<LineSegment>();
 			pSegments.allSegments.addAll(segments);
 			eventPointSegmentList.add(pSegments);
 	
@@ -602,13 +630,15 @@ public class LineSegmentIntersection {
 				eventPointSegmentList.pollFirst();
 			}
 		}
-		LinkedList<LineSegmentIntersection> allSegments = new LinkedList<LineSegmentIntersection>();
+		
+		
+		LinkedList<LineSegment> allSegments = new LinkedList<LineSegment>();
 		allSegments.addAll(Lp);
 		allSegments.addAll(Cp);
 		allSegments.addAll(Up);
 		int firstCurveIndex = allSegments.peekFirst().curveIndex;
 		boolean moreThanOneCurve = false;
-		for (LineSegmentIntersection aS : allSegments) {
+		for (LineSegment aS : allSegments) {
 			if(firstCurveIndex != aS.curveIndex){
 				moreThanOneCurve = true;
 			}
@@ -617,48 +647,105 @@ public class LineSegmentIntersection {
 			IntersectionPoint iP = new IntersectionPoint();
 			iP.point = p.point;
 			iP.intersectingSegments = allSegments;
+//			System.out.println("Inersection detected:");
+//			System.out.println(Arrays.toString(iP.point));
 			interPoints.add(iP);
 		}
+//		System.out.println("Up");
+//		for (LineSegment up : Up){
+//			System.out.println(up.toString());
+//		}
+//		System.out.println("Cp");
+//		for (LineSegment cp : Cp){
+//			System.out.println(cp.toString());
+//		}
+//		System.out.println("Lp");
+//		for (LineSegment lp : Lp){
+//			System.out.println(lp.toString());
+//		}
 		T.removeAll(Cp);
+//		System.out.println("removed Lp");
+//		for (LineSegment lp : Lp) {
+//			System.out.println(lp.toString());
+//			System.out.println(T.remove(lp));
+//		}
 		T.removeAll(Lp);
+//		System.out.println("tree without Lp and Cp : " + T.toString());
 		T.addAll(Cp);
 		T.addAll(Up);
+	
+//		System.out.println("Cp");
+//		for (LineSegment cp : Cp){
+//			System.out.println(cp.toString());
+//		}
+//		System.out.println("Up ");
+//		for (LineSegment up : Up) {
+//			System.out.println(up.toString());
+//		}
+////		System.out.println();
+//		System.out.println("EventPoint " + Arrays.toString(p.point));
+//		System.out.println("tree: " +T.toString());
 		if(Up.size() + Cp.size() == 0){
 			if(T.lower(p.segment) != null && T.higher(p.segment) != null){
-				LineSegmentIntersection sl = T.lower(p.segment);
-				LineSegmentIntersection sr = T.higher(p.segment);
+				LineSegment sl = T.lower(p.segment);
+				LineSegment sr = T.higher(p.segment);
 				findNewEvent(sl, sr, p, currentIntersections, eventPoints);
 			}
 		}
 		else{
-			LineSegmentIntersection leftmost = testPoint.segment;
+			LineSegment leftmost = testPoint.segment;
 			
 			while(T.lower(leftmost) != null && (Up.contains(T.lower(leftmost)) || Cp.contains(T.lower(leftmost)))){
 				leftmost = T.lower(leftmost);
 			}
 			if(T.lower(leftmost) != null){
-				LineSegmentIntersection sl = T.lower(leftmost);
+				LineSegment sl = T.lower(leftmost);
 				findNewEvent(sl, leftmost, p, currentIntersections, eventPoints);
 			}
-			LineSegmentIntersection rightmost = testPoint.segment;
+			LineSegment rightmost = testPoint.segment;
 			while(T.higher(rightmost) != null && (Up.contains(T.higher(rightmost)) || Cp.contains(T.higher(rightmost)))){
 				rightmost = T.higher(rightmost);
 			}
 			if(T.higher(rightmost) != null){
-				LineSegmentIntersection sr = T.higher(rightmost);
+				LineSegment sr = T.higher(rightmost);
 				findNewEvent(rightmost, sr, p, currentIntersections, eventPoints);
 			}
 		}
 	}
 	
-	public static void findNewEvent(LineSegmentIntersection sl, LineSegmentIntersection sr, EventPoint p, LinkedList<double[]> currentIntersections, PriorityQueue<EventPoint> eventPoints){
-		boolean intersection = twoSegmentIntersection(sl.segment[0], sl.segment[1], sr.segment[0], sr.segment[1]);
+	public static void findNewEvent(LineSegment sl, LineSegment sr, EventPoint p, LinkedList<double[]> currentIntersections, PriorityQueue<EventPoint> eventPoints){
+		boolean intersection = twoSegmentIntersection(sl, sr);
+//		System.out.println("for intersection checked segments:");
+//		System.out.println("sr " + sr.toString() + " sl " + sl.toString());
+//		boolean reversedIntersection = twoSegmentIntersection(sr, sl);
 		double[] intersectionPoint = intersectionPoint(sl, sr);
-		if(intersection){
-		}
 		double[] reversedIntersectionPoint = intersectionPoint(sr, sl);
-		if((intersection && intersectionPoint[1] < p.point[1]) || (intersection && intersectionPoint[1] == p.point[1] && intersectionPoint[0] > p.point[0])){
-			
+//		System.out.println("left seg:  curveIndex"+ sl.curveIndex + " indexOnCurve " + sl.indexOnCurve);
+//		System.out.println("right seg:  curveIndex"+ sr.curveIndex + " indexOnCurve " + sr.indexOnCurve);
+//		System.out.println(" segments intersect: " + intersection );
+//		System.out.println(" segments intersect reversed: " + reversedIntersection );
+//		if(intersection){
+//			System.out.println();
+//			System.out.println("Intersection located");
+//			intersectionPoint(sl, sr);
+//			System.out.println("sl horizontal "+isHorizontal(sl));
+//			System.out.println("sr horizontal "+isHorizontal(sr));
+//			System.out.println("sl "+ sl.toString() + "endpoints " + Arrays.toString(sl.segment[0]) + " " + Arrays.toString(sl.segment[1]));
+//			System.out.println("sr "+ sr.toString() + "endpoints " + Arrays.toString(sr.segment[0]) + " " + Arrays.toString(sr.segment[1]));
+//			System.out.println("EventPoint " + Arrays.toString(p.point));
+//			System.out.println(" intersectionPoint" + Arrays.toString(intersectionPoint));
+//			System.out.println(" reversedIntersectionPoint" + Arrays.toString(reversedIntersectionPoint));
+//			System.out.println();
+//		}
+//		if(intersection && (intersectionPoint[1] > p.point[1] || reversedIntersectionPoint[1] > p.point[1])){
+//			System.out.println();
+//			System.out.println("GROESSER");
+//			System.out.println();
+//		}
+//		if(true){
+		if((intersection && intersectionPoint[1] < p.point[1]) || (intersection && intersectionPoint[1] == p.point[1] && intersectionPoint[0] >= p.point[0])
+				||(intersection && reversedIntersectionPoint[1] < p.point[1]) || (intersection && reversedIntersectionPoint[1] == p.point[1] && reversedIntersectionPoint[0] >= p.point[0])){
+//			System.out.println("drinn mit Intersectionpoint: " + Arrays.toString(intersectionPoint));
 			boolean isSelected = false;
 			for (double[] ci  : currentIntersections) {
 				if((intersectionPoint[0] == ci[0] && intersectionPoint[1] == ci[1]) || (reversedIntersectionPoint[0] == ci[0] && reversedIntersectionPoint[1] == ci[1])){
@@ -666,26 +753,33 @@ public class LineSegmentIntersection {
 				}
 			}
 			if(!isSelected){
-				if(!Rn.equals(intersectionPoint, sl.segment[1]) && !Rn.equals(reversedIntersectionPoint, sl.segment[1])){
-					EventPoint left = new EventPoint(intersectionPoint, PointStatus1.containsInterior, sl);
+
+				if(!Rn.equals(intersectionPoint, sl.segment[1]) && !Rn.equals(reversedIntersectionPoint, sl.segment[1]) && !Rn.equals(intersectionPoint, sl.segment[0]) && !Rn.equals(reversedIntersectionPoint, sl.segment[0])){
+//				if(!Rn.equals(intersectionPoint, sl.segment[1]) && !Rn.equals(reversedIntersectionPoint, sl.segment[1])){
+//					System.out.println("new IntersectionPoint left "+sl.curveIndex+"|"+sl.indexOnCurve +" "+ Arrays.toString(intersectionPoint));
+					EventPoint left = new EventPoint(intersectionPoint, PointStatus.containsInterior, sl);
 					eventPoints.add(left);
 					currentIntersections.add(intersectionPoint);
 					currentIntersections.add(reversedIntersectionPoint);
 				}
-				if(!Rn.equals(intersectionPoint, sr.segment[1]) && !Rn.equals(reversedIntersectionPoint, sr.segment[1])){
-					EventPoint right = new EventPoint(intersectionPoint, PointStatus1.containsInterior, sr);
+				if(!Rn.equals(intersectionPoint, sr.segment[1]) && !Rn.equals(reversedIntersectionPoint, sr.segment[1]) && !Rn.equals(intersectionPoint, sr.segment[0]) && !Rn.equals(reversedIntersectionPoint, sr.segment[0])){
+//				if(!Rn.equals(intersectionPoint, sr.segment[1]) && !Rn.equals(reversedIntersectionPoint, sr.segment[1])){
+//					System.out.println("new IntersectionPoint right " +sr.curveIndex+"|"+sr.indexOnCurve +" "+ Arrays.toString(intersectionPoint));
+					EventPoint right = new EventPoint(intersectionPoint, PointStatus.containsInterior, sr);
 					eventPoints.add(right);
 					currentIntersections.add(intersectionPoint);
 					currentIntersections.add(reversedIntersectionPoint);
 				}
-				
-				
 			}
 		}
 	}
 	
+
+	
 	
 	public static void main(String[] args){
+		
+		
 //		double[] a1 = {1,10};
 //		double[] a2 = {4,1};
 //		double[] a3 = {2,3};
@@ -704,70 +798,80 @@ public class LineSegmentIntersection {
 //		double[] b6 = {5,2};
 //		double[] b7 = {4,4};
 //		double[] b8 = {4,1};
-//		LineSegmentIntersection s1 = new LineSegmentIntersection();
+//		LineSegment s1 = new LineSegment();
 //		s1.segment = new double[2][];
 //		s1.segment[0] = a1;
 //		s1.segment[1] = a2;
 //		s1.curveIndex = 1;
-//		LineSegmentIntersection s2 = new LineSegmentIntersection();
+//		s1.indexOnCurve = 1;
+//		LineSegment s2 = new LineSegment();
 //		s2.segment = new double[2][];
 //		s2.segment[0] = a3;
 //		s2.segment[1] = a4;
 //		s2.curveIndex = 2;
-//		LineSegmentIntersection s3 = new LineSegmentIntersection();
+//		s2.indexOnCurve = 1;
+//		LineSegment s3 = new LineSegment();
 //		s3.segment = new double[2][];
 //		s3.segment[0] = a5;
 //		s3.segment[1] = a6;
 //		s3.curveIndex = 3;
-//		LineSegmentIntersection s4 = new LineSegmentIntersection();
+//		s3.indexOnCurve = 1;
+//		LineSegment s4 = new LineSegment();
 //		s4.segment = new double[2][];
 //		s4.segment[0] = a7;
 //		s4.segment[1] = a8;
 //		s4.curveIndex = 4;
-//		LineSegmentIntersection s5 = new LineSegmentIntersection();
+//		s4.indexOnCurve = 1;
+//		LineSegment s5 = new LineSegment();
 //		s5.segment = new double[2][];
 //		s5.segment[0] = a9;
 //		s5.segment[1] = a10;
 //		s5.curveIndex = 5;
-//		LineSegmentIntersection t1 = new LineSegmentIntersection();
+//		LineSegment t1 = new LineSegment();
 //		t1.segment = new double[2][];
 //		t1.segment[0] = b1;
 //		t1.segment[1] = b2;
 //		t1.curveIndex = 1;
-//		LineSegmentIntersection t2 = new LineSegmentIntersection();
+//		t1.indexOnCurve = 1;
+//		LineSegment t2 = new LineSegment();
 //		t2.segment = new double[2][];
 //		t2.segment[0] = b3;
 //		t2.segment[1] = b4;
 //		t2.curveIndex = 2;
-//		LineSegmentIntersection t3 = new LineSegmentIntersection();
+//		t2.indexOnCurve = 1;
+//		LineSegment t3 = new LineSegment();
 //		t3.segment = new double[2][];
 //		t3.segment[0] = b5;
 //		t3.segment[1] = b6;
 //		t3.curveIndex = 3;
-//		LineSegmentIntersection t4 = new LineSegmentIntersection();
+//		t3.indexOnCurve = 1;
+//		LineSegment t4 = new LineSegment();
 //		t4.segment = new double[2][];
 //		t4.segment[0] = b7;
 //		t4.segment[1] = b8;
 //		t4.curveIndex = 4;
-//		LinkedList<LineSegmentIntersection> seg = new LinkedList<LineSegmentIntersection>();
+//		t4.indexOnCurve = 1;
+//		LinkedList<LineSegment> seg = new LinkedList<LineSegment>();
 //		seg.add(s1);
 //		seg.add(s2);
 //		seg.add(s3);
 //		seg.add(s4);
 //		seg.add(s5);
-//		LinkedList<LineSegmentIntersection> seg1 = new LinkedList<LineSegmentIntersection>();
+//		LinkedList<LineSegment> seg1 = new LinkedList<LineSegment>();
 //		seg1.add(t1);
 //		seg1.add(t2);
 //		seg1.add(t3);
 //		seg1.add(t4);
-////		findIntersections(seg);
-////		findIntersections(seg1);
+//		LinkedList<IntersectionPoint> iP = LineSegmentIntersection.findIntersections(seg);
+//		LinkedList<IntersectionPoint> iP1 = LineSegmentIntersection.findIntersections(seg1);
+//		Assert.assertTrue(iP.size() == 9);
+//		Assert.assertTrue(iP1.size() == 4);
 //		b1[0] = 2; b1[1] = 8.5;
 //		b2[0] = 3; b2[1] = 7.5;
 //		b3[0] = 4; b3[1] = 8.5;
 //		b4[0] = 3; b4[1] = 7.5;
-//		b5[0] = 2; b5[1] = 8;
-//		b6[0] = 3; b6[1] = 7;
+//		b5[0] = 2; b5[1] = 7.5;
+//		b6[0] = 4; b6[1] = 6;
 //		b7[0] = 4; b7[1] = 8;
 //		b8[0] = 2; b8[1] = 6;
 //		t1.segment = new double[2][];
@@ -792,111 +896,276 @@ public class LineSegmentIntersection {
 //		seg.add(t3);
 //		seg.add(t4);
 //		findIntersections(seg);
-//		System.out.println(Arrays.toString(intersectionPoint(t3, t4)));
-//		System.out.println(twoSegmentIntersection(b5, b6, b7, b8));
-		double[] r1 = {0,3};
-		double[] r2 = {2,3};
-		double[] r3 = {4,3};
-		double[] r4 = {6,3};
-		double[] r5 = {8,3};
-		double[] r6 = {1,1};
-		double[] r7 = {3,1};
-		double[] r8 = {5,1};
-		double[] r9 = {7,1};
-		double[] r10 = {9,1};
-		double[] g1 = {2,5};
-		double[] g2 = {2,3};
-		double[] g3 = {2,0};
-		double[] g4 = {7,4};
-		double[] g5 = {7,2};
-		double[] g6 = {7,1};
-		LineSegmentIntersection s1 = new LineSegmentIntersection();
-		s1.segment = new double[2][];
-		s1.segment[0] = r1;
-		s1.segment[1] = r2;
-		s1.curveIndex = 1;
-		s1.indexOnCurve = 1;
-		LineSegmentIntersection s2 = new LineSegmentIntersection();
-		s2.segment = new double[2][];
-		s2.segment[0] = r2;
-		s2.segment[1] = r3;
-		s2.curveIndex = 1;
-		s2.indexOnCurve = 2;
-		LineSegmentIntersection s3 = new LineSegmentIntersection();
-		s3.segment = new double[2][];
-		s3.segment[0] = r3;
-		s3.segment[1] = r4;
-		s3.curveIndex = 1;
-		s3.indexOnCurve = 3;
-		LineSegmentIntersection s4 = new LineSegmentIntersection();
-		s4.segment = new double[2][];
-		s4.segment[0] = r4;
-		s4.segment[1] = r5;
-		s4.curveIndex = 1;
-		s4.indexOnCurve = 4;
-		LineSegmentIntersection s5 = new LineSegmentIntersection();
-		s5.segment = new double[2][];
-		s5.segment[0] = r6;
-		s5.segment[1] = r7;
-		s5.curveIndex = 1;
-		s5.indexOnCurve = 5;
-		LineSegmentIntersection s6 = new LineSegmentIntersection();
-		s6.segment = new double[2][];
-		s6.segment[0] = r7;
-		s6.segment[1] = r8;
-		s6.curveIndex = 1;
-		s6.indexOnCurve = 6;
-		LineSegmentIntersection s7 = new LineSegmentIntersection();
-		s7.segment = new double[2][];
-		s7.segment[0] = r8;
-		s7.segment[1] = r9;
-		s7.curveIndex = 1;
-		s7.indexOnCurve = 7;
-		LineSegmentIntersection s8 = new LineSegmentIntersection();
-		s8.segment = new double[2][];
-		s8.segment[0] = r9;
-		s8.segment[1] = r10;
-		s8.curveIndex = 1;
-		s8.indexOnCurve = 8;
-		LineSegmentIntersection s9 = new LineSegmentIntersection();
-		s9.segment = new double[2][];
-		s9.segment[0] = g1;
-		s9.segment[1] = g2;
-		s9.curveIndex = 2;
-		s9.indexOnCurve = 1;
-		LineSegmentIntersection s10 = new LineSegmentIntersection();
-		s10.segment = new double[2][];
-		s10.segment[0] = g2;
-		s10.segment[1] = g3;
-		s10.curveIndex = 2;
-		s10.indexOnCurve = 2;
-		LineSegmentIntersection s11 = new LineSegmentIntersection();
-		s11.segment = new double[2][];
-		s11.segment[0] = g4;
-		s11.segment[1] = g5;
-		s11.curveIndex = 2;
-		s11.indexOnCurve = 3;
-		LineSegmentIntersection s12 = new LineSegmentIntersection();
-		s12.segment = new double[2][];
-		s12.segment[0] = g5;
-		s12.segment[1] = g6;
-		s12.curveIndex = 2;
-		s12.indexOnCurve = 4;
-		LinkedList<LineSegmentIntersection> segments = new LinkedList<LineSegmentIntersection>();
-		segments.clear();
-		segments.add(s1);
-		segments.add(s2);
-		segments.add(s3);
-		segments.add(s4);
-		segments.add(s5);
-		segments.add(s6);
-		segments.add(s7);
-		segments.add(s8);
-		segments.add(s9);
-		segments.add(s10);
-		segments.add(s11);
-		segments.add(s12);
-		findIntersections(segments);
 		
+		
+
+		double[] b1 = {0.001,0.001};
+		double[] b2 = {0.999,0.001};
+		double[] b3 = {0.001,0.999};
+		double[] b4 = {0.999,0.999};
+//		double[] b1 = {0,0};
+//		double[] b2 = {1,0};
+//		double[] b3 = {0,1};
+//		double[] b4 = {1,1};
+		LineSegment seg1_1 = new LineSegment();
+		seg1_1.segment = new double[2][];
+		seg1_1.segment[0] = b1;
+		seg1_1.segment[1] = b2;
+		seg1_1.curveIndex = 1;
+		seg1_1.indexOnCurve = 1;
+		LineSegment seg2_1 = new LineSegment();
+		seg2_1.segment = new double[2][];
+		seg2_1.segment[0] = b2;
+		seg2_1.segment[1] = b4;
+		seg2_1.curveIndex = 2;
+		seg2_1.indexOnCurve = 1;
+		LineSegment seg3_1 = new LineSegment();
+		seg3_1.segment = new double[2][];
+		seg3_1.segment[0] = b4;
+		seg3_1.segment[1] = b3;
+		seg3_1.curveIndex = 3;
+		seg3_1.indexOnCurve = 1;
+		LineSegment seg4_1 = new LineSegment();
+		seg4_1.segment = new double[2][];
+		seg4_1.segment[0] = b3;
+		seg4_1.segment[1] = b1;
+		seg4_1.curveIndex = 4;
+		seg4_1.indexOnCurve = 1;
+		double[] s1 = {1.0, 0.3333333333333333};
+		double[] s2 = {0.9333333333333332, 0.3333333333333333};
+		double[] s3 = {0.8333333333333333, 0.3333333333333333};
+		double[] s4 = {0.7333333333333333, 0.3333333333333333};
+		double[] s5 = {0.6333333333333333, 0.3333333333333333};
+		
+		double[] s6 = {0.5333333333333333, 0.3333333333333333};
+		double[] s7 = {0.43333333333333335, 0.3333333333333333};
+		double[] s8 = {0.3333333333333333, 0.3333333333333333};
+		double[] s9 = {0.2333333333333333, 0.3333333333333333};
+		double[] s10 = {0.1333333333333333, 0.3333333333333333};
+		
+		double[] s11 = {0.0333333333333333, 0.3333333333333333};
+		double[] s12 = {0.0, 0.3333333333333333};
+		
+		LineSegment seg1 = new LineSegment();
+		seg1.segment = new double[2][];
+		seg1.segment[0] = s1;
+		seg1.segment[1] = s2;
+		seg1.curveIndex = 5;
+		seg1.indexOnCurve = 1;
+		LineSegment seg2 = new LineSegment();
+		seg2.segment = new double[2][];
+		seg2.segment[0] = s2;
+		seg2.segment[1] = s3;
+		seg2.curveIndex = 5;
+		seg2.indexOnCurve = 2;
+		LineSegment seg3 = new LineSegment();
+		seg3.segment = new double[2][];
+		seg3.segment[0] = s3;
+		seg3.segment[1] = s4;
+		seg3.curveIndex = 5;
+		seg3.indexOnCurve = 3;
+		LineSegment seg4 = new LineSegment();
+		seg4.segment = new double[2][];
+		seg4.segment[0] = s4;
+		seg4.segment[1] = s5;
+		seg4.curveIndex = 5;
+		seg4.indexOnCurve = 4;
+		LineSegment seg5 = new LineSegment();
+		seg5.segment = new double[2][];
+		seg5.segment[0] = s5;
+		seg5.segment[1] = s6;
+		seg5.curveIndex = 5;
+		seg5.indexOnCurve = 5;
+		LineSegment seg6 = new LineSegment();
+		seg6.segment = new double[2][];
+		seg6.segment[0] = s6;
+		seg6.segment[1] = s7;
+		seg6.curveIndex = 5;
+		seg6.indexOnCurve = 6;
+		LineSegment seg7 = new LineSegment();
+		seg7.segment = new double[2][];
+		seg7.segment[0] = s1;
+		seg7.segment[1] = s2;
+		seg7.curveIndex = 5;
+		seg7.indexOnCurve = 7;
+		LineSegment seg8 = new LineSegment();
+		seg8.segment = new double[2][];
+		seg8.segment[0] = s8;
+		seg8.segment[1] = s9;
+		seg8.curveIndex = 5;
+		seg8.indexOnCurve = 8;
+		LineSegment seg9 = new LineSegment();
+		seg9.segment = new double[2][];
+		seg9.segment[0] = s9;
+		seg9.segment[1] = s10;
+		seg9.curveIndex = 5;
+		seg9.indexOnCurve = 9;
+		LineSegment seg10 = new LineSegment();
+		seg10.segment = new double[2][];
+		seg10.segment[0] = s10;
+		seg10.segment[1] = s11;
+		seg10.curveIndex = 5;
+		seg10.indexOnCurve = 10;
+		LineSegment seg11 = new LineSegment();
+		seg11.segment = new double[2][];
+		seg11.segment[0] = s11;
+		seg11.segment[1] = s12;
+		seg11.curveIndex = 5;
+		seg11.indexOnCurve = 11;
+		//index 6
+		double[] s13 = {0.3333333333333333, 1.0};
+		double[] s14 = {0.3333333333333333, 0.9333333333333332};
+		double[] s15 = {0.3333333333333333, 0.8333333333333333};
+		
+		double[] s16 = {0.3333333333333333, 0.7333333333333333};
+		double[] s17 = {0.3333333333333333, 0.6333333333333333};
+		double[] s18 = {0.3333333333333333, 0.5333333333333333};
+		double[] s19 = {0.3333333333333333, 0.43333333333333335};
+		double[] s20 = {0.3333333333333333, 0.3333333333333333};
+		
+		double[] s21 = {0.3333333333333333, 0.2333333333333333};
+		double[] s22 = {0.3333333333333333, 0.1333333333333333};
+		double[] s23 = {0.3333333333333333, 0.0333333333333333};
+		double[] s24 = {0.3333333333333333, 0.0};
+		
+		LineSegment seg12 = new LineSegment();
+		seg12.segment = new double[2][];
+		seg12.segment[0] = s13;
+		seg12.segment[1] = s14;
+		seg12.curveIndex = 6;
+		seg12.indexOnCurve = 1;
+		LineSegment seg13 = new LineSegment();
+		seg13.segment = new double[2][];
+		seg13.segment[0] = s14;
+		seg13.segment[1] = s15;
+		seg13.curveIndex = 6;
+		seg13.indexOnCurve = 2;
+		LineSegment seg14 = new LineSegment();
+		seg14.segment = new double[2][];
+		seg14.segment[0] = s15;
+		seg14.segment[1] = s16;
+		seg14.curveIndex = 6;
+		seg14.indexOnCurve = 3;
+		LineSegment seg15 = new LineSegment();
+		seg15.segment = new double[2][];
+		seg15.segment[0] = s16;
+		seg15.segment[1] = s17;
+		seg15.curveIndex = 6;
+		seg15.indexOnCurve = 4;
+		LineSegment seg16 = new LineSegment();
+		seg16.segment = new double[2][];
+		seg16.segment[0] = s17;
+		seg16.segment[1] = s18;
+		seg16.curveIndex = 6;
+		seg16.indexOnCurve = 5;
+		LineSegment seg17 = new LineSegment();
+		seg17.segment = new double[2][];
+		seg17.segment[0] = s18;
+		seg17.segment[1] = s19;
+		seg17.curveIndex = 6;
+		seg17.indexOnCurve = 6;
+		LineSegment seg18 = new LineSegment();
+		seg18.segment = new double[2][];
+		seg18.segment[0] = s19;
+		seg18.segment[1] = s20;
+		seg18.curveIndex = 6;
+		seg18.indexOnCurve = 7;
+		LineSegment seg19 = new LineSegment();
+		seg19.segment = new double[2][];
+		seg19.segment[0] = s20;
+		seg19.segment[1] = s21;
+		seg19.curveIndex = 6;
+		seg19.indexOnCurve = 8;
+		LineSegment seg20 = new LineSegment();
+		seg20.segment = new double[2][];
+		seg20.segment[0] = s21;
+		seg20.segment[1] = s22;
+		seg20.curveIndex = 6;
+		seg20.indexOnCurve = 9;
+		LineSegment seg21 = new LineSegment();
+		seg21.segment = new double[2][];
+		seg21.segment[0] = s22;
+		seg21.segment[1] = s23;
+		seg21.curveIndex = 6;
+		seg21.indexOnCurve = 10;
+		LineSegment seg22 = new LineSegment();
+		seg22.segment = new double[2][];
+		seg22.segment[0] = s23;
+		seg22.segment[1] = s24;
+		seg22.curveIndex = 6;
+		seg22.indexOnCurve = 11;
+		
+
+		LinkedList<LineSegment> segments = new LinkedList<LineSegment>();
+		segments.clear();
+		segments.add(seg1_1);
+		segments.add(seg2_1);
+		segments.add(seg3_1);
+		segments.add(seg4_1);
+		segments.add(seg1);
+		segments.add(seg2);
+		segments.add(seg3);
+		segments.add(seg4);
+		segments.add(seg5);
+		segments.add(seg6);
+		segments.add(seg7);
+		segments.add(seg8);
+		segments.add(seg9);
+		segments.add(seg10);
+		segments.add(seg11);
+		segments.add(seg12);
+		segments.add(seg13);
+		segments.add(seg14);
+		segments.add(seg15);
+		segments.add(seg16);
+		segments.add(seg17);
+		segments.add(seg18);
+		segments.add(seg19);
+		segments.add(seg20);
+		segments.add(seg21);
+		segments.add(seg22);
+//		findIntersections(segments);
+		
+		double[] t1 = {1.0, 0.3333333333333333};
+		double[] t2 = {0.5, 0.3333333333333333};
+		double[] t3 = {0, 0.3333333333333333};
+		double[] t4 = {0.5, 1};
+		double[] t5 = {0.5, 0.5};
+		double[] t6 = {0.5, 0};
+		LineSegment seg5_1 = new LineSegment();
+		seg5_1.segment = new double[2][];
+		seg5_1.segment[0] = t1;
+		seg5_1.segment[1] = t2;
+		seg5_1.curveIndex = 5;
+		seg5_1.indexOnCurve = 1;
+		LineSegment seg5_2 = new LineSegment();
+		seg5_2.segment = new double[2][];
+		seg5_2.segment[0] = t2;
+		seg5_2.segment[1] = t3;
+		seg5_2.curveIndex = 5;
+		seg5_2.indexOnCurve = 2;
+		LineSegment seg6_1 = new LineSegment();
+		seg6_1.segment = new double[2][];
+		seg6_1.segment[0] = t4;
+		seg6_1.segment[1] = t5;
+		seg6_1.curveIndex = 6;
+		seg6_1.indexOnCurve = 1;
+		LineSegment seg6_2 = new LineSegment();
+		seg6_2.segment = new double[2][];
+		seg6_2.segment[0] = t5;
+		seg6_2.segment[1] = t6;
+		seg6_2.curveIndex = 6;
+		seg6_2.indexOnCurve = 2;
+		LinkedList<LineSegment> segmentsT = new LinkedList<LineSegment>();
+		segmentsT.add(seg1_1);
+		segmentsT.add(seg2_1);
+		segmentsT.add(seg3_1);
+		segmentsT.add(seg4_1);
+		segmentsT.add(seg5_1);
+		segmentsT.add(seg5_2);
+		segmentsT.add(seg6_1);
+		segmentsT.add(seg6_2);
+		findIntersections(segmentsT);
+//		LinkedList<LineSegmentIntersection> test = new LinkedList<LineSegmentIntersection>();
 	}
 }

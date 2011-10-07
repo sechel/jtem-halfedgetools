@@ -5,13 +5,13 @@ import java.util.LinkedList;
 public class EventPointSegmentList {
 	
 	protected EventPoint p;
-	protected LinkedList<LineSegmentIntersection> allSegments;
+	protected LinkedList<LineSegment> allSegments;
 	
 	public EventPointSegmentList(){
 		
 	}
 	
-	public EventPointSegmentList(EventPoint p, LinkedList<LineSegmentIntersection> allSegments) {
+	public EventPointSegmentList(EventPoint p, LinkedList<LineSegment> allSegments) {
 		this.p = p;
 		this.allSegments = allSegments;
 	}
@@ -24,11 +24,11 @@ public class EventPointSegmentList {
 		this.p = p;
 	}
 
-	public LinkedList<LineSegmentIntersection> getAllSegments() {
+	public LinkedList<LineSegment> getAllSegments() {
 		return allSegments;
 	}
 
-	public void setAllSegments(LinkedList<LineSegmentIntersection> allSegments) {
+	public void setAllSegments(LinkedList<LineSegment> allSegments) {
 		this.allSegments = allSegments;
 	}
 	

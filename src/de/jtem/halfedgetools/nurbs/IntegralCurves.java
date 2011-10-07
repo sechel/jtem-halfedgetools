@@ -145,8 +145,9 @@ public class IntegralCurves {
 						}
 						u.pollLast();
 						u.add(last);
+						System.out.println("LAST: "+ Arrays.toString(u.getLast()));
 						IntObjects intObj = new IntObjects(u, ori, nearBy, max);
-						System.out.println("letztes element: " + Arrays.toString(intObj.getPoints().getLast()));
+						System.out.println("Last IntObj: " + Arrays.toString(intObj.getPoints().getLast()));
 						return intObj;
 					}
 					if (Rn.innerProduct(orientation,IntegralCurves.getMaxMinCurv(ns, u.getLast()[0],u.getLast()[1], max)) > 0) {
@@ -167,6 +168,7 @@ public class IntegralCurves {
 				}
 			}
 		IntObjects intObj = new IntObjects(u, ori, nearBy, max);
+		System.out.println("letzter Punkt: "+Arrays.toString(intObj.points.getLast()));
 		return intObj;
 	}
 	
