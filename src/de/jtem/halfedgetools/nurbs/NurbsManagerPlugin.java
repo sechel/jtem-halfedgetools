@@ -19,9 +19,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,8 +42,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
-
-import com.thoughtworks.xstream.XStream;
 
 import de.jreality.geometry.PointSetFactory;
 import de.jreality.math.Rn;

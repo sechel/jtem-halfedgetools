@@ -1,13 +1,10 @@
 package de.jtem.halfedgetools.nurbs;
 
 import java.util.LinkedList;
-import java.util.List;
-
-import org.junit.Test;
-
-import com.thoughtworks.xstream.XStream;
 
 import junit.framework.Assert;
+
+import org.junit.Test;
 
 public class IntersectionTests {
 	
