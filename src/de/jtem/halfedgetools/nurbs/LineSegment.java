@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.nurbs;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 public class LineSegment {
@@ -71,7 +72,7 @@ public class LineSegment {
 	public String toString() {
 		return //"LineSegmentIntersection [segment=" + Arrays.toString(segment[0]) + " " + Arrays.toString(segment[1])
 				//+ ", index=" + indexOnCurve +
-				curveIndex+ "|" + indexOnCurve;
+				curveIndex+ "|" + indexOnCurve;// + " endpoints " + Arrays.toString(segment[0]) + Arrays.toString(segment[1]);
 	}
 	
 

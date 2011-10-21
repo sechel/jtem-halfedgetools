@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -42,6 +43,9 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
+
+import compgeom.RLineSegment2D;
+import compgeom.RPoint2D;
 
 import de.jreality.geometry.PointSetFactory;
 import de.jreality.math.Rn;
@@ -423,7 +427,9 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			eps = Math.pow(10, eps);
 			double stepSize = stepSizeModel.getNumber().doubleValue();
 			stepSize = Math.pow(10, stepSize);
-			Set<Vertex<?,?,?>> verts = hif.getSelection().getVertices();
+			Set<Vertex<?,?,?>> verticies = hif.getSelection().getVertices();
+			LinkedList<Vertex<?,?,?>> verts = new LinkedList<Vertex<?,?,?>>(verticies);
+			Collections.sort(verts, new VertexComparator());
 			AdapterSet as = hif.getAdapters();
 			int n = 201;
 			LinkedList<double[]> umbilics = IntegralCurves.umbilicPoints(surfaces.get(surfacesTable.getSelectedRow()), n);
@@ -527,7 +533,10 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //				for (LineSegment s : allSegments) {
 //					System.out.println(Arrays.toString(s.segment[0]) +"  " + Arrays.toString(s.segment[1]) + "index: " + s.curveIndex);
 //				}
-				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.findIntersections(allSegments);
+//				Map<RPoint2D, Set<RLineSegment2D>> SetIntersections = LineSegmentIntersection.BentleyOttmannAlgoritm(allSegments);
+//				System.out.println("Start of my algorithm");
+//				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.findIntersections(allSegments);
+				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(allSegments);
 				LinkedList<HalfedgePoint> hp = LineSegmentIntersection.findAllNbrs(intersections);
 				LinkedList<HalfedgePoint> H = LineSegmentIntersection.orientedNbrs(hp);
 				System.out.println("INTERSECTION SIZE "+intersections.size());
