@@ -22,5 +22,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/java2dx"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jreality"/>
 	<classpathentry kind="lib" path="lib/mtj.jar"/>
+	<classpathentry kind="lib" path="lib/CompGeom-0.3_seidel.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

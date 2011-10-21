@@ -1,23 +1,26 @@
 package de.jtem.halfedgetools.nurbs;
 
 import java.util.LinkedList;
-
-import junit.framework.Assert;
+import java.util.List;
 
 import org.junit.Test;
+
+import com.thoughtworks.xstream.XStream;
+
+import junit.framework.Assert;
 
 public class IntersectionTests {
 	
 	
-//	@SuppressWarnings("unchecked")
-//	@Test
-//	public void testIntersection02() {
-//		XStream x = new XStream();
-//		Object intersectionsObj = x.fromXML(IntersectionTests.class.getResourceAsStream("testSegments.xml"));
-//		List<LineSegment> segments = (List<LineSegment>) intersectionsObj;
-//		LinkedList<IntersectionPoint> iP = LineSegmentIntersection.findIntersections(segments);
-//		Assert.assertEquals("number of intersections", 16, iP.size());
-//	}
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testIntersection02() {
+		XStream x = new XStream();
+		Object intersectionsObj = x.fromXML(IntersectionTests.class.getResourceAsStream("testSegments.xml"));
+		List<LineSegment> segments = (List<LineSegment>) intersectionsObj;
+		LinkedList<IntersectionPoint> iP = LineSegmentIntersection.findIntersections(segments);
+		Assert.assertEquals("number of intersections", 16, iP.size());
+	}
 	
 	
 	@Test
@@ -208,6 +211,82 @@ public class IntersectionTests {
 		segmentsT.add(seg6_1);
 		segmentsT.add(seg6_2);
 		LinkedList<IntersectionPoint> iP = LineSegmentIntersection.findIntersections(segmentsT);
+		Assert.assertTrue(iP.size() == 9);
+	}
+	
+	@Test
+	public void testSweepLineAlgorithm03(){
+		
+		/*
+		 * this is the example from NURBS-Surface c1 if you select the highest  right vertex 
+		 */
+		double[] p1 = {0.0010, 0.999};
+		double[] p2 = {0.1111111111111111, 1.0};
+		double[] p3 = {0.999, 0.999};
+		double[] p4 = {0.0, 0.1111111111111111};
+		double[] p5 = {0.1111111111111111, 0.1111111111111111};
+		double[] p6 = {1.0, 0.11111111111111112};
+		double[] p7 = {0.0010, 0.0010};
+		double[] p8 = {0.1111111111111111, 0.0};
+		double[] p9 = {0.999, 0.0010};
+		LineSegment seg1_1 = new LineSegment();
+		seg1_1.segment = new double[2][];
+		seg1_1.segment[0] = p9;
+		seg1_1.segment[1] = p7;
+		seg1_1.curveIndex = 1;
+		seg1_1.indexOnCurve = 1;
+		LineSegment seg2_1 = new LineSegment();
+		seg2_1.segment = new double[2][];
+		seg2_1.segment[0] = p9;
+		seg2_1.segment[1] = p3;
+		seg2_1.curveIndex = 2;
+		seg2_1.indexOnCurve = 1;
+		LineSegment seg3_1 = new LineSegment();
+		seg3_1.segment = new double[2][];
+		seg3_1.segment[0] = p1;
+		seg3_1.segment[1] = p3;
+		seg3_1.curveIndex = 3;
+		seg3_1.indexOnCurve = 1;
+		LineSegment seg4_1 = new LineSegment();
+		seg4_1.segment = new double[2][];
+		seg4_1.segment[0] = p1;
+		seg4_1.segment[1] = p7;
+		seg4_1.curveIndex = 4;
+		seg4_1.indexOnCurve = 1;
+		LineSegment seg5_2 = new LineSegment();
+		seg5_2.segment = new double[2][];
+		seg5_2.segment[0] = p4;
+		seg5_2.segment[1] = p5;
+		seg5_2.curveIndex = 5;
+		seg5_2.indexOnCurve = 2;
+		LineSegment seg5_3 = new LineSegment();
+		seg5_3.segment = new double[2][];
+		seg5_3.segment[0] = p6;
+		seg5_3.segment[1] = p5;
+		seg5_3.curveIndex = 5;
+		seg5_3.indexOnCurve = 3;
+		LineSegment seg6_2 = new LineSegment();
+		seg6_2.segment = new double[2][];
+		seg6_2.segment[0] = p2;
+		seg6_2.segment[1] = p5;
+		seg6_2.curveIndex = 6;
+		seg6_2.indexOnCurve = 2;
+		LineSegment seg6_3 = new LineSegment();
+		seg6_3.segment = new double[2][];
+		seg6_3.segment[0] = p8;
+		seg6_3.segment[1] = p5;
+		seg6_3.curveIndex = 6;
+		seg6_3.indexOnCurve = 3;
+		LinkedList<LineSegment> seg = new LinkedList<LineSegment>();
+		seg.add(seg1_1);
+		seg.add(seg2_1);
+		seg.add(seg3_1);
+		seg.add(seg4_1);
+		seg.add(seg5_2);
+		seg.add(seg5_3);
+		seg.add(seg6_2);
+		seg.add(seg6_3);
+		LinkedList<IntersectionPoint> iP = LineSegmentIntersection.findIntersections(seg);
 		Assert.assertTrue(iP.size() == 9);
 	}
 
