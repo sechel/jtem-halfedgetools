@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -65,6 +66,10 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			normalizeChecker = new JCheckBox("Normalize");
 	private JPanel optionsPanel = new JPanel();
 
+	private JComboBox colorChooser;
+	private Color[] colors = { Color.RED, Color.GREEN, Color.BLUE, Color.CYAN,
+			Color.MAGENTA, Color.YELLOW, Color.ORANGE, Color.PINK, Color.BLACK };
+
 	private VectorFieldVisualization actVis = null;
 	private boolean listenersDisabled = false;
 
@@ -85,15 +90,22 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		normalizeChecker.setSelected(true);
 		normalizeChecker.addActionListener(this);
 
-		optionsPanel.add(tubesChecker, cr);
+		String[] colornames = { "RED", "GREEN", "BLUE", "CYAN", "MAGENTA",
+				"YELLOW", "ORANGE", "PINK", "BLACK"};
+		colorChooser = new JComboBox(colornames);
+		optionsPanel.add(colorChooser,cr);
+		colorChooser.addActionListener(this);
+		
+		optionsPanel.add(tubesChecker, cl);
 		tubesChecker.addActionListener(this);
+		
+		optionsPanel.add(directedChecker, cr);
+		directedChecker.addActionListener(this);
 
 		optionsPanel.add(new JLabel("Thickness"), cl);
 		optionsPanel.add(thicknessSpinner, cr);
 		thicknessSpinner.addChangeListener(this);
 
-		optionsPanel.add(directedChecker, cl);
-		directedChecker.addActionListener(this);
 
 		checkTubesEnabled();
 	}
@@ -131,6 +143,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		vis.tubesenabled = tubesChecker.isSelected();
 		vis.directed = directedChecker.isSelected();
 		vis.normalize = normalizeChecker.isSelected();
+		vis.color = colors[colorChooser.getSelectedIndex()];
 		layer.addTemporaryGeometry(vis.vectorsComponent);
 
 		return vis;
@@ -161,6 +174,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		actVis.tubesenabled = tubesChecker.isSelected();
 		actVis.directed = directedChecker.isSelected();
 		actVis.normalize = normalizeChecker.isSelected();
+		actVis.color = colors[colorChooser.getSelectedIndex()];
 		actVis.update();
 	}
 
@@ -174,6 +188,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		protected double scale = 1., thickness = 1.;
 		protected boolean tubesenabled = false, directed = false,
 				normalize = true;
+		protected Color color = Color.RED;
 
 		public VectorFieldVisualization(HalfedgeLayer layer, Adapter<?> source,
 				DataVisualizer visualizer, NodeType type) {
@@ -181,10 +196,8 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			initLineAppearance();
 			vectorsComponent.setAppearance(vectorFieldApp);
 		}
-		
+
 		private void initLineAppearance() {
-			vectorFieldApp.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR,
-					Color.RED);
 			vectorFieldApp.setAttribute(LINE_SHADER + "." + DEPTH_FUDGE_FACTOR,
 					0.88888);
 			vectorFieldApp.setAttribute(EDGE_DRAW, true);
@@ -195,10 +208,10 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			vectorFieldApp.setAttribute(LINE_SHADER + "." + PICKABLE, false);
 			vectorFieldApp.setAttribute(DEPTH_FUDGE_FACTOR, 0.9999);
 
-			vectorFieldApp.setAttribute(LINE_SHADER + "." + POLYGON_SHADER + "."
-					+ SMOOTH_SHADING, true);
-			vectorFieldApp
-					.setAttribute(POLYGON_SHADER + "." + SMOOTH_SHADING, true);
+			vectorFieldApp.setAttribute(LINE_SHADER + "." + POLYGON_SHADER
+					+ "." + SMOOTH_SHADING, true);
+			vectorFieldApp.setAttribute(POLYGON_SHADER + "." + SMOOTH_SHADING,
+					true);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -248,6 +261,8 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 
 			vectorFieldApp.setAttribute(LINE_SHADER + "." + TUBES_DRAW,
 					tubesenabled);
+			vectorFieldApp.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR,
+					color);
 
 			updateVectorsComponent();
 		}
@@ -266,9 +281,8 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			E extends Edge<V, E, F>, 
 			F extends Face<V, E, F>, 
 			N extends Node<V, E, F>
-		> IndexedLineSet generateSimpleVectorLineSet(
-				Collection<N> nodes, Adapter<double[]> vec, AdapterSet aSet,
-				double meanEdgeLength) {
+		> IndexedLineSet generateSimpleVectorLineSet(Collection<N> nodes, 
+				Adapter<double[]> vec, AdapterSet aSet, double meanEdgeLength) {
 
 			IndexedLineSetFactory ilf = new IndexedLineSetFactory();
 			if (nodes.size() == 0) {
@@ -296,9 +310,8 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			E extends Edge<V, E, F>, 
 			F extends Face<V, E, F>, 
 			N extends Node<V, E, F>
-		> IndexedLineSet generateTubedVectorArrows(
-				Collection<N> nodes, Adapter<double[]> vec, AdapterSet aSet,
-				double meanEdgeLength, boolean arrows) {
+		> IndexedLineSet generateTubedVectorArrows(Collection<N> nodes, 
+				Adapter<double[]> vec, AdapterSet aSet, double meanEdgeLength, boolean arrows) {
 
 			IndexedLineSetFactory ilsf = new IndexedLineSetFactory();
 			if (nodes.size() == 0) {
@@ -346,7 +359,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 				radii[i + 1 * numOfVectors] = thickness;
 				radii[i + 2 * numOfVectors] = thickness;
 
-				edgecolors[i] = Color.yellow;
+				edgecolors[i] = color;
 
 				if (arrows) {
 					edges[i] = new int[] { i + 0 * numOfVectors,
@@ -366,7 +379,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 					edges[i + numOfVectors] = new int[] { i + 3 * numOfVectors,
 							i + 4 * numOfVectors, i + 5 * numOfVectors };
 
-					edgecolors[i + numOfVectors] = Color.red;
+					edgecolors[i + numOfVectors] = Color.black;
 				} else {
 					coords[i + 3 * numOfVectors] = Rn.add(null, targetcoords,
 							Rn.setEuclideanNorm(null, 0.001, vector));
@@ -393,7 +406,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 
 			ilsf.update();
 			return ilsf.getIndexedLineSet();
-			
+
 		}
 
 		private <
@@ -401,8 +414,8 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			E extends Edge<V, E, F>, 
 			F extends Face<V, E, F>, 
 			N extends Node<V, E, F>
-		> void getVectors(Collection<N> nodes, Adapter<double[]> vec,
-				AdapterSet aSet, double meanEdgeLength, List<double[]> vData,
+		> void getVectors(Collection<N> nodes, Adapter<double[]> vec, 
+				AdapterSet aSet, double meanEdgeLength, List<double[]> vData, 
 				List<int[]> iData) {
 			aSet.setParameter("alpha", .5);
 			for (N node : nodes) {
