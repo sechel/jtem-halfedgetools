@@ -170,7 +170,7 @@ public class VectorFieldManager extends ShrinkPanelPlugin implements ActionListe
 		activeFields = active; 
 		fieldTable.setModel(new VectorFieldTableModel());
 		fieldTable.getColumnModel().getColumn(0).setMaxWidth(30);
-		panel.updateUI();
+		panel.validate();
 	}
 	
 	@Override

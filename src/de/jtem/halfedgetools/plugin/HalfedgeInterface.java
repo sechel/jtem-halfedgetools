@@ -726,8 +726,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		deleteLayerAction.setEnabled(layers.size() > 1);
 		undoAction.setEnabled(activeLayer.canUndo());
 		redoAction.setEnabled(activeLayer.canRedo());
-		undoButton.updateUI();
-		redoButton.updateUI();
+		undoButton.validate();
+		redoButton.validate();
 		
 		HalfedgeLayer layer = getActiveLayer();
 		int index = layers.indexOf(layer);
