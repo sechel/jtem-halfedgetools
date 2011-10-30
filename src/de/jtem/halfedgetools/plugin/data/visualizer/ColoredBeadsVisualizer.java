@@ -120,7 +120,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		actVis.update();
 	}
 	
-	private class ColoredBeadsVisualization extends AbstractDataVisualization {
+	public class ColoredBeadsVisualization extends AbstractDataVisualization {
 		
 		private double
 			span = 1.0,
@@ -135,6 +135,8 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			psf = new PointSetFactory();
 		private Adapter<double[]>
 			beadPosAdapter = null;
+		private boolean cutSmallValues= false;
+		private double smallestAbsolutValue= 1E-10;
 		
 		public ColoredBeadsVisualization(
 			HalfedgeLayer layer, 
@@ -217,7 +219,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 				double[] numbers = convertValue(val);
 				for (int j = 0; j < numbers.length; j++) {
 					double v = numbers[j];
-					colorData[i] = colorMap.getColor(v, min, max);
+					colorData[i] = colorMap.getColor(v, min, max);					
 					sizeData[i++] = mapScale(v, scale, span, invert, min, max, mean, meanEdgeLength / 4);
 				}
 			}
@@ -238,6 +240,17 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			updateBeadsComponent();
 		}
 		
+		private double mapScale(double val, double scale, double span,
+				boolean invert, double min, double max, double mean,
+				double resultMean) {
+			if(Math.abs(val)<smallestAbsolutValue)
+				return 0;
+			double dist = max - min;
+			double offset = (1 - span) * resultMean * scale;
+			double nomaleVal = (val - min) / dist;
+			double result = offset + span * resultMean * scale * (invert ? 1 - nomaleVal : nomaleVal);
+			return max(result, 0);
+		}
 		
 		private double[] convertValue(Object val) {
 			double[] numbers = new double[0];
@@ -268,17 +281,54 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			layer.addTemporaryGeometry(beadsComponent);
 		}
 		
-	}
-	
-	
-	private double mapScale(double val, double scale, double span,
-			boolean invert, double min, double max, double mean,
-			double resultMean) {
-		double dist = max - min;
-		double offset = (1 - span) * resultMean * scale;
-		double nomaleVal = (val - min) / dist;
-		double result = offset + span * resultMean * scale * (invert ? 1 - nomaleVal : nomaleVal);
-		return max(result, 0);
+		public double getSpan() {
+			return span;
+		}
+
+		public void setSpan(double span) {
+			this.span = span;
+		}
+
+		public double getScale() {
+			return scale;
+		}
+
+		public void setScale(double scale) {
+			this.scale = scale;
+		}
+
+		public boolean isInvert() {
+			return invert;
+		}
+
+		public void setInvert(boolean invert) {
+			this.invert = invert;
+		}
+
+		public ColorMap getColorMap() {
+			return colorMap;
+		}
+
+		public void setColorMap(ColorMap colorMap) {
+			this.colorMap = colorMap;
+		}
+
+		public boolean isCutSmallValues() {
+			return cutSmallValues;
+		}
+
+		public void setCutSmallValues(boolean dontShowZeros) {
+			this.cutSmallValues = dontShowZeros;
+		}
+
+		public double getSmallestAbsolutValue() {
+			return smallestAbsolutValue;
+		}
+
+		public void setSmallestAbsolutValue(double smallestValue) {
+			this.smallestAbsolutValue = smallestValue;
+		}
+
 	}
 	
 	

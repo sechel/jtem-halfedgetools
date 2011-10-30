@@ -178,17 +178,17 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		actVis.update();
 	}
 
-	private class VectorFieldVisualization extends AbstractDataVisualization {
+	public class VectorFieldVisualization extends AbstractDataVisualization {
 
 		private SceneGraphComponent vectorsComponent = new SceneGraphComponent(
 				"Vectors");
 		private Appearance vectorFieldApp = new Appearance(
 				"Vector Field Appearance");
 
-		protected double scale = 1., thickness = 1.;
-		protected boolean tubesenabled = false, directed = false,
+		private double scale = 1., thickness = 1.;
+		private boolean tubesenabled = false, directed = false,
 				normalize = true;
-		protected Color color = Color.RED;
+		private Color color = Color.RED;
 
 		public VectorFieldVisualization(HalfedgeLayer layer, Adapter<?> source,
 				DataVisualizer visualizer, NodeType type) {
@@ -446,6 +446,54 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			HalfedgeLayer layer = getLayer();
 			layer.removeTemporaryGeometry(vectorsComponent);
 			layer.addTemporaryGeometry(vectorsComponent);
+		}
+
+		public double getScale() {
+			return scale;
+		}
+
+		public void setScale(double scale) {
+			this.scale = scale;
+		}
+
+		public double getThickness() {
+			return thickness;
+		}
+
+		public void setThickness(double thickness) {
+			this.thickness = thickness;
+		}
+
+		public boolean isTubesenabled() {
+			return tubesenabled;
+		}
+
+		public void setTubesenabled(boolean tubesenabled) {
+			this.tubesenabled = tubesenabled;
+		}
+
+		public boolean isDirected() {
+			return directed;
+		}
+
+		public void setDirected(boolean directed) {
+			this.directed = directed;
+		}
+
+		public boolean isNormalize() {
+			return normalize;
+		}
+
+		public void setNormalize(boolean normalize) {
+			this.normalize = normalize;
+		}
+
+		public Color getColor() {
+			return color;
+		}
+
+		public void setColor(Color color) {
+			this.color = color;
 		}
 
 	}
