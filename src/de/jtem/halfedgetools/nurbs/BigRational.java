@@ -182,6 +182,8 @@ public class BigRational
 //	implements Comparable<BigRational>
 {
 
+	private static final long serialVersionUID = 1L;
+
 	/** Numerator.
 	* Numerator may be negative.
 	* Numerator may be zero, in which case m_q must be one.
@@ -2743,6 +2745,7 @@ public class BigRational
 	* Comparable&lt;Object&gt; is declared to be implemented
 	* rather than Comparable&lt;BigRational&gt;.
 	*/
+	@Override
 	public int compareTo(Object object) {
 		if (object instanceof Byte) {
 			return compareTo(((Byte)object).longValue());

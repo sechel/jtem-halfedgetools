@@ -800,11 +800,11 @@ public class LineSegmentIntersection {
 //		System.out.println("for intersection checked segments:");
 //		System.out.println("sr " + sr.toString() + " sl " + sl.toString());
 //		boolean reversedIntersection = twoSegmentIntersection(sr, sl);
-		EventPoint next = eventPoints.peek();
+//		EventPoint next = eventPoints.peek();
 		double[] intersectionPoint = intersectionPoint(sl, sr, p);
 		double[] reversedIntersectionPoint = intersectionPoint(sr, sl, p);
 		// new
-		double currEps = Math.min(conditionalEps(sl), conditionalEps(sr));
+//		double currEps = Math.min(conditionalEps(sl), conditionalEps(sr));
 //		if((intersectionPoint[1] - p.point[1]) < currEps){
 //			intersectionPoint[1] = p.point[1] - intersectionPoint[1];
 //		}

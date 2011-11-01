@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -43,9 +42,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
-
-import compgeom.RLineSegment2D;
-import compgeom.RPoint2D;
 
 import de.jreality.geometry.PointSetFactory;
 import de.jreality.math.Rn;
@@ -270,6 +266,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 			
 		}
 		
+		@Override
 		public void actionPerformed(ActionEvent e){
 			double tol = tolExpModel.getNumber().doubleValue();
 			tol = Math.pow(10, tol);
@@ -420,6 +417,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 		}
 		
 		
+		@Override
 		public void actionPerformed(ActionEvent e){
 			double tol = tolExpModel.getNumber().doubleValue();
 			tol = Math.pow(10, tol);

@@ -14,6 +14,7 @@ public class TreeSegmentComparator implements Comparator<LineSegment>{
 	public LinkedList<EventPointSegmentList> eventPointSegmentList;
 	
 	
+	@Override
 	public int compare(LineSegment s1, LineSegment s2){
 		double a1;
 		double a2;
@@ -132,12 +133,12 @@ public class TreeSegmentComparator implements Comparator<LineSegment>{
 		return result;
 	}
 	
-	private boolean isHorizontal(LineSegment ls){
-		if(ls.segment[0][1] == ls.segment[1][1]){
-			return true;
-		}
-		return false;
-	}
+//	private boolean isHorizontal(LineSegment ls){
+//		if(ls.segment[0][1] == ls.segment[1][1]){
+//			return true;
+//		}
+//		return false;
+//	}
 	
 
 }
