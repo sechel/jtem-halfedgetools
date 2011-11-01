@@ -85,8 +85,8 @@ public class JRHalfedgeViewer {
 	
 	
 	public static void main(String[] args) {
-		initHalfedgeFronted();
 		JRViewer v = new JRViewer();
+		initHalfedgeFronted();
 		v.setPropertiesFile("JRHalfedgeViewer.xml");
 		v.setPropertiesResource(JRHalfedgeViewer.class, "JRHalfedgeViewer.xml");
 		v.addContentUI();
@@ -94,7 +94,7 @@ public class JRHalfedgeViewer {
 		v.addContentSupport(ContentType.Raw);
 		v.registerPlugins(HalfedgePluginFactory.createPlugins());
 		v.registerPlugin(ConsolePlugin.class);
-		v.getController().setManageLookAndFeel(true);
+		v.getController().setManageLookAndFeel(false);
 		addLnFPlugins(v);
 		v.startup(); 
 	}
