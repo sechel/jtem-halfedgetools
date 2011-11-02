@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -486,17 +487,17 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				// default patch
 				List<LineSegment> allSegments = new LinkedList<LineSegment>(segments);
 				LinkedList<LineSegment> boundarySegments = new LinkedList<LineSegment>();
-				double[][] seg1 = {{0.001,0.001},{0.999,0.001}};
-//				double[][] seg1 = {{0,0},{1,0}};
+//				double[][] seg1 = {{0.001,0.001},{0.999,0.001}};
+				double[][] seg1 = {{0,0},{1,0}};
 				LineSegment b1 = new LineSegment(seg1, 1, 1, true);
-				double[][] seg2 = {{0.999,0.001},{0.999,0.999}};
-//				double[][] seg2 = {{1,0},{1,0}};
+//				double[][] seg2 = {{0.999,0.001},{0.999,0.999}};
+				double[][] seg2 = {{1,0},{1,1}};
 				LineSegment b2 = new LineSegment(seg2, 1, 2, true);
-				double[][] seg3 = {{0.999,0.999},{0.001,0.999}};
-//				double[][] seg3 = {{1,1},{0,1}};
+//				double[][] seg3 = {{0.999,0.999},{0.001,0.999}};
+				double[][] seg3 = {{1,1},{0,1}};
 				LineSegment b3 = new LineSegment(seg3, 1, 3, true);
-				double[][] seg4 = {{0.001,0.999},{0.001,0.001}};
-//				double[][] seg4 = {{0,1},{0,0}};
+//				double[][] seg4 = {{0.001,0.999},{0.001,0.001}};
+				double[][] seg4 = {{0,1},{0,0}};
 				LineSegment b4 = new LineSegment(seg4, 1, 4, true);
 				boundarySegments.add(b1);
 				boundarySegments.add(b2);
@@ -528,13 +529,21 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 //				}
 //				System.out.println("PRINT OUT END");
 				
-//				for (LineSegment s : allSegments) {
-//					System.out.println(Arrays.toString(s.segment[0]) +"  " + Arrays.toString(s.segment[1]) + "index: " + s.curveIndex);
-//				}
+				for (LineSegment s : allSegments) {
+					System.out.println(Arrays.toString(s.segment[0]) +"  "+ Arrays.toString(s.segment[1]) + " index: " + s.curveIndex + " indexOnCurve " + s.indexOnCurve);
+					
+				}
 //				Map<RPoint2D, Set<RLineSegment2D>> SetIntersections = LineSegmentIntersection.BentleyOttmannAlgoritm(allSegments);
 //				System.out.println("Start of my algorithm");
 //				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.findIntersections(allSegments);
 				LinkedList<IntersectionPoint> intersections = LineSegmentIntersection.BentleyOttmannAlgoritm(allSegments);
+//				for (IntersectionPoint ip : intersections) {
+//					System.out.println("intersectionpoint " + Arrays.toString(ip.point));
+//					System.out.println("Segments");
+//					for (LineSegment ls : ip.intersectingSegments) {
+//						System.out.println(Arrays.toString(ls.segment[0]) +"  " + Arrays.toString(ls.segment[1]) + "index: " + ls.curveIndex + " indexOnCurve " + ls.indexOnCurve);
+//					}
+//				}
 				LinkedList<HalfedgePoint> hp = LineSegmentIntersection.findAllNbrs(intersections);
 				LinkedList<HalfedgePoint> H = LineSegmentIntersection.orientedNbrs(hp);
 				System.out.println("INTERSECTION SIZE "+intersections.size());
