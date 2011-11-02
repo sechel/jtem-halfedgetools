@@ -9,6 +9,7 @@ public class IntObjects {
 	protected double[] orientation;
 	protected boolean nearby;
 	protected boolean maxMin;
+	protected boolean cyclic = false;
 	protected int umbilicIndex;
 	
 	public int getUmbilicIndex() {
@@ -59,6 +60,10 @@ public class IntObjects {
 
 	public void setNearby(boolean nearby) {
 		this.nearby = nearby;
+	}
+
+	public void setCyclic(boolean b) {
+		cyclic = b;
 	}
 
 }
