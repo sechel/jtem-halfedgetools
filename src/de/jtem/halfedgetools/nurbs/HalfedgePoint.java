@@ -5,9 +5,11 @@ import java.util.LinkedList;
 
 public class HalfedgePoint {
 	
+	
+
 	protected IntersectionPoint point;
 	protected LinkedList<IntersectionPoint> nbrs;
-	protected LinkedList<IntersectionPoint> usedNbrs;
+	protected LinkedList<IntersectionPoint> unusedNbrs;
 	
 	
 
@@ -27,8 +29,17 @@ public class HalfedgePoint {
 			LinkedList<IntersectionPoint> minNbrs) {
 		super();
 		this.point = point;
-		this.usedNbrs = maxNbrs;
+		this.unusedNbrs = maxNbrs;
 	}
+
+	public LinkedList<IntersectionPoint> getNbrs() {
+		return nbrs;
+	}
+
+	public void setNbrs(LinkedList<IntersectionPoint> nbrs) {
+		this.nbrs = nbrs;
+	}
+
 
 
 
@@ -41,12 +52,12 @@ public class HalfedgePoint {
 	}
 
 
-	public LinkedList<IntersectionPoint> getMaxNbrs() {
-		return usedNbrs;
+	public LinkedList<IntersectionPoint> getUnusedNbrs() {
+		return unusedNbrs;
 	}
 
-	public void setMaxNbrs(LinkedList<IntersectionPoint> maxNbrs) {
-		this.usedNbrs = maxNbrs;
+	public void setUnusedNbrs(LinkedList<IntersectionPoint> unusedNbrs) {
+		this.unusedNbrs = unusedNbrs;
 	}
 
 
@@ -54,11 +65,11 @@ public class HalfedgePoint {
 
 	@Override
 	public String toString() {
-		System.out.println("HalfedgePoint:");
+		System.out.println("HalfedgePoint:" + Arrays.toString(point.point));
 		for (IntersectionPoint n : nbrs) {
 			System.out.println(Arrays.toString(n.point));
 		}
-		return "HalfedgePoint [point=" + point +  "]";
+		return "";
 	}
 	
 	
