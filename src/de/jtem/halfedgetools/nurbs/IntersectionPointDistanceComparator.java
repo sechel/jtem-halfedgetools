@@ -7,7 +7,7 @@ public class IntersectionPointDistanceComparator implements
 
 	@Override
 	public int compare(IntersectionPoint o1, IntersectionPoint o2) {
-		return (int)Math.signum(o1.sameIndexDist-o2.sameIndexDist);
+		return (int)Math.signum(o1.sameIndexDist - o2.sameIndexDist);
 	}
 
 }
