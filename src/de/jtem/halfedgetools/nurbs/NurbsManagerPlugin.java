@@ -630,11 +630,6 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				all.add(first);
 				noSegment = all.size();
 			}
-			//only debugging
-//			for (double[] ds : all) {
-//				System.out.println(Arrays.toString(ds));
-//			}
-			//
 			int index = 0;
 			double[] firstcurvePoint = all.getFirst();
 			for (double[] secondCurvePoint : all) {
