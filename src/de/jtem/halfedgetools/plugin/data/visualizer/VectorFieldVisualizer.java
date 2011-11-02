@@ -188,7 +188,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		private double scale = 1., thickness = 1.;
 		private boolean tubesenabled = false, directed = false,
 				normalize = true;
-		private Color color = Color.RED;
+		private Color color = Color.BLACK;
 
 		public VectorFieldVisualization(HalfedgeLayer layer, Adapter<?> source,
 				DataVisualizer visualizer, NodeType type) {
