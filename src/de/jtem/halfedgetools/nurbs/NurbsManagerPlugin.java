@@ -623,6 +623,7 @@ public class NurbsManagerPlugin extends ShrinkPanelPlugin implements ActionListe
 				all.addAll(intObj.getPoints());
 			}else{
 				//add the first element of a closed curve
+				intObj.setCyclic(true);
 				System.out.println("add first");
 				double[] first = new double [2];
 				first[0] = all.getFirst()[0];
