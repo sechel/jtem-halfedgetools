@@ -182,6 +182,9 @@ public class BigRational
 //	implements Comparable<BigRational>
 {
 
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 
 	/** Numerator.

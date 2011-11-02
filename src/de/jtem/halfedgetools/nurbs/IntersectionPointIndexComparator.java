@@ -6,16 +6,20 @@ public class IntersectionPointIndexComparator implements Comparator<Intersection
 	
 	public int curveIndex;
 	
-	@Override
+	@Override	
 	public int compare(IntersectionPoint ip1, IntersectionPoint ip2) {
-		for (LineSegment seg1 : ip1.intersectingSegments) {
-			for (LineSegment seg2 : ip2.intersectingSegments) {
-				if(seg1.curveIndex == curveIndex && seg2.curveIndex == curveIndex){
-					return (int)Math.signum(seg1.indexOnCurve - seg2.indexOnCurve);
-				}
+		
+		return (int)Math.signum(getIndexOnCurveFromCurveIndexAndIntersectionPoint(curveIndex, ip1)- getIndexOnCurveFromCurveIndexAndIntersectionPoint(curveIndex, ip2));
+	}
+	
+	private static int getIndexOnCurveFromCurveIndexAndIntersectionPoint(int curveIndex, IntersectionPoint iP){
+		int result = 0;
+		for (LineSegment seg : iP.intersectingSegments) {
+			if(seg.curveIndex == curveIndex && result < seg.indexOnCurve){
+				result = seg.indexOnCurve;
 			}
 		}
-		return 0;
+		return result;
 	}
 }
 
