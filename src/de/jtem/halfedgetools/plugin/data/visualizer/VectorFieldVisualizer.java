@@ -93,6 +93,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		String[] colornames = { "RED", "GREEN", "BLUE", "CYAN", "MAGENTA",
 				"YELLOW", "ORANGE", "PINK", "BLACK"};
 		colorChooser = new JComboBox(colornames);
+		colorChooser.setSelectedIndex(8);
 		optionsPanel.add(colorChooser,cr);
 		colorChooser.addActionListener(this);
 		
