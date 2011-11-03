@@ -127,6 +127,9 @@ public class Sqrt3 {
 		for(E oldE : oldHeds.getEdges()) {
 			E flipE = newHeds.getEdge(oldE.getIndex());
 			oldEtoNewE.put(oldE, flipE);
+			if (flipE.isPositive()) {
+				flip(flipE);
+			}
 		}
 		
 		//set coordinates for the old points
@@ -142,14 +145,13 @@ public class Sqrt3 {
 			double[] pos = oldFtoPos.get(of);
 			a.set(Position.class, nv, pos);
 		}		
-			
-		return oldEtoNewE;
 		
+		return oldEtoNewE;
 	}
 
 
 	// return new HEDS triangulated
-	public  <
+	private <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
@@ -217,12 +219,13 @@ public class Sqrt3 {
 		}
 	}
 	
-	public <
+	private <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	>void flip (HDS newheds, E e){
+	>void flip (E e){
+		System.out.println("flip edge " + e);
 			//edges
 			E e1 = e.getNextEdge();
 			E e2 = e1.getNextEdge();
