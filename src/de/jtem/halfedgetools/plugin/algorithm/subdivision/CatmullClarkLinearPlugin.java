@@ -38,6 +38,7 @@ import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.algorithm.subdivision.CatmullClarkLinear;
@@ -60,6 +61,9 @@ public class CatmullClarkLinearPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
+		if (HalfEdgeUtils.boundaryEdges(hds).size() != 0) {
+			throw new RuntimeException("This algorithm does not work on meshes with boundary yet.");
+		}
 		HDS hds2 = hcp.createEmpty(hds);
 		Map<V, V> vMap = new HashMap<V, V>();
 		Map<E, V> eMap = new HashMap<E, V>();

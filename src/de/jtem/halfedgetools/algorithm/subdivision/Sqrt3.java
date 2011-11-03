@@ -40,7 +40,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.adapter.TypedAdapterSet;
+import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
 import de.jtem.halfedgetools.adapter.type.generic.Position4d;
@@ -60,7 +60,7 @@ public class Sqrt3 {
 	> Map<E, E> subdivide(
 		HDS oldHeds, 
 		HDS newHeds, 
-		TypedAdapterSet<double[]> a
+		AdapterSet a
 	) {
 		Map<V,F> newVtoOldF = new HashMap<V,F>();
 		Map<V, double[]> oldVtoPos = new HashMap<V, double[]>();
@@ -95,7 +95,7 @@ public class Sqrt3 {
 		
 		//calc coordinates for the new points
 		for(F oldF : oldHeds.getFaces()) {
-			oldFtoPos.put(oldF, a.get(Position4d.class, oldF));
+			oldFtoPos.put(oldF, a.getD(Position4d.class, oldF));
 		}
 		
 		
@@ -108,14 +108,14 @@ public class Sqrt3 {
 			for(E e : star) {
 				a.setParameter("alpha", 0.0);
 				a.setParameter("ignore", false);
-				Rn.add(mid, a.get(BaryCenter3d.class, e), mid);
+				Rn.add(mid, a.getD(BaryCenter3d.class, e), mid);
 			}
 			Rn.times(mid, 1.0 / deg, mid);	
 			
 			double[] newpos = new double[] {0,0,0};
 			double alpha = alphaMap.get(deg);
 			
-			Rn.linearCombination(newpos, 1.0 - alpha, a.get(BaryCenter3d.class, v), alpha, mid);
+			Rn.linearCombination(newpos, 1.0 - alpha, a.getD(BaryCenter3d.class, v), alpha, mid);
 			
 			oldVtoPos.put(v, newpos);			
 		}
