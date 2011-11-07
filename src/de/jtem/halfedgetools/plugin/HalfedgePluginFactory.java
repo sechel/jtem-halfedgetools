@@ -228,7 +228,7 @@ public class HalfedgePluginFactory {
 		s.addAll(createEditorModePlugins());
 		s.addAll(createDataVisualizationPlugins());
 		s.add(new GarlandHeckbertPlugin());
-		s.add(new VectorFieldManager());
+//		s.add(new VectorFieldManager());
 		s.add(new CurvatureVectorFields());
 		s.add(new HalfedgePreferencePage());
 		s.add(new CoordinatesPivot());
