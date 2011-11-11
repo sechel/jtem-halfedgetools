@@ -225,33 +225,34 @@ public class Sqrt3 {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	>void flip (E e){
-		System.out.println("flip edge " + e);
-			//edges
-			E e1 = e.getNextEdge();
-			E e2 = e1.getNextEdge();
-			E oe = e.getOppositeEdge();
-			E oe1 = oe.getNextEdge();
-			E oe2 = oe1.getNextEdge();
-			//faces
-			F f = e.getLeftFace();
-			F of = oe.getLeftFace();
-			//vertices
-			V vs = oe1.getTargetVertex();
-			V vt = e1.getTargetVertex();
-			
-			//face f
-			oe1.setLeftFace(f);
-			e.setTargetVertex(vt);
-			e.linkNextEdge(e2);
-			e2.linkNextEdge(oe1);
-			oe1.linkNextEdge(e);
-			
-			//face of
-			e1.setLeftFace(of);
-			oe.setTargetVertex(vs);
-			oe.linkNextEdge(oe2);
-			oe2.linkNextEdge(e1);
-			e1.linkNextEdge(oe);
+		// System.out.println("flip edge " + e);
+		
+		// edges
+		E e1 = e.getNextEdge();
+		E e2 = e1.getNextEdge();
+		E oe = e.getOppositeEdge();
+		E oe1 = oe.getNextEdge();
+		E oe2 = oe1.getNextEdge();
+		// faces
+		F f = e.getLeftFace();
+		F of = oe.getLeftFace();
+		// vertices
+		V vs = oe1.getTargetVertex();
+		V vt = e1.getTargetVertex();
+
+		// face f
+		oe1.setLeftFace(f);
+		e.setTargetVertex(vt);
+		e.linkNextEdge(e2);
+		e2.linkNextEdge(oe1);
+		oe1.linkNextEdge(e);
+
+		// face of
+		e1.setLeftFace(of);
+		oe.setTargetVertex(vs);
+		oe.linkNextEdge(oe2);
+		oe2.linkNextEdge(e1);
+		e1.linkNextEdge(oe);
 	}
 
  }
