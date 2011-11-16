@@ -68,7 +68,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 
 	private JComboBox colorChooser;
 	private Color[] colors = { Color.RED, Color.GREEN, Color.BLUE, Color.CYAN,
-			Color.MAGENTA, Color.YELLOW, Color.ORANGE, Color.PINK, Color.BLACK };
+			Color.MAGENTA, Color.YELLOW, Color.ORANGE, Color.PINK, Color.BLACK ,Color.WHITE};
 
 	private VectorFieldVisualization actVis = null;
 	private boolean listenersDisabled = false;
@@ -91,7 +91,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		normalizeChecker.addActionListener(this);
 
 		String[] colornames = { "RED", "GREEN", "BLUE", "CYAN", "MAGENTA",
-				"YELLOW", "ORANGE", "PINK", "BLACK"};
+				"YELLOW", "ORANGE", "PINK", "BLACK", "WHITE"};
 		colorChooser = new JComboBox(colornames);
 		colorChooser.setSelectedIndex(8);
 		optionsPanel.add(colorChooser,cr);
