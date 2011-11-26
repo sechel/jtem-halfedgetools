@@ -18,6 +18,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -68,7 +69,8 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 
 	private JComboBox colorChooser;
 	private Color[] colors = { Color.RED, Color.GREEN, Color.BLUE, Color.CYAN,
-			Color.MAGENTA, Color.YELLOW, Color.ORANGE, Color.PINK, Color.BLACK ,Color.WHITE};
+			Color.MAGENTA, Color.YELLOW, Color.ORANGE, Color.PINK, Color.BLACK,
+			Color.WHITE };
 
 	private VectorFieldVisualization actVis = null;
 	private boolean listenersDisabled = false;
@@ -91,22 +93,21 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		normalizeChecker.addActionListener(this);
 
 		String[] colornames = { "RED", "GREEN", "BLUE", "CYAN", "MAGENTA",
-				"YELLOW", "ORANGE", "PINK", "BLACK", "WHITE"};
+				"YELLOW", "ORANGE", "PINK", "BLACK", "WHITE" };
 		colorChooser = new JComboBox(colornames);
 		colorChooser.setSelectedIndex(8);
-		optionsPanel.add(colorChooser,cr);
+		optionsPanel.add(colorChooser, cr);
 		colorChooser.addActionListener(this);
-		
+
 		optionsPanel.add(tubesChecker, cl);
 		tubesChecker.addActionListener(this);
-		
+
 		optionsPanel.add(directedChecker, cr);
 		directedChecker.addActionListener(this);
 
 		optionsPanel.add(new JLabel("Thickness"), cl);
 		optionsPanel.add(thicknessSpinner, cr);
 		thicknessSpinner.addChangeListener(this);
-
 
 		checkTubesEnabled();
 	}
@@ -118,7 +119,10 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 
 	@Override
 	public boolean canRead(Adapter<?> a, NodeType type) {
-		return a.checkType(double[].class);
+		boolean accept = false;
+		accept |= a.checkType(double[][].class);
+		accept |= a.checkType(double[].class);
+		return accept;
 	}
 
 	@Override
@@ -248,9 +252,9 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 					.getMeanEdgeLength(hds, aSet);
 
 			IndexedLineSet ils = tubesenabled ? generateTubedVectorArrows(
-					nodes, (Adapter<double[]>) genericAdapter, aSet,
+					nodes, genericAdapter, aSet,
 					meanEdgeLength, directed) : generateSimpleVectorLineSet(
-					nodes, (Adapter<double[]>) genericAdapter, aSet,
+					nodes, genericAdapter, aSet,
 					meanEdgeLength);
 
 			clearVectorsComponent();
@@ -282,8 +286,9 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			E extends Edge<V, E, F>, 
 			F extends Face<V, E, F>, 
 			N extends Node<V, E, F>
-		> IndexedLineSet generateSimpleVectorLineSet(Collection<N> nodes, 
-				Adapter<double[]> vec, AdapterSet aSet, double meanEdgeLength) {
+		> IndexedLineSet generateSimpleVectorLineSet(
+				Collection<N> nodes, Adapter<?> vec, AdapterSet aSet,
+				double meanEdgeLength) {
 
 			IndexedLineSetFactory ilf = new IndexedLineSetFactory();
 			if (nodes.size() == 0) {
@@ -291,9 +296,14 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 				return ilf.getIndexedLineSet();
 			}
 
+			Object val = vec.get(nodes.iterator().next(), aSet);
+
 			List<double[]> vData = new LinkedList<double[]>();
 			List<int[]> iData = new LinkedList<int[]>();
-			getVectors(nodes, vec, aSet, meanEdgeLength, vData, iData);
+			if (val instanceof double[])
+				getVectors(nodes, (Adapter<double[]>)vec, aSet, meanEdgeLength, vData, iData);
+			if (val instanceof double[][])
+				getMultiVectors(nodes, (Adapter<double[][]>)vec, aSet, meanEdgeLength, vData, iData);
 
 			if (vData.size() == 0) {
 				return ilf.getIndexedLineSet();
@@ -306,23 +316,30 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			return ilf.getIndexedLineSet();
 		}
 
+		@SuppressWarnings("unchecked")
 		private <
 			V extends Vertex<V, E, F>, 
 			E extends Edge<V, E, F>, 
 			F extends Face<V, E, F>, 
 			N extends Node<V, E, F>
-		> IndexedLineSet generateTubedVectorArrows(Collection<N> nodes, 
-				Adapter<double[]> vec, AdapterSet aSet, double meanEdgeLength, boolean arrows) {
+		> IndexedLineSet generateTubedVectorArrows(
+				Collection<N> nodes, Adapter<?> vec, AdapterSet aSet,
+				double meanEdgeLength, boolean arrows) {
 
 			IndexedLineSetFactory ilsf = new IndexedLineSetFactory();
 			if (nodes.size() == 0) {
 				ilsf.update();
 				return ilsf.getIndexedLineSet();
 			}
+			
+			Object val = vec.get(nodes.iterator().next(), aSet);
 
 			List<double[]> vData = new LinkedList<double[]>();
 			List<int[]> iData = new LinkedList<int[]>();
-			getVectors(nodes, vec, aSet, meanEdgeLength, vData, iData);
+			if (val instanceof double[])
+				getVectors(nodes, (Adapter<double[]>)vec, aSet, meanEdgeLength, vData, iData);
+			if (val instanceof double[][])
+				getMultiVectors(nodes, (Adapter<double[][]>)vec, aSet, meanEdgeLength, vData, iData);
 
 			int numOfVectors = vData.size() / 2;
 
@@ -415,9 +432,9 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			E extends Edge<V, E, F>, 
 			F extends Face<V, E, F>, 
 			N extends Node<V, E, F>
-		> void getVectors(Collection<N> nodes, Adapter<double[]> vec, 
-				AdapterSet aSet, double meanEdgeLength, List<double[]> vData, 
-				List<int[]> iData) {
+		> void getVectors(
+				Collection<N> nodes, Adapter<double[]> vec, AdapterSet aSet,
+				double meanEdgeLength, List<double[]> vData, List<int[]> iData) {
 			aSet.setParameter("alpha", .5);
 			for (N node : nodes) {
 				double[] v = vec.get(node, aSet);
@@ -441,6 +458,42 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 				vData.add(Rn.add(null, p, v));
 				iData.add(new int[] { vData.size() - 1, vData.size() - 2 });
 			}
+		}
+
+		private <
+			V extends Vertex<V, E, F>, 
+			E extends Edge<V, E, F>, 
+			F extends Face<V, E, F>, 
+			N extends Node<V, E, F>
+		> void getMultiVectors(Collection<N> nodes, Adapter<double[][]> vec, 
+				AdapterSet aSet, double meanEdgeLength, List<double[]> vData, 
+				List<int[]> iData) {
+			aSet.setParameter("alpha", .5);
+			for (N node : nodes) {
+				double[][] v = vec.get(node, aSet);
+				if (v == null) {
+					System.err.println("Null value in adapter " + vec
+							+ " for node " + node + " found.");
+					continue;
+				} else {
+					for (int i = 0; i < v.length; i++) {
+						if (v[i].length != 3)
+							throw new RuntimeException(
+									"Adapter does not return vectors in 3-space.");
+						v[i] = v[i].clone();
+						double[] p = aSet.getD(BaryCenter3d.class, node);
+						if (normalize) {
+							Rn.normalize(v[i], v[i]);
+							Rn.times(v[i], meanEdgeLength, v[i]);
+						}
+						Rn.times(v[i], scale / 2., v[i]);
+						vData.add(Rn.add(null, p, v[i]));
+						Rn.times(v[i], -1, v[i]);
+						vData.add(Rn.add(null, p, v[i]));
+						iData.add(new int[] { vData.size() - 1,
+								vData.size() - 2 });
+					}
+				}}
 		}
 
 		private void updateVectorsComponent() {
