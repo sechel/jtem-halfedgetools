@@ -18,7 +18,6 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,7 +63,8 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			thicknessSpinner = new JSpinner(thicknessModel);
 	private JCheckBox directedChecker = new JCheckBox("Directed"),
 			tubesChecker = new JCheckBox("Tubes"),
-			normalizeChecker = new JCheckBox("Normalize");
+			normalizedChecker = new JCheckBox("Normalized"),
+			centeredChecker = new JCheckBox("Centered");
 	private JPanel optionsPanel = new JPanel();
 
 	private JComboBox colorChooser;
@@ -87,27 +87,32 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		optionsPanel.add(new JLabel("Scale"), cl);
 		optionsPanel.add(scaleSpinner, cr);
 		scaleSpinner.addChangeListener(this);
-
-		optionsPanel.add(normalizeChecker, cl);
-		normalizeChecker.setSelected(true);
-		normalizeChecker.addActionListener(this);
-
-		String[] colornames = { "RED", "GREEN", "BLUE", "CYAN", "MAGENTA",
-				"YELLOW", "ORANGE", "PINK", "BLACK", "WHITE" };
-		colorChooser = new JComboBox(colornames);
-		colorChooser.setSelectedIndex(8);
-		optionsPanel.add(colorChooser, cr);
-		colorChooser.addActionListener(this);
+		
+		optionsPanel.add(new JLabel("Thickness"), cl);
+		optionsPanel.add(thicknessSpinner, cr);
+		thicknessSpinner.addChangeListener(this);
 
 		optionsPanel.add(tubesChecker, cl);
 		tubesChecker.addActionListener(this);
 
 		optionsPanel.add(directedChecker, cr);
 		directedChecker.addActionListener(this);
+		
+		optionsPanel.add(normalizedChecker, cl);
+		normalizedChecker.setSelected(true);
+		normalizedChecker.addActionListener(this);
+		
+		optionsPanel.add(centeredChecker, cr);
+		centeredChecker.setSelected(true);
+		centeredChecker.addActionListener(this);
 
-		optionsPanel.add(new JLabel("Thickness"), cl);
-		optionsPanel.add(thicknessSpinner, cr);
-		thicknessSpinner.addChangeListener(this);
+		String[] colornames = { "RED", "GREEN", "BLUE", "CYAN", "MAGENTA",
+				"YELLOW", "ORANGE", "PINK", "BLACK", "WHITE" };
+		colorChooser = new JComboBox(colornames);
+		colorChooser.setSelectedIndex(8);
+		cl.gridwidth = 2;
+		optionsPanel.add(colorChooser, cl);
+		colorChooser.addActionListener(this);
 
 		checkTubesEnabled();
 	}
@@ -147,7 +152,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		vis.thickness = thicknessModel.getNumber().doubleValue();
 		vis.tubesenabled = tubesChecker.isSelected();
 		vis.directed = directedChecker.isSelected();
-		vis.normalize = normalizeChecker.isSelected();
+		vis.normalize = normalizedChecker.isSelected();
 		vis.color = colors[colorChooser.getSelectedIndex()];
 		layer.addTemporaryGeometry(vis.vectorsComponent);
 
@@ -178,7 +183,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		actVis.thickness = thicknessModel.getNumber().doubleValue();
 		actVis.tubesenabled = tubesChecker.isSelected();
 		actVis.directed = directedChecker.isSelected();
-		actVis.normalize = normalizeChecker.isSelected();
+		actVis.normalize = normalizedChecker.isSelected();
 		actVis.color = colors[colorChooser.getSelectedIndex()];
 		actVis.update();
 	}
@@ -452,10 +457,16 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 					Rn.normalize(v, v);
 					Rn.times(v, meanEdgeLength, v);
 				}
-				Rn.times(v, scale / 2., v);
-				vData.add(Rn.add(null, p, v));
-				Rn.times(v, -1, v);
-				vData.add(Rn.add(null, p, v));
+				if(centeredChecker.isSelected()){
+					Rn.times(v, scale / 2., v);
+					vData.add(Rn.add(null, p, v));
+					Rn.times(v, -1, v);	
+					vData.add(Rn.add(null, p, v));
+				}else{
+					Rn.times(v, scale / 2., v);
+					vData.add(Rn.add(null, p, v));
+					vData.add(p);
+				}
 				iData.add(new int[] { vData.size() - 1, vData.size() - 2 });
 			}
 		}
@@ -486,10 +497,16 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 							Rn.normalize(v[i], v[i]);
 							Rn.times(v[i], meanEdgeLength, v[i]);
 						}
-						Rn.times(v[i], scale / 2., v[i]);
-						vData.add(Rn.add(null, p, v[i]));
-						Rn.times(v[i], -1, v[i]);
-						vData.add(Rn.add(null, p, v[i]));
+						if (centeredChecker.isSelected()) {
+							Rn.times(v[i], scale / 2., v[i]);
+							vData.add(Rn.add(null, p, v[i]));
+							Rn.times(v[i], -1, v[i]);
+							vData.add(Rn.add(null, p, v[i]));
+						} else {
+							Rn.times(v[i], scale / 2., v[i]);
+							vData.add(Rn.add(null, p, v[i]));
+							vData.add(p);
+						}
 						iData.add(new int[] { vData.size() - 1,
 								vData.size() - 2 });
 					}
@@ -563,7 +580,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		directedChecker.setEnabled(actVis.tubesenabled);
 		thicknessSpinner.setEnabled(actVis.tubesenabled);
 		thicknessModel.setValue(actVis.thickness);
-		normalizeChecker.setSelected(actVis.normalize);
+		normalizedChecker.setSelected(actVis.normalize);
 		listenersDisabled = false;
 
 		return optionsPanel;
