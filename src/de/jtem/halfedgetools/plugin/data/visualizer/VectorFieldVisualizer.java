@@ -224,7 +224,6 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 					true);
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public void update() {
 
@@ -286,6 +285,8 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 				vectorsComponent.removeChild(sgc.get(0));
 		}
 
+		
+		@SuppressWarnings("unchecked")
 		private <
 			V extends Vertex<V, E, F>, 
 			E extends Edge<V, E, F>, 

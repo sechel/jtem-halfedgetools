@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.plugin.data;
 
+import static javax.swing.JSplitPane.HORIZONTAL_SPLIT;
 import static javax.swing.JTabbedPane.WRAP_TAB_LAYOUT;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
@@ -24,6 +25,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -67,8 +69,9 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		sourceScroller = new JScrollPane(sourceTable);
 	private JPanel
 		activePanel = new JPanel(), 
-		creationPanel = new JPanel(),
 		optionsPanel = new JPanel();
+	private JSplitPane
+		creationSplitter = new JSplitPane(HORIZONTAL_SPLIT, true, sourceScroller, visualizerScroller);
 	private Icon
 		controlIcon = ImageHook.getIcon("control_equalizer_blue.png"),
 		removeIcon = ImageHook.getIcon("remove.png"),
@@ -134,9 +137,8 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		shrinkPanel.add(activePanel, c1);
 		
 		// creation panel
-		creationPanel.setLayout(new GridBagLayout());
 		sourceScroller.setPreferredSize(new Dimension(200, 150));
-		sourceScroller.setMinimumSize(new Dimension(200, 150));
+		sourceScroller.setMinimumSize(new Dimension(100, 150));
 		sourceScroller.setBorder(BorderFactory.createEtchedBorder());
 		sourceTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
 		sourceTable.setRowHeight(22);
@@ -144,9 +146,8 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		sourceTable.getSelectionModel().addListSelectionListener(this);
 		c1.gridwidth = 1;
 		c1.weighty = 1.0;
-		creationPanel.add(sourceScroller, c1);
 		visualizerScroller.setPreferredSize(new Dimension(250, 150));
-		visualizerScroller.setMinimumSize(new Dimension(250, 150));
+		visualizerScroller.setMinimumSize(new Dimension(100, 150));
 		visualizerScroller.setBorder(BorderFactory.createEtchedBorder());
 		visualizerTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
 		visualizerTable.setRowHeight(22);
@@ -156,9 +157,8 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		visualizerTable.setCellSelectionEnabled(false);
 		c1.gridwidth = GridBagConstraints.RELATIVE;
 		c1.weightx = 1.0;
-		creationPanel.add(visualizerScroller, c1);
 		c1.gridwidth = GridBagConstraints.REMAINDER;
-		tabbedPane.addTab("Configuration", controlIcon, creationPanel);
+		tabbedPane.addTab("Configuration", controlIcon, creationSplitter);
 		tabbedPane.setPreferredSize(new Dimension(200, 300));
 		tabbedPane.setMinimumSize(new Dimension(400, 150));
 		shrinkPanel.add(tabbedPane, c1);
