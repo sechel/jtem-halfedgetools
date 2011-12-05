@@ -82,8 +82,8 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		sourceSet = new TreeSet<Adapter<?>>(new AdapterNameComparator());
 	private Set<DataVisualizer>
 		visualizerSet = new TreeSet<DataVisualizer>(new VisualizerNameComparator());
-	private Map<HalfedgeLayer, Set<DataVisualization>>
-		activeMap = new HashMap<HalfedgeLayer, Set<DataVisualization>>();
+	private Map<HalfedgeLayer, List<DataVisualization>>
+		activeMap = new HashMap<HalfedgeLayer, List<DataVisualization>>();
 	
 	private ButtonCellRenderer
 		createCellRenderer = new ButtonCellRenderer(),
@@ -202,10 +202,10 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		updateVisualizationOptions();
 	}
 	
-	private Set<DataVisualization> getActiveVisualizations() {
+	private List<DataVisualization> getActiveVisualizations() {
 		HalfedgeLayer l = hif.getActiveLayer();
 		if (!activeMap.containsKey(l)) {
-			activeMap.put(l, new TreeSet<DataVisualization>());
+			activeMap.put(l, new LinkedList<DataVisualization>());
 		}
 		return activeMap.get(l);
 	}
@@ -219,8 +219,8 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 	
 	
 	public void activateVisualization(DataVisualization v) {
-		Set<DataVisualization> vSet = getActiveVisualizations();
-		vSet.add(v);
+		List<DataVisualization> vList = getActiveVisualizations();
+		vList.add(v);
 		updateActiveTable();
 		updateVisualizerTable();
 		updateVisualization(v);
@@ -228,8 +228,8 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 	
 	public void removeVisualization(DataVisualization v) {
 		DataVisualizer vis = v.getVisualizer();
-		Set<DataVisualization> vSet = getActiveVisualizations();
-		vSet.remove(v);
+		List<DataVisualization> vList = getActiveVisualizations();
+		vList.remove(v);
 		vis.disposeVisualization(v);
 		updateActiveTable();
 		updateVisualizationOptions();
@@ -467,7 +467,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 			if (row < 0 || row >= sourceSet.size()) {
 				return "-";
 			}
-			Set<DataVisualization> aSet = getActiveVisualizations();
+			List<DataVisualization> aSet = getActiveVisualizations();
 			Object[] objects = aSet.toArray();
 			DataVisualization op = (DataVisualization)objects[row];
 			switch (column) {
