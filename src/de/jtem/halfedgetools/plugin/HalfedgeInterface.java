@@ -1037,8 +1037,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		layers.remove(layer);
 		root.removeChild(layer.getLayerRoot());
 		if (layer == activeLayer) {
-			layer = layers.get(index);
-			activateLayer(layer);
+			HalfedgeLayer newActLayer = layers.get(index);
+			activateLayer(newActLayer);
 		}
 		updateStates();
 		fireLayerRemoved(layer);

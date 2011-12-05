@@ -364,6 +364,13 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 	}
 	@Override
 	public void layerRemoved(HalfedgeLayer layer) {
+		List<DataVisualization> vList = activeMap.get(layer);
+		if (vList != null) {
+			for (DataVisualization vis : vList) {
+				DataVisualizer v = vis.getVisualizer();
+				v.disposeVisualization(vis);
+			}
+		}
 		activeMap.remove(layer);
 	}
 	
