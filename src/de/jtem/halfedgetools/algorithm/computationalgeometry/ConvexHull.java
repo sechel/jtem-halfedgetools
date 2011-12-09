@@ -55,13 +55,13 @@ public class ConvexHull {
 		double tolerance
 	) { 
 		if (hds.numFaces() > 0) {
-			new IllegalArgumentException("HDS cannot have faces in convexHull()");
+			throw new IllegalArgumentException("HDS cannot have faces in convexHull()");
 		}
 		if (hds.numEdges() > 0) {
-			new IllegalArgumentException("HDS cannot have edges in convexHull()");
+			throw new IllegalArgumentException("HDS cannot have edges in convexHull()");
 		}
 		if (hds.numVertices() < 4) {
-			new IllegalArgumentException("HDS must have at least 4 points in convexHull()");
+			throw new IllegalArgumentException("HDS must have at least 4 points in convexHull()");
 		}
 		
 		Map<F, Set<V>> fMap = new HashMap<F, Set<V>>();

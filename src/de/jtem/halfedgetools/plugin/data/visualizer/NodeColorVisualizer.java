@@ -133,6 +133,7 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 			}
 			HalfEdgeDataStructure<?, ?, ?> hds = getLayer().get();
 			AdapterSet a = getLayer().getEffectiveAdapters();
+			a.addAll(hif.getActiveVolatileAdapters());
 			switch (getType()) {
 				case Vertex:
 					List<? extends Vertex<?,?,?>> vList = getColoredNodes(hds.getVertices(), a, minmax);

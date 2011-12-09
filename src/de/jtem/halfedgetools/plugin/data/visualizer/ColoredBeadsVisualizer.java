@@ -41,6 +41,7 @@ import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.BeadPosition;
 import de.jtem.halfedgetools.adapter.type.Length;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.data.AbstractDataVisualization;
 import de.jtem.halfedgetools.plugin.data.DataVisualization;
@@ -48,6 +49,7 @@ import de.jtem.halfedgetools.plugin.data.DataVisualizer;
 import de.jtem.halfedgetools.plugin.data.DataVisualizerPlugin;
 import de.jtem.halfedgetools.plugin.data.color.ColorMap;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements ActionListener, ChangeListener {
@@ -73,6 +75,8 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		appBeads = new Appearance("Beads Appearance");
 	private SimpleBeadsPositionAdapter
 		simpleBeadsPositionAdapter = new SimpleBeadsPositionAdapter();
+	private HalfedgeInterface
+		hif = null;
 	
 	public ColoredBeadsVisualizer() {
 		optionsPanel.setLayout(new GridBagLayout());
@@ -100,6 +104,12 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		appBeads.setAttribute(POINT_SHADER + "." + SPHERES_DRAW, true);
 		appBeads.setAttribute(POINT_SHADER + "." + POLYGON_SHADER + "." + SMOOTH_SHADING, true);
 		appBeads.setAttribute(POINT_SHADER + "." + POINT_RADIUS, 1.0);
+	}
+	
+	@Override
+	public void install(Controller c) throws Exception {
+		super.install(c);
+		hif = c.getPlugin(HalfedgeInterface.class);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -159,6 +169,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			
 			HalfEdgeDataStructure<?, ?, ?> hds = getLayer().get();
 			AdapterSet aSet = getLayer().getEffectiveAdapters();
+			aSet.addAll(hif.getActiveVolatileAdapters());
 			aSet.add(simpleBeadsPositionAdapter);
 			Adapter<?> genericAdapter = getSource();
 			
