@@ -152,7 +152,8 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		vis.thickness = thicknessModel.getNumber().doubleValue();
 		vis.tubesenabled = tubesChecker.isSelected();
 		vis.directed = directedChecker.isSelected();
-		vis.normalize = normalizedChecker.isSelected();
+		vis.normalized = normalizedChecker.isSelected();
+		vis.centered = centeredChecker.isSelected();
 		vis.color = colors[colorChooser.getSelectedIndex()];
 		layer.addTemporaryGeometry(vis.vectorsComponent);
 
@@ -183,7 +184,8 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		actVis.thickness = thicknessModel.getNumber().doubleValue();
 		actVis.tubesenabled = tubesChecker.isSelected();
 		actVis.directed = directedChecker.isSelected();
-		actVis.normalize = normalizedChecker.isSelected();
+		actVis.normalized = normalizedChecker.isSelected();
+		actVis.centered = centeredChecker.isSelected();
 		actVis.color = colors[colorChooser.getSelectedIndex()];
 		actVis.update();
 	}
@@ -197,7 +199,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 
 		private double scale = 1., thickness = 1.;
 		private boolean tubesenabled = false, directed = false,
-				normalize = true;
+				normalized = true, centered = true;
 		private Color color = Color.BLACK;
 
 		public VectorFieldVisualization(HalfedgeLayer layer, Adapter<?> source,
@@ -454,11 +456,11 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 				}
 				v = v.clone();
 				double[] p = aSet.getD(BaryCenter3d.class, node);
-				if (normalize) {
+				if (normalized) {
 					Rn.normalize(v, v);
 					Rn.times(v, meanEdgeLength, v);
 				}
-				if(centeredChecker.isSelected()){
+				if(centered){
 					Rn.times(v, scale / 2., v);
 					vData.add(Rn.add(null, p, v));
 					Rn.times(v, -1, v);	
@@ -494,11 +496,11 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 									"Adapter does not return vectors in 3-space.");
 						v[i] = v[i].clone();
 						double[] p = aSet.getD(BaryCenter3d.class, node);
-						if (normalize) {
+						if (normalized) {
 							Rn.normalize(v[i], v[i]);
 							Rn.times(v[i], meanEdgeLength, v[i]);
 						}
-						if (centeredChecker.isSelected()) {
+						if (centered) {
 							Rn.times(v[i], scale / 2., v[i]);
 							vData.add(Rn.add(null, p, v[i]));
 							Rn.times(v[i], -1, v[i]);
@@ -552,12 +554,20 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			this.directed = directed;
 		}
 
-		public boolean isNormalize() {
-			return normalize;
+		public boolean isNormalized() {
+			return normalized;
 		}
 
-		public void setNormalize(boolean normalize) {
-			this.normalize = normalize;
+		public void setNormalized(boolean normalize) {
+			this.normalized = normalize;
+		}
+		
+		public boolean isCentered() {
+			return centered;
+		}
+
+		public void setCentered(boolean centered) {
+			this.centered = centered;
 		}
 
 		public Color getColor() {
@@ -581,7 +591,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		directedChecker.setEnabled(actVis.tubesenabled);
 		thicknessSpinner.setEnabled(actVis.tubesenabled);
 		thicknessModel.setValue(actVis.thickness);
-		normalizedChecker.setSelected(actVis.normalize);
+		normalizedChecker.setSelected(actVis.normalized);
 		listenersDisabled = false;
 
 		return optionsPanel;
