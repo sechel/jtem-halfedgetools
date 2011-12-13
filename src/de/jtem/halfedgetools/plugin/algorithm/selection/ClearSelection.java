@@ -1,5 +1,9 @@
 package de.jtem.halfedgetools.plugin.algorithm.selection;
 
+import java.awt.event.KeyEvent;
+
+import javax.swing.KeyStroke;
+
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -23,6 +27,11 @@ public class ClearSelection extends AlgorithmPlugin {
 		return "Clear";
 	}
 
+	@Override
+	public KeyStroke getKeyboardShortcut() {
+		return KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK);
+	}
+	
 	@Override
 	public <
 		V extends Vertex<V, E, F>, 

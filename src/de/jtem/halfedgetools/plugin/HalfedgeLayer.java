@@ -618,6 +618,8 @@ public class HalfedgeLayer implements ActionListener {
 		undoIndex--;
 		geometry = undoHistory.get(undoIndex);
 		persistentAdapters = adapterHistory.get(undoIndex);
+		activeVolatileAdapters.clear();
+		volatileAdapters.clear();
 		geometryRoot.setGeometry(geometry);
 		convertFaceSet();
 		convertHDS();
@@ -628,6 +630,8 @@ public class HalfedgeLayer implements ActionListener {
 		undoIndex++;
 		geometry = undoHistory.get(undoIndex);
 		persistentAdapters = adapterHistory.get(undoIndex);
+		activeVolatileAdapters.clear();
+		volatileAdapters.clear();
 		geometryRoot.setGeometry(geometry);
 		convertFaceSet();
 		convertHDS();

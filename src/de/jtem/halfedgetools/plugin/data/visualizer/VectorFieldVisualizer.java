@@ -340,7 +340,11 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 				return ilsf.getIndexedLineSet();
 			}
 			
-			Object val = vec.get(nodes.iterator().next(), aSet);
+			Object val = null; 
+			for (N node : nodes) {
+				val = vec.get(node, aSet);
+				if (val != null) break;
+			}
 
 			List<double[]> vData = new LinkedList<double[]>();
 			List<int[]> iData = new LinkedList<int[]>();
@@ -444,11 +448,11 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 				Collection<N> nodes, Adapter<double[]> vec, AdapterSet aSet,
 				double meanEdgeLength, List<double[]> vData, List<int[]> iData) {
 			aSet.setParameter("alpha", .5);
+			int numNullValues = 0;
 			for (N node : nodes) {
 				double[] v = vec.get(node, aSet);
 				if (v == null) {
-					System.err.println("Null value in adapter " + vec
-							+ " for node " + node + " found.");
+					numNullValues++;
 					continue;
 				} else if (v.length != 3) {
 					throw new RuntimeException(
@@ -472,6 +476,9 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 				}
 				iData.add(new int[] { vData.size() - 1, vData.size() - 2 });
 			}
+			if (numNullValues > 0) {
+				System.err.println(numNullValues + " null values in adapter " + vec + " found.");
+			}
 		}
 
 		private <
@@ -483,11 +490,11 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 				AdapterSet aSet, double meanEdgeLength, List<double[]> vData, 
 				List<int[]> iData) {
 			aSet.setParameter("alpha", .5);
+			int numNullValues = 0;
 			for (N node : nodes) {
 				double[][] v = vec.get(node, aSet);
 				if (v == null) {
-					System.err.println("Null value in adapter " + vec
-							+ " for node " + node + " found.");
+					numNullValues++;
 					continue;
 				} else {
 					for (int i = 0; i < v.length; i++) {
@@ -513,7 +520,11 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 						iData.add(new int[] { vData.size() - 1,
 								vData.size() - 2 });
 					}
-				}}
+				}
+			}
+			if (numNullValues > 0) {
+				System.err.println(numNullValues + " null values in adapter " + vec + " found.");
+			}
 		}
 
 		private void updateVectorsComponent() {

@@ -31,6 +31,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.data.VisualizationInterface;
+import de.jtem.halfedgetools.plugin.widget.MarqueeWidget;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -45,6 +46,10 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 	private JCheckBox xBox = new JCheckBox("X"), yBox = new JCheckBox("Y"),
 			zBox = new JCheckBox("Z");
 	private JPanel panel = new JPanel();
+	private MarqueeWidget
+		marqee = null;
+	private boolean
+		marqeeWasActive = false;
 
 	public VertexEditorPlugin() {
 		tool.addPointDragListener(this);
@@ -78,6 +83,7 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 		hif = c.getPlugin(HalfedgeInterface.class);
 		hif.addHalfedgeListener(this);
 		vif = c.getPlugin(VisualizationInterface.class);
+		marqee = c.getPlugin(MarqueeWidget.class);
 	}
 
 	@Override
@@ -112,6 +118,8 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 			double[] pos = Rn.subtract(null, vertexpos, pointerpos);
 			differences.put(v, pos);
 		}
+		marqeeWasActive = marqee.isActivated();
+		marqee.setActivated(false);
 	}
 
 	@Override
@@ -145,6 +153,7 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 	@Override
 	public void pointDragEnd(PointDragEvent e) {
 		differences.clear();
+		marqee.setActivated(marqeeWasActive);
 	}
 
 	@Override

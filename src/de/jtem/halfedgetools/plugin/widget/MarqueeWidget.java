@@ -295,7 +295,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 	public void mouseDragged(MouseEvent e) {
 		if (!activated) return;
 		if (!marqueeEnabled) return;
-		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) {
+		if (!(e.isMetaDown()||e.isAltDown()||e.isShiftDown())) {
 			cancelMarqee();
 			return;
 		}
@@ -320,7 +320,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 			}
 		}
 		
-		if(e.isControlDown()){
+		if(e.isMetaDown()){
 			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
 				sel.setSelected(face, true);
 			}
@@ -339,7 +339,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if (!activated) return;
-		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) {
+		if (!(e.isMetaDown()||e.isAltDown()||e.isShiftDown())) {
 			return;
 		}
 		marqueeEnabled = true;
@@ -355,7 +355,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if (!marqueeEnabled) return;
-		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) {
+		if (!(e.isMetaDown()||e.isAltDown()||e.isShiftDown())) {
 			cancelMarqee();
 			return;
 		}
@@ -373,7 +373,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 				sel.setSelected(edge, true);
 			}
 		}
-		if (e.isControlDown()){
+		if (e.isMetaDown()){
 			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
 				sel.setSelected(face, true);
 			}
@@ -394,6 +394,9 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 	
 	public void setActivated(boolean activated) {
 		this.activated = activated;
+		if (!activated) {
+			cancelMarqee();
+		}
 	}
 	
 	public boolean isActivated() {

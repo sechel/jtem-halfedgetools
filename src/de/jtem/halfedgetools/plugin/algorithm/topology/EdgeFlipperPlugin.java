@@ -102,7 +102,7 @@ public class EdgeFlipperPlugin extends AlgorithmPlugin {
 
 	@Override
 	public KeyStroke getKeyboardShortcut() {
-		return KeyStroke.getKeyStroke('E', InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK);
+		return KeyStroke.getKeyStroke('F', InputEvent.SHIFT_DOWN_MASK);
 	}
 	
 	

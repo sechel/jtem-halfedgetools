@@ -555,6 +555,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			getActiveLayer().undo();
+			clearVolatileAdapters();
 			updateStates();
 			fireDataChanged();
 			checkContent();
@@ -577,6 +578,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			getActiveLayer().redo();
+			clearVolatileAdapters();
 			updateStates();
 			fireDataChanged();
 			checkContent();
@@ -667,7 +669,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 					set(hds);
 				}
 			} catch (Exception ex) {
-				JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(w, ex.toString(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
 			}
 			updateStates();
 			checkContent();
