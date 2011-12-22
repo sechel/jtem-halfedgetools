@@ -154,6 +154,7 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 	public void pointDragEnd(PointDragEvent e) {
 		differences.clear();
 		marqee.setActivated(marqeeWasActive);
+		hif.update();
 	}
 
 	@Override

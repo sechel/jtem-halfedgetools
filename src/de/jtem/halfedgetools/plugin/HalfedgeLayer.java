@@ -49,6 +49,7 @@ import de.jreality.util.SceneGraphUtility;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
@@ -242,7 +243,7 @@ public class HalfedgeLayer implements ActionListener {
 	> void setNoUndo(HDS hds) {
 		this.hds = hds;
 		convertHDS();
-		clearSelection();
+		validateSelection();
 	}
 	
 	
@@ -390,7 +391,6 @@ public class HalfedgeLayer implements ActionListener {
 	
 	
 	private void convertHDS() {
-		clearSelection();
 		AdapterSet ea = getEffectiveAdapters();
 		initVisualizers(ea);
 		ea = getEffectiveAdapters();
@@ -438,10 +438,10 @@ public class HalfedgeLayer implements ActionListener {
 	}
 	
 	public HalfedgeSelection getSelection() {
-		return selection;
+		return new HalfedgeSelection(selection);
 	}
 	public void setSelection(HalfedgeSelection sel) {
-		this.selection = sel;
+		this.selection = new HalfedgeSelection(sel);
 		updateSelection();
 		hif.fireSelectionChanged(selection);
 	}
@@ -452,6 +452,15 @@ public class HalfedgeLayer implements ActionListener {
 		hif.fireSelectionChanged(selection);
 	}
 	
+	protected void validateSelection() {
+		for (Node<?,?,?> checkNode : selection.getNodes()) {
+			if (!checkNode.isValid() || checkNode.getHalfEdgeDataStructure() != hds) {
+				selection.remove(checkNode);
+			}
+		}
+		updateSelection();
+		hif.fireSelectionChanged(selection);
+	}
 	
 	public boolean isActive() {
 		return active;
@@ -623,6 +632,7 @@ public class HalfedgeLayer implements ActionListener {
 		geometryRoot.setGeometry(geometry);
 		convertFaceSet();
 		convertHDS();
+		validateSelection();
 	}
 	
 	public void redo() {
@@ -635,6 +645,7 @@ public class HalfedgeLayer implements ActionListener {
 		geometryRoot.setGeometry(geometry);
 		convertFaceSet();
 		convertHDS();
+		validateSelection();
 	}
 	
 	public void addTemporaryGeometry(SceneGraphComponent root) {
