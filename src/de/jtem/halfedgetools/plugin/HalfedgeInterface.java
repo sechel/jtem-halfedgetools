@@ -1024,6 +1024,17 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	
+	public HalfedgeLayer createLayer(String name) {
+		HalfedgeLayer newLayer = new HalfedgeLayer(this);
+		newLayer.setName(name);
+		layers.add(0, newLayer);
+		root.addChild(newLayer.getLayerRoot());
+		updateStates();
+		fireLayerAdded(newLayer);
+		return newLayer;
+	}
+	
+	
 	public void addLayer(HalfedgeLayer layer) {
 		if (layers.contains(layer)) return;
 		layers.add(0, layer);

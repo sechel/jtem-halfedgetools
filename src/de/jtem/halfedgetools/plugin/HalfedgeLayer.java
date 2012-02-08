@@ -315,13 +315,13 @@ public class HalfedgeLayer implements ActionListener {
 		if (g instanceof IndexedLineSet){
 			IndexedLineSet ils = (IndexedLineSet)g;
 			geometry = new IndexedFaceSet(g.getName());
-			geometry.setVertexAttributes(ils.getVertexAttributes());
-			geometry.setEdgeAttributes(ils.getEdgeAttributes());
+			geometry.setVertexCountAndAttributes(ils.getVertexAttributes());
+			geometry.setEdgeCountAndAttributes(ils.getEdgeAttributes());
 		} else 
 		if (g instanceof PointSet) {
 			PointSet ps = (PointSet)g;
 			geometry = new IndexedFaceSet(g.getName());
-			geometry.setVertexAttributes(ps.getVertexAttributes());
+			geometry.setVertexCountAndAttributes(ps.getVertexAttributes());
 		} else {
 			geometry = new IndexedFaceSet(g.getName());
 		}
