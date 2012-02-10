@@ -753,7 +753,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	> void set(final HDS hds) {
 		activeLayer.set(hds);
 		updateStates();
-		checkContent();
 		clearVolatileAdapters();
 		fireDataChanged();
 	}

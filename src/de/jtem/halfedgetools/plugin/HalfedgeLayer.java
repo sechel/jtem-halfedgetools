@@ -296,6 +296,7 @@ public class HalfedgeLayer implements ActionListener {
 	> void set(HDS hds) {
 		setNoUndo(hds);
 		updateUndoList();
+		hif.checkContent();
 	}
 	
 	public void update() {
@@ -333,6 +334,7 @@ public class HalfedgeLayer implements ActionListener {
 		setNoUndo(g);
 		updateUndoList();
 		updateNoUndo(); // update visualizers
+		hif.checkContent();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -585,6 +587,7 @@ public class HalfedgeLayer implements ActionListener {
 
 	public void setVisible(boolean visible) {
 		layerRoot.setVisible(visible);
+		hif.updateStates();
 	}
 	
 	public String getName() {
