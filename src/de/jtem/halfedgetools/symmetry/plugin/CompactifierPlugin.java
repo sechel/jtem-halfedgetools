@@ -76,12 +76,12 @@ import de.jtem.discretegroup.core.DiscreteGroupUtility;
 import de.jtem.discretegroup.core.FiniteStateAutomaton;
 import de.jtem.discretegroup.core.Platycosm;
 import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.symmetry.node.SEdge;
 import de.jtem.halfedgetools.symmetry.node.SFace;
 import de.jtem.halfedgetools.symmetry.node.SHDS;
 import de.jtem.halfedgetools.symmetry.node.SVertex;
+import de.jtem.halfedgetools.symmetry.util.SymmetricHDSUtils;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -358,13 +358,7 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 				if(ee.getStartVertex() == v2)
 					e2 = ee;
 			}
-			
-			SEdge e3 = null;
-			for(SEdge ee : HalfEdgeUtilsExtra.getBoundary(f2)) {
-				if(ee.getTargetVertex() == v2)
-					e3 = ee;
-			}
-			if (e3 == null) {
+			if (e2 == null) {
 				throw new RuntimeException(v2 + " is not in the boundary of " + f2);
 			}
 			
@@ -372,7 +366,6 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 			double[] generator = Rn.subtract(null, v2.getEmbedding(), v1.getEmbedding());
 			DiscreteGroupElement gen = new DiscreteGroupElement();
 
-			
 			
 			// calc first frame
 			double[] p0 = e1.getNextEdge().getTargetVertex().getEmbedding();
@@ -387,9 +380,9 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 //			double[] q0 = coordApt.getCoordinate(e2.getTargetVertex());
 //			double[] q1 = coordApt.getCoordinate(v2);
 //			double[] q2 = coordApt.getCoordinate(e2.getPreviouSymmetricEdge().getStartVertex());
-			double[] q2 = e3.getNextEdge().getTargetVertex().getEmbedding();
+			double[] q2 = e2.getNextEdge().getTargetVertex().getEmbedding();
 			double[] q1 = v2.getEmbedding();
-			double[] q0 = e3.getPreviousEdge().getTargetVertex().getEmbedding();
+			double[] q0 = e2.getPreviousEdge().getTargetVertex().getEmbedding();
 			
 			
 			double[] ff1 = Rn.normalize(null, Rn.subtract(null, q0, q1));
@@ -400,18 +393,6 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 			} else {
 				ff3 = Rn.crossProduct(null, ff1, ff2);
 			}
-			
-//			double[] ee = new double[] {
-//					ee1[0],ee1[1],ee1[2],
-//					ee2[0],ee2[1],ee2[2],
-//					ee3[0],ee3[1],ee3[2]
-//					                  };
-			
-//			double[] ff = new double[] {
-//					ff1[0],ff1[1],ff1[2],
-//					ff2[0],ff2[1],ff2[2],
-//					ff3[0],ff3[1],ff3[2]
-//					                  };
 			
 			Color[] colors = new Color[3];
 			colors[0] = Color.RED;
@@ -455,7 +436,7 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 			ilsF.update();
 			
 			IndexedLineSet frame2 = ilsF.getIndexedLineSet();
-			
+
 			SceneGraphComponent frames = SceneGraphUtility.createFullSceneGraphComponent("frames");
 			GeometryMergeFactory gmf = new GeometryMergeFactory();
 			IndexedLineSet framesMerged = gmf.mergeIndexedLineSets(new IndexedLineSet[] {frame1,frame2});
@@ -469,18 +450,14 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 			Matrix G = new Matrix();
 			G.setColumn(0, ff1); G.setColumn(1, ff2); G.setColumn(2, ff3); G.setColumn(3, q1); G.setEntry(3, 3, 1.0);
 			
-			
 			if(onlyTranslateCheckBox.isSelected()) {
 				MatrixBuilder.euclidean().translate(generator[0],generator[1],generator[2]).assignTo(gen.getMatrix());
 			} else {
 				SFace.invert();
 				G.multiplyOnRight(SFace);
 				G.assignTo(gen.getMatrix());
-			}				
+			}
 			
-			
-//			Matrix t = DiscreteGroupExtra.generateIsometry(ee, p1, ff, q1);
-//			t.assignTo(gen.getMatrix());
 			
 			System.err.println("Transformation matrix is:");
 			System.err.println(Rn.matrixToJavaString(gen.getMatrix().getArray()));
@@ -491,7 +468,7 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 			generators.add(gen);
 			generators.add(genInv);
 			
-			Set<SEdge> symmetryCycle = TopologyAlgorithms.glueFacesAlongCycle(f1, f2, e1, e2);
+			Set<SEdge> symmetryCycle = SymmetricHDSUtils.glueFacesAlongCycle(f1, f2, e1, e2);
 			
 			hds.getSymmetryCycles().paths.put(symmetryCycle,genInv);
 			
@@ -506,50 +483,9 @@ public class CompactifierPlugin extends ShrinkPanelPlugin implements StatusFlavo
 			rightIndexVertexSpinner.setValue(0);
 		}
 		
-//		if(e.getSource() == flipOrientButton) {
-//			
-//			if(flipOrientButton.isSelected()) {
-//
-//			} else {
-//
-//			}
-//		}
-//		
-//		if(e.getSource() == onlyTranslateCheckBox) {
-//			
-//		}
+
 		
 	}
-
-	
-//	public static void main(String[] args) {
-//
-//
-//		JRViewer viewer = new JRViewer();
-//
-//		viewer.addBasicUI();
-//		viewer.addContentUI();
-//		viewer.setShowPanelSlots(true, false, false, false);
-//		viewer.setShowToolBar(true);
-//		viewer.setPropertiesFile("working.jrw");
-//		viewer.addContentSupport(ContentType.CenteredAndScaled);
-//		viewer.registerPlugin(new CompactifierPlugin());
-//		viewer.registerPlugin(new HalfedgeConnectorPlugin<SVertex, SEdge, SFace, SHDS>(new SHDS(),new SymmetricCoordinateAdapter(AdapterType.VERTEX_ADAPTER)));
-////		viewer.registerPlugin(new SubdivisionPlugin());
-////		viewer.registerPlugin(new HalfedgeDebuggerPlugin<SymmetricVertex, SymmetricEdge, SymmetricFace>());
-//		viewer.registerPlugin(new LookAndFeelSwitch());
-//		viewer.startup();
-//		
-//		try {
-//			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//		} catch (Exception SEdge) {
-//			SEdge.printStackTrace();
-//		}
-//		
-//
-//
-//	}
-	
 	
 
 }

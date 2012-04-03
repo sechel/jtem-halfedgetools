@@ -199,9 +199,10 @@ public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent {
 		
 		tc = new TesselatedSymmetricSubdivisionTutorial();
 		viewer.registerPlugin(tc);
+
 		
-//		hif.addHalfedgeListener(tc);
-//		hif.setAutomaticConversion(false);
+	//	hif.addHalfedgeListener(tc);
+	//	hif.setAutomaticConversion(false);
 		
 		viewer.registerPlugin(hif);
 		viewer.registerPlugin(new SymmetricCatmullClarkPlugin());
@@ -215,7 +216,8 @@ public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent {
 
 		viewer.startup();
 		
-	//	SHDS cube = generateCube();
+//		SHDS cube = 
+		generateCube();
 	//	hif.set(cube);
 		
 	}

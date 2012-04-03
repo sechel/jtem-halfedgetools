@@ -34,11 +34,14 @@ package de.jtem.halfedgetools.symmetry.tutorial;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.PerturbPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.TriangulatePlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.FillHolesPlugin;
+import de.jtem.halfedgetools.plugin.misc.VertexEditorPlugin;
 import de.jtem.halfedgetools.symmetry.adapters.BundleCycleColorAdapter;
-import de.jtem.halfedgetools.symmetry.adapters.SymmetricPositionAdapter;
 import de.jtem.halfedgetools.symmetry.adapters.SymmetricBaryCenterAdapter;
+import de.jtem.halfedgetools.symmetry.adapters.SymmetricPositionAdapter;
 import de.jtem.halfedgetools.symmetry.adapters.SymmetryEdgeColorAdapter;
 import de.jtem.halfedgetools.symmetry.adapters.SymmetryFaceColorAdapter;
 import de.jtem.halfedgetools.symmetry.plugin.CompactifierPlugin;
@@ -73,8 +76,16 @@ public class SymmetricSubdivisionTutorial {
 		viewer.registerPlugin(new SymmetricSqrt3Plugin());
 		viewer.registerPlugin(new SymmetricSqrt3wFlipPlugin());
 		viewer.registerPlugin(new PerturbPlugin());
+		viewer.registerPlugin(new FillHolesPlugin());
 		viewer.registerPlugin(new CompactifierPlugin());
 		viewer.registerPlugin(new SymmetryVisualizer());
+//		viewer.registerPlugin(new CubeGenerator());
+//		viewer.registerPlugin(new CylinderGenerator());
+		viewer.registerPlugin(new VertexEditorPlugin());
+		
+		viewer.registerPlugins(HalfedgePluginFactory.createEditingPlugins());
+		viewer.registerPlugins(HalfedgePluginFactory.createVisualizerPlugins());
+		viewer.registerPlugins(HalfedgePluginFactory.createGeneratorPlugins());
 
 		viewer.startup();
 		
