@@ -31,8 +31,14 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.symmetry.tutorial;
 
+import de.jreality.math.P3;
+import de.jreality.math.Pn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
+import de.jtem.discretegroup.core.DiscreteGroup;
+import de.jtem.discretegroup.core.DiscreteGroupElement;
+import de.jtem.discretegroup.core.DiscreteGroupSimpleConstraint;
+import de.jtem.discretegroup.plugin.TessellatedContent;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.PerturbPlugin;
@@ -58,11 +64,12 @@ public class SymmetricSubdivisionTutorial {
 	
 		JRViewer viewer = new JRViewer();
 		viewer.addBasicUI();
-		viewer.addContentUI();
-		viewer.addContentSupport(ContentType.CenteredAndScaled);
+		viewer.addContentUI();		
+//		viewer.addContentSupport(ContentType.CenteredAndScaled);
 		viewer.setShowPanelSlots(true, false, false, false);
 		viewer.setShowToolBar(true);
-		
+		TessellatedContent tc = new TessellatedContent();
+		viewer.registerPlugin(tc);
 		HalfedgeInterface hif = new HalfedgeInterface();
 		hif.addAdapter(new SymmetricPositionAdapter(), true);
 		hif.addAdapter(new SymmetryEdgeColorAdapter(), true);
@@ -88,6 +95,27 @@ public class SymmetricSubdivisionTutorial {
 		viewer.registerPlugins(HalfedgePluginFactory.createGeneratorPlugins());
 
 		viewer.startup();
+		tc.setFollowsCamera(false);
+		tc.setClipToCamera(false);
+		tc.setGroup(getGroup(), false);
+
+	}
+	
+	private static DiscreteGroup getGroup()	{
+		String[] names = {"x", "y", "z"};
+		double[][] tlates = {{-0.361053, 1.11881, -0.396760}, {-1.23166, -0.00475500, 0.0114950}, {-0.0924910, -0.0203500, -1.24443}};
+		DiscreteGroupElement gens[]  = new DiscreteGroupElement[6];
+		for (int i = 0; i<3; ++i)	{
+			gens[i] = new DiscreteGroupElement(0, P3.makeTranslationMatrix(null, tlates[i], 0), names[i]);
+			gens[i+3] = gens[i].getInverse();
+		}
+		DiscreteGroup dg = new DiscreteGroup();
+		dg.setDimension(3);
+		dg.setMetric(Pn.EUCLIDEAN);
+		dg.setGenerators(gens);
+		dg.setConstraint(new DiscreteGroupSimpleConstraint(20));
+		dg.update();
+		return dg;
 		
 	}
 }

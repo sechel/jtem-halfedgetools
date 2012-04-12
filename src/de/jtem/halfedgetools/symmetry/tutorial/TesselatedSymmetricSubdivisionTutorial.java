@@ -34,6 +34,9 @@ package de.jtem.halfedgetools.symmetry.tutorial;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.sun.j3d.utils.geometry.Primitive;
+
+import de.jreality.geometry.Primitives;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
@@ -63,12 +66,13 @@ import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
 public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent {
 	
 	private static TesselatedSymmetricSubdivisionTutorial tc;
+	private static TriangleGroup cubeRot;
 	
 	public static SHDS generateCube() {
 		
 		SHDS shds = new SHDS();
 		
-		TriangleGroup cubeRot = TriangleGroup.instanceOfGroup("234");
+		cubeRot = TriangleGroup.instanceOfGroup("234");
 		shds.setGroup(cubeRot);
 		
 		SEdge e00 = shds.addNewEdge();
@@ -216,9 +220,13 @@ public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent {
 
 		viewer.startup();
 		
-//		SHDS cube = 
+		SHDS cube = 
 		generateCube();
-	//	hif.set(cube);
+		cubeRot.setCenterPoint(new double[]{.1,.1,.2,1});
+		tc.setGroup(cubeRot, false);
+		tc.setContent(Primitives.cube());
+//		tc.setContent(cube.g)
+		hif.set(cube);
 		
 	}
 //
