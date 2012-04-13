@@ -69,6 +69,9 @@ public class SymmetricSubdivisionTutorial {
 		viewer.setShowPanelSlots(true, false, false, false);
 		viewer.setShowToolBar(true);
 		TessellatedContent tc = new TessellatedContent();
+		tc.setFollowsCamera(false);
+		tc.setClipToCamera(false);
+		tc.setDoDirichletDomain(false);
 		viewer.registerPlugin(tc);
 		HalfedgeInterface hif = new HalfedgeInterface();
 		hif.addAdapter(new SymmetricPositionAdapter(), true);
@@ -95,8 +98,6 @@ public class SymmetricSubdivisionTutorial {
 		viewer.registerPlugins(HalfedgePluginFactory.createGeneratorPlugins());
 
 		viewer.startup();
-		tc.setFollowsCamera(false);
-		tc.setClipToCamera(false);
 		tc.setGroup(getGroup(), false);
 
 	}

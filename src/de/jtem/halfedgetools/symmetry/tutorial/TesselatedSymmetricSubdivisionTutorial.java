@@ -157,18 +157,25 @@ public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent {
 		HalfEdgeUtils.fillAllHoles(shds);
 		
 		double[][] pts = cubeRot.getTriangle();
+//			{{1,0,1,1},{1,1,1,1},{0,0,1,1}};
 		// project the points onto the unit cube; points by default lie on unit cube
+//		for (int i = 0; i<3; ++i)	{
+//			for (int j = 0; j<3; ++j)	{
+//				pts[i][j] = pts[i][j]/pts[i][2];
+//			}
+//		}
 		Pn.setToLength(pts[0], pts[0], 1.414, 0);
 		Pn.setToLength(pts[1], pts[1], 1.731, 0);
 		double[][] pts4 = {pts[0], pts[1], pts[2], new double[4]};
 		Rn.average(pts4[3], pts);
 		Pn.setToLength(pts4[3], pts4[3], 1.5, Pn.EUCLIDEAN);
+		System.err.println("triangle = "+Rn.toString(pts));
 		
 		v00.setEmbedding(pts4[0]);
 		v01.setEmbedding(pts4[1]);
 		v02.setEmbedding(pts4[2]);
 		v03.setEmbedding(pts4[3]);
-		v04.setEmbedding(new double[] {0,0,0});
+		v04.setEmbedding(new double[] {0,0,0,1});
 		
 		CuttingInfo<SVertex, SEdge, SFace> symmetryCycles = new CuttingInfo<SVertex, SEdge, SFace>();
 		
@@ -177,7 +184,7 @@ public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent {
 		order3.add(e15); order3.add(e16);
 		order4.add(e14); order4.add(e17);
 		symmetryCycles.paths.put(order3, cubeRot.getGenerators()[0]);
-		symmetryCycles.paths.put(order3, cubeRot.getGenerators()[1]);
+		symmetryCycles.paths.put(order4, cubeRot.getGenerators()[1]);
 		
 		shds.setSymmetryCycles(symmetryCycles);
 		
@@ -190,7 +197,7 @@ public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent {
 		JRViewer viewer = new JRViewer();
 		viewer.addBasicUI();
 		viewer.addContentUI();
-		viewer.addContentSupport(ContentType.CenteredAndScaled);
+//		viewer.addContentSupport(ContentType.CenteredAndScaled);
 		viewer.setShowPanelSlots(true, false, false, false);
 		viewer.setShowToolBar(true);
 		
@@ -202,6 +209,9 @@ public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent {
 		hif.addAdapter(new SymmetricBaryCenterAdapter(), true);
 		
 		tc = new TesselatedSymmetricSubdivisionTutorial();
+		tc.setFollowsCamera(false);
+		tc.setClipToCamera(false);
+		tc.setDoDirichletDomain(false);
 		viewer.registerPlugin(tc);
 
 		
@@ -220,11 +230,10 @@ public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent {
 
 		viewer.startup();
 		
-		SHDS cube = 
-		generateCube();
+		SHDS cube = generateCube();
 		cubeRot.setCenterPoint(new double[]{.1,.1,.2,1});
 		tc.setGroup(cubeRot, false);
-		tc.setContent(Primitives.cube());
+//		tc.setContent(Primitives.cube());
 //		tc.setContent(cube.g)
 		hif.set(cube);
 		
