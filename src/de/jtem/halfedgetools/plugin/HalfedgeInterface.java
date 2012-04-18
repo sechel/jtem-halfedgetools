@@ -1235,7 +1235,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		updateStates();
 	}
 	
-	protected SceneGraphComponent getHalfedgeRoot() {
+	public SceneGraphComponent getHalfedgeRoot() {
 		return root;
 	}
 	
