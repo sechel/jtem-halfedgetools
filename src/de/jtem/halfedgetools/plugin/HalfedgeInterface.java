@@ -848,7 +848,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	 * of the active layer
 	 * @return
 	 */
-	public AdapterSet getPersistantAdapters() {
+	public AdapterSet getPersistentAdapters() {
 		AdapterSet result = new AdapterSet();
 		result.addAll(persistentAdapters);
 		result.addAll(activeLayer.getPersistentAdapters());
@@ -923,6 +923,14 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		activeVolatileAdapters.clear();
 		activeVolatileAdapters.addAll(volatileAdapters);
 		volatileAdapters.clear();
+	}
+	
+	public void addTemporaryGeometry(SceneGraphComponent c) {
+		getActiveLayer().addTemporaryGeometry(c);
+	}
+
+	public void removeTemporaryGeometry(SceneGraphComponent c) {
+		getActiveLayer().removeTemporaryGeometry(c);
 	}
 	
 	@Override

@@ -34,7 +34,6 @@ package de.jtem.halfedgetools.symmetry.tutorial;
 import de.jreality.math.P3;
 import de.jreality.math.Pn;
 import de.jreality.plugin.JRViewer;
-import de.jreality.plugin.JRViewer.ContentType;
 import de.jtem.discretegroup.core.DiscreteGroup;
 import de.jtem.discretegroup.core.DiscreteGroupElement;
 import de.jtem.discretegroup.core.DiscreteGroupSimpleConstraint;

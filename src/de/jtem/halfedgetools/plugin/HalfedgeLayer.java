@@ -652,6 +652,9 @@ public class HalfedgeLayer implements ActionListener {
 	}
 	
 	public void addTemporaryGeometry(SceneGraphComponent root) {
+		if (!layerRoot.isDirectAncestor(temporaryRoot)) {
+			layerRoot.addChild(temporaryRoot);
+		}			
 		SceneGraphUtility.addChildNode(temporaryRoot, root);
 	}
 	
