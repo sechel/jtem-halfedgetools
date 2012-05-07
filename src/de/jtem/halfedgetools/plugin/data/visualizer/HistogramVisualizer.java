@@ -184,7 +184,7 @@ public class HistogramVisualizer extends DataVisualizerPlugin implements ChangeL
 			numBins = 100,
 			exp = 0;
 		private ColorMap
-			colorMap = ColorMap.RedGreen;
+			colorMap = ColorMap.Hue;
 		private ColoredXYBarRenderer
 			renderer = new ColoredXYBarRenderer();
 		private double[]

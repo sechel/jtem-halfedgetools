@@ -76,7 +76,7 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 		optionsPanel.add(new JLabel("Offset"), cl);
 		optionsPanel.add(offsetSpinner, cr);
 		
-		colorMapCombo.setSelectedItem(ColorMap.RedGreen);
+		colorMapCombo.setSelectedItem(ColorMap.Hue);
 		
 		colorMapCombo.addActionListener(this);
 		offsetSpinner.addChangeListener(this);
@@ -99,7 +99,7 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 	private class NodeColorVisualization extends AbstractDataVisualization {
 		
 		private ColorMap
-			colorMap = ColorMap.RedGreen;
+			colorMap = ColorMap.Hue;
 		private SceneGraphComponent
 			geomComponent = new SceneGraphComponent("Node Colors");
 		private Appearance
