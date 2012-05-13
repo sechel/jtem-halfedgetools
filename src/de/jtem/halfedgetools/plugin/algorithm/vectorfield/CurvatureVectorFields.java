@@ -9,6 +9,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JCheckBox;
@@ -110,7 +112,11 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 				if (boundaryOnly) {
 					nodes = HalfEdgeUtils.boundaryEdges(hds);
 				} else {
-					nodes = hds.getEdges();
+					List<E> edgeList = new LinkedList<E>();
+					for (E e : hds.getPositiveEdges()) {
+						edgeList.add(e);
+					}
+					nodes = new LinkedList<Node<V,E,F>>(edgeList);
 				}
 				break;
 			case 2: 
@@ -119,6 +125,7 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 		}
 		
 		for (Node<V, E, F> node : nodes) {
+			a.setParameter("alpha", 0.5);
 			double[] p = a.getD(BaryCenter3d.class, node);
 			try {
 				evd = getCurvatureTensor(p, scale * radius, kd, a);
@@ -134,6 +141,15 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 				nMap.put(node, n);
 				k1AbsMap.put(node, values[0]);
 				k2AbsMap.put(node, values[1]);
+				if (node instanceof Edge) {
+					Edge<V,E,F> e = (Edge<V,E,F>)node;
+					Edge<V,E,F> eOpp = e.getOppositeEdge();
+					k1Map.put(eOpp, vecs[0]);
+					k2Map.put(eOpp, vecs[1]);
+					nMap.put(eOpp, n);
+					k1AbsMap.put(eOpp, values[0]);
+					k2AbsMap.put(eOpp, values[1]);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
