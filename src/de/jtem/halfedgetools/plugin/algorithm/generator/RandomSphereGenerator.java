@@ -15,6 +15,8 @@ import de.jtem.halfedgetools.algorithm.computationalgeometry.ConvexHull;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class RandomSphereGenerator extends AlgorithmPlugin {
 
@@ -51,5 +53,11 @@ public class RandomSphereGenerator extends AlgorithmPlugin {
 		ConvexHull.convexHull(r, a, 1E-8);
 		hi.set(r);
 	}
-
+	
+	@Override
+	public PluginInfo getPluginInfo() {
+		PluginInfo info = new PluginInfo("Create Random Sphere");
+		info.icon = ImageHook.getIcon("RandomSphere.png",16,16);
+		return info;
+	}
 }

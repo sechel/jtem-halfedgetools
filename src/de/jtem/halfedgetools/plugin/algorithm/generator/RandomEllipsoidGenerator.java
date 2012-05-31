@@ -21,6 +21,8 @@ import de.jtem.halfedgetools.algorithm.computationalgeometry.ConvexHull;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
+import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class RandomEllipsoidGenerator extends AlgorithmDialogPlugin {
 
@@ -94,4 +96,10 @@ public class RandomEllipsoidGenerator extends AlgorithmDialogPlugin {
 		hi.set(r);
 	}
 
+	@Override
+	public PluginInfo getPluginInfo() {
+		PluginInfo info = new PluginInfo("Create Random Ellipsoid");
+		info.icon = ImageHook.getIcon("RandomEllipse.png",16,16);
+		return info;
+	}
 }
