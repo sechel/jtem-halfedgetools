@@ -96,7 +96,7 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 		actVis.update();
 	}
 	
-	private class NodeColorVisualization extends AbstractDataVisualization {
+	public class NodeColorVisualization extends AbstractDataVisualization {
 		
 		private ColorMap
 			colorMap = ColorMap.Hue;
