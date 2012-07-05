@@ -12,6 +12,7 @@ import static java.lang.Math.max;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -57,12 +59,18 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 	private JComboBox
 		beadsPosCombo = new JComboBox(),
 		colorMapCombo = new JComboBox(ColorMap.values());
+	private MyClampModel
+		clampLowModel = new MyClampModel(),
+		clampHighModel = new MyClampModel();
 	private SpinnerNumberModel
 		spanModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.1),
 		scaleModel = new SpinnerNumberModel(1.0, 0.1, 100.0, 0.1);
 	private JCheckBox
+		clampChecker = new JCheckBox("C"),
 		invertChecker = new JCheckBox("Invert Scale");
 	private JSpinner
+		clampLowSpinner = new JSpinner(clampLowModel),
+		clampHighSpinner = new JSpinner(clampHighModel),
 		spanSpinner = new JSpinner(spanModel),
 		scaleSpinner = new JSpinner(scaleModel);
 	private JPanel
@@ -78,25 +86,69 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 	private HalfedgeInterface
 		hif = null;
 	
+	private class MyClampModel extends SpinnerNumberModel {
+
+		private static final long 
+			serialVersionUID = 1L;
+		private Double
+			stepsize = 1E-1;
+		
+		public MyClampModel() {
+			super(0.0, null, null, 1.0);
+		}
+		
+		@Override
+		public Object getNextValue() {
+			return getNumber().doubleValue() + stepsize;
+		}
+		
+		@Override
+		public Object getPreviousValue() {
+			return getNumber().doubleValue() - stepsize;
+		}
+		
+		@Override
+		public void setStepSize(Number stepSize) {
+			this.stepsize = stepSize.doubleValue();
+		}
+		
+	}
+	
+	
 	public ColoredBeadsVisualizer() {
 		optionsPanel.setLayout(new GridBagLayout());
 		GridBagConstraints cl = LayoutFactory.createLeftConstraint();
 		GridBagConstraints cr = LayoutFactory.createRightConstraint();
-		optionsPanel.add(new JLabel("Scale"), cl);
-		optionsPanel.add(scaleSpinner, cr);
-		optionsPanel.add(new JLabel("Span"), cl);
+		GridBagConstraints c = new GridBagConstraints();
+		c.weightx = 1.0;
+		c.gridwidth = 1;
+		c.insets = new Insets(1,1,1,1);
+		c.fill = GridBagConstraints.BOTH;
+		optionsPanel.add(new JLabel("Scale/Span"), c);
+		optionsPanel.add(scaleSpinner, c);
 		optionsPanel.add(spanSpinner, cr);
+		optionsPanel.add(clampChecker, c);
+		optionsPanel.add(clampLowSpinner, c);
+		optionsPanel.add(clampHighSpinner, cr);		
 		optionsPanel.add(invertChecker, cr);
 		optionsPanel.add(new JLabel("Colors"), cl);
 		optionsPanel.add(colorMapCombo, cr);
 		optionsPanel.add(new JLabel("Position"), cl);
 		optionsPanel.add(beadsPosCombo, cr);
 
+		JComponent highEditor = new JSpinner.NumberEditor(clampHighSpinner, "0.00E0");
+		clampHighSpinner.setEditor(highEditor);
+		JComponent lowEditor = new JSpinner.NumberEditor(clampLowSpinner, "0.00E0");
+		clampLowSpinner.setEditor(lowEditor);
+		
 		scaleSpinner.addChangeListener(this);
 		spanSpinner.addChangeListener(this);
+		clampHighSpinner.addChangeListener(this);
+		clampLowSpinner.addChangeListener(this);
 		invertChecker.addActionListener(this);
 		colorMapCombo.addActionListener(this);
 		beadsPosCombo.addActionListener(this);
+		clampChecker.addActionListener(this);
 		
 		colorMapCombo.setSelectedItem(ColorMap.Hue);
 		
@@ -119,6 +171,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		actVis.colorMap = (ColorMap)colorMapCombo.getSelectedItem();
 		actVis.invert = invertChecker.isSelected();
 		actVis.beadPosAdapter = (Adapter<double[]>)beadsPosCombo.getSelectedItem();
+		actVis.clamp = clampChecker.isSelected();
 		actVis.update();
 	}
 	
@@ -127,15 +180,21 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		if (actVis == null || listenersDisabled) return;
 		actVis.scale = scaleModel.getNumber().doubleValue();
 		actVis.span = spanModel.getNumber().doubleValue();
+		actVis.clampHigh = clampHighModel.getNumber().doubleValue();
+		actVis.clampLow = clampLowModel.getNumber().doubleValue();
 		actVis.update();
 	}
 	
 	public class ColoredBeadsVisualization extends AbstractDataVisualization {
 		
 		private double
+			clampLow = 0.0,
+			clampHigh = 0.0,
 			span = 1.0,
 			scale = 1.0;
 		private boolean
+			clamp = false,
+			clampInited = false,
 			invert = false;
 		private ColorMap
 			colorMap = ColorMap.Hue;
@@ -147,6 +206,9 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			beadPosAdapter = null;
 		private boolean cutSmallValues= false;
 		private double smallestAbsolutValue= 1E-10;
+		private double
+			minValue = 0.0,
+			maxValue = 0.0;
 		
 		public ColoredBeadsVisualization(
 			HalfedgeLayer layer, 
@@ -192,8 +254,8 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 			meanEdgeLength /= hds.numEdges() / 2;
 			List<double[]> vertexData = new LinkedList<double[]>();
 			int i = 0;
-			double max = -Double.MAX_VALUE;
-			double min = Double.MAX_VALUE;
+			maxValue = -Double.MAX_VALUE;
+			minValue = Double.MAX_VALUE;
 			double mean = 0;
 			aSet.setParameter("beadScale", scale);
 			int foundNullValues = 0;
@@ -211,10 +273,15 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 					aSet.setParameter("beadScale", meanEdgeLength);
 					vertexData.add(beadPosAdapter.get(n, aSet));
 					double num = numbers[j];
-					if (num > max) max = num;
-					if (num < min) min = num;
+					if (num > maxValue) maxValue = num;
+					if (num < minValue) minValue = num;
 					mean += num;
 				}
+			}
+			if (!clampInited) {
+				clampHigh = maxValue;
+				clampLow = minValue;
+				clampInited = true;
 			}
 			mean /= nodes.size();
 			if (foundNullValues > 0) {
@@ -230,8 +297,13 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 				double[] numbers = convertValue(val);
 				for (int j = 0; j < numbers.length; j++) {
 					double v = numbers[j];
-					colorData[i] = colorMap.getColor(v, min, max);					
-					sizeData[i++] = mapScale(v, scale, span, invert, min, max, mean, meanEdgeLength / 4);
+					if (clamp) {
+						v = ColorMap.clamp(v, clampLow, clampHigh);
+						colorData[i] = colorMap.getColor(v, clampLow, clampHigh);
+					} else {
+						colorData[i] = colorMap.getColor(v, minValue, maxValue);					
+					}			
+					sizeData[i++] = mapScale(v, scale, span, invert, minValue, maxValue, mean, meanEdgeLength / 4);
 				}
 			}
 			if (vertexDataArr.length == 0) {
@@ -351,6 +423,24 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		scaleModel.setValue(actVis.scale);
 		spanModel.setValue(actVis.span);
 		invertChecker.setSelected(actVis.invert);
+		clampChecker.setSelected(actVis.clamp);
+		if (actVis.clampHigh < actVis.minValue) {
+			actVis.clampHigh = actVis.minValue;
+		}
+		if (actVis.clampLow < actVis.minValue) {
+			actVis.clampLow = actVis.minValue;
+		}
+		if (actVis.clampHigh > actVis.maxValue) {
+			actVis.clampHigh = actVis.maxValue;
+		}
+		if (actVis.clampLow > actVis.maxValue) {
+			actVis.clampLow = actVis.maxValue;
+		}		
+		double stepSize =  Math.abs(actVis.maxValue - actVis.minValue) / 100.0;
+		clampHighModel.setStepSize(stepSize);
+		clampLowModel.setStepSize(stepSize);
+		clampHighModel.setValue(actVis.clampHigh);
+		clampLowModel.setValue(actVis.clampLow);
 		listenersDisabled = false;
 		
 		AdapterSet aSet = visualization.getLayer().getEffectiveAdapters();
@@ -361,7 +451,6 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		ComboBoxModel beadPosModel = new DefaultComboBoxModel(beadPosVec);
 		beadsPosCombo.setModel(beadPosModel);
 		beadsPosCombo.setSelectedItem(actVis.beadPosAdapter);
-		
 		return optionsPanel;
 	}
 	

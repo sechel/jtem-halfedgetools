@@ -1,5 +1,8 @@
 package de.jtem.halfedgetools.plugin.data.color;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 import java.awt.Color;
 
 public enum ColorMap {
@@ -25,6 +28,10 @@ public enum ColorMap {
 		default:
 			return Color.getHSBColor(2f/3f - 2f * relativeValue / 3f, 1f, 1f);
 		}
+	}
+
+	public static double clamp(double val, double low, double high) {
+		return max(min(val, high), low);
 	}
 
 	public String getName() {
