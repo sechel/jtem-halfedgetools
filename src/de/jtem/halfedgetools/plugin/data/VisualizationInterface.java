@@ -731,4 +731,15 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		}
 	}
 	
+	
+	public AdapterSet getActiveAdapters() {
+		AdapterSet set = new AdapterSet();
+		List<DataVisualization> vis = getActiveVisualizations();
+		for (DataVisualization dv : vis) {
+			set.add(dv.getSource());
+		}
+		return set;
+	}
+	
+	
 }
