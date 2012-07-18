@@ -16,12 +16,15 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class RandomSphereGenerator extends AlgorithmPlugin {
 
 	private Random 
 		rnd = new Random();
+	private int
+		extraPoints = 20;
 	
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
@@ -32,6 +35,19 @@ public class RandomSphereGenerator extends AlgorithmPlugin {
 	public String getAlgorithmName() {
 		return "Random Sphere";
 	}
+	
+	@Override
+	public void storeStates(Controller c) throws Exception {
+		super.storeStates(c);
+		c.storeProperty(RandomSphereGenerator.class, "numPoints", extraPoints);
+	}
+	
+	@Override
+	public void restoreStates(Controller c) throws Exception {
+		super.restoreStates(c);
+		extraPoints = c.getProperty(RandomSphereGenerator.class, "numPoints", 20);
+	}
+	
 
 	@Override
 	public <
@@ -40,9 +56,9 @@ public class RandomSphereGenerator extends AlgorithmPlugin {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		String numString = JOptionPane.showInputDialog(getOptionParent(), "Number of points", 20);
+		String numString = JOptionPane.showInputDialog(getOptionParent(), "Number of points", extraPoints);
 		if (numString == null) return;
-		int extraPoints = Integer.parseInt(numString);
+		extraPoints = Integer.parseInt(numString);
 		HDS r = hi.createEmpty(hds);
 		for (int i = 0; i < extraPoints; i++) {
 			double[] pos = {rnd.nextGaussian(), rnd.nextGaussian(), rnd.nextGaussian()};

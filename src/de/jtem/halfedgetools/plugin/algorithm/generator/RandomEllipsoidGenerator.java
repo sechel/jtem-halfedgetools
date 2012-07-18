@@ -22,6 +22,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class RandomEllipsoidGenerator extends AlgorithmDialogPlugin {
@@ -31,10 +32,10 @@ public class RandomEllipsoidGenerator extends AlgorithmDialogPlugin {
 	private JPanel
 		panel = new JPanel();
 	private SpinnerNumberModel
-		numPointsModel = new SpinnerNumberModel(4, 4, 100000, 1),
+		numPointsModel = new SpinnerNumberModel(50, 4, 100000, 1),
 		aSpinnerModel = new SpinnerNumberModel(1.0, 0.01, 10000.0, 0.1),
-		bSpinnerModel = new SpinnerNumberModel(1.0, 0.01, 10000.0, 0.1),
-		cSpinnerModel = new SpinnerNumberModel(1.0, 0.01, 10000.0, 0.1);
+		bSpinnerModel = new SpinnerNumberModel(2.0, 0.01, 10000.0, 0.1),
+		cSpinnerModel = new SpinnerNumberModel(3.0, 0.01, 10000.0, 0.1);
 	private JSpinner
 		numPointsSpinner = new JSpinner(numPointsModel),
 		aSpinner = new JSpinner(aSpinnerModel),
@@ -58,6 +59,26 @@ public class RandomEllipsoidGenerator extends AlgorithmDialogPlugin {
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
 		return AlgorithmCategory.Generator;
+	}
+	
+	@Override
+	public void storeStates(Controller c) throws Exception {
+		super.storeStates(c);
+		Class<RandomEllipsoidGenerator> context = RandomEllipsoidGenerator.class;
+		c.storeProperty(context, "a", aSpinnerModel.getNumber().doubleValue());
+		c.storeProperty(context, "b", bSpinnerModel.getNumber().doubleValue());
+		c.storeProperty(context, "c", cSpinnerModel.getNumber().doubleValue());
+		c.storeProperty(context, "points", numPointsModel.getNumber().intValue());
+	}
+	
+	@Override
+	public void restoreStates(Controller c) throws Exception {
+		super.restoreStates(c);
+		Class<RandomEllipsoidGenerator> context = RandomEllipsoidGenerator.class;
+		aSpinnerModel.setValue(c.getProperty(context, "a", 1.0));
+		bSpinnerModel.setValue(c.getProperty(context, "b", 2.0));
+		cSpinnerModel.setValue(c.getProperty(context, "c", 3.0));
+		numPointsModel.setValue(c.getProperty(context, "points", 50.0));
 	}
 	
 	@Override

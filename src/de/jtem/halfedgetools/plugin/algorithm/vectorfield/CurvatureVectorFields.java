@@ -36,6 +36,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.jtem.halfedgetools.util.GeometryUtility;
+import de.jtem.jrworkspace.plugin.Controller;
 
 public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 
@@ -75,6 +76,30 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 		vecPanel.add(k1Radio);
 		vecPanel.add(k2Radio);
 		vecPanel.add(nRadio);
+	}
+	
+	@Override
+	public void storeStates(Controller c) throws Exception {
+		super.storeStates(c);
+		Class<CurvatureVectorFields> context = CurvatureVectorFields.class;
+		c.storeProperty(context, "k1Checked", k1Radio.isSelected());
+		c.storeProperty(context, "k2Checked", k2Radio.isSelected());
+		c.storeProperty(context, "nChecked", nRadio.isSelected());
+		c.storeProperty(context, "onBoundaryChecked", onBoundaryChecker.isSelected());
+		c.storeProperty(context, "nodeType", nodeTypeCombo.getSelectedIndex());
+		c.storeProperty(context, "radius", radiusModel.getNumber().doubleValue());
+	}
+	
+	@Override
+	public void restoreStates(Controller c) throws Exception {
+		super.restoreStates(c);
+		Class<CurvatureVectorFields> context = CurvatureVectorFields.class;
+		k1Radio.setSelected(c.getProperty(context, "k1Checked", true));
+		k2Radio.setSelected(c.getProperty(context, "k2Checked", true));
+		nRadio.setSelected(c.getProperty(context, "k2Cheked", false));
+		onBoundaryChecker.setSelected(c.getProperty(context, "onBoundaryChecked", false));
+		nodeTypeCombo.setSelectedIndex(c.getProperty(context, "nodeType", 0));
+		radiusModel.setValue(c.getProperty(context, "radius", 4.0));
 	}
 	
 	@Override
