@@ -297,6 +297,11 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 				double[] numbers = convertValue(val);
 				for (int j = 0; j < numbers.length; j++) {
 					double v = numbers[j];
+					if (Double.isNaN(v) || Double.isInfinite(v)) {
+						colorData[i] = Color.BLACK;
+						sizeData[i++] = 0.0;
+						continue;
+					}
 					if (clamp) {
 						v = ColorMap.clamp(v, clampLow, clampHigh);
 						colorData[i] = colorMap.getColor(v, clampLow, clampHigh);

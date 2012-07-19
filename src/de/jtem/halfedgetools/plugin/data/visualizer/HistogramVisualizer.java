@@ -329,7 +329,10 @@ public class HistogramVisualizer extends DataVisualizerPlugin implements ChangeL
 		int i = 0;
 		for (N n : nodes) {
 			Number val = source.get(n, aSet);
-			if (val == null) continue;
+			double dValue = val == null ? Double.NaN : val.doubleValue();
+			if (Double.isNaN(dValue) || Double.isInfinite(dValue)) {
+				continue;
+			}
 			data[i++] = val.doubleValue() * scale;
 		}
 		return Arrays.copyOf(data, i);
