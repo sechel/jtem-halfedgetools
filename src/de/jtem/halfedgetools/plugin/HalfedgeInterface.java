@@ -923,6 +923,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		activeVolatileAdapters.clear();
 		activeVolatileAdapters.addAll(volatileAdapters);
 		volatileAdapters.clear();
+		fireAdaptersChanged();
 	}
 	
 	public void addTemporaryGeometry(SceneGraphComponent c) {
