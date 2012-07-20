@@ -78,7 +78,7 @@ public class RandomEllipsoidGenerator extends AlgorithmDialogPlugin {
 		aSpinnerModel.setValue(c.getProperty(context, "a", 1.0));
 		bSpinnerModel.setValue(c.getProperty(context, "b", 2.0));
 		cSpinnerModel.setValue(c.getProperty(context, "c", 3.0));
-		numPointsModel.setValue(c.getProperty(context, "points", 50.0));
+		numPointsModel.setValue(c.getProperty(context, "points", 50));
 	}
 	
 	@Override
