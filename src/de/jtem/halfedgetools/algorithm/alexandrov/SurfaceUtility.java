@@ -43,6 +43,7 @@ import javax.vecmath.Point4d;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.HalfedgeException;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasAngle;
@@ -52,7 +53,6 @@ import de.jtem.halfedgetools.algorithm.alexandrov.decorations.IsBoundary;
 import de.jtem.halfedgetools.algorithm.alexandrov.delaunay.decorations.HasLength;
 import de.jtem.halfedgetools.algorithm.alexandrov.delaunay.decorations.IsFlippable;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
-import de.jtem.halfedgetools.util.SurfaceException;
 import de.jtem.halfedgetools.util.TriangulationException;
 
 
@@ -80,9 +80,10 @@ public class SurfaceUtility {
 		V extends Vertex<V, E, F> & HasXY,
 		E extends Edge<V, E, F> & IsBoundary,
 		F extends Face<V, E, F>
-	> void constructBoundary(HalfEdgeDataStructure<V, E, F> graph) throws SurfaceException{
-		for (E e : graph.getEdges())
+	> void constructBoundary(HalfEdgeDataStructure<V, E, F> graph) {
+		for (E e : graph.getEdges()) {
 			e.setBoundary(false);
+		}
 		Comparator<V> comp = new VertexXPosComparator<V, E, F>();
 		V rightMost = Collections.max(graph.getVertices(), comp);
 		List<E> cocycle =HalfEdgeUtilsExtra.getEdgeStar(rightMost);
@@ -111,7 +112,7 @@ public class SurfaceUtility {
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
-	> void linkBoundary(HalfEdgeDataStructure<V, E, F> graph) throws SurfaceException{
+	> void linkBoundary(HalfEdgeDataStructure<V, E, F> graph) {
 		for (F f : graph.getFaces()){
 			if (HalfEdgeUtils.isInteriorFace(f))
 				continue;
@@ -273,7 +274,7 @@ public class SurfaceUtility {
 		V extends Vertex<V, E, F> & HasXY,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
-	> void linkAllEdges(HalfEdgeDataStructure<V, E, F> graph) throws SurfaceException{
+	> void linkAllEdges(HalfEdgeDataStructure<V, E, F> graph) throws HalfedgeException {
 		for (E e : graph.getEdges()){
 			E actEdge = e;
 			int counter = 0;
@@ -285,7 +286,7 @@ public class SurfaceUtility {
 				counter++;
 			} while (actEdge != e && counter <= graph.numEdges());
 			if (counter == graph.numEdges() + 1)
-				throw new SurfaceException("No valid geometry in link all edges!");
+				throw new HalfedgeException ("No valid geometry in link all edges!");
 		}
 	}
 	
@@ -319,7 +320,7 @@ public class SurfaceUtility {
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
-	> List<F>   fillHoles(HalfEdgeDataStructure<V, E, F> graph) throws SurfaceException{
+	> List<F>   fillHoles(HalfEdgeDataStructure<V, E, F> graph) throws HalfedgeException {
 		List<F> faces = new LinkedList<F>();
 		for (E e : graph.getEdges()){
 			if (e.getLeftFace() != null)
@@ -330,7 +331,7 @@ public class SurfaceUtility {
 			int counter = 0;
 			do {
 				if (actEdge == null)
-					throw new SurfaceException("No valid surface while generating faces!");
+					throw new HalfedgeException("No valid surface while generating faces!");
 				actEdge.setLeftFace(face);
 				actEdge = actEdge.getNextEdge();
 				counter++;
@@ -338,7 +339,7 @@ public class SurfaceUtility {
 		}
 
 		if(!HalfEdgeUtils.isValidSurface(graph, true))
-			throw new SurfaceException("No valid surface could be constructed!");
+			throw new HalfedgeException("No valid surface could be constructed!");
 	
 		return faces;
 	}

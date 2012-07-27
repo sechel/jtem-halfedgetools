@@ -12,7 +12,6 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.TypedAdapterSet;
-import de.jtem.halfedgetools.util.SurfaceException;
 
 public class DooSabin {
 

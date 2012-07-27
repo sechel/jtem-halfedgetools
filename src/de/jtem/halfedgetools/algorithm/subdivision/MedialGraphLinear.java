@@ -10,7 +10,6 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
-import de.jtem.halfedgetools.util.SurfaceException;
 
 public class MedialGraphLinear {
 
