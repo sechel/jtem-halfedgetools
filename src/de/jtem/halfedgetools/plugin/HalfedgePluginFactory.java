@@ -84,6 +84,7 @@ import de.jtem.halfedgetools.plugin.data.visualizer.ColoredBeadsVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.LabelVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.NodeColorVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.HistogramVisualizer;
+import de.jtem.halfedgetools.plugin.data.visualizer.Immersion3DVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.TableDataVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.TextDumpVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.VectorFieldVisualizer;
@@ -194,6 +195,7 @@ public class HalfedgePluginFactory {
 		s.add(new ColoredBeadsVisualizer());
 		s.add(new HistogramVisualizer());	
 		s.add(new VectorFieldVisualizer());
+		s.add(new Immersion3DVisualizer());
 		return s;
 	}
 	
