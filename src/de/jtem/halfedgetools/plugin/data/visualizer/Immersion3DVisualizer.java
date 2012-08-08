@@ -153,8 +153,7 @@ public class Immersion3DVisualizer extends DataVisualizerPlugin implements
 			immersionComponent.setAppearance(immersionAppearance);
 		}
 
-		// TODO: handle boundary
-		@SuppressWarnings({ "rawtypes", "unchecked" })
+		@SuppressWarnings({ "unchecked" })
 		@Override
 		public void update() {
 
@@ -194,7 +193,7 @@ public class Immersion3DVisualizer extends DataVisualizerPlugin implements
 				p = new double[hds.numVertices()][];
 				ids = new int[hds.numFaces()][];
 
-				for (Vertex v : hds.getVertices()) {
+				for (Vertex<?,?,?> v : hds.getVertices()) {
 					p[v.getIndex()] = (double[]) imm.get(v, adapters);
 				}
 				for (Face f : hds.getFaces()) {
@@ -218,7 +217,7 @@ public class Immersion3DVisualizer extends DataVisualizerPlugin implements
 				p = new double[hds.numEdges()][];
 				ids = new int[hds.numFaces() + hds.numVertices()][];
 
-				for (Edge e : hds.getEdges()) {
+				for (Edge<?,?,?> e : hds.getEdges()) {
 					p[e.getIndex()] = (double[]) imm.get(e, adapters);
 				}
 				int nV = hds.numVertices();
@@ -250,19 +249,18 @@ public class Immersion3DVisualizer extends DataVisualizerPlugin implements
 				p = new double[hds.numFaces()][];
 				ids = new int[hds.numVertices() - numBdVert][];
 
-				for (Face f : hds.getFaces()) {
+				for (Face<?,?,?> f : hds.getFaces()) {
 					p[f.getIndex()] = (double[]) imm.get(f, adapters);
 				}
 				int count = 0;
 				for (int i = 0; i < hds.numVertices(); i++) {
-					Vertex v = hds.getVertex(i);
-					if (HalfEdgeUtils.isBoundaryVertex(v)) {
+					if (HalfEdgeUtils.isBoundaryVertex(hds.getVertex(i))) {
 						count++;
 					} else {
-						List<Edge> star = HalfEdgeUtilsExtra.getEdgeStar(v);
-						ids[v.getIndex() - count] = new int[star.size()];
+						List<?> star = HalfEdgeUtilsExtra.getEdgeStar(hds.getVertex(i));
+						ids[i - count] = new int[star.size()];
 						for (int j = 0; j < star.size(); j++)
-							ids[v.getIndex() - count][j] = star.get(j)
+							ids[i - count][j] = ((Edge)star.get(j))
 									.getRightFace().getIndex();
 					}
 				}

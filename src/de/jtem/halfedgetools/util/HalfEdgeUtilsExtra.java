@@ -475,12 +475,15 @@ public class HalfEdgeUtilsExtra {
 
     /**
      * Return the edge star of the current vertex
+     * 
+     * @param <V>
+     * @param <E>
+     * @param v
      * @return List of edges adjacent to current vertex, which is their targetVertex
      */
     public static <
 		V extends Vertex<V, E, ?>,
-		E extends Edge<V, E, ?>,
-		F extends Face<V, E, ?>
+		E extends Edge<V, E, ?>
     > List<E> getEdgeStar(V v){
     	List<E> edgeStar = new LinkedList<E>();
     	if (v.getIncomingEdge() == null || !v.getIncomingEdge().isValid())
