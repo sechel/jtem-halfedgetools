@@ -407,7 +407,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				return getDescription();
 			}
 		});
-		chooser.setFileFilter(new FileFilter() {
+		chooser.addChoosableFileFilter(new FileFilter() {
 			@Override
 			public String getDescription() {
 				return "Halfedge XML (*.heml)";
@@ -422,7 +422,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				return getDescription();
 			}
 		});
-		chooser.addChoosableFileFilter(new FileFilter(){
+		chooser.setFileFilter(new FileFilter(){
 			@Override
 			public boolean accept(File f) {
 				return f.isDirectory() || f.getName().toLowerCase().endsWith(".obj") ||
