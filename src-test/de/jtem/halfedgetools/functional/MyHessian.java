@@ -62,4 +62,9 @@ public class MyHessian implements Hessian {
 		return H.get(i, j);
 	}
 
+	@Override
+	public String toString() {
+		return H.toString();
+	}
+	
 }

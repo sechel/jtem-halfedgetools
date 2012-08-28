@@ -61,5 +61,10 @@ public class MyGradient implements Gradient {
 	public double get(int i) {
 		return G.get(i);
 	}
+	
+	@Override
+	public String toString() {
+		return G.toString();
+	}
 
 }

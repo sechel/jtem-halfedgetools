@@ -33,7 +33,8 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 
 	private static final long 
 		serialVersionUID = 1L;
-
+	private double
+		priorityBound = Double.POSITIVE_INFINITY;
 
 	public AdapterSet() {
 	}
@@ -50,6 +51,21 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		add(a);
 	}
 	
+	public void setPriorityBound(double maxQueryPriority) {
+		this.priorityBound = maxQueryPriority;
+		resetQueryCache();
+	}
+	public void removePriorityBound() {
+		priorityBound = Double.POSITIVE_INFINITY;
+		resetQueryCache();
+	}
+	protected boolean checkPriorityBound(Adapter<?> a) {
+		if (Double.isInfinite(priorityBound)) {
+			return true;
+		} else {
+			return a.getPriority() < priorityBound;
+		}
+	}
 	
 	public <
 		A extends Annotation, 
@@ -71,7 +87,9 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		Adapter<?> result = queryCache1.get(hash);
 		if (result != null) return (A)result;
 		for (Adapter<?> a : this) {
-			if (aClass.isAssignableFrom(a.getClass())) {
+			if (aClass.isAssignableFrom(a.getClass()) && 
+				checkPriorityBound(a)
+			) {
 				result = a;
 				break;
 			}
@@ -93,7 +111,11 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		Adapter<O> result = (Adapter<O>)queryCache2.get(hash);
 		if (result != null) return result; 
 		for (Adapter<?> a : this) {
-			if (a.getClass().isAnnotationPresent(type) && a.canAccept(nodeType) && a.checkType(out)) {
+			if (a.getClass().isAnnotationPresent(type) && 
+				a.canAccept(nodeType) && 
+				a.checkType(out) && 
+				checkPriorityBound(a)
+			) {
 				result = (Adapter<O>)a;
 				break;
 			}
@@ -117,7 +139,11 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		if (result != null) return result;
 		result = new LinkedList<Adapter<O>>();
 		for (Adapter<?> a : this) {
-			if (a.getClass().isAnnotationPresent(type) && a.canAccept(nodeType) && a.checkType(out)) {
+			if (a.getClass().isAnnotationPresent(type) && 
+				a.canAccept(nodeType) && 
+				a.checkType(out) && 
+				checkPriorityBound(a)
+			) {
 				result.add((Adapter<O>)a);
 			}
 		}
@@ -139,7 +165,10 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		if (result != null) return result;
 		result = new LinkedList<Adapter<O>>();
 		for (Adapter<?> a : this) {
-			if (a.getClass().isAnnotationPresent(type) && a.checkType(out)) {
+			if (a.getClass().isAnnotationPresent(type) && 
+				a.checkType(out) && 
+				checkPriorityBound(a)
+			) {
 				result.add((Adapter<O>)a);
 			}
 		}
@@ -158,7 +187,9 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		if (result != null) return result;
 		result = new LinkedList<Adapter<?>>();
 		for (Adapter<?> a : this) {
-			if (a.getClass().isAnnotationPresent(type)) {
+			if (a.getClass().isAnnotationPresent(type) && 
+				checkPriorityBound(a)
+			) {
 				result.add(a);
 			}
 		}
@@ -180,7 +211,9 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		if (result != null) return result;
 		result = new TypedAdapterSet<O>(out);
 		for (Adapter<?> a : this) {
-			if (a.checkType(out)) {
+			if (a.checkType(out) && 
+				checkPriorityBound(a)
+			) {
 				result.add(a);
 			}
 		}
@@ -202,7 +235,10 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		if (result != null) return result;
 		result = new TypedAdapterSet<O>(out);
 		for (Adapter<?> a : this) {
-			if (a.canAccept(noteType) && a.checkType(out)) {
+			if (a.canAccept(noteType) && 
+				a.checkType(out) && 
+				checkPriorityBound(a)
+			) {
 				result.add(a);
 			}
 		}
