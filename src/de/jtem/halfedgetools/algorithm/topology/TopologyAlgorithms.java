@@ -46,11 +46,69 @@ import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 public class TopologyAlgorithms {
 
 	public static <
-	V extends Vertex<V, E, F>,
-	E extends Edge<V, E, F>,
-	F extends Face<V, E, F>
-	> V collapseFace(F face) {
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>
+	> E splitFaceAt(F f, V v1, V v2) {
+		HalfEdgeDataStructure<V, E, F> hds = f.getHalfEdgeDataStructure();
+		// edges
+		E inv1 = null;
+		E outv1 = null;
+		for (E e : HalfEdgeUtils.incomingEdges(v1)) {
+			if (e.getLeftFace() == f) {
+				inv1 = e;
+			}
+			if (e.getRightFace() == f) {
+				outv1 = e.getOppositeEdge();
+			}
+		}
+		assert inv1 != null && outv1 != null;
 		
+		E inv2 = null;
+		E outv2 = null;
+		for (E e : HalfEdgeUtils.incomingEdges(v2)) {
+			if (e.getLeftFace() == f) {
+				inv2 = e;
+			}
+			if (e.getRightFace() == f) {
+				outv2 = e.getOppositeEdge();
+			}
+		}
+		assert inv2 != null && outv2 != null;
+		
+		// no degenerate split
+		if (outv1 == inv2 || outv2 == inv1) {
+			return null;
+		}
+		
+		E ne1 = hds.addNewEdge();
+		E ne2 = hds.addNewEdge();
+		ne1.linkOppositeEdge(ne2);
+		ne1.setTargetVertex(v1);
+		ne2.setTargetVertex(v2);
+		ne1.linkNextEdge(outv1);
+		ne1.linkPreviousEdge(inv2);
+		ne2.linkNextEdge(outv2);
+		ne2.linkPreviousEdge(inv1);
+		
+		// faces
+		F newface = hds.addNewFace();
+		ne2.setLeftFace(f);
+		E e = ne1;
+		do {
+			e.setLeftFace(newface);
+			e = e.getNextEdge();
+		} while (e != ne1);
+		return ne2;
+	}
+
+	
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	> V collapseFace(F face) {
 		HalfEdgeDataStructure<V,E,F> hds = face.getHalfEdgeDataStructure();
 	
 		V w = hds.addNewVertex();
