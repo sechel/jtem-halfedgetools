@@ -153,7 +153,7 @@ public class Immersion3DVisualizer extends DataVisualizerPlugin implements
 			immersionComponent.setAppearance(immersionAppearance);
 		}
 
-		@SuppressWarnings({ "unchecked" })
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		@Override
 		public void update() {
 
