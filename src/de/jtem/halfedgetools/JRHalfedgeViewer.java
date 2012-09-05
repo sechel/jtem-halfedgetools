@@ -49,8 +49,9 @@ public class JRHalfedgeViewer {
 	public static void initHalfedgeFronted() {
 		if (supportsOverlay()) {
 			System.setProperty(
-				"de.jreality.scene.Viewer", 
+				"de.jreality.scene.Viewer",
 				"de.jreality.jogl.GLJPanelViewer" + " " + 
+				SystemProperties.VIEWER_DEFAULT_JOGL + " " + 
 				SystemProperties.VIEWER_DEFAULT_SOFT
 			);
 		} else {

@@ -32,7 +32,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.Position4d;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.WidgetInterface;
@@ -88,17 +88,8 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		HalfEdgeDataStructure<?, ?, ?> hds = hif.get();
 		double[] homPos = {0,0,0,1};
 		for (Vertex<?,?,?> v : hds.getVertices()) {
-			double[] pos = a.get(Position.class, v, double[].class);
-			if (pos.length > 3) {
-				homPos[0] = pos[0] / pos[3];
-				homPos[1] = pos[1] / pos[3];
-				homPos[2] = pos[2] / pos[3];
-			} else {
-				homPos[0] = pos[0];
-				homPos[1] = pos[1];
-				homPos[2] = pos[2];
-			}
-			homPos[3] = 1.0;
+			double[] pos = a.get(Position4d.class, v, double[].class);
+			Pn.dehomogenize(homPos, pos);
 			T.transformVector(homPos);
 			P.transformVector(homPos);
 			Pn.dehomogenize(homPos, homPos);
@@ -295,7 +286,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 	public void mouseDragged(MouseEvent e) {
 		if (!activated) return;
 		if (!marqueeEnabled) return;
-		if (!(e.isMetaDown()||e.isAltDown()||e.isShiftDown())) {
+		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) {
 			cancelMarqee();
 			return;
 		}
@@ -320,7 +311,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 			}
 		}
 		
-		if(e.isMetaDown()){
+		if(e.isControlDown()){
 			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
 				sel.setSelected(face, true);
 			}
@@ -339,7 +330,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if (!activated) return;
-		if (!(e.isMetaDown()||e.isAltDown()||e.isShiftDown())) {
+		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) {
 			return;
 		}
 		marqueeEnabled = true;
@@ -355,7 +346,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if (!marqueeEnabled) return;
-		if (!(e.isMetaDown()||e.isAltDown()||e.isShiftDown())) {
+		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) {
 			cancelMarqee();
 			return;
 		}
@@ -373,7 +364,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 				sel.setSelected(edge, true);
 			}
 		}
-		if (e.isMetaDown()){
+		if (e.isControlDown()){
 			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
 				sel.setSelected(face, true);
 			}
