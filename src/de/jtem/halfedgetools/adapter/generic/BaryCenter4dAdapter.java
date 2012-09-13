@@ -26,6 +26,16 @@ public class BaryCenter4dAdapter extends AbstractAdapter<double[]> {
 		return -1;
 	}
 	
+	public static double[] convertCoordinate(double[] c) {
+		switch (c.length) {
+		case 2: return new double[] {c[0], c[1], 0, 1};
+		case 3: return new double[] {c[0], c[1], c[2], 1};
+		case 4: return c;
+		default:
+			throw new IllegalArgumentException("cannot convert coordinate in Position2dAdapter");
+		}
+	}
+	
 	@Override
 	public <
 		V extends Vertex<V, E, F>,
@@ -33,11 +43,7 @@ public class BaryCenter4dAdapter extends AbstractAdapter<double[]> {
 		F extends Face<V, E, F>
 	> double[] getV(V v, AdapterSet a) {
 		double[] r = a.getDefault(BaryCenter.class, v, new double[] {0, 0, 0, 1});
-		if (r.length == 3) {
-			double[] ar = {r[0], r[1], r[2], 1};
-			r = ar;
-		}
-		return r;
+		return convertCoordinate(r);
 	}
 	
 	@Override
@@ -47,11 +53,7 @@ public class BaryCenter4dAdapter extends AbstractAdapter<double[]> {
 		F extends Face<V, E, F>
 	> double[] getE(E e, AdapterSet a) {
 		double[] r = a.getDefault(BaryCenter.class, e, new double[] {0, 0, 0, 1});
-		if (r.length == 3) {
-			double[] ar = {r[0], r[1], r[2], 1};
-			r = ar;
-		}
-		return r;
+		return convertCoordinate(r);
 	}	
 	
 	@Override
@@ -61,11 +63,7 @@ public class BaryCenter4dAdapter extends AbstractAdapter<double[]> {
 		F extends Face<V, E, F>
 	> double[] getF(F f, AdapterSet a) {
 		double[] r = a.getDefault(BaryCenter.class, f, new double[] {0, 0, 0, 1});
-		if (r.length == 3) {
-			double[] ar = {r[0], r[1], r[2], 1};
-			r = ar;
-		}
-		return r;
+		return convertCoordinate(r);
 	}
 	
 	@Override

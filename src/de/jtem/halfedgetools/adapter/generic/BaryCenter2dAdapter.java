@@ -26,6 +26,18 @@ public class BaryCenter2dAdapter extends AbstractAdapter<double[]> {
 		return -1;
 	}
 	
+	public static double[] convertCoordinate(double[] c) {
+		switch (c.length) {
+		case 2: return c;
+		case 3: return new double[] {c[0], c[1]};
+		case 4: 
+			// interpret c[3] as homgeneous coordinate
+			return new double[] {c[0] / c[3], c[1] / c[3]};
+		default:
+			throw new IllegalArgumentException("cannot convert coordinate in BaryCenter2dAdapter");
+		}
+	}
+	
 	@Override
 	public <
 		V extends Vertex<V, E, F>,
@@ -33,11 +45,7 @@ public class BaryCenter2dAdapter extends AbstractAdapter<double[]> {
 		F extends Face<V, E, F>
 	> double[] getV(V v, AdapterSet a) {
 		double[] r = a.getDefault(BaryCenter.class, v, new double[] {0, 0});
-		if (r.length == 4) {
-			double[] ar = {r[0]/r[3], r[1]/r[3]};
-			r = ar;
-		}
-		return r;
+		return convertCoordinate(r);
 	}
 	
 	@Override
@@ -47,11 +55,7 @@ public class BaryCenter2dAdapter extends AbstractAdapter<double[]> {
 		F extends Face<V, E, F>
 	> double[] getE(E e, AdapterSet a) {
 		double[] r = a.getDefault(BaryCenter.class, e, new double[] {0, 0});
-		if (r.length == 4) {
-			double[] ar = {r[0]/r[3], r[1]/r[3]};
-			r = ar;
-		}
-		return r;
+		return convertCoordinate(r);
 	}	
 	
 	@Override
@@ -61,11 +65,7 @@ public class BaryCenter2dAdapter extends AbstractAdapter<double[]> {
 		F extends Face<V, E, F>
 	> double[] getF(F f, AdapterSet a) {
 		double[] r = a.getDefault(BaryCenter.class, f, new double[] {0, 0});
-		if (r.length == 4) {
-			double[] ar = {r[0]/r[3], r[1]/r[3]};
-			r = ar;
-		}
-		return r;
+		return convertCoordinate(r);
 	}
 	
 	@Override
