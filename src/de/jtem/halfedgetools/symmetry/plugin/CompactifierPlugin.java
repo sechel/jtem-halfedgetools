@@ -74,7 +74,7 @@ import de.jtem.discretegroup.core.DiscreteGroup;
 import de.jtem.discretegroup.core.DiscreteGroupElement;
 import de.jtem.discretegroup.core.DiscreteGroupUtility;
 import de.jtem.discretegroup.core.FiniteStateAutomaton;
-import de.jtem.discretegroup.core.Platycosm;
+import de.jtem.discretegroup.groups.Platycosm;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.symmetry.node.SEdge;

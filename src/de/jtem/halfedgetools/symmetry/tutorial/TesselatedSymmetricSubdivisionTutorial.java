@@ -37,7 +37,7 @@ import java.util.Set;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
-import de.jtem.discretegroup.core.TriangleGroup;
+import de.jtem.discretegroup.groups.TriangleGroup;
 import de.jtem.discretegroup.plugin.TessellatedContent;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;

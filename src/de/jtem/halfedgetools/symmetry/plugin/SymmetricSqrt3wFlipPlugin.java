@@ -50,8 +50,8 @@ import de.jtem.halfedgetools.symmetry.node.SEdge;
 import de.jtem.halfedgetools.symmetry.node.SFace;
 import de.jtem.halfedgetools.symmetry.node.SHDS;
 import de.jtem.halfedgetools.symmetry.node.SVertex;
-import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
 import de.jtem.halfedgetools.util.TriangulationException;
+import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class SymmetricSqrt3wFlipPlugin extends AlgorithmPlugin {
