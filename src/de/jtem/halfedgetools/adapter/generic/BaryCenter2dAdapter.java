@@ -70,7 +70,7 @@ public class BaryCenter2dAdapter extends AbstractAdapter<double[]> {
 	
 	@Override
 	public String toString() {
-		return "Barycenter 3D";
+		return "Barycenter 2D";
 	}
 	
 }
