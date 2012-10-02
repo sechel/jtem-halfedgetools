@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -58,6 +59,8 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 		offsetModel = new SpinnerNumberModel(0.005, 0.001, 1.0, 0.001);
 	private JSpinner
 		offsetSpinner = new JSpinner(offsetModel);
+	private JCheckBox 
+		maxabsSelection= new JCheckBox("center color of zero");
 	private JPanel
 		optionsPanel = new JPanel();
 	private NodeColorVisualization
@@ -75,11 +78,14 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 		optionsPanel.add(colorMapCombo, cr);
 		optionsPanel.add(new JLabel("Offset"), cl);
 		optionsPanel.add(offsetSpinner, cr);
+		optionsPanel.add(maxabsSelection, cr);
 		
+		maxabsSelection.setSelected(true);
 		colorMapCombo.setSelectedItem(ColorMap.Hue);
 		
 		colorMapCombo.addActionListener(this);
 		offsetSpinner.addChangeListener(this);
+		maxabsSelection.addActionListener(this);
 	}
 	
 	@Override
@@ -185,8 +191,10 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 					if (dval < min) min = dval;
 				}
 			}
-			minmax[0] = min;
-			minmax[1] = max;
+			minmax[0] = maxabsSelection.isSelected() ? -Math.max(Math.abs(min),
+					Math.abs(max)) : min;
+			minmax[1] = maxabsSelection.isSelected() ? Math.max(Math.abs(min),
+					Math.abs(max)) : max;
 			return r;
 		}
 		
