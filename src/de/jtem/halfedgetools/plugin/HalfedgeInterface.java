@@ -91,22 +91,8 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.generic.AngleDefectAdapter;
-import de.jtem.halfedgetools.adapter.generic.BaryCenter2dAdapter;
-import de.jtem.halfedgetools.adapter.generic.BaryCenter3dAdapter;
-import de.jtem.halfedgetools.adapter.generic.BaryCenter4dAdapter;
-import de.jtem.halfedgetools.adapter.generic.BaryCenterAdapter;
-import de.jtem.halfedgetools.adapter.generic.EdgeLengthAdapter;
-import de.jtem.halfedgetools.adapter.generic.EdgeVectorAdapter;
-import de.jtem.halfedgetools.adapter.generic.FaceAreaAdapter;
 import de.jtem.halfedgetools.adapter.generic.GaussCurvatureAdapter;
-import de.jtem.halfedgetools.adapter.generic.NormalAdapter;
-import de.jtem.halfedgetools.adapter.generic.Position2dAdapter;
-import de.jtem.halfedgetools.adapter.generic.Position3dAdapter;
-import de.jtem.halfedgetools.adapter.generic.Position4dAdapter;
 import de.jtem.halfedgetools.adapter.generic.SelectionAdapter;
-import de.jtem.halfedgetools.adapter.generic.TexturePosition2dAdapter;
-import de.jtem.halfedgetools.adapter.generic.TexturePosition3dAdapter;
-import de.jtem.halfedgetools.adapter.generic.TexturePosition4dAdapter;
 import de.jtem.halfedgetools.adapter.generic.UndirectedEdgeIndex;
 import de.jtem.halfedgetools.io.HalfedgeIO;
 import de.jtem.halfedgetools.jreality.adapter.JRNormalAdapter;
@@ -198,20 +184,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	public HalfedgeInterface() {
 		makeLayout();
 		// add generic and default adapters
-		persistentAdapters.add(new NormalAdapter());
-		persistentAdapters.add(new BaryCenterAdapter());
-		persistentAdapters.add(new BaryCenter2dAdapter());
-		persistentAdapters.add(new BaryCenter3dAdapter());
-		persistentAdapters.add(new BaryCenter4dAdapter());
-		persistentAdapters.add(new FaceAreaAdapter());
-		persistentAdapters.add(new Position2dAdapter());
-		persistentAdapters.add(new Position3dAdapter());
-		persistentAdapters.add(new Position4dAdapter());
-		persistentAdapters.add(new TexturePosition2dAdapter());
-		persistentAdapters.add(new TexturePosition3dAdapter());
-		persistentAdapters.add(new TexturePosition4dAdapter());
-		persistentAdapters.add(new EdgeVectorAdapter());
-		persistentAdapters.add(new EdgeLengthAdapter());
+		persistentAdapters.addAll(AdapterSet.createGenericAdapters());
+		
 		persistentAdapters.add(new UndirectedEdgeIndex());
 		persistentAdapters.add(new GaussCurvatureAdapter());
 		persistentAdapters.add(new AngleDefectAdapter());
