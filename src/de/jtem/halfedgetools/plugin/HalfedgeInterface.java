@@ -405,7 +405,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 
 			@Override
 			public String getDescription() {
-				return "Geometry Data (.heml|*.obj)";
+				return "Geometry Data (*.heml|*.obj)";
 			}
 			
 			@Override
