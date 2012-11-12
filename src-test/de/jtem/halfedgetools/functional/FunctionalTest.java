@@ -255,22 +255,43 @@ public abstract class FunctionalTest <
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void createTriangulatedCube(HDS hds, AdapterSet a) {
+		createCube(hds, a);
+		Triangulator.triangulate(hds);
+	}
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void createCube(HDS hds, AdapterSet a) {
 		HalfEdgeUtils.addCube(hds);
-		Triangulator.triangulate(hds);
-		
-		a.set(Position.class, hds.getVertex(0), new double[] {-0.5, -0.5, -0.5});
-		a.set(Position.class, hds.getVertex(1), new double[] {0.5, -0.5, -0.5});
-		a.set(Position.class, hds.getVertex(2), new double[] {-0.5, 0.5, -0.5});
-		a.set(Position.class, hds.getVertex(3), new double[] {0.5, 0.5, -0.5});
+		a.set(Position.class, hds.getVertex(0), new double[] {-0.5, 0.5, 0.5});
+		a.set(Position.class, hds.getVertex(1), new double[] {0.5, 0.5, 0.5});
+		a.set(Position.class, hds.getVertex(2), new double[] {0.5, 0.5, -0.5});
+		a.set(Position.class, hds.getVertex(3), new double[] {-0.5, 0.5, -0.5});
 		a.set(Position.class, hds.getVertex(4), new double[] {-0.5, -0.5, 0.5});
 		a.set(Position.class, hds.getVertex(5), new double[] {0.5, -0.5, 0.5});
-		a.set(Position.class, hds.getVertex(6), new double[] {-0.5, 0.5, 0.5});
-		a.set(Position.class, hds.getVertex(7), new double[] {0.5, 0.5, 0.5});
+		a.set(Position.class, hds.getVertex(6), new double[] {0.5, -0.5, -0.5});
+		a.set(Position.class, hds.getVertex(7), new double[] {-0.5, -0.5, -0.5});
 	}
 	
 	
-	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void createOctahedron(HDS hds, AdapterSet a) {
+		HalfEdgeUtils.addOctahedron(hds);
+		a.set(Position.class, hds.getVertex(0), new double[] {0.0, sqrt(2)/2, 0.0});
+		a.set(Position.class, hds.getVertex(1), new double[] {-0.5, 0.0, 0.5});
+		a.set(Position.class, hds.getVertex(2), new double[] {0.5, 0.0, 0.5});
+		a.set(Position.class, hds.getVertex(3), new double[] {0.5, 0.0, -0.5});
+		a.set(Position.class, hds.getVertex(4), new double[] {-0.5, 0.0, -0.5});
+		a.set(Position.class, hds.getVertex(5), new double[] {0.0, -sqrt(2)/2, 0.0});
+	}
 	
 }
 

@@ -43,6 +43,18 @@ public class ConvexHull {
 	private static Random
 		rnd = new Random();
 	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void convexHull(
+		HDS hds,
+		AdapterSet vp
+	) { 
+		convexHull(hds, vp, 1E-8);
+	}
+	
 	
 	public static <
 		V extends Vertex<V, E, F>,

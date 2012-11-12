@@ -1,4 +1,4 @@
-package de.jtem.halfedgetools.plugin.algorithm.geometry;
+package de.jtem.halfedgetools.plugin.algorithm.generator;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -30,10 +30,11 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin {
 		primitivesGroup = new ButtonGroup();
 	
 	private JRadioButton
-		triangleButton = new JRadioButton("triangle"),
-		cubeButton = new JRadioButton("cube"),
-		openCubeButton = new JRadioButton("open cube"),
-		tetrahedronButton = new JRadioButton("tetrahedron");
+		triangleButton = new JRadioButton("Triangle"),
+		cubeButton = new JRadioButton("Cube"),
+		openCubeButton = new JRadioButton("Open Cube"),
+		tetrahedronButton = new JRadioButton("Tetrahedron"),
+		icosahedronButton = new JRadioButton("Icosahedron");
 
 	private ConverterJR2Heds
 		converter = new ConverterJR2Heds();
@@ -56,11 +57,13 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin {
 		primitivesGroup.add(openCubeButton);
 		primitivesGroup.add(cubeButton);
 		primitivesGroup.add(tetrahedronButton);
+		primitivesGroup.add(icosahedronButton);
 		
 		panel.add(triangleButton,gbc2);
 		panel.add(cubeButton,gbc2);
 		panel.add(openCubeButton, gbc2);
 		panel.add(tetrahedronButton,gbc2);
+		panel.add(icosahedronButton, gbc2);
 	}
 	
 	@Override
@@ -90,6 +93,9 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin {
 		}
 		if(tetrahedronButton.isSelected()) {
 			ifs = Primitives.tetrahedron();
+		}
+		if (icosahedronButton.isSelected()) {
+			ifs = Primitives.icosahedron();
 		}
 		converter.ifs2heds(ifs, hds, hcp.getAdapters());
 		hcp.update();

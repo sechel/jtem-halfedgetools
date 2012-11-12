@@ -43,7 +43,6 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
-import de.jtem.halfedgetools.adapter.type.generic.Position4d;
 
 /**
  * @author Kristoffer Josefsson, Andre Heydt 
@@ -95,7 +94,7 @@ public class Sqrt3 {
 		
 		//calc coordinates for the new points
 		for(F oldF : oldHeds.getFaces()) {
-			oldFtoPos.put(oldF, a.getD(Position4d.class, oldF));
+			oldFtoPos.put(oldF, a.getD(BaryCenter3d.class, oldF));
 		}
 		
 		
