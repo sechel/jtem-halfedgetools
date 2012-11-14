@@ -50,6 +50,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.algorithm.computationalgeometry.ConvexHull;
 import de.jtem.halfedgetools.algorithm.triangulation.Triangulator;
 
 
@@ -291,6 +292,29 @@ public abstract class FunctionalTest <
 		a.set(Position.class, hds.getVertex(3), new double[] {0.5, 0.0, -0.5});
 		a.set(Position.class, hds.getVertex(4), new double[] {-0.5, 0.0, -0.5});
 		a.set(Position.class, hds.getVertex(5), new double[] {0.0, -sqrt(2)/2, 0.0});
+	}
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void createIcosahedron(HDS hds, AdapterSet a) {
+		hds.clear();
+		hds.addNewVertices(12);
+		a.set(Position.class, hds.getVertex(0), new double[] {0.850651026, 0, 0.525731027});
+		a.set(Position.class, hds.getVertex(1), new double[] {0.850651026, 0, -0.525731027});
+		a.set(Position.class, hds.getVertex(2), new double[] {0.525731027, 0.850651026, 0});
+		a.set(Position.class, hds.getVertex(3), new double[] {0.525731027, -0.850651026, 0.0});
+		a.set(Position.class, hds.getVertex(4), new double[] {0.0, -0.525731027, 0.850651026});
+		a.set(Position.class, hds.getVertex(5), new double[] {0.0, 0.525731027, 0.850651026});
+		a.set(Position.class, hds.getVertex(6), new double[] {-0.850651026, 0, -0.525731027});
+		a.set(Position.class, hds.getVertex(7), new double[] { -0.850651026, 0, 0.525731027});
+		a.set(Position.class, hds.getVertex(8), new double[] {-0.525731027, 0.850651026, 0});
+		a.set(Position.class, hds.getVertex(9), new double[] { 0.0, 0.525731027, -0.850651026});
+		a.set(Position.class, hds.getVertex(10), new double[] {0.0, -0.525731027, -0.850651026});
+		a.set(Position.class, hds.getVertex(11), new double[] {-0.525731027, -0.850651026, 0.0});
+		ConvexHull.convexHull(hds, a);
 	}
 	
 }

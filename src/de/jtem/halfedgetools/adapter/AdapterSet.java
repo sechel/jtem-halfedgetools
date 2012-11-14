@@ -19,6 +19,7 @@ import de.jtem.halfedgetools.adapter.generic.BaryCenter3dAdapter;
 import de.jtem.halfedgetools.adapter.generic.BaryCenter4dAdapter;
 import de.jtem.halfedgetools.adapter.generic.BaryCenterAdapter;
 import de.jtem.halfedgetools.adapter.generic.EdgeLengthAdapter;
+import de.jtem.halfedgetools.adapter.generic.EdgeLengthTexAdapter;
 import de.jtem.halfedgetools.adapter.generic.EdgeVectorAdapter;
 import de.jtem.halfedgetools.adapter.generic.FaceAreaAdapter;
 import de.jtem.halfedgetools.adapter.generic.NormalAdapter;
@@ -479,6 +480,7 @@ public class AdapterSet extends TreeSet<Adapter<?>> {
 		aSet.add(new TexturePosition4dAdapter());
 		aSet.add(new EdgeVectorAdapter());
 		aSet.add(new EdgeLengthAdapter());
+		aSet.add(new EdgeLengthTexAdapter());
 		return aSet;
 	}
 	

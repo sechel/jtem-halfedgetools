@@ -7,13 +7,13 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.Length;
-import de.jtem.halfedgetools.adapter.type.generic.Position3d;
+import de.jtem.halfedgetools.adapter.type.LengthTex;
+import de.jtem.halfedgetools.adapter.type.generic.TexturePosition3d;
 
-@Length
-public class EdgeLengthAdapter extends AbstractAdapter<Double> {
+@LengthTex
+public class EdgeLengthTexAdapter extends AbstractAdapter<Double> {
 
-	public EdgeLengthAdapter() {
+	public EdgeLengthTexAdapter() {
 		super(Double.class, true, false);
 	}
 	
@@ -23,8 +23,8 @@ public class EdgeLengthAdapter extends AbstractAdapter<Double> {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> Double getE(E e, AdapterSet a) {
-		double[] s = a.getD(Position3d.class, e.getStartVertex());
-		double[] t = a.getD(Position3d.class, e.getTargetVertex());
+		double[] s = a.getD(TexturePosition3d.class, e.getStartVertex());
+		double[] t = a.getD(TexturePosition3d.class, e.getTargetVertex());
 		return Rn.euclideanDistance(s, t);
 	}
 	

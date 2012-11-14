@@ -41,6 +41,7 @@ import de.jtem.halfedgetools.plugin.algorithm.geometry.CopyVertexPositions;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.PasteVertexPositions;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.PerturbPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.geometry.ProjectPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.geometry.SwapPosTexPos;
 import de.jtem.halfedgetools.plugin.algorithm.selection.BoundaryEdgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.BoundaryFaceSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.BoundaryVertexSelection;
@@ -230,11 +231,10 @@ public class HalfedgePluginFactory {
 		s.addAll(createEditorModePlugins());
 		s.addAll(createDataVisualizationPlugins());
 		s.add(new GarlandHeckbertPlugin());
-//		s.add(new VectorFieldManager());
 		s.add(new CurvatureVectorFields());
 		s.add(new HalfedgePreferencePage());
 		s.add(new CoordinatesPivot());
-//		s.add(new Histogram());
+		s.add(new SwapPosTexPos());
 		return s;
 	}
 	
