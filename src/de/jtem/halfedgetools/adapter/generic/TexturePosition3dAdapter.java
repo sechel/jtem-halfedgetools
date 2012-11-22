@@ -35,7 +35,7 @@ public class TexturePosition3dAdapter extends AbstractAdapter<double[]> {
 			// interpret c[3] as homgeneous coordinate
 			return new double[] {c[0] / c[3], c[1] / c[3], c[2] / c[3]};
 		default:
-			throw new IllegalArgumentException("cannot convert coordinate in Position2dAdapter");
+			throw new IllegalArgumentException("cannot convert coordinate in Position3dAdapter");
 		}
 	}
 	

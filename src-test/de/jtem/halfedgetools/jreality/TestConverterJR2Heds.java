@@ -21,26 +21,6 @@ public class TestConverterJR2Heds {
 	
 	@Before
 	public void setUp() throws Exception {
-//		IndexedFaceSetFactory ifsf = new IndexedFaceSetFactory();
-//		double[][] vertexData = {
-//			{0,0,0,1},
-//			{0,1,0,1},
-//			{1,1,0,1},
-//			{1,0,0,1}
-//		};
-//		int[][] faceData = {
-//			{0,0,1,2},	
-//			{0,2,3},
-//			{0,1},
-//			{0}
-//		};
-//		ifsf.setVertexCount(4);
-//		ifsf.setFaceCount(4);
-//		ifsf.setVertexCoordinates(vertexData);
-//		ifsf.setFaceIndices(faceData);
-//		ifsf.update();
-//		g = ifsf.getIndexedFaceSet();
-//		IndexedFaceSetUtility.makeConsistentOrientation(g);
 		ReaderOBJ r = new ReaderOBJ();
 		SceneGraphComponent c = r.read(getClass().getResource("roofquads_curvatue01.obj"));
 		g = (IndexedFaceSet)SceneGraphUtility.getFirstGeometry(c);
