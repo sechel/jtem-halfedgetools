@@ -47,7 +47,13 @@ import de.jtem.jrworkspace.plugin.lnfswitch.plugin.SystemLookAndFeel;
 public class JRHalfedgeViewer {
 	
 	public static void initHalfedgeFronted() {
-		if (supportsOverlay()) {
+		boolean overlaysSupported = false;
+		try {
+			overlaysSupported = supportsOverlay();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		if (overlaysSupported) {
 			System.setProperty(
 				"de.jreality.scene.Viewer",
 				"de.jreality.jogl.GLJPanelViewer" + " " + 
