@@ -98,6 +98,7 @@ import de.jtem.halfedgetools.io.HalfedgeIO;
 import de.jtem.halfedgetools.jreality.adapter.JRNormalAdapter;
 import de.jtem.halfedgetools.jreality.adapter.JRPositionAdapter;
 import de.jtem.halfedgetools.jreality.adapter.JRTexturePositionAdapter;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.halfedgetools.plugin.widget.LayerPropertyWidget;
 import de.jtem.jrworkspace.plugin.Controller;
@@ -108,6 +109,8 @@ import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
 public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectionListener, ActionListener, PopupMenuListener {
 
+	private Controller
+		controller = null;
 	private Scene
 		scene = null;
 	private Content
@@ -934,6 +937,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
+		this.controller = c;
 		content = JRViewerUtility.getContentPlugin(c);
 		content.addContentChangedListener(contentChangedListener);
 		scene = c.getPlugin(Scene.class);
@@ -1231,6 +1235,16 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	public HalfEdgeDataStructure<?, ?, ?> getTemplateHDS() {
 		return templateHDS;
+	}
+	
+	public AlgorithmPlugin getAlgorithm(String name) {
+		List<AlgorithmPlugin> algos = controller.getPlugins(AlgorithmPlugin.class);
+		for (AlgorithmPlugin a : algos) {
+			if (a.getAlgorithmName().equalsIgnoreCase(name)) {
+				return a;
+			}
+		}
+		return null;
 	}
 
 }

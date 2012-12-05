@@ -123,6 +123,14 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		
 	}
 	
+	public void execute() {
+		try {
+			execute(hcp.get(), hcp.getAdapters(), hcp);
+		} catch (Throwable e) {
+			System.err.println(e);
+		}
+	}
+	
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
