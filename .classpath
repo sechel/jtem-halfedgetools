@@ -19,5 +19,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/java2dx"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jreality"/>
 	<classpathentry kind="lib" path="lib/mtj.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/halfedgeDDG"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
