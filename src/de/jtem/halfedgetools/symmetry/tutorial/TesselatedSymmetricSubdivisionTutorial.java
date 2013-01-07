@@ -199,7 +199,7 @@ public class TesselatedSymmetricSubdivisionTutorial extends TessellatedContent {
 		tc = new TesselatedSymmetricSubdivisionTutorial();
 		tc.setFollowsCamera(false);
 		tc.setClipToCamera(false);
-		tc.setDoDirichletDomain(false);
+//		tc.setDoDirichletDomain(false);
 		viewer.registerPlugin(tc);
 
 		

@@ -70,7 +70,7 @@ public class SymmetricSubdivisionTutorial {
 		TessellatedContent tc = new TessellatedContent();
 		tc.setFollowsCamera(false);
 		tc.setClipToCamera(false);
-		tc.setDoDirichletDomain(false);
+//		tc.setDoDirichletDomain(false);
 		viewer.registerPlugin(tc);
 		HalfedgeInterface hif = new HalfedgeInterface();
 		hif.addAdapter(new SymmetricPositionAdapter(), true);
