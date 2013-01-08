@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.symmetry2;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import de.discretization.halfedge.hds.DEdge;
 import de.discretization.halfedge.hds.DVertex;
 import de.jreality.math.Matrix;
 import de.jreality.math.P3;
@@ -84,7 +86,7 @@ public class QuotientMeshUtility {
 //		}
 		for (E e : hds.getEdges()) {
 			DiscreteGroupElement g = a.get(GroupElement.class, e, DiscreteGroupElement.class);
-			if (g != null) System.err.println(e.getIndex()+" dge = "+g.getWord());
+			if (g != null) System.err.println(e.getIndex()+":"+e.getStartVertex().getIndex()+":"+e.getTargetVertex().getIndex()+" dge = "+g.getWord());
 		}
 		
 	}
@@ -119,22 +121,92 @@ public class QuotientMeshUtility {
 	F extends Face<V, E, F>,
 	HDS extends HalfEdgeDataStructure<V, E, F>
 > void  assignCanonicalCoordinates( HDS hds, AdapterSet a, WallpaperGroup group, IndexedFaceSet fundDom) {
+		for (E e : hds.getEdges()) {
+			System.err.println(e.getIndex()+":"+e.getStartVertex().getIndex()+":"+e.getTargetVertex().getIndex());
+		}
+
 		// pull back all vertices into the fund dom
 		for (V v : hds.getVertices())	{
 			double[] p0 = a.getD(Position3d.class, v);
 			DiscreteGroupElement dge0 = new DiscreteGroupElement();
+			
+			// find the group element which brings the point into the fundamental domain
 			double[] cp0 = DiscreteGroupUtility.getCanonicalRepresentative2(null, p0, dge0, fundDom, group);
 			a.set(CanonicalPosition.class, v, cp0);
 //			if (Rn.isIdentityMatrix(dge0.getArray(), 10E-8)) continue;
+			// we are interested in the inverse, which brings the canon. repn. to its original position in covering space
 			DiscreteGroupElement idge0 = dge0.getInverse();
 			if (dge0.getWord().length() != 0) {
 				System.err.println("vertex "+v.getIndex()+" "+idge0.getWord()+" "+Rn.toString(p0)+" :: "+Rn.toString(cp0));
 				a.set(GroupElement.class, v, idge0);
 			}
 		}
+		// store off group elements for edges based on vertex results above
+		// we've already found the inverse elements; edge elements are determined by product of start/end vertex elements
+		for (E e: hds.getEdges()) {
+			V v0 = e.getStartVertex(), v1 = e.getTargetVertex();
+			DiscreteGroupElement g0 = a.get(GroupElement.class, v0, DiscreteGroupElement.class);
+			g0 = (g0 == null) ? new DiscreteGroupElement() : g0;
+			DiscreteGroupElement g1 = a.get(GroupElement.class, v1, DiscreteGroupElement.class);
+			g1 = (g1== null) ? new DiscreteGroupElement() : g1;
+			DiscreteGroupElement dge = new DiscreteGroupElement( g1);
+			dge.multiplyOnRight(g0.getInverse());
+			a.set(GroupElement.class, e, dge);
+		}
+		Collection<V> bv = HalfEdgeUtils.boundaryVertices(hds);
+		for (E e0: HalfEdgeUtils.boundaryEdges(hds) ){
+			for (E e1: HalfEdgeUtils.boundaryEdges(hds) ){
+				if (!e0.isValid() || !e1.isValid() || e0 == e1) continue;
+				V 		v00 = e0.getStartVertex(),
+						v01 = e0.getTargetVertex(),
+						v10 = e1.getTargetVertex(),
+						v11 = e1.getStartVertex();
+				double[] cp00 = a.getD(CanonicalPosition.class, v00),
+						cp01 = a.getD(CanonicalPosition.class, v01),
+						cp10 = a.getD(CanonicalPosition.class, v10),
+						cp11 = a.getD(CanonicalPosition.class, v11);
+				if (Rn.euclideanDistanceSquared(cp00, cp10) > 10E-8  ||
+						Rn.euclideanDistanceSquared(cp01, cp11) > 10E-8) {
+					continue;
+				}
+				System.err.println("Vertices "+v00.getIndex()+":"+v01.getIndex()+"::"+v10.getIndex()+":"+v11.getIndex());
+				DiscreteGroupElement g00, g01, g10, g11;
+				g00 = a.get(GroupElement.class, v00, DiscreteGroupElement.class);
+				g01 = a.get(GroupElement.class, v01, DiscreteGroupElement.class);
+				g10 = a.get(GroupElement.class, v10, DiscreteGroupElement.class);
+				g11 = a.get(GroupElement.class, v11, DiscreteGroupElement.class);
+				g00 = (g00 == null) ? new DiscreteGroupElement() : g00;
+				g01 = (g01 == null) ? new DiscreteGroupElement() : g01;
+				g10 = (g10 == null) ? new DiscreteGroupElement() : g10;
+				g11 = (g11 == null) ? new DiscreteGroupElement() : g11;
+				DiscreteGroupElement prod = new DiscreteGroupElement(g00);
+				prod = prod.getInverse();
+				prod.multiplyOnRight(g10);
+				prod.multiplyOnRight(g11.getInverse());
+				prod.multiplyOnRight(g01);
+				if (Rn.isIdentityMatrix(prod.getArray(), 10E-4))	{
+					System.err.println("found matching edges "+e0.getIndex()+" "+e1.getIndex());
+					// remove these edges and relink
+					identifyBoundaryVertices(hds, v00, v10);
+					if (v00 != v01 || v10 != v11) identifyBoundaryVertices(hds, v01, v11);
+					E eo0 = e0.getOppositeEdge();
+					E eo1 = e1.getOppositeEdge();
+					eo0.linkOppositeEdge(eo1);
+					eo1.linkOppositeEdge(eo0);
+					if (e0.getPreviousEdge() != e0) e0.getPreviousEdge().linkNextEdge(e1.getNextEdge());
+					if (e1.getPreviousEdge() != e1) e1.getPreviousEdge().linkNextEdge(e0.getNextEdge());
+					hds.removeEdge(e0);
+					hds.removeEdge(e1);
+				}
+				
+				
+			}
+			System.err.println("hds has "+hds.getEdges().size()+" edges");
+		}
 		// remove duplicate vertices
-		for (V v0: HalfEdgeUtils.boundaryVertices(hds)) {
-			for (V v1: HalfEdgeUtils.boundaryVertices(hds))	{
+		if (false)
+		for (V v0: bv) {
+			for (V v1:  bv)	{
 				if (! v0.isValid() || !v1.isValid() || v0.equals(v1)) continue;
 				System.err.println("checking "+v0.getIndex()+" against "+v1.getIndex());
 				double[] cp0 = a.getD(CanonicalPosition.class, v0);
@@ -145,11 +217,9 @@ public class QuotientMeshUtility {
 					double[] p0 = a.getD(Position.class, v0);
 					double[] p1 = a.getD(Position.class, v1);
 					System.err.println("identifying "+Rn.toString(p0)+" and "+Rn.toString(p1));
-					DiscreteGroupElement dge = a.get(GroupElement.class, v0, DiscreteGroupElement.class);
-					if (dge == null) identifyBoundaryVertices(hds, v0, v1);
-					else identifyBoundaryVertices(hds, v1,  v0);
-				}
-			}
+					identifyBoundaryVertices(hds, v0, v1);
+					}
+			}	
 		}
 	}
 	public static <
@@ -158,37 +228,15 @@ public class QuotientMeshUtility {
 	F extends Face<V, E, F>,
 	HDS extends HalfEdgeDataStructure<V, E, F>
 >  void identifyBoundaryVertices(HDS hds, V v0, V v1)	{
-		List<E> edges0 = HalfEdgeUtils.incomingEdges(v0),
-				edges1 = HalfEdgeUtils.incomingEdges(v1);
-		E in0 = null, in1 = null, in0Next = null, in1Next = null;
-		for (E e: edges0)	{
-			if (e.getLeftFace() == null)	{
-				in0 = e;
-				in0Next = in0.getNextEdge();
-			}
-		}
+		List<E> edges1 = HalfEdgeUtils.incomingEdges(v1);
 		for (E e: edges1)	{
-			if (e.getLeftFace() == null)	{
-				in1 = e;
-				in1Next = in1.getNextEdge();
-			}
-			// replace v1 by v0
 			e.setTargetVertex(v0);
 		}
+//		edges1 = HalfEdgeUtils.outgoingEdges(v1);
+//		for (E e: edges1)	{
+//			e.setStartVertex(v0);
+//		}
 		hds.removeVertex(v1);
-		in0.linkNextEdge(in1Next);
-		in1.linkNextEdge(in0Next);
-		// now test if there's more to identify
-		if (in0.getStartVertex() == in1Next.getTargetVertex() && !(in0.getStartVertex() == v1)) {
-			in0.getOppositeEdge().linkOppositeEdge(in1Next.getOppositeEdge());
-			hds.removeEdge(in0);
-			hds.removeEdge(in1Next);
-		}
-		if (in1.getStartVertex() == in0Next.getTargetVertex() && !(in1.getStartVertex() == v0)) {
-			in1.getOppositeEdge().linkOppositeEdge(in0Next.getOppositeEdge());
-			hds.removeEdge(in1);
-			hds.removeEdge(in0Next);
-		}
 	}
 
 	public static <

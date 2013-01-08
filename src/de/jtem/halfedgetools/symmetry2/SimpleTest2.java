@@ -37,17 +37,17 @@ import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
 
 public class SimpleTest2 {
 
-	double[][] v = {
+	double[][] v2 = {
 			{0,0,0},
 			{1,0,0},
 			{0,1,0},
 			{1,1,0}
 	};
-	int[][] indices = {
+	int[][] indices2 = {
 			{0,1,2},
 			{1,3,2}
 	};
-	double[][] v2 = {
+	double[][] v = {
 			{0,0,0},
 			{.5,0,0},
 			{1,0,0},
@@ -57,7 +57,7 @@ public class SimpleTest2 {
 			{.5,1,0},
 			{1,1,0}
 	};
-	int[][] indices2 = {
+	int[][] indices = {
 			{0,1,3},
 			{1,4,3},
 			{2,4,1},
@@ -107,6 +107,7 @@ public class SimpleTest2 {
 		DHDS dhds = new DHDS();
 		converter.ifs2heds(ifsf.getIndexedFaceSet(), dhds, a, null);
 		
+
 		// assign group elements (from the torus group) to edges based on the group wlement
 		// required to move from the source to the target
 //		for (DEdge e: dhds.getEdges()) {
