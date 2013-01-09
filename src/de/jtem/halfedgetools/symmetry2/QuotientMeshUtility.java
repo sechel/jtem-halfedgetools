@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.symmetry2;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -99,6 +100,9 @@ public class QuotientMeshUtility {
 	> void unwrapTargetVertex(E e, Map<V, Matrix> vertexMatrices, AdapterSet a) {
 		V v0 = e.getStartVertex();
 		V v1 = e.getTargetVertex();
+		if (v0 == null || v1 == null)	{
+			throw new IllegalStateException("can't be null");
+		}
 		Matrix accumulated = vertexMatrices.get(v0);
 		accumulated = (accumulated == null) ? new Matrix() : accumulated;
 		DiscreteGroupElement g = a.get(GroupElement.class, e, DiscreteGroupElement.class);
@@ -121,9 +125,7 @@ public class QuotientMeshUtility {
 	F extends Face<V, E, F>,
 	HDS extends HalfEdgeDataStructure<V, E, F>
 > void  assignCanonicalCoordinates( HDS hds, AdapterSet a, WallpaperGroup group, IndexedFaceSet fundDom) {
-		for (E e : hds.getEdges()) {
-			System.err.println(e.getIndex()+":"+e.getStartVertex().getIndex()+":"+e.getTargetVertex().getIndex());
-		}
+		printEdges(hds);
 
 		// pull back all vertices into the fund dom
 		for (V v : hds.getVertices())	{
@@ -154,9 +156,11 @@ public class QuotientMeshUtility {
 			a.set(GroupElement.class, e, dge);
 		}
 		Collection<V> bv = HalfEdgeUtils.boundaryVertices(hds);
+		List<List<V>> toIdentify = new ArrayList<List<V>>();
+		List<List<E>> toLink = new ArrayList<List<E>>();
 		for (E e0: HalfEdgeUtils.boundaryEdges(hds) ){
 			for (E e1: HalfEdgeUtils.boundaryEdges(hds) ){
-				if (!e0.isValid() || !e1.isValid() || e0 == e1) continue;
+				if (!e0.isValid() || !e1.isValid() || e0.getIndex() <= e1.getIndex()) continue;
 				V 		v00 = e0.getStartVertex(),
 						v01 = e0.getTargetVertex(),
 						v10 = e1.getTargetVertex(),
@@ -187,39 +191,49 @@ public class QuotientMeshUtility {
 				if (Rn.isIdentityMatrix(prod.getArray(), 10E-4))	{
 					System.err.println("found matching edges "+e0.getIndex()+" "+e1.getIndex());
 					// remove these edges and relink
-					identifyBoundaryVertices(hds, v00, v10);
-					if (v00 != v01 || v10 != v11) identifyBoundaryVertices(hds, v01, v11);
-					E eo0 = e0.getOppositeEdge();
-					E eo1 = e1.getOppositeEdge();
-					eo0.linkOppositeEdge(eo1);
-					eo1.linkOppositeEdge(eo0);
-					if (e0.getPreviousEdge() != e0) e0.getPreviousEdge().linkNextEdge(e1.getNextEdge());
-					if (e1.getPreviousEdge() != e1) e1.getPreviousEdge().linkNextEdge(e0.getNextEdge());
-					hds.removeEdge(e0);
-					hds.removeEdge(e1);
+//					identifyBoundaryVertices(hds, v00, v10);
+//					identifyBoundaryVertices(hds, v01, v11);
+					ArrayList<V> al0 = new ArrayList<V>();
+					al0.add(v00); al0.add(v10);
+					ArrayList<V> al1 = new ArrayList<V>();
+					al1.add(v01); al1.add(v11);
+					toIdentify.add(al0); toIdentify.add(al1);
+					ArrayList<E> el = new ArrayList<E>();
+					el.add(e0); el.add(e1);
+					toLink.add(el);
 				}
-				
-				
 			}
 			System.err.println("hds has "+hds.getEdges().size()+" edges");
 		}
 		// remove duplicate vertices
-		if (false)
-		for (V v0: bv) {
-			for (V v1:  bv)	{
-				if (! v0.isValid() || !v1.isValid() || v0.equals(v1)) continue;
-				System.err.println("checking "+v0.getIndex()+" against "+v1.getIndex());
-				double[] cp0 = a.getD(CanonicalPosition.class, v0);
-				double[] cp1 = a.getD(CanonicalPosition.class, v1);
-				// TODO: make this metric neutral
-				double d = Rn.euclideanDistance(cp0, cp1);
-				if (d < 10E-8) {
-					double[] p0 = a.getD(Position.class, v0);
-					double[] p1 = a.getD(Position.class, v1);
-					System.err.println("identifying "+Rn.toString(p0)+" and "+Rn.toString(p1));
-					identifyBoundaryVertices(hds, v0, v1);
-					}
-			}	
+		for (List<V> pair : toIdentify)	{
+			identifyBoundaryVertices(hds, pair.get(0), pair.get(1));
+			System.err.println("identified vertices");
+			printEdges(hds);
+		}
+		for (List<E> pair : toLink)	{
+			E e0 = pair.get(0), e1 = pair.get(1);
+			E eo0 = e0.getOppositeEdge();
+			E eo1 = e1.getOppositeEdge();
+			eo0.linkOppositeEdge(eo1);
+			eo1.linkOppositeEdge(eo0);
+			if (e0.getPreviousEdge() != e0) e0.getPreviousEdge().linkNextEdge(e1.getNextEdge());
+			if (e1.getPreviousEdge() != e1) e1.getPreviousEdge().linkNextEdge(e0.getNextEdge());
+			hds.removeEdge(e0);
+			hds.removeEdge(e1);
+			System.err.println("linked edge pair");
+			printEdges(hds);
+		}
+		
+	}
+
+	public static <
+	V extends Vertex<V, E, F>,
+	E extends Edge<V, E, F>,
+	F extends Face<V, E, F>,
+	HDS extends HalfEdgeDataStructure<V, E, F>> void printEdges(HDS hds) {
+		for (E e : hds.getEdges()) {
+			System.err.println(e.getIndex()+":"+e.getStartVertex().getIndex()+":"+e.getTargetVertex().getIndex());
 		}
 	}
 	public static <
@@ -228,6 +242,8 @@ public class QuotientMeshUtility {
 	F extends Face<V, E, F>,
 	HDS extends HalfEdgeDataStructure<V, E, F>
 >  void identifyBoundaryVertices(HDS hds, V v0, V v1)	{
+		if (!v0.isValid() || !v1.isValid()) return;
+		System.err.println("Identifying vertices "+v0.getIndex()+" "+v1.getIndex());
 		List<E> edges1 = HalfEdgeUtils.incomingEdges(v1);
 		for (E e: edges1)	{
 			e.setTargetVertex(v0);

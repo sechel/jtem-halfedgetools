@@ -13,6 +13,7 @@ import de.jreality.math.P3;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.plugin.JRViewer;
+import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.Viewer;
@@ -73,11 +74,7 @@ public class SimpleTest2 {
 		st2.doIt();
 	}
 
-	public  <
-	V extends Vertex<V, E, F>,
-	E extends Edge<V, E, F>,
-	F extends Face<V, E, F>,
-	HDS extends HalfEdgeDataStructure<V, E, F>	> void doIt()	{
+	public  	 void doIt()	{
 
 		IndexedFaceSetFactory ifsf = new IndexedFaceSetFactory();
 		ifsf.setVertexCount(v.length);
@@ -86,6 +83,8 @@ public class SimpleTest2 {
 		ifsf.setFaceIndices(indices);
 		ifsf.setGenerateFaceNormals(true);
 		ifsf.setGenerateEdgesFromFaces(true);
+		ifsf.setGenerateEdgeLabels(true);
+		ifsf.setGenerateVertexLabels(true);
 		ifsf.update();
 		
 		WallpaperGroup group = WallpaperGroup.instanceOfGroup("O");
@@ -129,6 +128,7 @@ public class SimpleTest2 {
 //		}
 		QuotientMeshUtility.assignCanonicalCoordinates(dhds, a, group, fundDom);
 		// store away the canonical position
+		QuotientMeshUtility.printEdges(dhds);
 		System.err.println("setting up canonical positions");
 		for (DVertex v : dhds.getVertices())	{
 			DiscreteGroupElement dge0 = new DiscreteGroupElement();
@@ -158,7 +158,9 @@ public class SimpleTest2 {
 
 		SceneGraphComponent world = SceneGraphUtility.createFullSceneGraphComponent("world");
 		SceneGraphComponent dirdom = SceneGraphUtility.createFullSceneGraphComponent("dirdom");
-		world.setGeometry(ifs);
+		Appearance ap = world.getAppearance();
+		ap.setAttribute(CommonAttributes.SCALE, .002);
+		world.setGeometry(ifsf.getGeometry()); //ifs); //
 		world.addChild(dirdom);
 		dirdom.setGeometry(fundDom);
 		MatrixBuilder.euclidean().translate(0,0,-.01).assignTo(dirdom);
