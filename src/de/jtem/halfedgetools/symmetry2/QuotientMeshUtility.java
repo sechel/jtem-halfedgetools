@@ -50,7 +50,7 @@ public class QuotientMeshUtility {
 		Queue<E> edgesTodo = new LinkedList<E>();
 		Set<E> edgesDone = new HashSet<E>();
 		Map<V, Matrix> vertexMatrices = new HashMap<V, Matrix>();
-		E e0 = hds.getEdge(0);		// start
+		E e0 = hds.getEdge(9);		// start
 		// startup
 		edgesTodo.add(e0);
 		edgesTodo.add(e0.getOppositeEdge());
@@ -91,6 +91,59 @@ public class QuotientMeshUtility {
 		}
 		
 	}
+	
+	public static <
+	V extends Vertex<V, E, F>,
+	E extends Edge<V, E, F>,
+	F extends Face<V, E, F>,
+	HDS extends HalfEdgeDataStructure<V, E, F>
+> void assignCoveringSpaceCoordinatesNew(HDS hds, AdapterSet a) {
+	Queue<E> edgesTodo = new LinkedList<E>();
+	Set<E> edgesDone = new HashSet<E>();
+	Map<V, Matrix> vertexMatrices = new HashMap<V, Matrix>();
+	E e0 = hds.getEdge(3);		// start
+	// startup
+	edgesTodo.addAll(HalfEdgeUtils.incomingEdges(hds.getVertex(1)));
+//	edgesTodo.add(e0.getOppositeEdge());
+	while (!edgesTodo.isEmpty())	{
+		E e = edgesTodo.poll();
+		// process this triangle
+		edgesDone.add(e);
+//		edgesDone.add(e.getNextEdge());
+//		edgesDone.add(e.getPreviousEdge());
+//		System.err.println(e.toString());
+		edgesTodo.addAll(HalfEdgeUtils.incomingEdges(e.getOppositeEdge().getTargetVertex()));
+		unwrapTargetVertex(e, vertexMatrices, a);
+		unwrapTargetVertex(e.getNextEdge(), vertexMatrices, a);
+		unwrapTargetVertex(e.getPreviousEdge(), vertexMatrices, a);
+		// do combinatorics
+		E next = e.getNextEdge();
+		if (!edgesDone.contains(next.getOppositeEdge())) {
+			edgesTodo.add(next.getOppositeEdge());
+		}
+		E prev = e.getPreviousEdge();
+		if (!edgesDone.contains(prev.getOppositeEdge())) {
+			edgesTodo.add(prev.getOppositeEdge());
+		}
+	}
+//	for (F f : hds.getFaces())	{
+//		double[] accumulatedMatrix = Rn.identityMatrix(4);
+//		// TODO: fix this to follow the edges around
+//		System.err.println("next face");
+//		for (E e : HalfEdgeUtils.boundaryEdges(f))	{
+//			DiscreteGroupElement g = a.get(GroupElement.class, e, DiscreteGroupElement.class);
+//			// accumulate the transformation
+//			accumulatedMatrix = Rn.times(null, g.getArray(), accumulatedMatrix);
+//			V v = e.getTargetVertex();
+//		}
+//	}
+	for (E e : hds.getEdges()) {
+		DiscreteGroupElement g = a.get(GroupElement.class, e, DiscreteGroupElement.class);
+		if (g != null) System.err.println(e.getIndex()+":"+e.getStartVertex().getIndex()+":"+e.getTargetVertex().getIndex()+" dge = "+g.getWord());
+	}
+	
+}
+
 
 	static final Matrix identity = new Matrix();
 	protected static <
@@ -195,9 +248,8 @@ public class QuotientMeshUtility {
 //					identifyBoundaryVertices(hds, v01, v11);
 					ArrayList<V> al0 = new ArrayList<V>();
 					al0.add(v00); al0.add(v10);
-					ArrayList<V> al1 = new ArrayList<V>();
-					al1.add(v01); al1.add(v11);
-					toIdentify.add(al0); toIdentify.add(al1);
+					al0.add(v01); al0.add(v11);
+					toIdentify.add(al0);
 					ArrayList<E> el = new ArrayList<E>();
 					el.add(e0); el.add(e1);
 					toLink.add(el);
@@ -206,13 +258,15 @@ public class QuotientMeshUtility {
 			System.err.println("hds has "+hds.getEdges().size()+" edges");
 		}
 		// remove duplicate vertices
-		for (List<V> pair : toIdentify)	{
-			identifyBoundaryVertices(hds, pair.get(0), pair.get(1));
+//		for (List<V> pair : toIdentify)	{
+		int n = toIdentify.size();
+		for (int i = 0; i<n; i++)	{
+			List<V> pairV = toIdentify.get(i);
+			identifyBoundaryVertices(hds, pairV.get(0), pairV.get(1));
+			identifyBoundaryVertices(hds, pairV.get(2), pairV.get(3));
 			System.err.println("identified vertices");
-			printEdges(hds);
-		}
-		for (List<E> pair : toLink)	{
-			E e0 = pair.get(0), e1 = pair.get(1);
+			List<E> pairE = toLink.get(i);
+			E e0 = pairE.get(0), e1 = pairE.get(1);
 			E eo0 = e0.getOppositeEdge();
 			E eo1 = e1.getOppositeEdge();
 			eo0.linkOppositeEdge(eo1);
@@ -224,6 +278,19 @@ public class QuotientMeshUtility {
 			System.err.println("linked edge pair");
 			printEdges(hds);
 		}
+//		for (List<E> pair : toLink)	{
+//			E e0 = pair.get(0), e1 = pair.get(1);
+//			E eo0 = e0.getOppositeEdge();
+//			E eo1 = e1.getOppositeEdge();
+//			eo0.linkOppositeEdge(eo1);
+//			eo1.linkOppositeEdge(eo0);
+//			if (e0.getPreviousEdge() != e0) e0.getPreviousEdge().linkNextEdge(e1.getNextEdge());
+//			if (e1.getPreviousEdge() != e1) e1.getPreviousEdge().linkNextEdge(e0.getNextEdge());
+//			hds.removeEdge(e0);
+//			hds.removeEdge(e1);
+//			System.err.println("linked edge pair");
+//			printEdges(hds);
+//		}
 		
 	}
 
@@ -288,8 +355,8 @@ public class QuotientMeshUtility {
 			e1.setTargetVertex(v1);
 			e2.setTargetVertex(v2);
 			e0o.setTargetVertex(v2);
-			e1o.setTargetVertex(v1);
-			e2o.setTargetVertex(v0);
+			e1o.setTargetVertex(v0);
+			e2o.setTargetVertex(v1);
 			
 			E ee0 = f.getBoundaryEdge();
 			E ee1 = ee0.getNextEdge();
