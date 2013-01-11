@@ -1,6 +1,5 @@
 package de.jtem.halfedgetools.plugin;
 
-import static de.jreality.math.Pn.EUCLIDEAN;
 import static de.jreality.shader.CommonAttributes.LINE_SHADER;
 import static de.jreality.shader.CommonAttributes.POINT_RADIUS;
 import static de.jreality.shader.CommonAttributes.POINT_SHADER;
@@ -79,7 +78,6 @@ import de.jreality.shader.DefaultPointShader;
 import de.jreality.shader.EffectiveAppearance;
 import de.jreality.shader.ShaderUtility;
 import de.jreality.tools.ActionTool;
-import de.jreality.util.CameraUtility;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 import de.jtem.halfedge.Edge;
@@ -1048,10 +1046,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	public void encompassAll() {
-		SceneGraphPath avatarPath = scene.getAvatarPath();
-		SceneGraphPath scenePath = scene.getContentPath();
-		SceneGraphPath cameraPath = scene.getCameraPath();
-		CameraUtility.encompass(avatarPath, scenePath, cameraPath, 1.75, EUCLIDEAN);
+		JRViewerUtility.encompassEuclidean(scene);
 	}
 	
 	
@@ -1125,21 +1120,25 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			cce.node.accept(new SceneGraphVisitor() {
 				private SceneGraphPath
 					path = new SceneGraphPath();
+				private boolean
+					geometryFound = false;
 				
 				@Override
 				public void visit(SceneGraphComponent c) {
-					if (!c.isVisible()) return;
+					if (!c.isVisible() || geometryFound) return;
 					path.push(c);
-					if (c.getGeometry() != null) {
-						Geometry g = c.getGeometry();
-						Transformation layerTransform = new Transformation(path.getMatrix(null));
-						HalfedgeLayer layer = new HalfedgeLayer(g, HalfedgeInterface.this);
-						layer.setName(g.getName());
-						layer.setTransformation(layerTransform);
-						newLayers.add(layer);
-					}
 					c.childrenAccept(this);
 					path.pop();
+				}
+				
+				@Override
+				public void visit(Geometry g) {
+					Transformation layerTransform = new Transformation(path.getMatrix(null));
+					HalfedgeLayer layer = new HalfedgeLayer(g, HalfedgeInterface.this);
+					layer.setName(g.getName());
+					layer.setTransformation(layerTransform);
+					newLayers.add(layer);
+					geometryFound = true;
 				}
 			});
 			if (newLayers.isEmpty()) return;

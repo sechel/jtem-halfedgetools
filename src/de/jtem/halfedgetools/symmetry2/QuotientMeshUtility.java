@@ -1,7 +1,6 @@
 package de.jtem.halfedgetools.symmetry2;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -10,10 +9,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import de.discretization.halfedge.hds.DEdge;
-import de.discretization.halfedge.hds.DVertex;
 import de.jreality.math.Matrix;
-import de.jreality.math.P3;
 import de.jreality.math.Rn;
 import de.jreality.scene.IndexedFaceSet;
 import de.jtem.discretegroup.core.DiscreteGroupElement;
@@ -101,7 +97,7 @@ public class QuotientMeshUtility {
 	Queue<E> edgesTodo = new LinkedList<E>();
 	Set<E> edgesDone = new HashSet<E>();
 	Map<V, Matrix> vertexMatrices = new HashMap<V, Matrix>();
-	E e0 = hds.getEdge(3);		// start
+//	E e0 = hds.getEdge(3);		// start
 	// startup
 	edgesTodo.addAll(HalfEdgeUtils.incomingEdges(hds.getVertex(1)));
 //	edgesTodo.add(e0.getOppositeEdge());
@@ -208,7 +204,7 @@ public class QuotientMeshUtility {
 			dge.multiplyOnRight(g0.getInverse());
 			a.set(GroupElement.class, e, dge);
 		}
-		Collection<V> bv = HalfEdgeUtils.boundaryVertices(hds);
+//		Collection<V> bv = HalfEdgeUtils.boundaryVertices(hds);
 		List<List<V>> toIdentify = new ArrayList<List<V>>();
 		List<List<E>> toLink = new ArrayList<List<E>>();
 		for (E e0: HalfEdgeUtils.boundaryEdges(hds) ){

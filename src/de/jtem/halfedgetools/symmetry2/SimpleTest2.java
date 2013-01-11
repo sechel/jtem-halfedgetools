@@ -3,8 +3,6 @@ package de.jtem.halfedgetools.symmetry2;
 import java.awt.Color;
 import java.util.List;
 
-import sun.management.snmp.AdaptorBootstrap;
-
 import de.discretization.halfedge.hds.DEdge;
 import de.discretization.halfedge.hds.DFace;
 import de.discretization.halfedge.hds.DHDS;
@@ -19,7 +17,6 @@ import de.jreality.plugin.JRViewer;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
-import de.jreality.scene.Viewer;
 import de.jreality.scene.data.Attribute;
 import de.jreality.scene.data.StorageModel;
 import de.jreality.scene.pick.PickResult;
@@ -28,19 +25,11 @@ import de.jreality.scene.tool.InputSlot;
 import de.jreality.scene.tool.ToolContext;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.util.SceneGraphUtility;
-import de.jtem.discretegroup.core.DiscreteGroup;
 import de.jtem.discretegroup.core.DiscreteGroupElement;
-import de.jtem.discretegroup.core.DiscreteGroupUtility;
-import de.jtem.discretegroup.groups.CrystallographicGroup;
 import de.jtem.discretegroup.groups.WallpaperGroup;
-import de.jtem.halfedge.Edge;
-import de.jtem.halfedge.Face;
-import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
-import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.jreality.ConverterHeds2JR;
 import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
 
@@ -199,7 +188,8 @@ public class SimpleTest2 {
 		dirdom.getAppearance().setAttribute(CommonAttributes.VERTEX_DRAW, false);
 		dirdom.getAppearance().setAttribute(CommonAttributes.EDGE_DRAW, false);
 		
-		Viewer jrv = JRViewer.display(world); //f.getIndexedFaceSet());
+//		Viewer jrv = 
+		JRViewer.display(world); //f.getIndexedFaceSet());
 		world.getAppearance().setAttribute("polygonShader.diffuseColor", Color.white);
 	}
 	

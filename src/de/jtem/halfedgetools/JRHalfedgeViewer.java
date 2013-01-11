@@ -55,7 +55,7 @@ public class JRHalfedgeViewer {
 		}
 		if (overlaysSupported) {
 			System.setProperty(
-				"de.jreality.scene.Viewer",
+				SystemProperties.VIEWER,
 				"de.jreality.jogl.GLJPanelViewer" + " " + 
 				SystemProperties.VIEWER_DEFAULT_JOGL + " " + 
 				SystemProperties.VIEWER_DEFAULT_SOFT

@@ -9,7 +9,6 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.Position;
 
 @CanonicalPosition
 public class MappedCanonicalPositionAdapter extends AbstractAdapter<double[]> {

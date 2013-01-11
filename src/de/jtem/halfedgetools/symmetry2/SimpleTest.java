@@ -5,8 +5,6 @@ import de.discretization.halfedge.hds.DFace;
 import de.discretization.halfedge.hds.DHDS;
 import de.discretization.halfedge.hds.DVertex;
 import de.jreality.geometry.IndexedFaceSetUtility;
-import de.jreality.math.Matrix;
-import de.jreality.math.MatrixBuilder;
 import de.jreality.math.Pn;
 import de.jreality.plugin.JRViewer;
 import de.jreality.scene.IndexedFaceSet;
