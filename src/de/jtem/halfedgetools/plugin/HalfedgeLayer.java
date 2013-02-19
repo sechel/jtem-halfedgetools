@@ -169,11 +169,7 @@ public class HalfedgeLayer implements ActionListener {
 	}
 	
 	public HalfedgeLayer(Geometry geometry, HalfedgeInterface hif) {
-		this();
-		this.hif = hif;
-		if (hif.getTemplateHDS() != null) {
-			hds = hif.createEmpty(hif.getTemplateHDS());
-		}
+		this(hif);
 		set(geometry);
 	}
 	

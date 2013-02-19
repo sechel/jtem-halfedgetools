@@ -26,9 +26,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -1116,7 +1117,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		@Override
 		public void contentChanged(ContentChangedEvent cce) {
 			if (cce.node == root || cce.node == null) return; // update boomerang
-			final List<HalfedgeLayer> newLayers = new LinkedList<HalfedgeLayer>();
+			final Map<HalfedgeLayer, Geometry> layersMap = new HashMap<HalfedgeLayer, Geometry>();
 			cce.node.accept(new SceneGraphVisitor() {
 				private SceneGraphPath
 					path = new SceneGraphPath();
@@ -1134,23 +1135,23 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				@Override
 				public void visit(Geometry g) {
 					Transformation layerTransform = new Transformation(path.getMatrix(null));
-					HalfedgeLayer layer = new HalfedgeLayer(g, HalfedgeInterface.this);
+					HalfedgeLayer layer = new HalfedgeLayer(HalfedgeInterface.this);
 					layer.setName(g.getName());
 					layer.setTransformation(layerTransform);
-					newLayers.add(layer);
+					layersMap.put(layer, g);
 					geometryFound = true;
 				}
 			});
-			if (newLayers.isEmpty()) return;
-			Collections.reverse(newLayers);
+			if (layersMap.isEmpty()) return;
 			List<HalfedgeLayer> oldLayers = new LinkedList<HalfedgeLayer>(layers);
-			for (HalfedgeLayer l : newLayers) {
+			for (HalfedgeLayer l : layersMap.keySet()) {
+				l.set(layersMap.get(l));
 				addLayer(l);
 			}
 			for (HalfedgeLayer l : oldLayers) {
 				removeLayer(l);
 			}
-			activateLayer(newLayers.get(0));
+			activateLayer(layers.get(0));
 			checkContent();
 			updateStates();
 			encompassAll();
