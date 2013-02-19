@@ -62,6 +62,7 @@ public class GeometryPreviewerPanel extends JPanel implements PropertyChangeList
 		setBorder(BorderFactory.createTitledBorder("Preview"));
 		viewer.addContentSupport(ContentType.Raw);
 		viewer.addContentUI();
+		viewer.getController().setRegisterSPIPlugins(false);
 		viewer.startupLocal();
 		View view = viewer.getPlugin(View.class);
 		Scene scene = viewer.getPlugin(Scene.class);
