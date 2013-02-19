@@ -3,7 +3,7 @@ This file is part of a jTEM project.
 All jTEM projects are licensed under the FreeBSD license 
 or 2-clause BSD license (see http://www.opensource.org/licenses/bsd-license.php). 
 
-Copyright (c) 2002-2010, Technische Universität Berlin, jTEM
+Copyright (c) 2002-2010, Technische Universitaet Berlin, jTEM
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, 
@@ -58,6 +58,7 @@ public class JRHalfedgeViewer {
 				SystemProperties.VIEWER,
 				"de.jreality.jogl.GLJPanelViewer" + " " + 
 				SystemProperties.VIEWER_DEFAULT_JOGL + " " + 
+				SystemProperties.VIEWER_DEFAULT_JOGL3 + " " + 
 				SystemProperties.VIEWER_DEFAULT_SOFT
 			);
 		} else {
