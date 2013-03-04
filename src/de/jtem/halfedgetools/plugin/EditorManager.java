@@ -2,6 +2,7 @@ package de.jtem.halfedgetools.plugin;
 
 import static java.awt.event.KeyEvent.VK_F1;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -79,6 +80,7 @@ public class EditorManager extends Plugin implements ActionListener {
 		modeCombo.setModel(model);
 		modeCombo.setSelectedItem(activeMode);
 		modeCombo.addActionListener(this);
+		modeCombo.setMaximumSize(new Dimension(120, 50));
 		
 		// rebuild menu
 		modeMenu.removeAll();
