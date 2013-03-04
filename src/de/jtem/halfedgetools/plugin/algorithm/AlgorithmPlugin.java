@@ -49,17 +49,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.AlgorithmDropdownToolbar;
-import de.jtem.halfedgetools.plugin.AlgorithmToolbars.EditingCategoryToolbar;
-import de.jtem.halfedgetools.plugin.AlgorithmToolbars.FileCategoryToolbar;
-import de.jtem.halfedgetools.plugin.AlgorithmToolbars.GeneratorCategoryToolbar;
-import de.jtem.halfedgetools.plugin.AlgorithmToolbars.GeometryCategoryToolbar;
-import de.jtem.halfedgetools.plugin.AlgorithmToolbars.SelectionCategoryToolbar;
-import de.jtem.halfedgetools.plugin.AlgorithmToolbars.SimplificationCategoryToolbar;
-import de.jtem.halfedgetools.plugin.AlgorithmToolbars.SubdivisionCategoryToolbar;
-import de.jtem.halfedgetools.plugin.AlgorithmToolbars.TextureRemeshingCategoryToolbar;
-import de.jtem.halfedgetools.plugin.AlgorithmToolbars.TopologyCategoryToolbar;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeToolBar;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.aggregators.ToolBarAggregator;
@@ -141,37 +131,37 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		hcp = c.getPlugin(HalfedgeInterface.class);
 		viewMenuBar = c.getPlugin(ViewMenuBar.class);
 		viewMenuBar.addMenuItem(getClass(), getPriority(), action, "Halfedge", getAlgorithmCategory().toString());
-		switch (getAlgorithmCategory()) {
-		case Editing:
-			toolbar = c.getPlugin(EditingCategoryToolbar.class);
-			break;
-		case Geometry:
-			toolbar = c.getPlugin(GeometryCategoryToolbar.class);
-			break;
-		case Simplification:
-			toolbar = c.getPlugin(SimplificationCategoryToolbar.class);
-			break;
-		case Subdivision:
-			toolbar = c.getPlugin(SubdivisionCategoryToolbar.class);
-			break;
-		case Topology:
-			toolbar = c.getPlugin(TopologyCategoryToolbar.class);
-			break;
-		case File:
-			toolbar = c.getPlugin(FileCategoryToolbar.class);
-			break;
-		case Generator:
-			toolbar = c.getPlugin(GeneratorCategoryToolbar.class);
-			break;
-		case Selection:
-			toolbar = c.getPlugin(SelectionCategoryToolbar.class);
-			break;
-		case TextureRemeshing:
-			toolbar = c.getPlugin(TextureRemeshingCategoryToolbar.class);
-			break;
-		default:
-			toolbar = c.getPlugin(HalfedgeToolBar.class); 
-		}
+//		switch (getAlgorithmCategory()) {
+//		case Editing:
+//			toolbar = c.getPlugin(EditingCategoryToolbar.class);
+//			break;
+//		case Geometry:
+//			toolbar = c.getPlugin(GeometryCategoryToolbar.class);
+//			break;
+//		case Simplification:
+//			toolbar = c.getPlugin(SimplificationCategoryToolbar.class);
+//			break;
+//		case Subdivision:
+//			toolbar = c.getPlugin(SubdivisionCategoryToolbar.class);
+//			break;
+//		case Topology:
+//			toolbar = c.getPlugin(TopologyCategoryToolbar.class);
+//			break;
+//		case File:
+//			toolbar = c.getPlugin(FileCategoryToolbar.class);
+//			break;
+//		case Generator:
+//			toolbar = c.getPlugin(GeneratorCategoryToolbar.class);
+//			break;
+//		case Selection:
+//			toolbar = c.getPlugin(SelectionCategoryToolbar.class);
+//			break;
+//		case TextureRemeshing:
+//			toolbar = c.getPlugin(TextureRemeshingCategoryToolbar.class);
+//			break;
+//		default:
+//			toolbar = c.getPlugin(HalfedgeToolBar.class); 
+//		}
 //		toolbar.addAction(getClass(), getPriority(), action);
 		dropdownToolbar = c.getPlugin(AlgorithmDropdownToolbar.class);
 		dropdownToolbar.addAlgorithm(this);

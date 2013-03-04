@@ -1,9 +1,8 @@
 package de.jtem.halfedgetools.plugin;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,7 +16,6 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.event.ListDataListener;
 
@@ -37,24 +35,19 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 	private Map<AlgorithmCategory, Set<AlgorithmPlugin>>
 		algoMap = new HashMap<AlgorithmCategory, Set<AlgorithmPlugin>>();
 	private JToolBar
-		comboPanel = new JToolBar("Halfedge Algorithms");
+		comboToolBar = new JToolBar("Halfedge Algorithms");
 	
 	public AlgorithmDropdownToolbar() {
-		comboPanel.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
 		for (AlgorithmCategory cat : AlgorithmCategory.values()) {
 			JComboBox catCombo = new JComboBox();
-			catCombo.setPreferredSize(new Dimension(55, 24));
 			AlgorithmComboModel model = new AlgorithmComboModel(cat);
 			catCombo.setModel(model);
 			AlgorithmCellRenderer renderer = new AlgorithmCellRenderer(cat);
 			catCombo.setRenderer(renderer);
 			comboMap.put(cat, catCombo);
-			comboPanel.add(catCombo, c);
 			algoMap.put(cat, new HashSet<AlgorithmPlugin>());
 		}
-		c.weightx = 1.0;
-		comboPanel.add(new JPanel(), c);
+		updateComboBoxes();
 	}
 	
 	
@@ -76,10 +69,12 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 				JLabel l = (JLabel)c;
 				if (index == -1) {
 					l.setIcon(ImageHook.getIcon("color_swatch.png"));
+					l.setText(category.toString());
 				} else {
 					List<AlgorithmPlugin> algos = getAlgorithms(category);
 					AlgorithmPlugin algo = algos.get(index);
 					l.setIcon(algo.getPluginInfo().icon);
+					l.setText(algo.getAlgorithmName());
 				}
 			}
 			return c;
@@ -143,17 +138,27 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 	
 	
 	public void updateComboBoxes() {
+		GridBagConstraints c = new GridBagConstraints();
+		c.weightx = 1.0;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 1;
+		int numCombos = 0;
 		for (AlgorithmCategory cat : AlgorithmCategory.values()) {
 			JComboBox combo = comboMap.get(cat);
 			Set<AlgorithmPlugin> algos = algoMap.get(cat);
-			combo.setVisible(!algos.isEmpty());
-			combo.revalidate();
+			if (algos.isEmpty()) continue;
+			comboToolBar.add(combo, c);
+			numCombos++;
 		}
+		int cols = 6;
+		int rows = (int)Math.ceil(numCombos / 6.0);
+		comboToolBar.setLayout(new GridLayout(rows, cols));
+		comboToolBar.revalidate();
 	}
 	
 	@Override
 	public Component getToolBarComponent() {
-		return comboPanel;
+		return comboToolBar;
 	}
 
 	@Override
@@ -175,6 +180,10 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 		Set<AlgorithmPlugin> plugins = algoMap.get(ap.getAlgorithmCategory());
 		plugins.remove(ap);
 		updateComboBoxes();
+	}
+	
+	public void setFloatable(boolean floatable) {
+		comboToolBar.setFloatable(floatable);
 	}
 	
 }

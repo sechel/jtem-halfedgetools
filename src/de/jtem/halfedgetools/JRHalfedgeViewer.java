@@ -37,12 +37,14 @@ import de.jreality.jogl.GLJPanelViewer;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
+import de.jreality.ui.JRealitySplashScreen;
 import de.jreality.util.SystemProperties;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.jrworkspace.plugin.lnfswitch.LookAndFeelSwitch;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.CrossPlatformLnF;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.NimbusLnF;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.SystemLookAndFeel;
+import de.jtem.jrworkspace.plugin.simplecontroller.widget.SplashScreen;
 
 public class JRHalfedgeViewer {
 	
@@ -93,8 +95,11 @@ public class JRHalfedgeViewer {
 	
 	
 	public static void main(String[] args) {
-		JRViewer v = new JRViewer();
+		SplashScreen splash = new JRealitySplashScreen();
+		splash.setVisible(true);
 		initHalfedgeFronted();
+		JRViewer v = new JRViewer();
+		v.setSplashScreen(splash);
 		v.setPropertiesFile("JRHalfedgeViewer.xml");
 		v.setPropertiesResource(JRHalfedgeViewer.class, "JRHalfedgeViewer.xml");
 		v.addContentUI();
@@ -105,5 +110,6 @@ public class JRHalfedgeViewer {
 		v.getController().setManageLookAndFeel(false);
 		addLnFPlugins(v);
 		v.startup(); 
+		splash.setVisible(false);
 	}
 }
