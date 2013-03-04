@@ -43,7 +43,7 @@ public class GarlandHeckbertPlugin extends AlgorithmPlugin {
 
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
-		return AlgorithmCategory.Simplification;
+		return AlgorithmCategory.Editing;
 	}
 	
 	@Override

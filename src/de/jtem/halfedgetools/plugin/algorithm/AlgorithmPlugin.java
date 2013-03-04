@@ -3,7 +3,7 @@ This file is part of a jTEM project.
 All jTEM projects are licensed under the FreeBSD license 
 or 2-clause BSD license (see http://www.opensource.org/licenses/bsd-license.php). 
 
-Copyright (c) 2002-2010, Technische Universität Berlin, jTEM
+Copyright (c) 2002-2010, Technische Universitaet Berlin, jTEM
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, 
@@ -48,6 +48,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.plugin.AlgorithmDropdownToolbar;
 import de.jtem.halfedgetools.plugin.AlgorithmToolbars.EditingCategoryToolbar;
 import de.jtem.halfedgetools.plugin.AlgorithmToolbars.FileCategoryToolbar;
 import de.jtem.halfedgetools.plugin.AlgorithmToolbars.GeneratorCategoryToolbar;
@@ -71,6 +72,8 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		viewMenuBar = null;
 	protected ToolBarAggregator
 		toolbar = null;
+	protected AlgorithmDropdownToolbar
+		dropdownToolbar = null;
 	protected HalfedgeInterface
 		hcp = null;
 	private HalfedgeAction 
@@ -169,7 +172,9 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		default:
 			toolbar = c.getPlugin(HalfedgeToolBar.class); 
 		}
-		toolbar.addAction(getClass(), getPriority(), action);
+//		toolbar.addAction(getClass(), getPriority(), action);
+		dropdownToolbar = c.getPlugin(AlgorithmDropdownToolbar.class);
+		dropdownToolbar.addAlgorithm(this);
 	}
 	
 	@Override
