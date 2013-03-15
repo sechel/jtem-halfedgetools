@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -163,7 +164,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		volatileAdapters = new AdapterSet();
 	
 	private List<HalfedgeListener>
-		listeners = new LinkedList<HalfedgeListener>();
+		listeners = Collections.synchronizedList(new LinkedList<HalfedgeListener>());
 	
 	private ActionTool
 		layerActivationTool = new ActionTool("PrimaryAction");
@@ -1170,31 +1171,41 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	
 	protected void fireActiveLayerChanged(HalfedgeLayer old, HalfedgeLayer active) {
-		for (HalfedgeListener l : listeners) {
-			l.activeLayerChanged(old, active);
+		synchronized (listeners) {
+			for (HalfedgeListener l : new LinkedList<HalfedgeListener>(listeners)) {
+				l.activeLayerChanged(old, active);
+			}
 		}
 	}
 	
 	protected void fireDataChanged() {
-		for (HalfedgeListener l : listeners) {
-			l.dataChanged(getActiveLayer());
+		synchronized (listeners) {
+			for (HalfedgeListener l : new LinkedList<HalfedgeListener>(listeners)) {
+				l.dataChanged(getActiveLayer());
+			}
 		}
 	}
 	
 	protected void fireAdaptersChanged() {
-		for (HalfedgeListener l : listeners) {
-			l.adaptersChanged(getActiveLayer());
+		synchronized (listeners) {
+			for (HalfedgeListener l : new LinkedList<HalfedgeListener>(listeners)) {
+				l.adaptersChanged(getActiveLayer());
+			}
 		}
 	}
 	
 	protected void fireLayerAdded(HalfedgeLayer layer) {
-		for (HalfedgeListener l : listeners) {
-			l.layerCreated(layer);
+		synchronized (listeners) {
+			for (HalfedgeListener l : new LinkedList<HalfedgeListener>(listeners)) {
+				l.layerCreated(layer);
+			}
 		}
 	}
 	protected void fireLayerRemoved(HalfedgeLayer layer) {
-		for (HalfedgeListener l : listeners) {
-			l.layerRemoved(layer);
+		synchronized (listeners) {
+			for (HalfedgeListener l : new LinkedList<HalfedgeListener>(listeners)) {
+				l.layerRemoved(layer);
+			}
 		}
 	}
 	
