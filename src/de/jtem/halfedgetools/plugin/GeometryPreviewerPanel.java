@@ -14,13 +14,13 @@ import static javax.swing.JOptionPane.ERROR_MESSAGE;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 
-import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -58,8 +58,7 @@ public class GeometryPreviewerPanel extends JPanel implements PropertyChangeList
 	
 	public GeometryPreviewerPanel() {
 		setLayout(new GridLayout());
-		setPreferredSize(new Dimension(250, 200));
-		setBorder(BorderFactory.createTitledBorder("Preview"));
+		setPreferredSize(new Dimension(300, 300));
 		viewer.addContentSupport(ContentType.Raw);
 		viewer.addContentUI();
 		viewer.getController().setRegisterSPIPlugins(false);
@@ -80,16 +79,14 @@ public class GeometryPreviewerPanel extends JPanel implements PropertyChangeList
 		contentApp.setAttribute(LINE_SHADER + "." + DIFFUSE_COLOR, new Color(100, 200, 50));
 		contentApp.setAttribute(POINT_SHADER + "." + POINT_RADIUS, 0.12);
 		contentApp.setAttribute(POINT_SHADER + "." + DIFFUSE_COLOR, new Color(200, 100, 50));
-		contentApp.setAttribute(POLYGON_SHADER + "." + DIFFUSE_COLOR, new Color(10, 230, 230));
+		contentApp.setAttribute(POLYGON_SHADER + "." + DIFFUSE_COLOR, new Color(200, 200, 200));
 		contentApp.setAttribute(POLYGON_SHADER + "." + SMOOTH_SHADING, false);
 	}
 	
 	@Override
-	public void updateUI() {
-		super.updateUI();
-		if (rootApp != null) {
-			rootApp.setAttribute("backgroundColor", getBackground());
-		}
+	public void paint(Graphics g) {
+		super.paint(g);
+		rootApp.setAttribute("backgroundColor", getBackground());
 	}
 	
 	@Override

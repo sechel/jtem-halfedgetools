@@ -584,6 +584,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
 			HalfEdgeDataStructure<?, ?, ?> hds = get();
 			chooser.setDialogTitle("Export Layer Geometry");
+			chooser.setPreferredSize(new Dimension(800, 700));
 			int result = chooser.showSaveDialog(w);
 			if (result != JFileChooser.APPROVE_OPTION) return;
 			File file = chooser.getSelectedFile();
