@@ -76,6 +76,28 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		
 	}
 	
+	
+	private class AlgorithmExecuteDialogJob extends AbstractJob {
+		
+		@Override
+		public String getJobName() {
+			return getAlgorithmName() + " Dialog";
+		}
+		
+		@Override
+		public void execute() throws Exception {
+			Runnable r = new Runnable() {
+				@Override
+				public void run() {
+					executeDialog(hcp.get(), hcp.getAdapters(), hcp);
+				}
+			};
+			EventQueue.invokeAndWait(r);
+		}
+		
+	}
+	
+	
 	private class AlgorithmAfterJob extends AbstractJob {
 		
 		private AlgorithmShowDialogJob
@@ -105,9 +127,14 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 	public void execute() {
 		AlgorithmBeforeJob beforeJob = new AlgorithmBeforeJob();
 		AlgorithmShowDialogJob dialogJob = new AlgorithmShowDialogJob();
+		AlgorithmExecuteDialogJob execDialogJob = new AlgorithmExecuteDialogJob();
 		AlgorithmAfterJob afterJob = new AlgorithmAfterJob(dialogJob);
 		jobQueue.queueJob(beforeJob);
-		jobQueue.queueJob(dialogJob);
+		if (getDialogPanel() != null) {
+			jobQueue.queueJob(dialogJob);
+		} else { 
+			jobQueue.queueJob(execDialogJob);
+		}
 		jobQueue.queueJob(afterJob);
 	}
 	
@@ -127,6 +154,13 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void executeBeforeDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) {}
+	
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void executeDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) {}
 	
 	public <
 		V extends Vertex<V, E, F>,

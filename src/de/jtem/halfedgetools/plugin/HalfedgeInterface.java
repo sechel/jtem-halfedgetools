@@ -18,6 +18,7 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 import static javax.swing.SwingUtilities.getWindowAncestor;
 
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
 import java.awt.Insets;
@@ -700,30 +701,36 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	
 	protected void updateStates() {
-		HalfEdgeDataStructure<?, ?, ?> hds = activeLayer.get();
-		String text = hds.getClass().getSimpleName() + ": ";
-		text += "V" + hds.numVertices() + " ";
-		text += "E" + hds.numEdges() + " ";
-		text += "F" + hds.numFaces() + " ";
-		hdsLabel.setText(text);
-		hdsLabel.repaint();
-		deleteLayerAction.setEnabled(layers.size() > 1);
-		undoAction.setEnabled(activeLayer.canUndo());
-		redoAction.setEnabled(activeLayer.canRedo());
-		undoButton.validate();
-		redoButton.validate();
-		
-		HalfedgeLayer layer = getActiveLayer();
-		int index = layers.indexOf(layer);
-		disableListeners = true;
-		layersTable.revalidate();
-		layersTable.getSelectionModel().setSelectionInterval(index, index);
-		disableListeners = false;
-		getAdapters().revalidateAdapters();
-		for (HalfedgeLayer l : layers) {
-			l.updateBoundingBox();
-			l.setShowBoundingBox(l.isActive() & isShowBoundingBox());
-		}
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				HalfEdgeDataStructure<?, ?, ?> hds = activeLayer.get();
+				String text = hds.getClass().getSimpleName() + ": ";
+				text += "V" + hds.numVertices() + " ";
+				text += "E" + hds.numEdges() + " ";
+				text += "F" + hds.numFaces() + " ";
+				hdsLabel.setText(text);
+				hdsLabel.repaint();
+				deleteLayerAction.setEnabled(layers.size() > 1);
+				undoAction.setEnabled(activeLayer.canUndo());
+				redoAction.setEnabled(activeLayer.canRedo());
+				undoButton.validate();
+				redoButton.validate();
+				
+				HalfedgeLayer layer = getActiveLayer();
+				int index = layers.indexOf(layer);
+				disableListeners = true;
+				layersTable.revalidate();
+				layersTable.getSelectionModel().setSelectionInterval(index, index);
+				disableListeners = false;
+				getAdapters().revalidateAdapters();
+				for (HalfedgeLayer l : layers) {
+					l.updateBoundingBox();
+					l.setShowBoundingBox(l.isActive() & isShowBoundingBox());
+				}				
+			}
+		};
+		EventQueue.invokeLater(r);
 	}
 	
 	
@@ -1097,20 +1104,26 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	public void checkContent() {
-		if (scene == null) return;
-		List<SceneGraphPath> paths = getPathsBetween(scene.getSceneRoot(), root);
-		if (paths.isEmpty()) {
-			content.setContent(root);
-		}
-		MatrixBuilder mb = MatrixBuilder.euclidean();
-		rootTransform.setMatrix(mb.getArray());
-		Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(root);
-		double maxExtend = bbox.getMaxExtent();		
-		mb.scale(10 / maxExtend);
-		rootTransform.setMatrix(mb.getArray());
-		for (HalfedgeLayer l : layers) {
-			l.updateBoundingBox();
-		}
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				if (scene == null) return;
+				List<SceneGraphPath> paths = getPathsBetween(scene.getSceneRoot(), root);
+				if (paths.isEmpty()) {
+					content.setContent(root);
+				}
+				MatrixBuilder mb = MatrixBuilder.euclidean();
+				rootTransform.setMatrix(mb.getArray());
+				Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(root);
+				double maxExtend = bbox.getMaxExtent();		
+				mb.scale(10 / maxExtend);
+				rootTransform.setMatrix(mb.getArray());
+				for (HalfedgeLayer l : layers) {
+					l.updateBoundingBox();
+				}
+			}
+		};
+		EventQueue.invokeLater(r);
 	}
 	
 	
@@ -1171,43 +1184,70 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	
-	protected void fireActiveLayerChanged(HalfedgeLayer old, HalfedgeLayer active) {
-		synchronized (listeners) {
-			for (HalfedgeListener l : new LinkedList<HalfedgeListener>(listeners)) {
-				l.activeLayerChanged(old, active);
+	protected void fireActiveLayerChanged(final HalfedgeLayer old, final HalfedgeLayer active) {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				synchronized (listeners) {
+					for (HalfedgeListener l : new LinkedList<HalfedgeListener>(listeners)) {
+						l.activeLayerChanged(old, active);
+					}
+				}				
 			}
-		}
+		};
+		EventQueue.invokeLater(r);
 	}
-	
 	protected void fireDataChanged() {
-		synchronized (listeners) {
-			for (HalfedgeListener l : new LinkedList<HalfedgeListener>(listeners)) {
-				l.dataChanged(getActiveLayer());
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				synchronized (listeners) {
+					for (HalfedgeListener l : new LinkedList<HalfedgeListener>(listeners)) {
+						l.dataChanged(getActiveLayer());
+					}
+				}
 			}
-		}
+		};
+		EventQueue.invokeLater(r);
 	}
-	
 	protected void fireAdaptersChanged() {
-		synchronized (listeners) {
-			for (HalfedgeListener l : new LinkedList<HalfedgeListener>(listeners)) {
-				l.adaptersChanged(getActiveLayer());
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				synchronized (listeners) {
+					for (HalfedgeListener l : new LinkedList<HalfedgeListener>(listeners)) {
+						l.adaptersChanged(getActiveLayer());
+					}
+				}
 			}
-		}
+		};
+		EventQueue.invokeLater(r);
 	}
-	
-	protected void fireLayerAdded(HalfedgeLayer layer) {
-		synchronized (listeners) {
-			for (HalfedgeListener l : new LinkedList<HalfedgeListener>(listeners)) {
-				l.layerCreated(layer);
+	protected void fireLayerAdded(final HalfedgeLayer layer) {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				synchronized (listeners) {
+					for (HalfedgeListener l : new LinkedList<HalfedgeListener>(listeners)) {
+						l.layerCreated(layer);
+					}
+				}
 			}
-		}
+		};
+		EventQueue.invokeLater(r);
 	}
-	protected void fireLayerRemoved(HalfedgeLayer layer) {
-		synchronized (listeners) {
-			for (HalfedgeListener l : new LinkedList<HalfedgeListener>(listeners)) {
-				l.layerRemoved(layer);
+	protected void fireLayerRemoved(final HalfedgeLayer layer) {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				synchronized (listeners) {
+					for (HalfedgeListener l : new LinkedList<HalfedgeListener>(listeners)) {
+						l.layerRemoved(layer);
+					}
+				}
 			}
-		}
+		};
+		EventQueue.invokeLater(r);
 	}
 	
 	public HalfedgeSelection getSelection() {

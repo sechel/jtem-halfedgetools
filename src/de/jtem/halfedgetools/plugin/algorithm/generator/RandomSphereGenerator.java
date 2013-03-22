@@ -14,15 +14,17 @@ import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.algorithm.computationalgeometry.ConvexHull;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
-import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class RandomSphereGenerator extends AlgorithmPlugin {
+public class RandomSphereGenerator extends AlgorithmDialogPlugin {
 
 	private Random 
 		rnd = new Random();
+	private String 
+		dialogString = null;
 	private int
 		extraPoints = 20;
 	
@@ -55,10 +57,20 @@ public class RandomSphereGenerator extends AlgorithmPlugin {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		String numString = JOptionPane.showInputDialog(getOptionParent(), "Number of points", extraPoints);
-		if (numString == null) return;
-		extraPoints = Integer.parseInt(numString);
+	> void executeDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) {
+		dialogString = JOptionPane.showInputDialog(getOptionParent(), "Number of points", extraPoints);
+	}
+	
+	
+	@Override
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) {
+		if (dialogString == null) return;
+		extraPoints = Integer.parseInt(dialogString);
 		HDS r = hi.createEmpty(hds);
 		for (int i = 0; i < extraPoints; i++) {
 			double[] pos = {rnd.nextGaussian(), rnd.nextGaussian(), rnd.nextGaussian()};
@@ -69,6 +81,7 @@ public class RandomSphereGenerator extends AlgorithmPlugin {
 		ConvexHull.convexHull(r, a, 1E-8);
 		hi.set(r);
 	}
+	
 	
 	@Override
 	public PluginInfo getPluginInfo() {
