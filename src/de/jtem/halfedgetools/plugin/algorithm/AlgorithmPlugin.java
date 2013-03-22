@@ -33,6 +33,7 @@ package de.jtem.halfedgetools.plugin.algorithm;
 
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 
+import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 
@@ -125,11 +126,17 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		public void execute() throws Exception {
 			try {
 				AlgorithmPlugin.this.execute(hcp.get(), hcp.getAdapters(), hcp);
-			} catch (Exception e1) {
+			} catch (final Exception e1) {
 				e1.printStackTrace();
-				Window w = SwingUtilities.getWindowAncestor(hcp.getShrinkPanel());
-				String msg = e1.getClass().getSimpleName() + ": " + e1.getLocalizedMessage();
-				JOptionPane.showMessageDialog(w, msg, "Error: " + getAlgorithmName(), ERROR_MESSAGE);
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
+						Window w = SwingUtilities.getWindowAncestor(hcp.getShrinkPanel());
+						String msg = e1.getClass().getSimpleName() + ": " + e1.getLocalizedMessage();
+						JOptionPane.showMessageDialog(w, msg, "Error: " + getAlgorithmName(), ERROR_MESSAGE);						
+					}
+				};
+				EventQueue.invokeLater(r);
 				throw e1;
 			}
 		}

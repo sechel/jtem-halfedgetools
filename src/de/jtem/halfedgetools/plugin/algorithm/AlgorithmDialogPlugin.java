@@ -52,7 +52,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 	
 		@Override
 		public String getJobName() {
-			return getAlgorithmName() + " Dialog";
+			return "Dialog";
 		}
 		
 		@Override
@@ -81,7 +81,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		
 		@Override
 		public String getJobName() {
-			return getAlgorithmName() + " Dialog";
+			return "Dialog";
 		}
 		
 		@Override
@@ -110,7 +110,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 
 		@Override
 		public String getJobName() {
-			return getAlgorithmName() + " Algorithm";
+			return getAlgorithmName();
 		}
 		
 		@Override

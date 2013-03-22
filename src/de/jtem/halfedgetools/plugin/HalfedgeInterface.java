@@ -915,12 +915,24 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		fireAdaptersChanged();
 	}
 	
-	public void addTemporaryGeometry(SceneGraphComponent c) {
-		getActiveLayer().addTemporaryGeometry(c);
+	public void addTemporaryGeometry(final SceneGraphComponent c) {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				getActiveLayer().addTemporaryGeometry(c);				
+			}
+		};
+		EventQueue.invokeLater(r);
 	}
 
-	public void removeTemporaryGeometry(SceneGraphComponent c) {
-		getActiveLayer().removeTemporaryGeometry(c);
+	public void removeTemporaryGeometry(final SceneGraphComponent c) {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				getActiveLayer().removeTemporaryGeometry(c);
+			}
+		};
+		EventQueue.invokeLater(r);
 	}
 	
 	@Override
@@ -1253,16 +1265,33 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	public HalfedgeSelection getSelection() {
 		return activeLayer.getSelection();
 	}
-	public void setSelection(HalfedgeSelection s) {
-		activeLayer.setSelection(s);
+	public void setSelection(final HalfedgeSelection s) {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				activeLayer.setSelection(s);
+			}
+		};
+		EventQueue.invokeLater(r);
 	}
 	public void clearSelection() {
-		activeLayer.clearSelection();
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+					activeLayer.clearSelection();
+			}
+		};
+		EventQueue.invokeLater(r);
 	}
-	
-	public void setSelected(Node<?,?,?> n, boolean selected) {
-		getSelection().setSelected(n, selected);
-		activeLayer.updateSelection();
+	public void setSelected(final Node<?,?,?> n, final boolean selected) {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				getSelection().setSelected(n, selected);
+				activeLayer.updateSelection();
+			}
+		};
+		EventQueue.invokeLater(r);
 	}
 	
 	public boolean isSelected(Node<?,?,?> n) {
