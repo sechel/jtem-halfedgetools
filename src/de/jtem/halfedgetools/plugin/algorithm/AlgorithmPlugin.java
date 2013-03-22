@@ -43,6 +43,8 @@ import javax.swing.SwingUtilities;
 
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewMenuBar;
+import de.jreality.plugin.job.AbstractJob;
+import de.jreality.plugin.job.JobQueuePlugin;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -56,7 +58,9 @@ import de.jtem.jrworkspace.plugin.aggregators.ToolBarAggregator;
 
 public abstract class AlgorithmPlugin extends Plugin implements Comparable<AlgorithmPlugin> {
 
-	private View
+	protected JobQueuePlugin
+		jobQueue = null;
+	protected View
 		view = null;
 	protected ViewMenuBar
 		viewMenuBar = null;
@@ -104,29 +108,42 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			execute();
+		}
+		
+	}
+	
+	
+	private class AlgorithmJob extends AbstractJob {
+		
+		@Override
+		public String getJobName() {
+			return getAlgorithmName();
+		}
+		
+		@Override
+		public void execute() throws Exception {
 			try {
-				execute(hcp.get(), hcp.getAdapters(), hcp);
+				AlgorithmPlugin.this.execute(hcp.get(), hcp.getAdapters(), hcp);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 				Window w = SwingUtilities.getWindowAncestor(hcp.getShrinkPanel());
 				String msg = e1.getClass().getSimpleName() + ": " + e1.getLocalizedMessage();
 				JOptionPane.showMessageDialog(w, msg, "Error: " + getAlgorithmName(), ERROR_MESSAGE);
+				throw e1;
 			}
 		}
 		
 	}
 	
 	public void execute() {
-		try {
-			execute(hcp.get(), hcp.getAdapters(), hcp);
-		} catch (Throwable e) {
-			System.err.println(e);
-		}
+		jobQueue.queueJob(new AlgorithmJob());
 	}
 	
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
+		jobQueue = c.getPlugin(JobQueuePlugin.class);
 		view = c.getPlugin(View.class);
 		hcp = c.getPlugin(HalfedgeInterface.class);
 		viewMenuBar = c.getPlugin(ViewMenuBar.class);

@@ -34,6 +34,7 @@ package de.jtem.halfedgetools.plugin;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.jreality.plugin.job.JobMonitorPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.generator.ConvexHullGenerator;
 import de.jtem.halfedgetools.plugin.algorithm.generator.RandomEllipsoidGenerator;
 import de.jtem.halfedgetools.plugin.algorithm.generator.RandomSphereGenerator;
@@ -235,6 +236,7 @@ public class HalfedgePluginFactory {
 		s.add(new HalfedgePreferencePage());
 		s.add(new CoordinatesPivot());
 		s.add(new SwapPosTexPos());
+		s.add(new JobMonitorPlugin());
 		return s;
 	}
 	

@@ -4,6 +4,7 @@ import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
 import static javax.swing.JOptionPane.OK_OPTION;
 import static javax.swing.JOptionPane.PLAIN_MESSAGE;
 
+import java.awt.EventQueue;
 import java.awt.Window;
 
 import javax.swing.Icon;
@@ -12,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import de.jreality.plugin.basic.View;
+import de.jreality.plugin.job.AbstractJob;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -29,6 +31,86 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 	private static Icon
 		defaultIcon = ImageHook.getIcon("cog_edit.png");
 
+	
+	private class AlgorithmBeforeJob extends AbstractJob {
+		
+		@Override
+		public String getJobName() {
+			return getAlgorithmName() + " Init";
+		}
+		
+		@Override
+		public void execute() throws Exception {
+			executeBeforeDialog(hcp.get(), hcp.getAdapters(), hcp);
+		}
+		
+	}
+	
+	private class AlgorithmShowDialogJob extends AbstractJob {
+		
+		private int dialogResult = OK_OPTION;
+	
+		@Override
+		public String getJobName() {
+			return getAlgorithmName() + " Dialog";
+		}
+		
+		@Override
+		public void execute() throws Exception {
+			Runnable r = new Runnable() {
+				@Override
+				public void run() {
+					Window w = SwingUtilities.getWindowAncestor(view.getCenterComponent());
+					Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : defaultIcon;
+					dialogResult = JOptionPane.showConfirmDialog(
+						w, getDialogPanel(), 
+						getPluginInfo().name, 
+						OK_CANCEL_OPTION, 
+						PLAIN_MESSAGE, 
+						icon
+					);		
+				}
+			};
+			EventQueue.invokeAndWait(r);
+		}
+		
+	}
+	
+	private class AlgorithmAfterJob extends AbstractJob {
+		
+		private AlgorithmShowDialogJob
+			dialogJob = null;
+		
+		private AlgorithmAfterJob(AlgorithmShowDialogJob dialogJob) {
+			super();
+			this.dialogJob = dialogJob;
+		}
+
+		@Override
+		public String getJobName() {
+			return getAlgorithmName() + " Algorithm";
+		}
+		
+		@Override
+		public void execute() throws Exception {
+			if (dialogJob.dialogResult == OK_OPTION) {
+				executeAfterDialog(hcp.get(), hcp.getAdapters(), hcp);
+			}
+		}
+		
+	}
+	
+	
+	@Override
+	public void execute() {
+		AlgorithmBeforeJob beforeJob = new AlgorithmBeforeJob();
+		AlgorithmShowDialogJob dialogJob = new AlgorithmShowDialogJob();
+		AlgorithmAfterJob afterJob = new AlgorithmAfterJob(dialogJob);
+		jobQueue.queueJob(beforeJob);
+		jobQueue.queueJob(dialogJob);
+		jobQueue.queueJob(afterJob);
+	}
+	
 	@Override
 	public final <
 		V extends Vertex<V, E, F>,
@@ -36,22 +118,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		Window w = SwingUtilities.getWindowAncestor(view.getCenterComponent());
-		Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : defaultIcon;
-		int result = OK_OPTION;
-		executeBeforeDialog(hds, a, hi);
-		if (getDialogPanel() != null) {
-			result = JOptionPane.showConfirmDialog(
-				w, getDialogPanel(), 
-				getPluginInfo().name, 
-				OK_CANCEL_OPTION, 
-				PLAIN_MESSAGE, 
-				icon
-			);
-		}
-		if (result == OK_OPTION) {
-			executeAfterDialog(hds, a, hi);
-		}
+		execute();
 	}
 	
 	public <
