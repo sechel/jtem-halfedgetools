@@ -13,7 +13,6 @@ import javax.vecmath.Vector3d;
 
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
-import de.jreality.tutorial.projects.ksurfaces.R3;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -250,7 +249,7 @@ public class GarlandHeckbert <
 			double[] faceNormal = a.get(Normal.class, f, double[].class);
 			area = a.get(Area.class, f, Double.class); // weight by area maybe try 1 first...
 			double[] p = a.get(Position3d.class, v, double[].class);
-			d = -R3.dot(faceNormal, p);
+			d = -Rn.innerProduct(faceNormal, p);
 			quadric_c += area * d * d;
 			for (j = 0; j < 3; j++) {
 				quadric_b[j] += area * d * faceNormal[j];
