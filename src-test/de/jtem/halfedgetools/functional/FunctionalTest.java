@@ -35,11 +35,11 @@ import static de.jtem.halfedge.util.HalfEdgeUtils.constructFaceByVertices;
 import static java.lang.Math.sqrt;
 import static no.uib.cipr.matrix.Matrix.Norm.Frobenius;
 import static no.uib.cipr.matrix.Vector.Norm.TwoRobust;
-import junit.framework.Assert;
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Matrix;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

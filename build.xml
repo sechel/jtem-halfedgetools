@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="halfedgetools" default="default">
+    <description>
+            This is the build file for the jtem project halfedgetools.
+    </description>
+	
+    <target name="default" 
+    	description="This is the build file for the jTEM project halfedgetools." 
+    	depends="release"
+   	/>
+	
+	<property file="custom.properties"/>
+	<property file="default.properties"/>
+	
+	<tstamp><format property="time" pattern="yyyyMMddHHmm" /></tstamp>
+	<tstamp><format property="date" pattern="yyyy-MM-dd" /></tstamp>
+	<property name = "version" value = "B${time}"/>
+	<property name="vendor" value="jTEM Development Team"/>
+
+	<property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+	<property name="src" value="src"/>
+	<property name="src-test" value="src-test"/>
+	<property name="lib" value="lib"/>
+	<property name="build" value="build"/>
+	<property name="build-test" value="build-test"/>
+	<property name="release" value="${release.dir}"/>
+	<property name="tmp" value="tmp"/>
+	
+	<path id="jfreechart.libraryclasspath">
+		<pathelement location="${lib}/jfreechart/jcommon-1.0.18.jar"/>
+		<pathelement location="${lib}/jfreechart/jfreechart-1.0.14.jar"/>
+	</path>	
+	<path id="jtem.libraryclasspath">
+		<pathelement location="${lib}/jtem/discretegroup.jar"/>
+		<pathelement location="${lib}/jtem/halfedge.jar"/>
+		<pathelement location="${lib}/jtem/java2d.jar"/>
+		<pathelement location="${lib}/jtem/java2dx.jar"/>
+		<pathelement location="${lib}/jtem/jrworkspace.jar"/>
+		<pathelement location="${lib}/jtem/modelling.jar"/>
+	</path>	
+	<path id="mtjoptimization.libraryclasspath">
+		<pathelement location="${lib}/mtjoptimization/mtjOptimization.jar"/>
+		<pathelement location="${lib}/mtjoptimization/mtj.jar"/>
+		<pathelement location="${lib}/mtjoptimization/vecmath.jar"/>
+	</path>	
+	<path id="xstream.libraryclasspath">
+		<pathelement location="${lib}/xstream/xpp-1.1.4c.jar"/>
+		<pathelement location="${lib}/xstream/xstream-1.3.1.jar"/>
+	</path>	
+	<path id="jreality.libraryclasspath">
+		<pathelement location="${lib}/jReality.jar"/>
+	</path>	
+	<path id="junit.libraryclasspath">
+		<pathelement location="${lib}/junit/junit-4.11.jar"/>	
+		<pathelement location="${lib}/junit/hamcrest-core-1.3.jar"/>	
+	</path>	
+	
+	<target name="create build folders">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${release}"/>
+	</target>
+	
+	<target name="compile" depends="create build folders">
+        <javac destdir="${build}" excludesfile="build.exclude" source="${source}" target="${target}" includeantruntime="false" encoding="UTF-8">
+        	<compilerarg line="-Xlint:deprecation"/>
+        	<compilerarg line="-Xlint:unchecked"/>
+            <src path="${src}"/>
+        	<src path="${src-test}"/>
+            <classpath refid="jfreechart.libraryclasspath"/>
+            <classpath refid="jtem.libraryclasspath"/>
+            <classpath refid="mtjoptimization.libraryclasspath"/>
+            <classpath refid="xstream.libraryclasspath"/>
+            <classpath refid="jreality.libraryclasspath"/>
+            <classpath refid="junit.libraryclasspath"/>
+        </javac>
+		<copy todir="${build}" description="copy resources to output folder">
+			<fileset dir="${src}">
+				<include name="de/jtem/halfedgetools/plugin/image/**"/>
+				<exclude name="**/ImageHook.java"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="release" depends="compile" description="release target">
+		<property name="jarpath" value="${release}/halfedgetools.jar"/>
+		
+		<jar jarfile="${jarpath}" update="false">
+			<fileset dir="${build}">
+				<include name="**"/>	
+			</fileset>
+			<manifest>
+				<attribute name="Built-By" value="${user.name}"/>
+				<attribute name="Implementation-Vendor" value="${vendor}"/>
+				<attribute name="Implementation-Title" value="jTEM halfedgetools"/>
+				<attribute name="Implementation-Version" value="${version}"/>
+				<attribute name="Implementation-URL" value="http://www.jtem.com/"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build}"/>
+	</target>
+
+</project>

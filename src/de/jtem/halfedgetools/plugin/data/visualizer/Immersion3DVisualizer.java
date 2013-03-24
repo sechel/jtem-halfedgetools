@@ -21,6 +21,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.jreality.node.DefaultJRVertex;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.data.AbstractDataVisualization;
 import de.jtem.halfedgetools.plugin.data.DataVisualization;
@@ -254,10 +255,10 @@ public class Immersion3DVisualizer extends DataVisualizerPlugin implements
 				}
 				int count = 0;
 				for (int i = 0; i < hds.numVertices(); i++) {
-					if (HalfEdgeUtils.isBoundaryVertex(hds.getVertex(i))) {
+					if (HalfEdgeUtils.isBoundaryVertex((DefaultJRVertex)hds.getVertex(i))) {
 						count++;
 					} else {
-						List<?> star = HalfEdgeUtilsExtra.getEdgeStar(hds.getVertex(i));
+						List<?> star = HalfEdgeUtilsExtra.getEdgeStar((DefaultJRVertex)hds.getVertex(i));
 						ids[i - count] = new int[star.size()];
 						for (int j = 0; j < star.size(); j++)
 							ids[i - count][j] = ((Edge)star.get(j))
