@@ -73,7 +73,7 @@ public class SymmetryVisualizer extends VisualizerPlugin implements ChangeListen
 		IndexedFaceSet eifse = new IndexedFaceSet();
 		IndexedLineSet eilse = new IndexedLineSet();
 		if(hds.getClass().isAssignableFrom(SHDS.class)) {
-			shds = (SHDS)hds;
+			shds = SHDS.class.cast(hds);
 			
 			if(shds.getGroup() != null) {
 				

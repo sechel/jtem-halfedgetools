@@ -226,6 +226,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 					true);
 		}
 
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		@Override
 		public void update() {
 
@@ -241,7 +242,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 
 			Adapter<?> genericAdapter = getSource();
 
-			List<? extends Node<?, ?, ?>> nodes = null;
+			List<? extends Node> nodes = null;
 			switch (getType()) {
 			case Vertex:
 				nodes = hds.getVertices();
