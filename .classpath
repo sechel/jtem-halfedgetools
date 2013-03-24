@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="de/jtem/halfedgetools/plugin/HalfedgeSubdivisonPlugin.java|de/jtem/halfedgetools/plugin/HalfedgeConnectorPlugin.java" kind="src" path="src"/>
+	<classpathentry excluding="de/jtem/halfedgetools/plugin/HalfedgeSubdivisonPlugin.java|de/jtem/halfedgetools/plugin/HalfedgeConnectorPlugin.java|de/jtem/halfedgetools/plugin/algorithm/subdivision/AdaptiveSubdivisonPlugin.java" kind="src" path="src"/>
 	<classpathentry kind="src" path="src-test"/>
-	<classpathentry excluding="HalfedgeSubdivisonPlugin.java" kind="src" path="src-defect"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/halfedge"/>
 	<classpathentry kind="lib" path="lib/vecmath.jar"/>

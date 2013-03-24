@@ -43,7 +43,7 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.type.Bundle;
 import de.jtem.halfedgetools.adapter.type.Bundle.BundleType;
 import de.jtem.halfedgetools.adapter.type.Bundle.DisplayType;
-import de.jtem.halfedgetools.algorithm.alexandrov.delaunay.decorations.IsFlippable;
+import de.jtem.halfedgetools.symmetry.decoration.IsFlippable;
 import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
 import de.jtem.halfedgetools.util.TriangulationException;
 

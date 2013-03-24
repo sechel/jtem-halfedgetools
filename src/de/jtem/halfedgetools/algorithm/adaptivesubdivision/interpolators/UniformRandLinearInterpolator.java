@@ -34,10 +34,10 @@ package de.jtem.halfedgetools.algorithm.adaptivesubdivision.interpolators;
 import java.util.Random;
 
 import de.jreality.math.Rn;
-import de.jtem.halfedgetools.algorithm.alexandrov.delaunay.decorations.HasLengthSquared;
 import de.jtem.halfedgetools.jreality.node.JREdge;
 import de.jtem.halfedgetools.jreality.node.JRFace;
 import de.jtem.halfedgetools.jreality.node.JRVertex;
+import de.jtem.halfedgetools.symmetry.decoration.HasLengthSquared;
 
 public class UniformRandLinearInterpolator extends Interpolator{
 	@Override

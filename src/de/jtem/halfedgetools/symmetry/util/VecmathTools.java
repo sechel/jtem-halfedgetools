@@ -1,35 +1,4 @@
-/**
-This file is part of a jTEM project.
-All jTEM projects are licensed under the FreeBSD license 
-or 2-clause BSD license (see http://www.opensource.org/licenses/bsd-license.php). 
-
-Copyright (c) 2002-2010, Technische Universität Berlin, jTEM
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, 
-are permitted provided that the following conditions are met:
-
--	Redistributions of source code must retain the above copyright notice, 
-	this list of conditions and the following disclaimer.
-
--	Redistributions in binary form must reproduce the above copyright notice, 
-	this list of conditions and the following disclaimer in the documentation 
-	and/or other materials provided with the distribution.
- 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
-THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS 
-BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
-OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
-IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
-OF SUCH DAMAGE.
-**/
-
-package de.jtem.halfedgetools.algorithm.alexandrov;
+package de.jtem.halfedgetools.symmetry.util;
 
 import static java.lang.Double.isNaN;
 
@@ -158,33 +127,4 @@ public class VecmathTools {
 		double dist = temp.length()/rl.length();
 		return dist;
 	}
-	
-	
-//	public static Point2d circumCenter(Point2d p1, Point2d p2, Point2d p3) {
-//		
-//		double[] a = new double[] {
-//				p1.x, p1.y, 1.0, 
-//				p2.x, p2.y, 1.0, 
-//				p3.x, p3.y, 1.0
-//		};
-//		
-//		double[] bx = new double[] {
-//		        p1.x*p1.x + p1.y*p1.y, p1.y, 1.0, 
-//		        p2.x*p2.x + p2.y*p2.y, p2.y, 1.0,
-//		        p3.x*p3.x + p3.y*p3.y, p3.y, 1.0
-//		};
-//		
-//		double[] by = new double[] {
-//		        p1.x*p1.x + p1.y*p1.y, p1.x, 1.0, 
-//		        p2.x*p2.x + p2.y*p2.y, p2.x, 1.0,
-//		        p3.x*p3.x + p3.y*p3.y, p3.x, 1.0
-//		};
-//		
-//		double dbx = -Rn.determinant(bx);
-//		double dby = Rn.determinant(by);
-//		double da = 2.0*Rn.determinant(a);
-//		
-//		return new Point2d(- (dbx/da), - (dby/da));
-//		
-//	}
 }

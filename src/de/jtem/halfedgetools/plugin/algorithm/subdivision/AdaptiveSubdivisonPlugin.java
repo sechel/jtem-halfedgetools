@@ -29,10 +29,8 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.plugin;
+package de.jtem.halfedgetools.plugin.algorithm.subdivision;
 
-
-import static de.jtem.halfedgetools.jreality.adapter.Adapter.AdapterType.VERTEX_ADAPTER;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -53,25 +51,22 @@ import javax.swing.border.BevelBorder;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.View;
-import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedgetools.algorithm.Coord3DAdapter;
-import de.jtem.halfedgetools.algorithm.catmullclark.CatmullClarkSubdivision;
-import de.jtem.halfedgetools.algorithm.subdivision.Subdivider;
-import de.jtem.halfedgetools.algorithm.subdivision.Subdivider.InterpolFunk;
-import de.jtem.halfedgetools.algorithm.subdivision.Subdivider.SubdivType;
-import de.jtem.halfedgetools.algorithm.subdivision.node.SubDivEdge;
-import de.jtem.halfedgetools.algorithm.subdivision.node.SubDivFace;
-import de.jtem.halfedgetools.algorithm.subdivision.node.SubDivHDS;
-import de.jtem.halfedgetools.algorithm.subdivision.node.SubDivVertex;
-import de.jtem.halfedgetools.jreality.adapter.standard.StandardCoordinateAdapter;
+import de.jtem.halfedgetools.algorithm.adaptivesubdivision.Subdivider;
+import de.jtem.halfedgetools.algorithm.adaptivesubdivision.Subdivider.InterpolFunk;
+import de.jtem.halfedgetools.algorithm.adaptivesubdivision.Subdivider.SubdivType;
+import de.jtem.halfedgetools.algorithm.adaptivesubdivision.node.SubDivEdge;
+import de.jtem.halfedgetools.algorithm.adaptivesubdivision.node.SubDivFace;
+import de.jtem.halfedgetools.algorithm.adaptivesubdivision.node.SubDivHDS;
+import de.jtem.halfedgetools.algorithm.adaptivesubdivision.node.SubDivVertex;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
-public class HalfedgeSubdivisonPlugin extends ShrinkPanelPlugin implements ActionListener {
+public class AdaptiveSubdivisonPlugin extends ShrinkPanelPlugin implements ActionListener {
 
-	private HalfedgeConnectorPlugin<SubDivVertex,SubDivEdge,SubDivFace,SubDivHDS>
+	private HalfedgeInterface
 		hcp = null;
 		
 	// ----------------------------- Gui -----------------------------
@@ -95,7 +90,7 @@ public class HalfedgeSubdivisonPlugin extends ShrinkPanelPlugin implements Actio
 	private JButton	subdivideB= new JButton("Subdivide");
 	private JButton	unrefineB= new JButton("Unrefine");
 		
-	public HalfedgeSubdivisonPlugin() {
+	public AdaptiveSubdivisonPlugin() {
 		shrinkPanel.setLayout(new BorderLayout());
 		JPanel subP= new JPanel(new GridLayout(6,2));
 		JPanel unrefP= new JPanel(new GridLayout(2,2));
@@ -111,7 +106,7 @@ public class HalfedgeSubdivisonPlugin extends ShrinkPanelPlugin implements Actio
 		subP.add(sqrtRB);
 		subP.add(butterflyRB);
 		subP.add(stockRB);
-		subP.add(catmullRB);
+//		subP.add(catmullRB);
 		subP.add(gonskaRB);
 		subP.add(new JPanel());
 		subP.add(extraFlipCB);
@@ -125,7 +120,7 @@ public class HalfedgeSubdivisonPlugin extends ShrinkPanelPlugin implements Actio
 		typeBG.add(butterflyRB);
 		typeBG.add(stockRB);
 		typeBG.add(gonskaRB);
-		typeBG.add(catmullRB);
+//		typeBG.add(catmullRB);
 		
 		catmullRB.addActionListener(this);
 		sqrtRB.addActionListener(this);
@@ -142,6 +137,7 @@ public class HalfedgeSubdivisonPlugin extends ShrinkPanelPlugin implements Actio
 		linearCB.setEnabled(false);	
 	}
 	// ------------------------------ Listeners ------------------------
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		linearCB.setEnabled(gonskaRB.isSelected());
 		extraFlipCB.setEnabled(gonskaRB.isSelected());
@@ -150,29 +146,22 @@ public class HalfedgeSubdivisonPlugin extends ShrinkPanelPlugin implements Actio
 	}
 	private void unrefine(){
 		// convert:
-		SubDivHDS heds = new SubDivHDS();
-		hcp.convertActiveGeometryToHDS(heds,new StandardCoordinateAdapter(VERTEX_ADAPTER));
+		SubDivHDS heds = hcp.get(new SubDivHDS());
 		// perform:
-		Subdivider<SubDivVertex,SubDivEdge,SubDivFace> s = new Subdivider(SubDivVertex.class, SubDivEdge.class, SubDivFace.class);
+		Subdivider<SubDivVertex,SubDivEdge,SubDivFace, SubDivHDS> s = new Subdivider<SubDivVertex,SubDivEdge,SubDivFace, SubDivHDS>(heds);
 		s.setHeds(heds);
 		s.setToleranceShort(minSpM.getNumber().doubleValue());
 		s.removeShortEdges();
 		// reconvert:
 		heds=s.getHeds();
-		hcp.updateHalfedgeContentAndActiveGeometry(heds, true, 
-				new StandardCoordinateAdapter(VERTEX_ADAPTER)
-//				,new SubDivTypeColorAdapter(VERTEX_ADAPTER)
-//				,new SubDivTypeColorAdapter(FACE_ADAPTER)
-		);
+		hcp.set(heds);
 	}
 	private void subdivide(){
 		// convert:
-		HalfEdgeDataStructure<SubDivVertex, SubDivEdge,SubDivFace> heds= new HalfEdgeDataStructure<SubDivVertex, SubDivEdge, SubDivFace>(
-				SubDivVertex.class,SubDivEdge.class,SubDivFace.class);
-		hcp.convertActiveGeometryToHDS(heds,new StandardCoordinateAdapter(VERTEX_ADAPTER));
+		SubDivHDS heds = hcp.get(new SubDivHDS());
 
 		// settings and perform:
-		Subdivider s= new Subdivider(SubDivVertex.class, SubDivEdge.class, SubDivFace.class);
+		Subdivider<SubDivVertex,SubDivEdge,SubDivFace, SubDivHDS> s = new Subdivider<SubDivVertex,SubDivEdge,SubDivFace, SubDivHDS>(heds);
 		s.setHeds(heds);
 		s.setToleranceLong(maxSpM.getNumber().doubleValue());
 		boolean extraFlip=false;
@@ -202,33 +191,27 @@ public class HalfedgeSubdivisonPlugin extends ShrinkPanelPlugin implements Actio
 				s.usePredefinedInterpolFunk(InterpolFunk.SPLINE);
 			s.subdivide();
 		}
-		if (catmullRB.isSelected()) {
-			HalfEdgeDataStructure<SubDivVertex, SubDivEdge,SubDivFace> heds2= new HalfEdgeDataStructure<SubDivVertex, SubDivEdge, SubDivFace>(
-					SubDivVertex.class,SubDivEdge.class,SubDivFace.class);
-			CatmullClarkSubdivision<SubDivVertex, SubDivEdge, SubDivFace> ccs = new CatmullClarkSubdivision<SubDivVertex, SubDivEdge, SubDivFace>();
-			
-			Coord3DAdapter<SubDivVertex> ca = new Coord3DAdapter<SubDivVertex>() {
-				@Override
-				public double[] getCoord(SubDivVertex v) {
-					return v.position;
-				}
-				@Override
-				public void setCoord(SubDivVertex v, double[] c) {
-					v.position = c;
-				}
-			};
-			ccs.subdivide(heds, heds2, ca);
-			s.setHeds(heds2);
-		}
+//		if (catmullRB.isSelected()) {
+//			HalfEdgeDataStructure<SubDivVertex, SubDivEdge,SubDivFace> heds2= new HalfEdgeDataStructure<SubDivVertex, SubDivEdge, SubDivFace>(
+//					SubDivVertex.class,SubDivEdge.class,SubDivFace.class);
+//			CatmullClarkSubdivision<SubDivVertex, SubDivEdge, SubDivFace> ccs = new CatmullClarkSubdivision<SubDivVertex, SubDivEdge, SubDivFace>();
+//			
+//			Coord3DAdapter<SubDivVertex> ca = new Coord3DAdapter<SubDivVertex>() {
+//				@Override
+//				public double[] getCoord(SubDivVertex v) {
+//					return v.position;
+//				}
+//				@Override
+//				public void setCoord(SubDivVertex v, double[] c) {
+//					v.position = c;
+//				}
+//			};
+//			ccs.subdivide(heds, heds2, ca);
+//			s.setHeds(heds2);
+//		}
 		
 		// reconvert:
-		heds=s.getHeds();
-		hcp.updateHalfedgeContentAndActiveGeometry(heds, true, 
-				new StandardCoordinateAdapter(VERTEX_ADAPTER)
-//				,new SubDivTypeColorAdapter(VERTEX_ADAPTER)
-//				,new SubDivTypeColorAdapter(EDGE_ADAPTER)
-//				,new SubDivTypeColorAdapter(FACE_ADAPTER)
-				);
+		hcp.update();
 	}
 	
 	// ---------------------------------------------------------
@@ -244,11 +227,10 @@ public class HalfedgeSubdivisonPlugin extends ShrinkPanelPlugin implements Actio
 		return new PluginInfo("gonskas subdivider and others");
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
-		hcp = c.getPlugin(HalfedgeConnectorPlugin.class);
+		hcp = c.getPlugin(HalfedgeInterface.class);
 	}
 
 	
@@ -262,7 +244,7 @@ public class HalfedgeSubdivisonPlugin extends ShrinkPanelPlugin implements Actio
 		JRViewer v = new JRViewer();
 		v.addBasicUI();
 		v.addContentSupport(ContentType.CenteredAndScaled);
-		v.registerPlugin(new HalfedgeSubdivisonPlugin());
+		v.registerPlugin(new AdaptiveSubdivisonPlugin());
 		v.startup();
 	}
 	

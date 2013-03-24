@@ -29,7 +29,7 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.algorithm.alexandrov;
+package de.jtem.halfedgetools.symmetry.util;
 
 
 import java.util.Collections;
@@ -46,12 +46,12 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.HalfedgeException;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
-import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasAngle;
-import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasXY;
-import de.jtem.halfedgetools.algorithm.alexandrov.decorations.HasXYZW;
-import de.jtem.halfedgetools.algorithm.alexandrov.decorations.IsBoundary;
-import de.jtem.halfedgetools.algorithm.alexandrov.delaunay.decorations.HasLength;
-import de.jtem.halfedgetools.algorithm.alexandrov.delaunay.decorations.IsFlippable;
+import de.jtem.halfedgetools.symmetry.decoration.HasAngle;
+import de.jtem.halfedgetools.symmetry.decoration.HasLength;
+import de.jtem.halfedgetools.symmetry.decoration.HasXY;
+import de.jtem.halfedgetools.symmetry.decoration.HasXYZW;
+import de.jtem.halfedgetools.symmetry.decoration.IsBoundary;
+import de.jtem.halfedgetools.symmetry.decoration.IsFlippable;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 import de.jtem.halfedgetools.util.TriangulationException;
 

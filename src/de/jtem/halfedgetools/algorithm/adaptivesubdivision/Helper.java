@@ -31,10 +31,10 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.algorithm.adaptivesubdivision;
 import de.jtem.halfedgetools.algorithm.adaptivesubdivision.util.Calculator;
-import de.jtem.halfedgetools.algorithm.alexandrov.delaunay.decorations.HasLengthSquared;
 import de.jtem.halfedgetools.jreality.node.JREdge;
 import de.jtem.halfedgetools.jreality.node.JRFace;
 import de.jtem.halfedgetools.jreality.node.JRVertex;
+import de.jtem.halfedgetools.symmetry.decoration.HasLengthSquared;
 
 /** Dient der Unterstuetzung der Subdivider Klasse
  * @author Bernd Gonska
