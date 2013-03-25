@@ -701,19 +701,24 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	
 	protected void updateStates() {
-		HalfEdgeDataStructure<?, ?, ?> hds = activeLayer.get();
-		String text = hds.getClass().getSimpleName() + ": ";
-		text += "V" + hds.numVertices() + " ";
-		text += "E" + hds.numEdges() + " ";
-		text += "F" + hds.numFaces() + " ";
-		hdsLabel.setText(text);
-		hdsLabel.repaint();
-		deleteLayerAction.setEnabled(layers.size() > 1);
-		undoAction.setEnabled(activeLayer.canUndo());
-		redoAction.setEnabled(activeLayer.canRedo());
-		undoButton.validate();
-		redoButton.validate();
-		
+		Runnable updateStatesRunner = new Runnable() {
+			public void run() {
+				HalfEdgeDataStructure<?, ?, ?> hds = activeLayer.get();
+				String text = hds.getClass().getSimpleName() + ": ";
+				text += "V" + hds.numVertices() + " ";
+				text += "E" + hds.numEdges() + " ";
+				text += "F" + hds.numFaces() + " ";
+				hdsLabel.setText(text);
+				hdsLabel.repaint();
+				deleteLayerAction.setEnabled(layers.size() > 1);
+				undoAction.setEnabled(activeLayer.canUndo());
+				redoAction.setEnabled(activeLayer.canRedo());
+				undoButton.validate();
+				redoButton.validate();
+			}
+		};
+		EventQueue.invokeLater(updateStatesRunner);
+
 		HalfedgeLayer layer = getActiveLayer();
 		int index = layers.indexOf(layer);
 		disableListeners = true;
@@ -724,7 +729,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		for (HalfedgeLayer l : layers) {
 			l.updateBoundingBox();
 			l.setShowBoundingBox(l.isActive() & isShowBoundingBox());
-		}				
+		}			
 	}
 	
 	
