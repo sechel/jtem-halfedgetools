@@ -29,22 +29,26 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 **/
 
-package de.jtem.halfedgetools.plugin.algorithm.topology;
+package de.jtem.halfedgetools.plugin.misc;
 
-import java.util.Set;
+import static java.awt.event.InputEvent.CTRL_DOWN_MASK;
+import static java.awt.event.KeyEvent.VK_SPACE;
+
+import java.awt.EventQueue;
+
+import javax.swing.KeyStroke;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class VertexRemoverPlugin extends AlgorithmPlugin {
+public class RerunLastAlgorithmPlugin extends AlgorithmPlugin {
 
 	
 	@Override
@@ -54,17 +58,21 @@ public class VertexRemoverPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		Set<V> vertices = hif.getSelection().getVertices(hds);
-		if (vertices.isEmpty()) return;
-		int numVertices = 0;
-		for (V v : vertices) {
-			double progress = numVertices++ / (double)vertices.size();
-			getCurrentJob().fireJobProgress(progress);
-			TopologyAlgorithms.removeVertex(v);
-		}
-		hcp.update();
+		if (getLastAlgorithm() == null) return;
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				getLastAlgorithm().execute();				
+			}
+		};
+		EventQueue.invokeLater(r);
 	}
 
+	@Override
+	public KeyStroke getKeyboardShortcut() {
+		return KeyStroke.getKeyStroke(VK_SPACE, CTRL_DOWN_MASK);
+	}
+	
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
 		return AlgorithmCategory.Editing;
@@ -72,12 +80,12 @@ public class VertexRemoverPlugin extends AlgorithmPlugin {
 	
 	@Override
 	public String getAlgorithmName() {
-		return "Remove Vertex";
+		return "Rerun Last Algorithm";
 	}
 	
 	@Override
 	public PluginInfo getPluginInfo() {
-		return new PluginInfo("Vertex Remover", "Kristoffer Josefsson");
+		return new PluginInfo("Rerun Last Algorithm", "Stefan Sechelmann");
 	}
 
 }

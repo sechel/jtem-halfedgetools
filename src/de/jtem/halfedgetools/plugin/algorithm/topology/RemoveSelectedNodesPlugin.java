@@ -31,21 +31,29 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
-import java.util.Set;
+import static java.awt.event.KeyEvent.VK_DELETE;
+
+import javax.swing.KeyStroke;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class VertexRemoverPlugin extends AlgorithmPlugin {
+public class RemoveSelectedNodesPlugin extends AlgorithmPlugin {
 
+	private VertexRemoverPlugin
+		vertexRemove = null;
+	private FaceRemoverPlugin
+		faceRemove = null;
+	private EdgeRemoverPlugin
+		edgeRemove = null;
 	
 	@Override
 	public <
@@ -54,17 +62,16 @@ public class VertexRemoverPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		Set<V> vertices = hif.getSelection().getVertices(hds);
-		if (vertices.isEmpty()) return;
-		int numVertices = 0;
-		for (V v : vertices) {
-			double progress = numVertices++ / (double)vertices.size();
-			getCurrentJob().fireJobProgress(progress);
-			TopologyAlgorithms.removeVertex(v);
-		}
-		hcp.update();
+		vertexRemove.execute();
+		edgeRemove.execute();
+		faceRemove.execute();
 	}
 
+	@Override
+	public KeyStroke getKeyboardShortcut() {
+		return KeyStroke.getKeyStroke(VK_DELETE, 0);
+	}
+	
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
 		return AlgorithmCategory.Editing;
@@ -72,12 +79,20 @@ public class VertexRemoverPlugin extends AlgorithmPlugin {
 	
 	@Override
 	public String getAlgorithmName() {
-		return "Remove Vertex";
+		return "Remove Selected Nodes";
 	}
 	
 	@Override
 	public PluginInfo getPluginInfo() {
-		return new PluginInfo("Vertex Remover", "Kristoffer Josefsson");
+		return new PluginInfo("Remove Selected Nodes", "Stefan Sechelmann");
+	}
+	
+	@Override
+	public void install(Controller c) throws Exception {
+		super.install(c);
+		vertexRemove = c.getPlugin(VertexRemoverPlugin.class);
+		edgeRemove = c.getPlugin(EdgeRemoverPlugin.class);
+		faceRemove = c.getPlugin(FaceRemoverPlugin.class);
 	}
 
 }

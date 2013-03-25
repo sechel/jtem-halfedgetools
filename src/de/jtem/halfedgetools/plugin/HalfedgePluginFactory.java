@@ -77,6 +77,7 @@ import de.jtem.halfedgetools.plugin.algorithm.topology.FaceRemoverPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.FaceScalerPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.FaceSplitterPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.FillHolesPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.topology.RemoveSelectedNodesPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.RemoveVertexFillPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.VertexRemoverPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.vectorfield.CurvatureVectorFields;
@@ -90,6 +91,7 @@ import de.jtem.halfedgetools.plugin.data.visualizer.NodeColorVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.TableDataVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.TextDumpVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.VectorFieldVisualizer;
+import de.jtem.halfedgetools.plugin.misc.RerunLastAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.modes.EditMode;
 import de.jtem.halfedgetools.plugin.modes.SelectionMode;
 import de.jtem.halfedgetools.plugin.visualizers.DirichletEnergyVisualizer;
@@ -120,6 +122,8 @@ public class HalfedgePluginFactory {
 		hs.add(new FillHolesPlugin());
 		hs.add(new EdgeFlipperPlugin());
 		hs.add(new DelaunayPlugin());
+		hs.add(new RemoveSelectedNodesPlugin());
+		hs.add(new RerunLastAlgorithmPlugin());
 		return hs;
 	}
 	

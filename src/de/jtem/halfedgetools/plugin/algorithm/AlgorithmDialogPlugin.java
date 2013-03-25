@@ -122,6 +122,12 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		
 	}
 	
+	public void executeWithoutDialog() {
+		AlgorithmBeforeJob beforeJob = new AlgorithmBeforeJob();
+		AlgorithmAfterJob afterJob = new AlgorithmAfterJob(null);
+		jobQueue.queueJob(beforeJob);
+		jobQueue.queueJob(afterJob);
+	}
 	
 	@Override
 	public void execute() {

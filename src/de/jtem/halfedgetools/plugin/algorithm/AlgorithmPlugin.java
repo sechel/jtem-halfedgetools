@@ -73,6 +73,11 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		hcp = null;
 	private HalfedgeAction 
 		action = new HalfedgeAction();
+	private AlgorithmJob
+		currentJob = new AlgorithmJob();
+	
+	private static AlgorithmPlugin
+		lastAlgorithm = null;
 	
 	public AlgorithmPlugin() {
 	}
@@ -115,7 +120,7 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 	}
 	
 	
-	private class AlgorithmJob extends AbstractJob {
+	protected class AlgorithmJob extends AbstractJob {
 		
 		@Override
 		public String getJobName() {
@@ -141,10 +146,22 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 			}
 		}
 		
+		public void fireJobFinished() {
+			super.fireJobFinished(this);
+		}
+		public void fireJobProgress(double progress) {
+			super.fireJobProgress(this, progress);
+		}
+		public void fireJobStarted() {
+			super.fireJobStarted(this);
+		}
+		
 	}
 	
 	public void execute() {
-		jobQueue.queueJob(new AlgorithmJob());
+		lastAlgorithm = this;
+		currentJob = new AlgorithmJob();
+		jobQueue.queueJob(currentJob);
 	}
 	
 	@Override
@@ -222,4 +239,12 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi);
 		
+	public AlgorithmJob getCurrentJob() {
+		return currentJob;
+	}
+	
+	public static AlgorithmPlugin getLastAlgorithm() {
+		return lastAlgorithm;
+	}
+	
 }

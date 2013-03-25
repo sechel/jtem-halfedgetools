@@ -1,5 +1,7 @@
 package de.jtem.halfedgetools.plugin.algorithm.selection;
 
+import javax.swing.KeyStroke;
+
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -25,6 +27,11 @@ public class BoundaryEdgeSelection extends AlgorithmPlugin {
 		return "Boundary Edges";
 	}
 
+	@Override
+	public KeyStroke getKeyboardShortcut() {
+		return KeyStroke.getKeyStroke('b');
+	}
+	
 	@Override
 	public <
 		V extends Vertex<V, E, F>, 

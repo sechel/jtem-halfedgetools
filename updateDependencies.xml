@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="VaryLab Dependencies Update" default="default">
+    <description>
+            This is the VaryLab dependency update ant build file.
+    </description>
+    
+	<target name="default">
+		<echo>Please choose a dependency target to update.</echo>
+	</target>
+	
+	<target name="all" depends="jrworkspace, jreality">
+		<echo>Update all supported dependencies</echo>
+	</target>
+	
+	<target name="jrworkspace">
+		<ant antfile="build.xml" dir="../jrworkspace" target="jrworkspace"/>
+		<copy todir="lib/jtem">
+			<fileset dir="../jrworkspace/jar" includes="jrworkspace.jar"/>
+		</copy>
+	</target>
+	
+	<target name="jreality">
+		<ant antfile="build.xml" dir="../jreality" target="release-jar"/>
+		<copy todir="lib">
+			<fileset dir="../jreality/release" includes="jReality.jar"/>
+		</copy>
+	</target>
+	
+</project>

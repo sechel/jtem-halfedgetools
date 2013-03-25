@@ -57,8 +57,11 @@ public class EdgeRemoverPlugin extends AlgorithmPlugin {
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
 		Set<E> edges = hif.getSelection().getEdges(hds);
 		if (edges.isEmpty()) return;
+		int numEdges = 0;
 		for (E e : edges) {
 			if (e.isPositive()) continue;
+			double progress = numEdges++ / (double)edges.size() * 2.0;
+			getCurrentJob().fireJobProgress(progress);
 			TopologyAlgorithms.removeEdge(e);
 		}
 		HalfedgeSelection s = hif.getSelection();

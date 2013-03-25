@@ -55,7 +55,10 @@ public class FaceRemoverPlugin extends AlgorithmPlugin {
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
 		Set<F> faces = hif.getSelection().getFaces(hds);
 		if (faces.isEmpty()) return;
+		int numFaces = 0;
 		for (F f : faces) {
+			double progress = numFaces++ / (double)faces.size();
+			getCurrentJob().fireJobProgress(progress);
 			TopologyAlgorithms.removeFace(f);
 		}
 		hcp.update();
