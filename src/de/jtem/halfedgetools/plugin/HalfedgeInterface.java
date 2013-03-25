@@ -701,36 +701,30 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	
 	protected void updateStates() {
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				HalfEdgeDataStructure<?, ?, ?> hds = activeLayer.get();
-				String text = hds.getClass().getSimpleName() + ": ";
-				text += "V" + hds.numVertices() + " ";
-				text += "E" + hds.numEdges() + " ";
-				text += "F" + hds.numFaces() + " ";
-				hdsLabel.setText(text);
-				hdsLabel.repaint();
-				deleteLayerAction.setEnabled(layers.size() > 1);
-				undoAction.setEnabled(activeLayer.canUndo());
-				redoAction.setEnabled(activeLayer.canRedo());
-				undoButton.validate();
-				redoButton.validate();
-				
-				HalfedgeLayer layer = getActiveLayer();
-				int index = layers.indexOf(layer);
-				disableListeners = true;
-				layersTable.revalidate();
-				layersTable.getSelectionModel().setSelectionInterval(index, index);
-				disableListeners = false;
-				getAdapters().revalidateAdapters();
-				for (HalfedgeLayer l : layers) {
-					l.updateBoundingBox();
-					l.setShowBoundingBox(l.isActive() & isShowBoundingBox());
-				}				
-			}
-		};
-		EventQueue.invokeLater(r);
+		HalfEdgeDataStructure<?, ?, ?> hds = activeLayer.get();
+		String text = hds.getClass().getSimpleName() + ": ";
+		text += "V" + hds.numVertices() + " ";
+		text += "E" + hds.numEdges() + " ";
+		text += "F" + hds.numFaces() + " ";
+		hdsLabel.setText(text);
+		hdsLabel.repaint();
+		deleteLayerAction.setEnabled(layers.size() > 1);
+		undoAction.setEnabled(activeLayer.canUndo());
+		redoAction.setEnabled(activeLayer.canRedo());
+		undoButton.validate();
+		redoButton.validate();
+		
+		HalfedgeLayer layer = getActiveLayer();
+		int index = layers.indexOf(layer);
+		disableListeners = true;
+		layersTable.revalidate();
+		layersTable.getSelectionModel().setSelectionInterval(index, index);
+		disableListeners = false;
+		getAdapters().revalidateAdapters();
+		for (HalfedgeLayer l : layers) {
+			l.updateBoundingBox();
+			l.setShowBoundingBox(l.isActive() & isShowBoundingBox());
+		}				
 	}
 	
 	
@@ -916,23 +910,11 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	public void addTemporaryGeometry(final SceneGraphComponent c) {
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				getActiveLayer().addTemporaryGeometry(c);				
-			}
-		};
-		EventQueue.invokeLater(r);
+		getActiveLayer().addTemporaryGeometry(c);				
 	}
 
 	public void removeTemporaryGeometry(final SceneGraphComponent c) {
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				getActiveLayer().removeTemporaryGeometry(c);
-			}
-		};
-		EventQueue.invokeLater(r);
+		getActiveLayer().removeTemporaryGeometry(c);
 	}
 	
 	@Override
@@ -1116,26 +1098,20 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	public void checkContent() {
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				if (scene == null) return;
-				List<SceneGraphPath> paths = getPathsBetween(scene.getSceneRoot(), root);
-				if (paths.isEmpty()) {
-					content.setContent(root);
-				}
-				MatrixBuilder mb = MatrixBuilder.euclidean();
-				rootTransform.setMatrix(mb.getArray());
-				Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(root);
-				double maxExtend = bbox.getMaxExtent();		
-				mb.scale(10 / maxExtend);
-				rootTransform.setMatrix(mb.getArray());
-				for (HalfedgeLayer l : layers) {
-					l.updateBoundingBox();
-				}
+			if (scene == null) return;
+			List<SceneGraphPath> paths = getPathsBetween(scene.getSceneRoot(), root);
+			if (paths.isEmpty()) {
+				content.setContent(root);
 			}
-		};
-		EventQueue.invokeLater(r);
+			MatrixBuilder mb = MatrixBuilder.euclidean();
+			rootTransform.setMatrix(mb.getArray());
+			Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(root);
+			double maxExtend = bbox.getMaxExtent();		
+			mb.scale(10 / maxExtend);
+			rootTransform.setMatrix(mb.getArray());
+			for (HalfedgeLayer l : layers) {
+				l.updateBoundingBox();
+			}
 	}
 	
 	

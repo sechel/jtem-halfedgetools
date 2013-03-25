@@ -17,6 +17,7 @@ import static de.jreality.shader.CommonAttributes.Z_BUFFER_ENABLED;
 import static java.util.Collections.unmodifiableSet;
 
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -27,8 +28,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.SwingUtilities;
 
 import de.jreality.geometry.BoundingBoxUtility;
 import de.jreality.geometry.IndexedFaceSetUtility;
@@ -512,7 +511,7 @@ public class HalfedgeLayer implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		ToolContext tc = (ToolContext)e.getSource();
 		SelectionUpdater updater = new SelectionUpdater(tc);
-		SwingUtilities.invokeLater(updater);
+		EventQueue.invokeLater(updater);
 	}
 	
 	
