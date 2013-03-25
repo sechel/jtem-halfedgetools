@@ -702,6 +702,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	
 	protected void updateStates() {
 		Runnable updateStatesRunner = new Runnable() {
+			@Override
 			public void run() {
 				HalfEdgeDataStructure<?, ?, ?> hds = activeLayer.get();
 				String text = hds.getClass().getSimpleName() + ": ";
@@ -1247,32 +1248,14 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		return activeLayer.getSelection();
 	}
 	public void setSelection(final HalfedgeSelection s) {
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				activeLayer.setSelection(s);
-			}
-		};
-		EventQueue.invokeLater(r);
+		activeLayer.setSelection(s);
 	}
 	public void clearSelection() {
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-					activeLayer.clearSelection();
-			}
-		};
-		EventQueue.invokeLater(r);
+		activeLayer.clearSelection();
 	}
 	public void setSelected(final Node<?,?,?> n, final boolean selected) {
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				getSelection().setSelected(n, selected);
-				activeLayer.updateSelection();
-			}
-		};
-		EventQueue.invokeLater(r);
+		getSelection().setSelected(n, selected);
+		activeLayer.updateSelection();
 	}
 	
 	public boolean isSelected(Node<?,?,?> n) {
