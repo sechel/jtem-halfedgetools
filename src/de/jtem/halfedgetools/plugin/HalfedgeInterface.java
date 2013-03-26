@@ -179,7 +179,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		showBoundingBox = false,
 		disableListeners = false;
 	private List<SelectionListener>	
-		selectionListeners = new LinkedList<SelectionListener>();
+		selectionListeners = Collections.synchronizedList(new LinkedList<SelectionListener>());
 	
 	private List<HalfedgeLayer>
 		layers = new ArrayList<HalfedgeLayer>();
@@ -223,10 +223,19 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	public boolean removeSelectionListener(SelectionListener l) {
 		return selectionListeners.remove(l);
 	}
-	protected void fireSelectionChanged(HalfedgeSelection sel) {
-		for (SelectionListener l : selectionListeners) {
-			l.selectionChanged(sel, this);
-		}
+	protected void fireSelectionChanged(final HalfedgeSelection sel) {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				synchronized (selectionListeners) {
+					for (SelectionListener l : selectionListeners) {
+						l.selectionChanged(sel, HalfedgeInterface.this);
+					}	
+				}
+				
+			}
+		};
+		EventQueue.invokeLater(r);
 	}
 	
 	

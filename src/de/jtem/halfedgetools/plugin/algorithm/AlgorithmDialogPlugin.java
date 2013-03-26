@@ -40,7 +40,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		}
 		
 		@Override
-		public void execute() throws Exception {
+		public void executeJob() throws Exception {
 			executeBeforeDialog(hcp.get(), hcp.getAdapters(), hcp);
 		}
 		
@@ -56,7 +56,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		}
 		
 		@Override
-		public void execute() throws Exception {
+		public void executeJob() throws Exception {
 			Runnable r = new Runnable() {
 				@Override
 				public void run() {
@@ -85,7 +85,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		}
 		
 		@Override
-		public void execute() throws Exception {
+		public void executeJob() throws Exception {
 			Runnable r = new Runnable() {
 				@Override
 				public void run() {
@@ -114,7 +114,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		}
 		
 		@Override
-		public void execute() throws Exception {
+		public void executeJob() throws Exception {
 			if (dialogJob.dialogResult == OK_OPTION) {
 				executeAfterDialog(hcp.get(), hcp.getAdapters(), hcp);
 			}
