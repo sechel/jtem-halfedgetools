@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import de.jreality.plugin.basic.View;
-import de.jreality.plugin.job.AbstractJob;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -30,9 +29,8 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		view = null;
 	private static Icon
 		defaultIcon = ImageHook.getIcon("cog_edit.png");
-
 	
-	private class AlgorithmBeforeJob extends AbstractJob {
+	private class AlgorithmBeforeJob extends AlgorithmJob {
 		
 		@Override
 		public String getJobName() {
@@ -41,12 +39,13 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		
 		@Override
 		public void executeJob() throws Exception {
+			currentJob = this;
 			executeBeforeDialog(hcp.get(), hcp.getAdapters(), hcp);
 		}
 		
 	}
 	
-	private class AlgorithmShowDialogJob extends AbstractJob {
+	private class AlgorithmShowDialogJob extends AlgorithmJob {
 		
 		private int dialogResult = OK_OPTION;
 	
@@ -57,6 +56,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		
 		@Override
 		public void executeJob() throws Exception {
+			currentJob = this;
 			Runnable r = new Runnable() {
 				@Override
 				public void run() {
@@ -77,7 +77,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 	}
 	
 	
-	private class AlgorithmExecuteDialogJob extends AbstractJob {
+	private class AlgorithmExecuteDialogJob extends AlgorithmJob {
 		
 		@Override
 		public String getJobName() {
@@ -86,6 +86,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		
 		@Override
 		public void executeJob() throws Exception {
+			currentJob = this;
 			Runnable r = new Runnable() {
 				@Override
 				public void run() {
@@ -98,7 +99,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 	}
 	
 	
-	private class AlgorithmAfterJob extends AbstractJob {
+	private class AlgorithmAfterJob extends AlgorithmJob {
 		
 		private AlgorithmShowDialogJob
 			dialogJob = null;
@@ -115,6 +116,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		
 		@Override
 		public void executeJob() throws Exception {
+			currentJob = this;
 			if (dialogJob.dialogResult == OK_OPTION) {
 				executeAfterDialog(hcp.get(), hcp.getAdapters(), hcp);
 			}

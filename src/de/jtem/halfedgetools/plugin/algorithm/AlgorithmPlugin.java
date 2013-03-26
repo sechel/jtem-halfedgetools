@@ -51,6 +51,7 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.algorithm.ProgressNotifier;
 import de.jtem.halfedgetools.plugin.AlgorithmDropdownToolbar;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.jrworkspace.plugin.Controller;
@@ -73,7 +74,7 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		hcp = null;
 	private HalfedgeAction 
 		action = new HalfedgeAction();
-	private AlgorithmJob
+	protected AlgorithmJob
 		currentJob = new AlgorithmJob();
 	
 	private static AlgorithmPlugin
@@ -120,7 +121,7 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 	}
 	
 	
-	protected class AlgorithmJob extends AbstractJob {
+	protected class AlgorithmJob extends AbstractJob implements ProgressNotifier {
 		
 		@Override
 		public String getJobName() {

@@ -31,25 +31,15 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.symmetry.plugin;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.algorithm.subdivision.DooSabin;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
-import de.jtem.halfedgetools.symmetry.node.SEdge;
-import de.jtem.halfedgetools.symmetry.node.SFace;
-import de.jtem.halfedgetools.symmetry.node.SHDS;
-import de.jtem.halfedgetools.symmetry.node.SVertex;
-import de.jtem.halfedgetools.util.CuttingUtility.CuttingInfo;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class SymmetricDooSabinPlugin extends AlgorithmPlugin {
@@ -75,27 +65,28 @@ public class SymmetricDooSabinPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
-		SHDS shds = hcp.get(new SHDS());
-		SHDS result = new SHDS();
-		TypedAdapterSet<double[]> da = a.querySet(double[].class);
-		Map<SEdge, Set<SEdge>> oldToDoubleNew = subdivider.subdivide(shds, result, da);
-		CuttingInfo<SVertex, SEdge, SFace> symmCopy = new CuttingInfo<SVertex, SEdge, SFace>(); 
-		CuttingInfo<SVertex, SEdge, SFace> symmOld = shds.getSymmetryCycles();
-		if (symmOld != null) {
-			for(Set<SEdge> es: symmOld.paths.keySet()) {
-				Set<SEdge> newPath = new HashSet<SEdge>();
-				for(SEdge e : es) {
-					if (!oldToDoubleNew.containsKey(e)) continue;
-					for(SEdge ee : oldToDoubleNew.get(e)) {
-						newPath.add(ee);
-					}
-				}
-				symmCopy.paths.put(newPath, symmOld.paths.get(es));
-			}
-			result.setSymmetryCycles(symmCopy);
-			result.setGroup(shds.getGroup());
-		}
-		hcp.set(result);
+//		SHDS shds = hcp.get(new SHDS());
+//		SHDS result = new SHDS();
+//		TypedAdapterSet<double[]> da = a.querySet(double[].class);
+//		Map<SEdge, Set<SEdge>> oldToDoubleNew = subdivider.subdivide(shds, result, da);
+//		CuttingInfo<SVertex, SEdge, SFace> symmCopy = new CuttingInfo<SVertex, SEdge, SFace>(); 
+//		CuttingInfo<SVertex, SEdge, SFace> symmOld = shds.getSymmetryCycles();
+//		if (symmOld != null) {
+//			for(Set<SEdge> es: symmOld.paths.keySet()) {
+//				Set<SEdge> newPath = new HashSet<SEdge>();
+//				for(SEdge e : es) {
+//					if (!oldToDoubleNew.containsKey(e)) continue;
+//					for(SEdge ee : oldToDoubleNew.get(e)) {
+//						newPath.add(ee);
+//					}
+//				}
+//				symmCopy.paths.put(newPath, symmOld.paths.get(es));
+//			}
+//			result.setSymmetryCycles(symmCopy);
+//			result.setGroup(shds.getGroup());
+//		}
+//		hcp.set(result);
+		throw new RuntimeException("unsupported " + subdivider.toString());
 	}
 	
 	
