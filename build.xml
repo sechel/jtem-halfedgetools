@@ -63,7 +63,7 @@
 	</target>
 	
 	<target name="compile" depends="create build folders">
-        <javac destdir="${build}" excludesfile="build.exclude" source="${source}" target="${target}" includeantruntime="false" encoding="UTF-8">
+        <javac debug="yes" destdir="${build}" excludesfile="build.exclude" source="${source}" target="${target}" includeantruntime="false" encoding="UTF-8">
         	<compilerarg line="-Xlint:deprecation"/>
         	<compilerarg line="-Xlint:unchecked"/>
             <src path="${src}"/>
