@@ -65,6 +65,9 @@ import de.jreality.plugin.basic.Content.ContentChangedListener;
 import de.jreality.plugin.basic.Scene;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewMenuBar;
+import de.jreality.plugin.job.Job;
+import de.jreality.plugin.job.JobListener;
+import de.jreality.plugin.job.JobQueuePlugin;
 import de.jreality.reader.ReaderOBJ;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.Geometry;
@@ -120,6 +123,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		visualizersManager = null;
 	private ViewMenuBar
 		menuBar = null;
+	private JobQueuePlugin
+		jobQueue = null;
+	
 	private SceneGraphComponent
 		root = new SceneGraphComponent("Halfedge Root");
 	private Transformation
@@ -569,10 +575,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 	}
 	
 	
-	private class ExportAction extends AbstractAction {
+	private class ExportAction extends AbstractAction implements Job {
 		
 		private static final long 
 			serialVersionUID = 1L;
+		private File
+			selectedFile = null;
 
 		public ExportAction() {
 			putValue(NAME, "Export");
@@ -580,15 +588,40 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 			putValue(SHORT_DESCRIPTION, "Export");
 		}
 		
+		private ExportAction(File selectedFile) {
+			this.selectedFile = selectedFile;
+		}
+
+		@Override
+		public void execute() throws Exception {
+			final Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
+			HalfEdgeDataStructure<?, ?, ?> hds = get();
+			try {
+				if(selectedFile.getName().toLowerCase().endsWith(".heml")) {
+					HalfedgeIO.writeHDS(hds, selectedFile.getAbsolutePath());
+				} else if(selectedFile.getName().toLowerCase().endsWith(".obj")) {
+					HalfedgeIO.writeOBJ(hds, getAdapters(), selectedFile.getAbsolutePath());
+				}
+			} catch (final Exception ex) {
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
+						JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);						
+					}
+				};
+				EventQueue.invokeLater(r);
+			}
+		}
+		
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
-			HalfEdgeDataStructure<?, ?, ?> hds = get();
 			chooser.setDialogTitle("Export Layer Geometry");
 			chooser.setPreferredSize(new Dimension(800, 700));
 			int result = chooser.showSaveDialog(w);
 			if (result != JFileChooser.APPROVE_OPTION) return;
 			File file = chooser.getSelectedFile();
+			
 			String name = file.getName().toLowerCase();
 			if (!name.endsWith(".obj") && !name.endsWith(".heml")) {
 				file = new File(file.getAbsoluteFile() + ".obj");
@@ -602,43 +635,64 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 				);
 				if (result2 != JOptionPane.YES_OPTION) return;
 			}
-			try {
-				if(file.getName().toLowerCase().endsWith(".heml")) {
-					HalfedgeIO.writeHDS(hds, file.getAbsolutePath());
-				} else if(file.getName().toLowerCase().endsWith(".obj")) {
-					HalfedgeIO.writeOBJ(hds, getAdapters(), file.getAbsolutePath());
-				}
-			} catch (Exception ex) {
-				JOptionPane.showMessageDialog(w, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
-				ex.printStackTrace();
-			}
+			
+			ExportAction exportJob = new ExportAction(file);
+			jobQueue.queueJob(exportJob);
+		}
+		
+
+		@Override
+		public String getJobName() {
+			return "Export Geometry";
+		}
+		@Override
+		public void addJobListener(JobListener arg0) {
+		}
+		@Override
+		public void removeJobListener(JobListener arg0) {
+		}
+		@Override
+		public void removeAllJobListeners() {
 		}
 		
 	}
 	
 	
-	private class ImportAction extends AbstractAction {
+	private class ImportAction extends AbstractAction implements Job {
 		
 		private static final long 
 			serialVersionUID = 1L;
-
+		private File
+			selectedFile = null;
+		
 		public ImportAction() {
 			putValue(NAME, "Import");
 			putValue(SMALL_ICON, ImageHook.getIcon("folder.png"));
 			putValue(SHORT_DESCRIPTION, "Import");
 		}
 		
+		public ImportAction(File selectedFile) {
+			this.selectedFile = selectedFile;
+		}
+		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
+			final Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
 			chooser.setDialogTitle("Import Into Layer");
 			int result = chooser.showOpenDialog(w);
 			if (result != JFileChooser.APPROVE_OPTION) return;
 			File file = chooser.getSelectedFile();
+			ImportAction importJob = new ImportAction(file);
+			jobQueue.queueJob(importJob);
+		}
+
+		@Override
+		public void execute() throws Exception {
+			final Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
 			try {
-				if (file.getName().toLowerCase().endsWith(".obj")) {
+				if (selectedFile.getName().toLowerCase().endsWith(".obj")) {
 					ReaderOBJ reader = new ReaderOBJ();
-					SceneGraphComponent c = reader.read(file);
+					SceneGraphComponent c = reader.read(selectedFile);
 					Geometry g = SceneGraphUtility.getFirstGeometry(c);
 					if (g == null) return;
 					if (g instanceof IndexedFaceSet) {
@@ -647,16 +701,37 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 					}
 					set(g);
 				} else
-				if (file.getName().toLowerCase().endsWith(".heml")) {
-					HalfEdgeDataStructure<?, ?, ?> hds = HalfedgeIO.readHDS(file.getAbsolutePath());
+				if (selectedFile.getName().toLowerCase().endsWith(".heml")) {
+					String filePath = selectedFile.getAbsolutePath();
+					HalfEdgeDataStructure<?, ?, ?> hds = HalfedgeIO.readHDS(filePath);
 					set(hds);
 				}
-			} catch (Exception ex) {
-				JOptionPane.showMessageDialog(w, ex.toString(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
+			} catch (final Exception ex) {
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
+						JOptionPane.showMessageDialog(w, ex.toString(), ex.getClass().getSimpleName(), ERROR_MESSAGE);						
+					}
+				};
+				EventQueue.invokeLater(r);
 			}
 			updateStates();
 			checkContent();
 			encompassAll();
+		}
+
+		@Override
+		public String getJobName() {
+			return "Import Geometry";
+		}
+		@Override
+		public void addJobListener(JobListener arg0) {
+		}
+		@Override
+		public void removeJobListener(JobListener arg0) {
+		}
+		@Override
+		public void removeAllJobListeners() {
 		}
 		
 	}
@@ -952,6 +1027,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements ListSelectio
 		visualizersManager = c.getPlugin(VisualizersManager.class);
 		persistentAdapters.add(new SelectionAdapter(this));
 		menuBar = c.getPlugin(ViewMenuBar.class);
+		jobQueue = c.getPlugin(JobQueuePlugin.class);
 		
 		menuBar.addMenuItem(getClass(), -101, undoAction, "Halfedge");
 		menuBar.addMenuItem(getClass(), -100, redoAction, "Halfedge");
