@@ -3,7 +3,7 @@ This file is part of a jTEM project.
 All jTEM projects are licensed under the FreeBSD license 
 or 2-clause BSD license (see http://www.opensource.org/licenses/bsd-license.php). 
 
-Copyright (c) 2002-2010, Technische Universität Berlin, jTEM
+Copyright (c) 2002-2010, Technische Universitaet Berlin, jTEM
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, 
@@ -119,10 +119,15 @@ public final class DooSabin {
 		//resulting in #edges outer triangles or quadilaterals and 
 		//one #edges-gon formed of the new vertices, replacing this vertex 
 		for (V v : currentState.getSourceHeds().getVertices()) {
-			double prog = currentState.getVerticesDone().size() / (double)currentState.getSourceHeds().numVertices();
+			int done = 0;
+			for (boolean b : currentState.getVerticesDone()) {
+				if (b) done++;
+			}
+			double prog = done / (double)currentState.getSourceHeds().numVertices();
 			progress.fireJobProgress(prog);
 			//skip already expaned vertices
-			if (currentState.getVerticesDone().contains(v)) continue;
+			//if (currentState.getVerticesDone().contains(v)) continue;
+			if (currentState.getVerticesDone()[v.getIndex()]) continue;
 			
 			//list of generated outer edges of expanded vertex nGon
 			List<E> innerNGonOuterEdges = new LinkedList<E>();
@@ -168,8 +173,9 @@ public final class DooSabin {
 				E eo = e.getOppositeEdge();
 				
 				//decide which mode
-				if (currentState.getNewFaces().contains(eo.getLeftFace())) {
-								
+				//if (currentState.getNewFaces().contains(eo.getLeftFace())) {
+				if (currentState.getNewFaces()[eo.getLeftFace().getIndex()]) {
+				
 					//add only inner edge, which is an outer edge of the inner nGon
 					
 					V innerEdge_sv = newVertices.get(incomingEdgeCounter);
@@ -231,7 +237,8 @@ public final class DooSabin {
 					innerNGonOuterEdges.add(eoo_new_n);		
 					
 					//.. and the new added face.
-					currentState.getNewFaces().add(triangleFace);				
+					//currentState.getNewFaces().add(triangleFace);			
+					currentState.getNewFaces()[triangleFace.getIndex()] = true;
 					
 				}
 				incomingEdgeCounter++;
@@ -257,8 +264,9 @@ public final class DooSabin {
 			}	
 		
 			//update done list
-			currentState.getVerticesDone().add(v);
-		
+			//currentState.getVerticesDone().add(v);
+			currentState.getVerticesDone()[v.getIndex()] = true;
+			
 			//remove old vertex copy
 			currentState.getWorkingCopyHeds().removeVertex(currentState.getOldVertexToCopy().get(v));
 			
@@ -287,7 +295,7 @@ public final class DooSabin {
 		private HDS sourceHeds, workingCopyHeds;
 		
 		//new faces
-		private List<F> newFaces;	
+		private boolean[] newFaces;	
 		
 		//old position data
 		private Map<F, Double[]> faceMidPoints;
@@ -300,7 +308,7 @@ public final class DooSabin {
 		private Map<V, V> oldVertexToCopy;
 
 		//vertices done so far
-		private List<V> verticesDone;
+		private boolean[] verticesDone;
 
 		//adapter set
 		private TypedAdapterSet<double[]> a;
@@ -309,10 +317,10 @@ public final class DooSabin {
 				HDS sourceHeds, 
 				HDS workingCopyHeds,
 				TypedAdapterSet<double[]> a,
-				List<F> newFaces,
+				boolean[] newFaces,
 				Map<F, Double[]> faceMidPoints, Map<E, Double[]> edgeMidPoints,
 				Map<E, E> oldEdgeToCopy, Map<V, V> oldVertexToCopy,
-				List<V> verticesDone) {
+				boolean[] verticesDone) {
 			super();
 			this.sourceHeds = sourceHeds;
 			this.workingCopyHeds = workingCopyHeds;
@@ -337,7 +345,7 @@ public final class DooSabin {
 			return a;
 		}
 
-		public List<F> getNewFaces() {
+		public boolean[] getNewFaces() {
 			return newFaces;
 		}
 
@@ -357,7 +365,7 @@ public final class DooSabin {
 			return oldVertexToCopy;
 		}
 
-		public List<V> getVerticesDone() {
+		public boolean[] getVerticesDone() {
 			return verticesDone;
 		}
 		
@@ -375,9 +383,6 @@ public final class DooSabin {
 
 			//create deep copy of oldHeds
 			HDS newHeds = deepCopyHDS(oldHeds, null, hcp, a);
-	
-			//remember new faces to decide which mode to apply
-			List<F> newFaces = new LinkedList<F>();	
 			
 			Map<F, Double[]> faceMidPoints = new HashMap<F, Double[]>();
 			Map<E, Double[]> edgeMidPoints = new HashMap<E, Double[]>();
@@ -433,22 +438,22 @@ public final class DooSabin {
 			
 			//map old vertices to copied vertices
 			Map<V, V> oldVertexToCopy = new HashMap<V,V>();	
-			
+
 			for (V v : oldHeds.getVertices()) {
 				oldVertexToCopy.put(v, newHeds.getVertex(v.getIndex()));
 			}
-			
+	
 			//create algorithm state
 			return(new AlgorithmState<V, E, F, HDS>(
 					oldHeds,
 					newHeds,
 					a,
-					newFaces,
+					new boolean[oldHeds.getVertices().size() + oldHeds.getFaces().size() + oldHeds.getEdges().size()],
 					faceMidPoints,
 					edgeMidPoints,
 					oldEdgeToCopy,
 					oldVertexToCopy,
-					new LinkedList<V>()
+					new boolean[oldHeds.getVertices().size()]
 					));
 		
 	}
