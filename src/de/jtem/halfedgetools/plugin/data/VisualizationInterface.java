@@ -99,6 +99,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 	
 	public VisualizationInterface() {
 		shrinkPanel.setTitle("Halfedge Data Visualitazion");
+		shrinkPanel.setShrinked(true);
 		setInitialPosition(SHRINKER_TOP);
 		
 		shrinkPanel.setLayout(new GridBagLayout());
