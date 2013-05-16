@@ -59,6 +59,7 @@ public class GeometryPreviewerPanel extends JPanel implements PropertyChangeList
 	public GeometryPreviewerPanel() {
 		setLayout(new GridLayout());
 		setPreferredSize(new Dimension(300, 300));
+		viewer.getController().setPropertyEngineEnabled(false);
 		viewer.addContentSupport(ContentType.Raw);
 		viewer.addContentUI();
 		viewer.getController().setRegisterSPIPlugins(false);

@@ -102,6 +102,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		shrinkPanel.setShrinked(true);
 		setInitialPosition(SHRINKER_TOP);
 		
+		shrinkPanel.setShrinked(true);
 		shrinkPanel.setLayout(new GridBagLayout());
 		shrinkPanel.setPreferredSize(new Dimension(600, 300));
 		shrinkPanel.setMinimumSize(new Dimension(600, 300));
