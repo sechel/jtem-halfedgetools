@@ -60,10 +60,14 @@ public class JRHalfedgeViewer {
 				SystemProperties.VIEWER,
 				"de.jreality.jogl.GLJPanelViewer" + " " + 
 				SystemProperties.VIEWER_DEFAULT_JOGL + " " + 
-				SystemProperties.VIEWER_DEFAULT_JOGL3 + " " + 
 				SystemProperties.VIEWER_DEFAULT_SOFT
 			);
 		} else {
+			System.setProperty(
+				SystemProperties.VIEWER,
+				SystemProperties.VIEWER_DEFAULT_JOGL + " " + 
+				SystemProperties.VIEWER_DEFAULT_SOFT
+			);
 			System.err.println("Halfedge widget overlays not supported.");
 		}
 		UIManager.getDefaults().put("Slider.paintValue", false);

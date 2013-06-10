@@ -111,9 +111,9 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		c1.insets = new Insets(2, 2, 2, 2);
 		
 		activePanel.setLayout(new GridBagLayout());
-		activePanel.setPreferredSize(new Dimension(230, 300));
-		activeScroller.setPreferredSize(new Dimension(230, 130));
-		activeScroller.setMinimumSize(new Dimension(230, 130));
+		activePanel.setPreferredSize(new Dimension(260, 300));
+		activeScroller.setPreferredSize(new Dimension(260, 130));
+		activeScroller.setMinimumSize(new Dimension(260, 130));
 		activeScroller.setBorder(BorderFactory.createEtchedBorder());
 		activeTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
 		activeTable.setRowHeight(22);
@@ -130,8 +130,8 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		activePanel.add(activeScroller, c1);
 		
 		optionsPanel.setBorder(BorderFactory.createTitledBorder("Options"));
-		optionsPanel.setPreferredSize(new Dimension(230, 150));
-		optionsPanel.setMinimumSize(new Dimension(230, 150));
+		optionsPanel.setPreferredSize(new Dimension(260, 200));
+		optionsPanel.setMinimumSize(new Dimension(260, 200));
 		c1.weighty = 0.0;
 		activePanel.add(optionsPanel, c1);
 		c1.gridwidth = 1;

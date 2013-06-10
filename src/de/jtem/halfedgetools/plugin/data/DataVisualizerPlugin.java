@@ -4,11 +4,10 @@ import javax.swing.Icon;
 import javax.swing.JPanel;
 
 import de.jtem.halfedgetools.adapter.Adapter;
-import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 
-public abstract class DataVisualizerPlugin extends Plugin implements DataSourceProvider, DataVisualizer {
+public abstract class DataVisualizerPlugin extends Plugin implements DataVisualizer {
 
 	protected VisualizationInterface
 		visInterface = null;
@@ -44,11 +43,6 @@ public abstract class DataVisualizerPlugin extends Plugin implements DataSourceP
 		visInterface.removeDataDisplayFor(this);
 	}
 
-	@Override
-	public AdapterSet getDataSources() {
-		return new AdapterSet();
-	}
-	
 	@Override
 	public String getName() {
 		return toString();
