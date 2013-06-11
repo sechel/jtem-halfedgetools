@@ -60,7 +60,7 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 	private JSpinner
 		offsetSpinner = new JSpinner(offsetModel);
 	private JCheckBox 
-		maxabsSelection= new JCheckBox("center color of zero");
+		maxabsSelection= new JCheckBox("Center Color of Zero");
 	private JPanel
 		optionsPanel = new JPanel();
 	private NodeColorVisualization
@@ -80,7 +80,7 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 		optionsPanel.add(offsetSpinner, cr);
 		optionsPanel.add(maxabsSelection, cr);
 		
-		maxabsSelection.setSelected(true);
+		maxabsSelection.setSelected(false);
 		colorMapCombo.setSelectedItem(ColorMap.Hue);
 		
 		colorMapCombo.addActionListener(this);
