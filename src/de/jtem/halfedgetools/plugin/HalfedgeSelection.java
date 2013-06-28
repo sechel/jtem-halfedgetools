@@ -244,4 +244,12 @@ public class HalfedgeSelection {
 		return root;
 	}
 	
+	@Override
+	public boolean equals(Object s) {
+		if (!(s instanceof HalfedgeSelection)) return false;
+		HalfedgeSelection s2 = (HalfedgeSelection)s;
+		return vSet.equals(s2.vSet) && eSet.equals(s2.eSet) && fSet.equals(s2.fSet);
+	}
+	
+	
 }
