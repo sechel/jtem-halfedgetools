@@ -39,11 +39,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
 import de.jreality.ui.LayoutFactory;
 import de.jtem.halfedge.Edge;
@@ -72,6 +74,9 @@ public class DooSabinPlugin extends AlgorithmDialogPlugin {
 	private JCheckBox
 		interactiveMode = new JCheckBox("Interactive mode");
 
+	private DooSabin.BoundaryMode 
+		selectedMode = DooSabin.BoundaryMode.PROPOSED;
+	
 	private DooSabin 
 		ds = new DooSabin();
 
@@ -81,6 +86,46 @@ public class DooSabinPlugin extends AlgorithmDialogPlugin {
 		panel.setLayout(new GridBagLayout());
 		GridBagConstraints c = LayoutFactory.createRightConstraint();	
 		panel.add(interactiveMode,c);
+		
+		panel.add(new JLabel("boundary edges:"), c);
+		
+	    JRadioButton proposed = new JRadioButton("proposed");
+	    proposed.setActionCommand("PROPOSED");
+	    proposed.setSelected(true);
+
+	    JRadioButton fixed = new JRadioButton("fixed");
+	    fixed.setActionCommand("FIXED");
+	    
+	    JRadioButton custom = new JRadioButton("custom");
+	    custom.setActionCommand("CUSTOM");
+	    
+	    //Group the radio buttons.
+	    ButtonGroup group = new ButtonGroup();
+	    group.add(proposed);
+	    group.add(fixed);
+	    group.add(custom);
+
+	    ActionListener aListener = new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (e.getActionCommand().equals("PROPOSED")) {
+					selectedMode = DooSabin.BoundaryMode.PROPOSED;
+				} else if (e.getActionCommand().equals("FIXED")) {
+					selectedMode = DooSabin.BoundaryMode.FIXED;
+				} else if (e.getActionCommand().equals("CUSTOM")) {
+					selectedMode = DooSabin.BoundaryMode.CUSTOM;
+				}
+			}
+		};
+
+		proposed.addActionListener(aListener);
+		custom.addActionListener(aListener);
+		fixed.addActionListener(aListener);
+ 
+		panel.add(proposed, c);
+		panel.add(fixed, c);
+		panel.add(custom, c);
 
 	}
 		
@@ -98,13 +143,15 @@ public class DooSabinPlugin extends AlgorithmDialogPlugin {
 	
 		TypedAdapterSet<double[]> da = a.querySet(double[].class);
 
+		
 		ds.subdivide(
 			hds, 
 			hds2, 
 			da,
 			hcp,
 			(interactiveMode.isSelected() ? hdsSteps : null),
-			getCurrentJob()
+			getCurrentJob(),
+			selectedMode
 		);
 		
 		
