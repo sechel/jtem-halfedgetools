@@ -31,63 +31,50 @@ import de.jtem.halfedgetools.adapter.type.Radius;
 import de.jtem.halfedgetools.adapter.type.Size;
 import de.jtem.halfedgetools.adapter.type.TexturePosition;
 
+public class ConverterHeds2JR implements ConverterHds2Ifs {
 
-public class ConverterHeds2JR {
-	
-	protected List<double[]> 
-		coordinates = null,
-		colors = null,
-		normals = null,
-		textCoords = null;
-	protected List<String> 
-		labels = null;
-	protected List<Double> 
-		radius = null,
-		pointSize = null;
+	protected List<double[]> coordinates = null, colors = null, normals = null,
+			textCoords = null;
+	protected List<String> labels = null;
+	protected List<Double> radius = null, pointSize = null;
 
-	
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> IndexedFaceSet heds2ifs(HDS heds, AdapterSet adapters) throws AdapterException {
+	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> IndexedFaceSet heds2ifs(
+			HDS heds, AdapterSet adapters) throws AdapterException {
 		return heds2ifs(heds, adapters, null);
 	}
 
-	
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> IndexedFaceSet heds2ifs(HDS hds, AdapterSet adapters, Map<Integer, Edge<?,?,?>> edgeMap) throws AdapterException {
+	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> IndexedFaceSet heds2ifs(
+			HDS hds, AdapterSet adapters, Map<Integer, Edge<?, ?, ?>> edgeMap)
+			throws AdapterException {
 		Logger log = LoggingSystem.getLogger(ConverterHeds2JR.class);
-		if (!adapters.isAvailable(Position.class, hds.getVertexClass(), double[].class)) {
-			throw new AdapterException("No vertex position adapter found in ConverterHeds2Jr.heds2ifs");
+		if (!adapters.isAvailable(Position.class, hds.getVertexClass(),
+				double[].class)) {
+			throw new AdapterException(
+					"No vertex position adapter found in ConverterHeds2Jr.heds2ifs");
 		}
 		if (edgeMap != null) {
 			edgeMap.clear();
 		}
 		// some facts
-		int numV =hds.numVertices();	
-		if (numV==0) {
-			return new IndexedFaceSet(); 
+		int numV = hds.numVertices();
+		if (numV == 0) {
+			return new IndexedFaceSet();
 		}
-		int numHE =hds.numEdges();
-		int numE =numHE/2;
-		int numF =hds.numFaces();
+		int numHE = hds.numEdges();
+		int numE = numHE / 2;
+		int numF = hds.numFaces();
 		IndexedFaceSet ifs = new IndexedFaceSet();
 		ifs.setNumPoints(numV);
 		ifs.setNumEdges(numE);
 		ifs.setNumFaces(numF);
 		// Vertices
 		resetData();
-		for (V v : hds.getVertices()){
+		for (V v : hds.getVertices()) {
 			try {
 				readOutData(adapters, v);
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "Error reading vertex data: " + e.getLocalizedMessage());
+				log.log(Level.SEVERE,
+						"Error reading vertex data: " + e.getLocalizedMessage());
 				e.printStackTrace();
 			}
 		}
@@ -95,42 +82,68 @@ public class ConverterHeds2JR {
 			log.log(Level.SEVERE, "Vertex position adapter returned null array");
 			return new IndexedFaceSet();
 		}
-		ifs.setVertexAttributes(Attribute.COORDINATES, getdoubleArrayArray(coordinates));
-		if(colors.size() == hds.numVertices()) ifs.setVertexAttributes(Attribute.COLORS, getdoubleArrayArray(colors)); 
-		if(normals.size() == hds.numVertices()) ifs.setVertexAttributes(Attribute.NORMALS, getdoubleArrayArray(normals)); 
-		if(textCoords.size() == hds.numVertices()) ifs.setVertexAttributes(Attribute.TEXTURE_COORDINATES, getdoubleArrayArray(textCoords)); 
-		if(labels.size() == hds.numVertices()) ifs.setVertexAttributes(Attribute.LABELS, getStringArray(labels));
-		if(radius.size() == hds.numVertices()) ifs.setVertexAttributes(Attribute.RELATIVE_RADII, getdoubleArray(radius));
-		if(pointSize.size() == hds.numVertices()) ifs.setVertexAttributes(Attribute.POINT_SIZE, getdoubleArray(pointSize));
+		ifs.setVertexAttributes(Attribute.COORDINATES,
+				getdoubleArrayArray(coordinates));
+		if (colors.size() == hds.numVertices())
+			ifs.setVertexAttributes(Attribute.COLORS,
+					getdoubleArrayArray(colors));
+		if (normals.size() == hds.numVertices())
+			ifs.setVertexAttributes(Attribute.NORMALS,
+					getdoubleArrayArray(normals));
+		if (textCoords.size() == hds.numVertices())
+			ifs.setVertexAttributes(Attribute.TEXTURE_COORDINATES,
+					getdoubleArrayArray(textCoords));
+		if (labels.size() == hds.numVertices())
+			ifs.setVertexAttributes(Attribute.LABELS, getStringArray(labels));
+		if (radius.size() == hds.numVertices())
+			ifs.setVertexAttributes(Attribute.RELATIVE_RADII,
+					getdoubleArray(radius));
+		if (pointSize.size() == hds.numVertices())
+			ifs.setVertexAttributes(Attribute.POINT_SIZE,
+					getdoubleArray(pointSize));
 		// Edges
 		resetData();
-		int[][] edgeIndis= new int[numE][2];
-		
+		int[][] edgeIndis = new int[numE][2];
+
 		int k = 0;
 		for (E e : hds.getPositiveEdges()) {
 			if (edgeMap != null) {
 				edgeMap.put(k, e);
 			}
-			edgeIndis[k][0]=e.getOppositeEdge().getTargetVertex().getIndex();
-			edgeIndis[k][1]=e.getTargetVertex().getIndex();
+			edgeIndis[k][0] = e.getOppositeEdge().getTargetVertex().getIndex();
+			edgeIndis[k][1] = e.getTargetVertex().getIndex();
 			try {
 				readOutData(adapters, e);
 			} catch (Exception ex) {
-				log.log(Level.SEVERE, "Error reading edge data: " + ex.getLocalizedMessage());
+				log.log(Level.SEVERE,
+						"Error reading edge data: " + ex.getLocalizedMessage());
 				ex.printStackTrace();
 			}
 			k++;
 		}
-		ifs.setEdgeAttributes(Attribute.INDICES, new IntArrayArray.Array(edgeIndis)); 
-		if(coordinates.size() == hds.numEdges()/2)ifs.setEdgeAttributes(Attribute.COORDINATES, getdoubleArrayArray(coordinates));
-		if(colors.size() == hds.numEdges()/2) ifs.setEdgeAttributes(Attribute.COLORS, getdoubleArrayArray(colors)); 
-		if(normals.size() == hds.numEdges()/2) ifs.setEdgeAttributes(Attribute.NORMALS, getdoubleArrayArray(normals)); 
-		if(textCoords.size() == hds.numEdges()/2) ifs.setEdgeAttributes(Attribute.TEXTURE_COORDINATES, getdoubleArrayArray(textCoords)); 
-		if(labels.size() == hds.numEdges()/2) ifs.setEdgeAttributes(Attribute.LABELS, getStringArray(labels));
-		if(radius.size() == hds.numEdges()/2) ifs.setEdgeAttributes(Attribute.RELATIVE_RADII, getdoubleArray(radius));
-		if(pointSize.size() == hds.numEdges()/2) ifs.setEdgeAttributes(Attribute.POINT_SIZE, getdoubleArray(pointSize));
+		ifs.setEdgeAttributes(Attribute.INDICES, new IntArrayArray.Array(
+				edgeIndis));
+		if (coordinates.size() == hds.numEdges() / 2)
+			ifs.setEdgeAttributes(Attribute.COORDINATES,
+					getdoubleArrayArray(coordinates));
+		if (colors.size() == hds.numEdges() / 2)
+			ifs.setEdgeAttributes(Attribute.COLORS, getdoubleArrayArray(colors));
+		if (normals.size() == hds.numEdges() / 2)
+			ifs.setEdgeAttributes(Attribute.NORMALS,
+					getdoubleArrayArray(normals));
+		if (textCoords.size() == hds.numEdges() / 2)
+			ifs.setEdgeAttributes(Attribute.TEXTURE_COORDINATES,
+					getdoubleArrayArray(textCoords));
+		if (labels.size() == hds.numEdges() / 2)
+			ifs.setEdgeAttributes(Attribute.LABELS, getStringArray(labels));
+		if (radius.size() == hds.numEdges() / 2)
+			ifs.setEdgeAttributes(Attribute.RELATIVE_RADII,
+					getdoubleArray(radius));
+		if (pointSize.size() == hds.numEdges() / 2)
+			ifs.setEdgeAttributes(Attribute.POINT_SIZE,
+					getdoubleArray(pointSize));
 		// Faces
-		///
+		// /
 		resetData();
 		int[][] faceIndices = new int[numF][];
 		int i = 0;
@@ -144,70 +157,86 @@ public class ConverterHeds2JR {
 			try {
 				readOutData(adapters, f);
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "Error reading face data: " + e.getLocalizedMessage());
+				log.log(Level.SEVERE,
+						"Error reading face data: " + e.getLocalizedMessage());
 				e.printStackTrace();
 			}
 			faceIndices[i++] = face;
 		}
-		ifs.setFaceAttributes(Attribute.INDICES,new IntArrayArray.Array(faceIndices)); 
-		if(coordinates.size() == hds.numFaces())ifs.setFaceAttributes(Attribute.COORDINATES,getdoubleArrayArray(coordinates));
-		if(colors.size() == hds.numFaces()) ifs.setFaceAttributes(Attribute.COLORS,getdoubleArrayArray(colors)); 
-		if(normals.size() == hds.numFaces()) ifs.setFaceAttributes(Attribute.NORMALS,getdoubleArrayArray(normals)); 
-		if(textCoords.size() == hds.numFaces()) ifs.setFaceAttributes(Attribute.TEXTURE_COORDINATES,getdoubleArrayArray(textCoords)); 
-		if(labels.size() == hds.numFaces()) ifs.setFaceAttributes(Attribute.LABELS,getStringArray(labels));
-		if(radius.size() == hds.numFaces()) ifs.setFaceAttributes(Attribute.RELATIVE_RADII,getdoubleArray(radius));
-		if(pointSize.size() == hds.numFaces()) ifs.setFaceAttributes(Attribute.POINT_SIZE,getdoubleArray(pointSize));
-		// 
+		ifs.setFaceAttributes(Attribute.INDICES, new IntArrayArray.Array(
+				faceIndices));
+		if (coordinates.size() == hds.numFaces())
+			ifs.setFaceAttributes(Attribute.COORDINATES,
+					getdoubleArrayArray(coordinates));
+		if (colors.size() == hds.numFaces())
+			ifs.setFaceAttributes(Attribute.COLORS, getdoubleArrayArray(colors));
+		if (normals.size() == hds.numFaces())
+			ifs.setFaceAttributes(Attribute.NORMALS,
+					getdoubleArrayArray(normals));
+		if (textCoords.size() == hds.numFaces())
+			ifs.setFaceAttributes(Attribute.TEXTURE_COORDINATES,
+					getdoubleArrayArray(textCoords));
+		if (labels.size() == hds.numFaces())
+			ifs.setFaceAttributes(Attribute.LABELS, getStringArray(labels));
+		if (radius.size() == hds.numFaces())
+			ifs.setFaceAttributes(Attribute.RELATIVE_RADII,
+					getdoubleArray(radius));
+		if (pointSize.size() == hds.numFaces())
+			ifs.setFaceAttributes(Attribute.POINT_SIZE,
+					getdoubleArray(pointSize));
+		//
 		return ifs;
 	}
-	
-	private static DataList getdoubleArrayArray(List<double[]> dl){
-		int len= dl.size();
-		double[][] data= new double[len][];
-		int i=0;
-		for(double[] doub : dl){
-			data[i]=doub;
+
+	private static DataList getdoubleArrayArray(List<double[]> dl) {
+		int len = dl.size();
+		double[][] data = new double[len][];
+		int i = 0;
+		for (double[] doub : dl) {
+			data[i] = doub;
 			i++;
 		}
 		return new DoubleArrayArray.Array(data);
 	}
-	
-	private static DataList getdoubleArray(List<Double> dl){
-		int len= dl.size();
-		double[]data= new double[len];
-		int i=0;
-		for(double doub : dl){
-			data[i]=doub;
+
+	private static DataList getdoubleArray(List<Double> dl) {
+		int len = dl.size();
+		double[] data = new double[len];
+		int i = 0;
+		for (double doub : dl) {
+			data[i] = doub;
 			i++;
 		}
 		return new DoubleArray(data);
 	}
-	
-	private static DataList getStringArray(List<String> dl){
-		int len= dl.size();
-		String[]data= new String[len];
-		int i=0;
-		for(String s : dl){
-			data[i]=s;
+
+	private static DataList getStringArray(List<String> dl) {
+		int len = dl.size();
+		String[] data = new String[len];
+		int i = 0;
+		for (String s : dl) {
+			data[i] = s;
 			i++;
 		}
 		return new StringArray(data);
 	}
 
-	
-	private <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>,
-		N extends Node<V, E, F>
-	>	void readOutData(AdapterSet adapters, N n){
-		Adapter<double[]> pos = adapters.query(Position.class, n.getClass(), double[].class);
-		List<Adapter<double[]>> cols = adapters.queryAll(Color.class, n.getClass(), double[].class);
-		Adapter<double[]> normal = adapters.query(Normal.class, n.getClass(), double[].class);
-		Adapter<double[]> texCoord = adapters.query(TexturePosition.class, n.getClass(), double[].class);
-		List<Adapter<String>> labs = adapters.queryAll(Label.class, n.getClass(), String.class);
-		Adapter<Double> rad = adapters.query(Radius.class, n.getClass(), Double.class); 
-		Adapter<Double> size = adapters.query(Size.class, n.getClass(), Double.class);
+	private <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, N extends Node<V, E, F>> void readOutData(
+			AdapterSet adapters, N n) {
+		Adapter<double[]> pos = adapters.query(Position.class, n.getClass(),
+				double[].class);
+		List<Adapter<double[]>> cols = adapters.queryAll(Color.class,
+				n.getClass(), double[].class);
+		Adapter<double[]> normal = adapters.query(Normal.class, n.getClass(),
+				double[].class);
+		Adapter<double[]> texCoord = adapters.query(TexturePosition.class,
+				n.getClass(), double[].class);
+		List<Adapter<String>> labs = adapters.queryAll(Label.class,
+				n.getClass(), String.class);
+		Adapter<Double> rad = adapters.query(Radius.class, n.getClass(),
+				Double.class);
+		Adapter<Double> size = adapters.query(Size.class, n.getClass(),
+				Double.class);
 		if (pos != null) {
 			double[] posArr = pos.get(n, adapters);
 			if (posArr != null) {
@@ -216,12 +245,13 @@ public class ConverterHeds2JR {
 			}
 		}
 		if (!cols.isEmpty()) {
-			double[] c = {1, 1, 1, 1};
+			double[] c = { 1, 1, 1, 1 };
 			boolean colorValid = false;
 			for (Adapter<double[]> color : cols) {
 				double[] colorArr = color.get(n, adapters);
 				removeNaN(colorArr);
-				if (colorArr == null) continue;
+				if (colorArr == null)
+					continue;
 				for (int i = 0; i < Math.min(4, colorArr.length); i++) {
 					c[i] = c[i] * colorArr[i];
 				}
@@ -251,7 +281,8 @@ public class ConverterHeds2JR {
 			int i = 0;
 			for (Adapter<String> label : labs) {
 				String l = label.get(n, adapters);
-				if (l == null) continue;
+				if (l == null)
+					continue;
 				lab += l;
 				if (++i < labs.size()) {
 					lab += ", ";
@@ -281,8 +312,7 @@ public class ConverterHeds2JR {
 			}
 		}
 	}
-	
-	
+
 	private void removeNaN(double[] c) {
 		for (int i = 0; i < c.length; i++) {
 			if (Double.isNaN(c[i])) {
@@ -290,17 +320,15 @@ public class ConverterHeds2JR {
 			}
 		}
 	}
-	
-	
-	
-	private void resetData(){
-		coordinates=new LinkedList<double[]>();
-		colors=new LinkedList<double[]>();
-		normals=new LinkedList<double[]>();
-		textCoords=new LinkedList<double[]>();
-		labels=new LinkedList<String>();
-		radius=new LinkedList<Double>();
-		pointSize=new LinkedList<Double>();
+
+	private void resetData() {
+		coordinates = new LinkedList<double[]>();
+		colors = new LinkedList<double[]>();
+		normals = new LinkedList<double[]>();
+		textCoords = new LinkedList<double[]>();
+		labels = new LinkedList<String>();
+		radius = new LinkedList<Double>();
+		pointSize = new LinkedList<Double>();
 	}
-	
+
 }

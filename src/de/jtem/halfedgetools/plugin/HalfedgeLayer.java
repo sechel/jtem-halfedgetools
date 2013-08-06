@@ -56,74 +56,54 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.jreality.ConverterHds2Ifs;
 import de.jtem.halfedgetools.jreality.ConverterHeds2JR;
 import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
 
 public class HalfedgeLayer implements ActionListener {
 
-	private static Logger
-		layerLogger = LoggingSystem.getLogger(HalfedgeLayer.class);
-	private HalfedgeInterface
-		hif = null;
-	private HalfEdgeDataStructure<?, ?, ?>
-		hds = new DefaultJRHDS();
-	private IndexedFaceSet
-		geometry = new IndexedFaceSet();
-	private AdapterSet
-		persistentAdapters = new AdapterSet(),
-		activeVolatileAdapters = new AdapterSet(),
-		volatileAdapters = new AdapterSet();
-	private SceneGraphComponent
-		layerRoot = new SceneGraphComponent("Default Layer"),
-		displayFacesRoot = new SceneGraphComponent("Display Faces"),
-		geometryRoot = new SceneGraphComponent("Geometry"),
-		selectionRoot = new SceneGraphComponent("Selection"),
-		visualizersRoot = new SceneGraphComponent("Visualizers"),
-		boundingBoxRoot = new SceneGraphComponent("Bounding Box"),
-		temporaryRoot = new SceneGraphComponent("Temporary Geometry"),
-		pivotRoot = CoordinatesPivot.createPivot();
-	private Appearance
-		geometryAppearance = new Appearance("Geometry Appearance");
-	private Map<Integer, Edge<?,?,?>>
-		edgeMap = new HashMap<Integer, Edge<?,?,?>>();
-	private HalfedgeSelection
-		selection = new HalfedgeSelection();
-	private Set<VisualizerPlugin>
-		visualizers = new TreeSet<VisualizerPlugin>();
-	
-	private List<IndexedFaceSet> 
-		undoHistory = new ArrayList<IndexedFaceSet>();
-	private List<AdapterSet>
-		adapterHistory = new ArrayList<AdapterSet>();
-	private int
-		undoIndex = -1,
-		undoSize = 10;
-	
-	//layer properties
-	private boolean
-		thickenSurface = false,
-		makeHoles = true,
-		implode = false;
-	private int 
-		stepsPerEdge = 8; 
-	private double[][]
-	    profileCurve = new double[][]{{0,0}, {0,.4}, {.1,.5},{.9, .5},{1.0, .4}, {1,0}};
-	private double
-		holeFactor = 0.4,
-		thickness = 0.05,
-		implodeFactor = -0.85;
-	
-	private boolean 
-		active = true;
-	
-	private ConverterHeds2JR 
-		converterToIFS = new ConverterHeds2JR();
-	private ConverterJR2Heds
-		converterToHDS = new ConverterJR2Heds();
-	
-	private ActionTool
-		actionTool = new ActionTool("PrimaryAction");
+	private static Logger layerLogger = LoggingSystem
+			.getLogger(HalfedgeLayer.class);
+	private HalfedgeInterface hif = null;
+	private HalfEdgeDataStructure<?, ?, ?> hds = new DefaultJRHDS();
+	private IndexedFaceSet geometry = new IndexedFaceSet();
+	private AdapterSet persistentAdapters = new AdapterSet(),
+			activeVolatileAdapters = new AdapterSet(),
+			volatileAdapters = new AdapterSet();
+	private SceneGraphComponent layerRoot = new SceneGraphComponent(
+			"Default Layer"), displayFacesRoot = new SceneGraphComponent(
+			"Display Faces"),
+			geometryRoot = new SceneGraphComponent("Geometry"),
+			selectionRoot = new SceneGraphComponent("Selection"),
+			visualizersRoot = new SceneGraphComponent("Visualizers"),
+			boundingBoxRoot = new SceneGraphComponent("Bounding Box"),
+			temporaryRoot = new SceneGraphComponent("Temporary Geometry"),
+			pivotRoot = CoordinatesPivot.createPivot();
+	private Appearance geometryAppearance = new Appearance(
+			"Geometry Appearance");
+	private Map<Integer, Edge<?, ?, ?>> edgeMap = new HashMap<Integer, Edge<?, ?, ?>>();
+	private HalfedgeSelection selection = new HalfedgeSelection();
+	private Set<VisualizerPlugin> visualizers = new TreeSet<VisualizerPlugin>();
+
+	private List<IndexedFaceSet> undoHistory = new ArrayList<IndexedFaceSet>();
+	private List<AdapterSet> adapterHistory = new ArrayList<AdapterSet>();
+	private int undoIndex = -1, undoSize = 10;
+
+	// layer properties
+	private boolean thickenSurface = false, makeHoles = true, implode = false;
+	private int stepsPerEdge = 8;
+	private double[][] profileCurve = new double[][] { { 0, 0 }, { 0, .4 },
+			{ .1, .5 }, { .9, .5 }, { 1.0, .4 }, { 1, 0 } };
+	private double holeFactor = 0.4, thickness = 0.05, implodeFactor = -0.85;
+
+	private boolean active = true;
+
+	private ConverterHds2Ifs converterToIFS = new ConverterHeds2JR();
+
+	private ConverterJR2Heds converterToHDS = new ConverterJR2Heds();
+
+	private ActionTool actionTool = new ActionTool("PrimaryAction");
 
 	private HalfedgeLayer() {
 		layerRoot.addChild(geometryRoot);
@@ -137,7 +117,7 @@ public class HalfedgeLayer implements ActionListener {
 		geometryRoot.addTool(actionTool);
 		selectionRoot.setPickable(false);
 		actionTool.addActionListener(this);
-		
+
 		Appearance bBoxApp = new Appearance("Bounding Box Appearance");
 		bBoxApp.setAttribute(FACE_DRAW, false);
 		bBoxApp.setAttribute(VERTEX_DRAW, false);
@@ -151,45 +131,48 @@ public class HalfedgeLayer implements ActionListener {
 		bBoxApp.setAttribute(PICKABLE, false);
 		boundingBoxRoot.setAppearance(bBoxApp);
 		boundingBoxRoot.addChild(pivotRoot);
-		
+
 		Appearance facesAppearance = new Appearance("Faces Appearance");
 		facesAppearance.setAttribute(VERTEX_DRAW, false);
 		facesAppearance.setAttribute(EDGE_DRAW, false);
 		facesAppearance.setAttribute(PICKABLE, false);
 		displayFacesRoot.setAppearance(facesAppearance);
-		
+
 		geometryRoot.setAppearance(geometryAppearance);
 	}
-	
-	
+
 	public HalfedgeLayer(HalfedgeInterface hif) {
 		this();
 		this.hif = hif;
 		if (hif.getTemplateHDS() != null) {
 			hds = hif.createEmpty(hif.getTemplateHDS());
 		}
+		if (hif.getConverterHds2Ifs() != null) {
+			converterToIFS = hif.getConverterHds2Ifs();
+		}
 	}
-	
+
 	public HalfedgeLayer(Geometry geometry, HalfedgeInterface hif) {
 		this(hif);
 		set(geometry);
 	}
-	
-	
+
 	public Transformation getTransformation() {
 		return layerRoot.getTransformation();
 	}
+
 	public void setTransformation(Transformation T) {
 		layerRoot.setTransformation(T);
 	}
+
 	public Appearance getAppearance() {
 		return layerRoot.getAppearance();
 	}
+
 	public void setAppearance(Appearance layerAppearance) {
 		layerRoot.setAppearance(layerAppearance);
 	}
-	
-	
+
 	public AdapterSet getVisualizerAdapters() {
 		AdapterSet r = new AdapterSet();
 		for (VisualizerPlugin p : visualizers) {
@@ -197,12 +180,14 @@ public class HalfedgeLayer implements ActionListener {
 		}
 		return r;
 	}
-	
+
 	/**
-	 * Gather the effective adapters for a convert operation. This contains 
-	 * all adapters of the half-edge interface, all adapters of the layer and the 
+	 * Gather the effective adapters for a convert operation. This contains all
+	 * adapters of the half-edge interface, all adapters of the layer and the
 	 * adapters provided by any active visualizer.
-	 * @return An {@link AdapterSet} containing the effective adapters for the next convert.
+	 * 
+	 * @return An {@link AdapterSet} containing the effective adapters for the
+	 *         next convert.
 	 */
 	public AdapterSet getEffectiveAdapters() {
 		AdapterSet effectiveAdapters = new AdapterSet();
@@ -211,15 +196,13 @@ public class HalfedgeLayer implements ActionListener {
 		effectiveAdapters.addAll(getVisualizerAdapters());
 		return effectiveAdapters;
 	}
-	
-	
+
 	private void initVisualizers(AdapterSet a) {
 		for (VisualizerPlugin vp : visualizers) {
 			vp.initVisualization(hds, a, hif);
 		}
 	}
-	
-	
+
 	private void updateVisualizersGeometry(AdapterSet a) {
 		layerRoot.removeChild(visualizersRoot);
 		visualizersRoot = new SceneGraphComponent();
@@ -231,32 +214,27 @@ public class HalfedgeLayer implements ActionListener {
 		}
 		layerRoot.addChild(visualizersRoot);
 	}
-	
-	
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void setNoUndo(HDS hds) {
+
+	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> void setNoUndo(
+			HDS hds) {
 		this.hds = hds;
 		convertHDS();
 		validateSelection();
 	}
-	
-	
+
 	/**
-	 * Update the vertex positions for a previously set mesh
-	 * TODO: Decide on whether this should include visualizers. Or
-	 * convert at all. Converting feels natural as colors like
-	 * planar faces are displayed correctly after updateGeometry
-	 * In this case this is just a convenience method
-	 * @param positionAdapter the vertex position adapter
+	 * Update the vertex positions for a previously set mesh TODO: Decide on
+	 * whether this should include visualizers. Or convert at all. Converting
+	 * feels natural as colors like planar faces are displayed correctly after
+	 * updateGeometry In this case this is just a convenience method
+	 * 
+	 * @param positionAdapter
+	 *            the vertex position adapter
 	 */
 	public void updateGeometryNoUndo(Adapter<double[]> positionAdapter) {
 		AdapterSet adapters = getEffectiveAdapters();
 		double[][] posArr = new double[hds.numVertices()][];
-		for (Vertex<?,?,?> v : hds.getVertices()) {
+		for (Vertex<?, ?, ?> v : hds.getVertices()) {
 			double[] pos = positionAdapter.get(v, adapters);
 			if (pos != null) {
 				adapters.set(Position.class, v, pos);
@@ -265,7 +243,7 @@ public class HalfedgeLayer implements ActionListener {
 				posArr[v.getIndex()] = new double[3];
 			}
 		}
-//		updateNoUndo();
+		// updateNoUndo();
 		DataList vData = new DoubleArrayArray.Array(posArr);
 		geometry.setVertexCountAndAttributes(COORDINATES, vData);
 		IndexedFaceSetUtility.calculateAndSetNormals(geometry);
@@ -274,50 +252,43 @@ public class HalfedgeLayer implements ActionListener {
 		resetTemporaryGeometry();
 		updateSelection();
 	}
-	
+
 	/**
 	 * Update the vertex positions for a previously set mesh
-	 * @param positionAdapter the vertex position adapter
+	 * 
+	 * @param positionAdapter
+	 *            the vertex position adapter
 	 */
 	public void updateGeometry(Adapter<double[]> positionAdapter) {
 		updateGeometryNoUndo(positionAdapter);
 		updateUndoList();
 	}
-	
-	
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void set(HDS hds) {
+
+	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> void set(
+			HDS hds) {
 		setNoUndo(hds);
 		updateUndoList();
 		hif.checkContent();
 	}
-	
+
 	public void update() {
 		set(get());
 	}
-	
-	
+
 	public void updateNoUndo() {
 		setNoUndo(get());
 	}
-	
-	
+
 	public void setNoUndo(Geometry g) {
 		if (g instanceof IndexedFaceSet) {
-			geometry = (IndexedFaceSet)g;
-		} else 
-		if (g instanceof IndexedLineSet){
-			IndexedLineSet ils = (IndexedLineSet)g;
+			geometry = (IndexedFaceSet) g;
+		} else if (g instanceof IndexedLineSet) {
+			IndexedLineSet ils = (IndexedLineSet) g;
 			geometry = new IndexedFaceSet(g.getName());
 			geometry.setVertexCountAndAttributes(ils.getVertexAttributes());
 			geometry.setEdgeCountAndAttributes(ils.getEdgeAttributes());
-		} else 
-		if (g instanceof PointSet) {
-			PointSet ps = (PointSet)g;
+		} else if (g instanceof PointSet) {
+			PointSet ps = (PointSet) g;
 			geometry = new IndexedFaceSet(g.getName());
 			geometry.setVertexCountAndAttributes(ps.getVertexAttributes());
 		} else {
@@ -326,57 +297,52 @@ public class HalfedgeLayer implements ActionListener {
 		convertFaceSet();
 		clearSelection();
 	}
-	
+
 	public void set(Geometry g) {
 		setNoUndo(g);
 		updateUndoList();
 		updateNoUndo(); // update visualizers
 		hif.checkContent();
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> HDS get(HDS template) {
+	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> HDS get(
+			HDS template) {
 		if (template.getClass().isAssignableFrom(hds.getClass())) {
-			return (HDS)hds;
+			return (HDS) hds;
 		}
 		hds = template;
 		convertFaceSet();
 		// convert selection
 		HalfedgeSelection newSelection = new HalfedgeSelection();
-		for (Vertex<?,?,?> v : selection.getVertices()) {
-			Vertex<?,?,?> nv = hds.getVertex(v.getIndex());
+		for (Vertex<?, ?, ?> v : selection.getVertices()) {
+			Vertex<?, ?, ?> nv = hds.getVertex(v.getIndex());
 			newSelection.setSelected(nv, true);
 		}
-		for (Edge<?,?,?> e : selection.getEdges()) {
-			Edge<?,?,?> ne = hds.getEdge(e.getIndex());
+		for (Edge<?, ?, ?> e : selection.getEdges()) {
+			Edge<?, ?, ?> ne = hds.getEdge(e.getIndex());
 			newSelection.setSelected(ne, true);
 		}
-		for (Face<?,?,?> f : selection.getFaces()) {
-			Face<?,?,?> nf = hds.getFace(f.getIndex());
+		for (Face<?, ?, ?> f : selection.getFaces()) {
+			Face<?, ?, ?> nf = hds.getFace(f.getIndex());
 			newSelection.setSelected(nf, true);
 		}
 		selection = newSelection;
 		return template;
 	}
-	
-	public HalfEdgeDataStructure<?,?,?> get() {
+
+	public HalfEdgeDataStructure<?, ?, ?> get() {
 		return hds;
 	}
-	
-	
+
 	public IndexedFaceSet getGeometry() {
 		return geometry;
 	}
-	
-	
+
 	private void convertFaceSet() {
 		hds.clear();
-		boolean oriented = IndexedFaceSetUtility.makeConsistentOrientation(geometry);
+		boolean oriented = IndexedFaceSetUtility
+				.makeConsistentOrientation(geometry);
 		if (!oriented) {
 			System.err.println("Not orientable face set in convertFaceSet()");
 			return;
@@ -387,8 +353,11 @@ public class HalfedgeLayer implements ActionListener {
 		resetTemporaryGeometry();
 		clearVolatileAdapters();
 	}
-	
-	
+
+	public void setConverterToIFS(ConverterHds2Ifs converterToIFS) {
+		this.converterToIFS = converterToIFS;
+	}
+
 	private void convertHDS() {
 		AdapterSet ea = getEffectiveAdapters();
 		initVisualizers(ea);
@@ -400,16 +369,13 @@ public class HalfedgeLayer implements ActionListener {
 		resetTemporaryGeometry();
 		clearVolatileAdapters();
 	}
-	
-	
+
 	private void clearVolatileAdapters() {
 		activeVolatileAdapters.clear();
 		activeVolatileAdapters.addAll(volatileAdapters);
 		volatileAdapters.clear();
 	}
-	
-	
-	
+
 	private void createDisplayGeometry() {
 		IndexedFaceSet shownGeometry = geometry;
 		if (thickenSurface && geometry != null) {
@@ -424,7 +390,8 @@ public class HalfedgeLayer implements ActionListener {
 			shownGeometry = tsf.getThickenedSurface();
 		}
 		if (implode && geometry != null) {
-			shownGeometry = IndexedFaceSetUtility.implode(shownGeometry, implodeFactor);
+			shownGeometry = IndexedFaceSetUtility.implode(shownGeometry,
+					implodeFactor);
 		}
 		geometryRoot.setGeometry(geometry);
 		if (shownGeometry != geometry) {
@@ -435,35 +402,38 @@ public class HalfedgeLayer implements ActionListener {
 			geometryAppearance.setAttribute(FACE_DRAW, INHERITED);
 		}
 	}
-	
+
 	public HalfedgeSelection getSelection() {
 		return new HalfedgeSelection(selection);
 	}
+
 	public void setSelection(HalfedgeSelection sel) {
 		this.selection = new HalfedgeSelection(sel);
 		updateSelection();
 		hif.fireSelectionChanged(selection);
 	}
-	
+
 	public void clearSelection() {
 		this.selection.clear();
 		updateSelection();
 		hif.fireSelectionChanged(selection);
 	}
-	
+
 	protected void validateSelection() {
-		for (Node<?,?,?> checkNode : selection.getNodes()) {
-			if (!checkNode.isValid() || checkNode.getHalfEdgeDataStructure() != hds) {
+		for (Node<?, ?, ?> checkNode : selection.getNodes()) {
+			if (!checkNode.isValid()
+					|| checkNode.getHalfEdgeDataStructure() != hds) {
 				selection.remove(checkNode);
 			}
 		}
 		updateSelection();
 		hif.fireSelectionChanged(selection);
 	}
-	
+
 	public boolean isActive() {
 		return active;
 	}
+
 	public void setActive(boolean active) {
 		this.active = active;
 		if (active) {
@@ -472,12 +442,11 @@ public class HalfedgeLayer implements ActionListener {
 			geometryRoot.removeTool(actionTool);
 		}
 	}
-	
+
 	public void setShowBoundingBox(boolean show) {
 		boundingBoxRoot.setVisible(show);
 	}
-	
-	
+
 	protected void updateSelection() {
 		layerRoot.removeChild(selectionRoot);
 		AdapterSet a = hif.getAdapters();
@@ -488,13 +457,13 @@ public class HalfedgeLayer implements ActionListener {
 		hif.createSelectionAppearance(app, this, 0.1);
 		layerRoot.addChild(selectionRoot);
 	}
-	
-	
+
 	protected void updateBoundingBox() {
 		boundingBoxRoot.setGeometry(null);
 		boundingBoxRoot.removeChild(pivotRoot);
 		Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(layerRoot);
-		if (euclideanNormSquared(bbox.getExtent()) == 0) return;
+		if (euclideanNormSquared(bbox.getExtent()) == 0)
+			return;
 		BoundingBoxUtility.removeZeroExtends(bbox);
 		IndexedFaceSet ifs = IndexedFaceSetUtility.representAsSceneGraph(bbox);
 		ifs.setName("Bounding Box");
@@ -505,21 +474,18 @@ public class HalfedgeLayer implements ActionListener {
 		mb.assignTo(pivotRoot);
 		boundingBoxRoot.addChild(pivotRoot);
 	}
-	
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		ToolContext tc = (ToolContext)e.getSource();
+		ToolContext tc = (ToolContext) e.getSource();
 		SelectionUpdater updater = new SelectionUpdater(tc);
 		EventQueue.invokeLater(updater);
 	}
-	
-	
+
 	private class SelectionUpdater implements Runnable {
-		
-		private ToolContext
-			toolContext = null;
-		
+
+		private ToolContext toolContext = null;
+
 		public SelectionUpdater(ToolContext toolContext) {
 			this.toolContext = toolContext;
 		}
@@ -532,19 +498,22 @@ public class HalfedgeLayer implements ActionListener {
 			} catch (Exception e) {
 				return;
 			}
-			if (pr == null) return;
+			if (pr == null)
+				return;
 			int index = pr.getIndex();
-			if (index < 0) return;
-			
+			if (index < 0)
+				return;
+
 			switch (pr.getPickType()) {
 			case PickResult.PICK_TYPE_POINT:
-				if (hds.numVertices() <= index) return;
-				Vertex<?,?,?> v = hds.getVertex(index);
+				if (hds.numVertices() <= index)
+					return;
+				Vertex<?, ?, ?> v = hds.getVertex(index);
 				boolean selected = selection.isSelected(v);
 				selection.setSelected(v, !selected);
 				break;
 			case PickResult.PICK_TYPE_LINE:
-				Edge<?,?,?> e = edgeMap.get(index);
+				Edge<?, ?, ?> e = edgeMap.get(index);
 				if (e == null) {
 					System.err.println("Edge index not found");
 					return;
@@ -555,8 +524,9 @@ public class HalfedgeLayer implements ActionListener {
 				selection.setSelected(e.getOppositeEdge(), !selected);
 				break;
 			case PickResult.PICK_TYPE_FACE:
-				if (hds.numFaces() <= index) return;
-				Face<?,?,?> f = hds.getFace(index);
+				if (hds.numFaces() <= index)
+					return;
+				Face<?, ?, ?> f = hds.getFace(index);
 				selected = selection.isSelected(f);
 				selection.setSelected(f, !selected);
 				break;
@@ -567,17 +537,19 @@ public class HalfedgeLayer implements ActionListener {
 			updateSelection();
 		}
 	}
-	
+
 	public void addVisualizer(VisualizerPlugin v) {
 		visualizers.add(v);
 	}
+
 	public void removeVisualizer(VisualizerPlugin v) {
 		visualizers.remove(v);
 	}
+
 	public Set<VisualizerPlugin> getVisualizers() {
 		return unmodifiableSet(visualizers);
 	}
-	
+
 	public boolean isVisible() {
 		return layerRoot.isVisible();
 	}
@@ -586,10 +558,11 @@ public class HalfedgeLayer implements ActionListener {
 		layerRoot.setVisible(visible);
 		hif.updateStates();
 	}
-	
+
 	public String getName() {
 		return getLayerRoot().getName();
 	}
+
 	public void setName(String name) {
 		layerRoot.setName(name);
 	}
@@ -598,32 +571,33 @@ public class HalfedgeLayer implements ActionListener {
 	public String toString() {
 		return getName();
 	}
-	
+
 	public SceneGraphComponent getLayerRoot() {
 		return layerRoot;
 	}
-	
+
 	public boolean canUndo() {
 		return undoIndex > 0;
 	}
-	
+
 	public boolean canRedo() {
 		return undoIndex < undoHistory.size() - 1;
 	}
-	
+
 	private void updateUndoList() {
 		undoHistory = undoHistory.subList(0, undoIndex + 1);
 		undoHistory.add(geometry);
 		adapterHistory.add(new AdapterSet(persistentAdapters));
-		if(undoHistory.size() > undoSize) {
+		if (undoHistory.size() > undoSize) {
 			undoHistory.remove(0);
 			adapterHistory.remove(0);
 		}
-		undoIndex = undoHistory.size() - 1;		
+		undoIndex = undoHistory.size() - 1;
 	}
-	
+
 	public void undo() {
-		if (!canUndo()) return;
+		if (!canUndo())
+			return;
 		undoIndex--;
 		geometry = undoHistory.get(undoIndex);
 		persistentAdapters = adapterHistory.get(undoIndex);
@@ -634,9 +608,10 @@ public class HalfedgeLayer implements ActionListener {
 		convertHDS();
 		validateSelection();
 	}
-	
+
 	public void redo() {
-		if (!canRedo()) return;
+		if (!canRedo())
+			return;
 		undoIndex++;
 		geometry = undoHistory.get(undoIndex);
 		persistentAdapters = adapterHistory.get(undoIndex);
@@ -647,14 +622,14 @@ public class HalfedgeLayer implements ActionListener {
 		convertHDS();
 		validateSelection();
 	}
-	
+
 	public void addTemporaryGeometry(SceneGraphComponent root) {
 		if (!layerRoot.isDirectAncestor(temporaryRoot)) {
 			layerRoot.addChild(temporaryRoot);
-		}			
+		}
 		SceneGraphUtility.addChildNode(temporaryRoot, root);
 	}
-	
+
 	public void removeTemporaryGeometry(SceneGraphComponent root) {
 		try {
 			SceneGraphUtility.removeChildNode(temporaryRoot, root);
@@ -662,113 +637,105 @@ public class HalfedgeLayer implements ActionListener {
 			layerLogger.log(Level.FINEST, e.getMessage());
 		}
 	}
-	
-	
+
 	public void resetTemporaryGeometry() {
 		SceneGraphUtility.removeChildNode(layerRoot, temporaryRoot);
 		temporaryRoot = new SceneGraphComponent("Temporary Geometry");
 		SceneGraphUtility.addChildNode(layerRoot, temporaryRoot);
 	}
 
-
 	public boolean isThickenSurface() {
 		return thickenSurface;
 	}
-
 
 	public void setThickenSurface(boolean thickenSurface) {
 		this.thickenSurface = thickenSurface;
 	}
 
-
-	
 	public boolean isImplode() {
 		return implode;
 	}
-
 
 	public void setImplode(boolean implode) {
 		this.implode = implode;
 	}
 
-
 	public double getThickness() {
 		return thickness;
 	}
-
 
 	public void setThickness(double thickness) {
 		this.thickness = thickness;
 	}
 
-
 	public double getImplodeFactor() {
 		return implodeFactor;
 	}
 
-
 	public void setImplodeFactor(double implodeFactor) {
 		this.implodeFactor = implodeFactor;
 	}
-	
+
 	public boolean isMakeHoles() {
 		return makeHoles;
 	}
-	
+
 	public void setMakeHoles(boolean makeHoles) {
 		this.makeHoles = makeHoles;
 	}
-	
+
 	public double getHoleFactor() {
 		return holeFactor;
 	}
+
 	public void setHoleFactor(double holeFactor) {
 		this.holeFactor = holeFactor;
 	}
-	
+
 	public int getStepsPerEdge() {
 		return stepsPerEdge;
 	}
+
 	public void setStepsPerEdge(int stepsPerEdge) {
 		this.stepsPerEdge = stepsPerEdge;
 	}
-	
+
 	public AdapterSet getCurrentAdapters() {
 		AdapterSet adapters = new AdapterSet();
 		adapters.addAll(persistentAdapters);
 		adapters.addAll(volatileAdapters);
 		return adapters;
 	}
-	
+
 	public AdapterSet getActiveAdapters() {
 		AdapterSet adapters = new AdapterSet();
 		adapters.addAll(persistentAdapters);
 		adapters.addAll(activeVolatileAdapters);
 		return adapters;
 	}
-	
+
 	public AdapterSet getPersistentAdapters() {
 		return persistentAdapters;
 	}
-	
+
 	public AdapterSet getVolatileAdapters() {
 		return volatileAdapters;
 	}
-	
+
 	public AdapterSet getActiveVolatileAdapters() {
 		return activeVolatileAdapters;
 	}
-	
+
 	public double[][] getProfileCurve() {
 		return profileCurve;
 	}
+
 	public void setProfileCurve(double[][] profileCurve) {
 		this.profileCurve = profileCurve;
 	}
 
-
 	public boolean addAdapter(Adapter<?> a, boolean persistent) {
-		if(persistent) {
+		if (persistent) {
 			return persistentAdapters.add(a);
 		} else {
 			return volatileAdapters.add(a);
@@ -776,10 +743,9 @@ public class HalfedgeLayer implements ActionListener {
 	}
 
 	public boolean removeAdapter(Adapter<?> a) {
-		boolean 
-			pa = persistentAdapters.remove(a), 
-			va = volatileAdapters.remove(a);
+		boolean pa = persistentAdapters.remove(a), va = volatileAdapters
+				.remove(a);
 		return pa || va;
 	}
-	
+
 }
