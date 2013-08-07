@@ -1053,14 +1053,10 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 
 	public void createSelectionAppearance(Appearance app, HalfedgeLayer layer,
 			double offset) {
-		if (scene == null)
+		EffectiveAppearance ea = getEffectiveAppearance(layer.getLayerRoot());
+		if(ea == null) {
 			return;
-		SceneGraphComponent sceneRoot = scene.getSceneRoot();
-		List<SceneGraphPath> pathList = SceneGraphUtility.getPathsBetween(
-				sceneRoot, layer.getLayerRoot());
-		if (pathList.isEmpty())
-			return;
-		EffectiveAppearance ea = EffectiveAppearance.create(pathList.get(0));
+		}
 		DefaultGeometryShader dgs1 = ShaderUtility
 				.createDefaultGeometryShader(ea);
 		DefaultPointShader dps1 = (DefaultPointShader) dgs1.getPointShader();
@@ -1073,6 +1069,18 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 				* (1 + offset));
 		app.setAttribute(LINE_SHADER + "." + RADII_WORLD_COORDINATES,
 				dls1.getRadiiWorldCoordinates());
+	}
+
+	public EffectiveAppearance getEffectiveAppearance(SceneGraphComponent sgc) {
+		if (scene == null)
+			return null;
+		SceneGraphComponent sceneRoot = scene.getSceneRoot();
+		List<SceneGraphPath> pathList = SceneGraphUtility.getPathsBetween(
+				sceneRoot, sgc);
+		if (pathList.isEmpty())
+			return null;
+		EffectiveAppearance ea = EffectiveAppearance.create(pathList.get(0));
+		return ea;
 	}
 
 	public HalfedgeLayer createLayer(String name) {
