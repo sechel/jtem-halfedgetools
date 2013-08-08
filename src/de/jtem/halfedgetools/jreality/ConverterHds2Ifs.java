@@ -11,10 +11,18 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 
 public interface ConverterHds2Ifs {
 
-	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> IndexedFaceSet heds2ifs(
-			HDS heds, AdapterSet adapters);
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> IndexedFaceSet heds2ifs(HDS heds, AdapterSet adapters);
 
-	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> IndexedFaceSet heds2ifs(
-			HDS hds, AdapterSet adapters, Map<Integer, Edge<?, ?, ?>> edgeMap);
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> IndexedFaceSet heds2ifs(HDS hds, AdapterSet adapters, Map<Integer, Edge<?, ?, ?>> edgeMap);
 
 }

@@ -33,19 +33,34 @@ import de.jtem.halfedgetools.adapter.type.TexturePosition;
 
 public class ConverterHeds2JR implements ConverterHds2Ifs {
 
-	protected List<double[]> coordinates = null, colors = null, normals = null,
-			textCoords = null;
-	protected List<String> labels = null;
-	protected List<Double> radius = null, pointSize = null;
+	protected List<double[]> 
+		coordinates = null, 
+		colors = null, 
+		normals = null,
+		textCoords = null;
+	protected List<String> 
+		labels = null;
+	protected List<Double> 
+		radius = null, 
+		pointSize = null;
 
-	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> IndexedFaceSet heds2ifs(
-			HDS heds, AdapterSet adapters) throws AdapterException {
+	@Override
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> IndexedFaceSet heds2ifs(HDS heds, AdapterSet adapters) throws AdapterException {
 		return heds2ifs(heds, adapters, null);
 	}
 
-	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> IndexedFaceSet heds2ifs(
-			HDS hds, AdapterSet adapters, Map<Integer, Edge<?, ?, ?>> edgeMap)
-			throws AdapterException {
+	@Override
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> IndexedFaceSet heds2ifs(HDS hds, AdapterSet adapters, Map<Integer, Edge<?, ?, ?>> edgeMap) throws AdapterException {
 		Logger log = LoggingSystem.getLogger(ConverterHeds2JR.class);
 		if (!adapters.isAvailable(Position.class, hds.getVertexClass(),
 				double[].class)) {
@@ -221,8 +236,12 @@ public class ConverterHeds2JR implements ConverterHds2Ifs {
 		return new StringArray(data);
 	}
 
-	private <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, N extends Node<V, E, F>> void readOutData(
-			AdapterSet adapters, N n) {
+	private <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		N extends Node<V, E, F>
+	> void readOutData(AdapterSet adapters, N n) {
 		Adapter<double[]> pos = adapters.query(Position.class, n.getClass(),
 				double[].class);
 		List<Adapter<double[]>> cols = adapters.queryAll(Color.class,
