@@ -220,6 +220,7 @@ public class HalfedgeLayer implements ActionListener {
 		this.hds = hds;
 		convertHDS();
 		validateSelection();
+		hif.fireDataChanged();
 	}
 
 	/**
@@ -296,6 +297,7 @@ public class HalfedgeLayer implements ActionListener {
 		}
 		convertFaceSet();
 		clearSelection();
+		hif.fireDataChanged();
 	}
 
 	public void set(Geometry g) {
