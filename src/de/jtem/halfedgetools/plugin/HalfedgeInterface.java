@@ -1097,10 +1097,10 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		if (layers.contains(layer))
 			return;
 		layers.add(0, layer);
-		activateLayer(layer);
 		root.addChild(layer.getLayerRoot());
-		updateStates();
 		fireLayerAdded(layer);
+		updateStates();
+		activateLayer(layer);
 	}
 
 	public void removeLayer(HalfedgeLayer layer) {
