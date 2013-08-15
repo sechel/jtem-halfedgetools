@@ -35,11 +35,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
+import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.generic.Position3d;
+import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 
 public class Triangulator {
 
@@ -48,11 +52,11 @@ public class Triangulator {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> List<E> triangulate(HDS hds) {
+	> List<E> triangulateSingleSource(HDS hds) {
 		List<E> newEdges = new ArrayList<E>();
 		List<F> fList = new LinkedList<F>(hds.getFaces());
 		for (F f : fList) {
-			newEdges.addAll(triangulateFace(f,hds));
+			newEdges.addAll(triangulateSingleSource(f));
 		}
 		return newEdges;
 	}
@@ -60,9 +64,9 @@ public class Triangulator {
 	public static <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> List<E> triangulateFace(F f, HDS hds) {
+		F extends Face<V, E, F>
+	> List<E> triangulateSingleSource(F f) {
+		HalfEdgeDataStructure<V, E, F> hds = f.getHalfEdgeDataStructure();
 		List<E> newEdges = new ArrayList<E>();
 		List<E> b = HalfEdgeUtils.boundaryEdges(f);
 		if (b.size() == 3) {
@@ -103,4 +107,72 @@ public class Triangulator {
 		}
 		return newEdges;
 	}
+	
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> List<E> triangulateByCuttingCorners(HDS hds, AdapterSet a) {
+		List<E> newEdges = new ArrayList<E>();
+		List<F> fList = new LinkedList<F>(hds.getFaces());
+		for (F f : fList) {
+			newEdges.addAll(triangulateByCuttingCorners(f, a));
+		}
+		return newEdges;
+	}
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	> List<E> triangulateByCuttingCorners(F f, AdapterSet a) {
+		HalfEdgeDataStructure<V, E, F> hds = f.getHalfEdgeDataStructure();
+		List<E> newEdges = new ArrayList<E>();
+		int numFaces = hds.numFaces();
+		int numVerts = HalfEdgeUtils.boundaryVertices(f).size();
+		for (int i = 0; i < numVerts - 3; i++) {
+			E newEdge = cutCorner(f, a);
+			newEdges.add(newEdge);
+			newEdges.add(newEdge.getOppositeEdge());
+		}
+		numVerts = HalfEdgeUtils.boundaryVertices(f).size();
+		assert numVerts == 3 : "the input face is triangle";
+		assert numFaces + numVerts - 3 == hds.numFaces() : "number of faces has increased by the number of face vertices - 3";
+		return newEdges;
+	}
+	
+	static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	> E cutCorner(F f, AdapterSet a) {
+		double EPS = 1E-5;
+		E cornerEdge = null;
+		for (E be : HalfEdgeUtils.boundaryEdges(f)) {
+			V v1 = be.getStartVertex();
+			V v2 = be.getTargetVertex();
+			V v3 = be.getNextEdge().getTargetVertex();
+			double[] p1 = a.getD(Position3d.class, v1);
+			double[] p2 = a.getD(Position3d.class, v2);
+			double[] p3 = a.getD(Position3d.class, v3);
+			double[] vec1 = Rn.subtract(null, p1, p2);
+			double[] vec2 = Rn.subtract(null, p3, p2);
+			double[] cross = Rn.crossProduct(null, vec1, vec2);
+			double cl = Rn.euclideanNorm(cross);
+			if (cl > EPS) {
+				cornerEdge = be;
+				break;
+			}
+		}
+		if (cornerEdge == null) {
+			throw new RuntimeException("could not find three non-colinear vertices in cutCorner()");
+		}
+		V s = cornerEdge.getStartVertex();
+		V t = cornerEdge.getNextEdge().getTargetVertex();
+		return TopologyAlgorithms.splitFaceAt(f, s, t);
+	}
+	
+	
 }

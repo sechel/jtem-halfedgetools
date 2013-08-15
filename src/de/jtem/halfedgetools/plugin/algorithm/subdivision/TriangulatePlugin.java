@@ -79,11 +79,11 @@ public class TriangulatePlugin extends AlgorithmPlugin {
 		Set<F> faces = hi.getSelection().getFaces(hds);
 		List<E> addedEdges = new LinkedList<E>(); 
 		if(faces.size() == 0) {
-			List<E> te = Triangulator.triangulate(hds);
+			List<E> te = Triangulator.triangulateByCuttingCorners(hds, a);
 			addedEdges.addAll(te);
 		} else {
 			for(F f: faces) {
-				List<E> te = Triangulator.triangulateFace(f,hds);
+				List<E> te = Triangulator.triangulateByCuttingCorners(f, a);
 				addedEdges.addAll(te);
 			}
 		}

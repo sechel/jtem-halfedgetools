@@ -258,7 +258,7 @@ public abstract class FunctionalTest <
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void createTriangulatedCube(HDS hds, AdapterSet a) {
 		createCube(hds, a);
-		Triangulator.triangulate(hds);
+		Triangulator.triangulateSingleSource(hds);
 	}
 	
 	public static <

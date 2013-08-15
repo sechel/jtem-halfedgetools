@@ -30,7 +30,7 @@ public class GarlandHeckbertPlugin extends AlgorithmPlugin {
 		int retainVertices = Integer.parseInt(numString);
 		int numSteps = hds.numVertices() - retainVertices;
 		if (numSteps <= 0) return;
-		Triangulator.triangulate(hds);
+		Triangulator.triangulateSingleSource(hds);
 		GarlandHeckbert<V, E, F, HDS> gh = new GarlandHeckbert<V, E, F, HDS>(hds, a);
 		gh.simplify(numSteps);
 		hcp.set(hds);

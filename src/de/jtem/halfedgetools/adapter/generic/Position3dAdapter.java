@@ -35,7 +35,7 @@ public class Position3dAdapter extends AbstractAdapter<double[]> {
 			// interpret c[3] as homgeneous coordinate
 			return new double[] {c[0] / c[3], c[1] / c[3], c[2] / c[3]};
 		default:
-			throw new IllegalArgumentException("cannot convert coordinate in Position2dAdapter");
+			throw new IllegalArgumentException("cannot convert coordinate in Position3dAdapter");
 		}
 	}
 	
@@ -46,21 +46,7 @@ public class Position3dAdapter extends AbstractAdapter<double[]> {
 		F extends Face<V, E, F>
 	> double[] getV(V v, AdapterSet a) {
 		double[] r = a.getDefault(Position.class, v, new double[] {0, 0, 0});
-		switch (r.length) {
-		case 4:
-			double[] ar = new double[3];
-			ar[0] = r[0] / r[3];
-			ar[1] = r[1] / r[3];
-			ar[2] = r[2] / r[3];
-			r = ar;
-			break;
-		case 3:
-			break;
-		case 2:
-			r = new double[] {r[0], r[1], 0};
-			break;
-		}
-		return r;
+		return convertCoordinate(r);
 	}
 	
 	@Override

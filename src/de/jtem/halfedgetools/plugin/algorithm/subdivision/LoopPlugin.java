@@ -59,7 +59,7 @@ public class LoopPlugin extends AlgorithmPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
 		HDS hds2 = hcp.createEmpty(hds);
-		Triangulator.triangulate(hds);
+		Triangulator.triangulateByCuttingCorners(hds, a);
 		TypedAdapterSet<double[]> da = a.querySet(double[].class);
 		subdivider.subdivide(hds, hds2, da);
 		hcp.set(hds2);

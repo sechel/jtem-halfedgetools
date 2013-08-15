@@ -44,11 +44,7 @@ public class Position4dAdapter extends AbstractAdapter<double[]> {
 		F extends Face<V, E, F>
 	> double[] getV(V v, AdapterSet a) {
 		double[] r = a.getDefault(Position.class, v, new double[] {0, 0, 0, 1});
-		if (r.length == 3) {
-			double[] ar = {r[0], r[1], r[2], 1};
-			r = ar;
-		}
-		return r;
+		return convertCoordinate(r);
 	}
 	
 	@Override
