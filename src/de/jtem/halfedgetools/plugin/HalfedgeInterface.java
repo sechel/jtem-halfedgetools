@@ -878,7 +878,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		AdapterSet result = new AdapterSet();
 		result.addAll(persistentAdapters);
 		result.addAll(volatileAdapters);
-		result.addAll(activeLayer.getCurrentAdapters());
+		result.addAll(activeLayer.getAdapters());
 		return result;
 	}
 

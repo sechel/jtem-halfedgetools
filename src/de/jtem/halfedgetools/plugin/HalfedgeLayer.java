@@ -192,7 +192,7 @@ public class HalfedgeLayer implements ActionListener {
 	public AdapterSet getEffectiveAdapters() {
 		AdapterSet effectiveAdapters = new AdapterSet();
 		effectiveAdapters.addAll(hif.getAdapters());
-		effectiveAdapters.addAll(getCurrentAdapters());
+		effectiveAdapters.addAll(getAdapters());
 		effectiveAdapters.addAll(getVisualizerAdapters());
 		return effectiveAdapters;
 	}
@@ -702,7 +702,7 @@ public class HalfedgeLayer implements ActionListener {
 		this.stepsPerEdge = stepsPerEdge;
 	}
 
-	public AdapterSet getCurrentAdapters() {
+	public AdapterSet getAdapters() {
 		AdapterSet adapters = new AdapterSet();
 		adapters.addAll(persistentAdapters);
 		adapters.addAll(volatileAdapters);
