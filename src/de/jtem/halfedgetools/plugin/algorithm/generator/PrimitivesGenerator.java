@@ -33,6 +33,7 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin {
 		triangleButton = new JRadioButton("Triangle"),
 		cubeButton = new JRadioButton("Cube"),
 		openCubeButton = new JRadioButton("Open Cube"),
+		cylinderButton = new JRadioButton("Cylinder"),
 		tetrahedronButton = new JRadioButton("Tetrahedron"),
 		icosahedronButton = new JRadioButton("Icosahedron");
 
@@ -56,12 +57,14 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin {
 		primitivesGroup.add(triangleButton);
 		primitivesGroup.add(openCubeButton);
 		primitivesGroup.add(cubeButton);
+		primitivesGroup.add(cylinderButton);
 		primitivesGroup.add(tetrahedronButton);
 		primitivesGroup.add(icosahedronButton);
 		
 		panel.add(triangleButton,gbc2);
 		panel.add(cubeButton,gbc2);
 		panel.add(openCubeButton, gbc2);
+		panel.add(cylinderButton,gbc2);
 		panel.add(tetrahedronButton,gbc2);
 		panel.add(icosahedronButton, gbc2);
 	}
@@ -90,6 +93,10 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin {
 		}
 		if(openCubeButton.isSelected()) {
 			ifs = Primitives.openCube();
+		}
+		if(cylinderButton.isSelected()) {
+			int n = 15;
+			ifs = Primitives.cylinder(n, 1, 1, 0, 2*Math.PI, 2*Math.PI, n);
 		}
 		if(tetrahedronButton.isSelected()) {
 			ifs = Primitives.tetrahedron();
