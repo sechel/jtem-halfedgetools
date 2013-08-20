@@ -784,16 +784,16 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 				redoAction.setEnabled(activeLayer.canRedo());
 				undoButton.validate();
 				redoButton.validate();
+				
+				HalfedgeLayer layer = getActiveLayer();
+				int index = layers.indexOf(layer);
+				disableListeners = true;
+				layersTable.revalidate();
+				layersTable.getSelectionModel().setSelectionInterval(index, index);
+				disableListeners = false;
 			}
 		};
 		EventQueue.invokeLater(updateStatesRunner);
-
-		HalfedgeLayer layer = getActiveLayer();
-		int index = layers.indexOf(layer);
-		disableListeners = true;
-		layersTable.revalidate();
-		layersTable.getSelectionModel().setSelectionInterval(index, index);
-		disableListeners = false;
 		getAdapters().revalidateAdapters();
 		for (HalfedgeLayer l : layers) {
 			l.updateBoundingBox();
