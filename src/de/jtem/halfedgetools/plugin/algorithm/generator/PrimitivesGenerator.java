@@ -3,10 +3,15 @@ package de.jtem.halfedgetools.plugin.algorithm.generator;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 import de.jreality.geometry.Primitives;
 import de.jreality.scene.IndexedFaceSet;
@@ -21,8 +26,9 @@ import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.PluginInfo;
+import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 
-public class PrimitivesGenerator extends AlgorithmDialogPlugin {
+public class PrimitivesGenerator extends AlgorithmDialogPlugin implements ItemListener {
 
 	private JPanel
 		panel = new JPanel();
@@ -37,6 +43,19 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin {
 		tetrahedronButton = new JRadioButton("Tetrahedron"),
 		icosahedronButton = new JRadioButton("Icosahedron");
 
+	private ShrinkPanel
+		cylinderParametersPanel = new ShrinkPanel("Cyclinder parameters");
+	
+	private SpinnerNumberModel
+		circlePoints = new SpinnerNumberModel(15, 3, 100, 1),
+		heightPoints = new SpinnerNumberModel(15, 2, 100, 1),
+		aspectRatio = new SpinnerNumberModel(1.0, 0.0001, 10000, 0.1);
+	
+	private JSpinner
+		circleSpinner = new JSpinner(circlePoints),
+		heightSpinner = new JSpinner(heightPoints),
+		ratioSpinner = new JSpinner(aspectRatio);
+	
 	private ConverterJR2Heds
 		converter = new ConverterJR2Heds();
 	
@@ -58,13 +77,24 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin {
 		primitivesGroup.add(openCubeButton);
 		primitivesGroup.add(cubeButton);
 		primitivesGroup.add(cylinderButton);
+		cylinderButton.addItemListener(this);
 		primitivesGroup.add(tetrahedronButton);
 		primitivesGroup.add(icosahedronButton);
+		
+		cylinderParametersPanel.setLayout(new GridBagLayout());
+		cylinderParametersPanel.add(new JLabel("Points on circle"),gbc1);
+		cylinderParametersPanel.add(circleSpinner,gbc2);
+		cylinderParametersPanel.add(new JLabel("Levels"),gbc1);
+		cylinderParametersPanel.add(heightSpinner,gbc2);
+		cylinderParametersPanel.add(new JLabel("Aspect ratio"),gbc1);
+		cylinderParametersPanel.add(ratioSpinner,gbc2);
+		cylinderParametersPanel.setShrinked(false);
 		
 		panel.add(triangleButton,gbc2);
 		panel.add(cubeButton,gbc2);
 		panel.add(openCubeButton, gbc2);
 		panel.add(cylinderButton,gbc2);
+		panel.add(cylinderParametersPanel,gbc2);		
 		panel.add(tetrahedronButton,gbc2);
 		panel.add(icosahedronButton, gbc2);
 	}
@@ -95,8 +125,10 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin {
 			ifs = Primitives.openCube();
 		}
 		if(cylinderButton.isSelected()) {
-			int n = 15;
-			ifs = Primitives.cylinder(n, 1, 1, 0, 2*Math.PI, 2*Math.PI, n);
+			int circle = circlePoints.getNumber().intValue();
+			int levels = heightPoints.getNumber().intValue();
+			double aspectRatioOfQuads = aspectRatio.getNumber().doubleValue();
+			ifs = Primitives.cylinder(circle, 1, 1, 0, aspectRatioOfQuads*(levels-1)*2*Math.sin(Math.PI/circle), 2*Math.PI, levels);
 		}
 		if(tetrahedronButton.isSelected()) {
 			ifs = Primitives.tetrahedron();
@@ -121,6 +153,17 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin {
 	@Override
 	protected JPanel getDialogPanel() {
 		return panel;
+	}
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		if(e.getSource() == cylinderButton) {
+			if(cylinderButton.isSelected()) {
+				cylinderParametersPanel.setShrinked(false);
+			} else {
+				cylinderParametersPanel.setShrinked(true);
+			}
+		}
 	}
 	
 }
