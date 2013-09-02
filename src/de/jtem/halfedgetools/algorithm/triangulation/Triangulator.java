@@ -208,7 +208,7 @@ public class Triangulator {
 				V s = cornerEdge.getStartVertex();
 				V t = cornerEdge.getNextEdge().getTargetVertex();
 				cornerEdge = TopologyAlgorithms.splitFaceAt(f, s, t);
-				return cornerEdge;
+				break;
 			}
 		}
 		if (cornerEdge == null) {
