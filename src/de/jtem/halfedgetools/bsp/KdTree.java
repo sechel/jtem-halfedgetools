@@ -211,7 +211,8 @@ public class KdTree <
 		KdPQueue<V> pq = new KdPQueue<V>(knearest);
 		// Start the collectKNearest search
 		pq = collectKNearest(root, p, pq);
-		for (int i = 0; i < pq.getNumberItems(); i++) {
+		int numItems = pq.getNumberItems();
+		for (int i = 0; i < numItems; i++) {
             result.add(pq.pollSplitPos());
 		}
 	    return result;
@@ -231,7 +232,7 @@ public class KdTree <
             for (int i = s ; i <= e; i++) {
             	double[] pos = getPos(i);
 				double dist2 = distance2(pos, target);
-				if (dist2 != 0 && dist2 < pq.getMaximumDistance()) {
+				if (dist2 < pq.getMaximumDistance()) {
 					pq.add(dist2, points.get(i));
 				}
 			}
