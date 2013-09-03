@@ -157,7 +157,7 @@ public class Triangulator {
 			double[] p1 = a.getD(Position3d.class, v1);
 			double[] p2 = a.getD(Position3d.class, v2);
 			double[] p3 = a.getD(Position3d.class, v3);
-			System.err.println("vertices = "+Rn.toString(new double[][]{p1,p2,p3}));
+//			System.err.println("vertices = "+Rn.toString(new double[][]{p1,p2,p3}));
 			double[] vec1 = Rn.subtract(null, p1, p2);
 			double[] vec2 = Rn.subtract(null, p3, p2);
 			double[] cross = Rn.crossProduct(null, vec1, vec2);
@@ -174,7 +174,7 @@ public class Triangulator {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> E cutCorner(F f, AdapterSet a) {
-		System.err.println("Cutting corner "+f.getIndex());
+//		System.err.println("Cutting corner "+f.getIndex());
 		double EPS = 1E-5;
 		E cornerEdge = null;
 		List<E> bedges = HalfEdgeUtils.boundaryEdges(f);
@@ -185,7 +185,7 @@ public class Triangulator {
 			double[] p1 = a.getD(Position3d.class, v1);
 			double[] p2 = a.getD(Position3d.class, v2);
 			double[] p3 = a.getD(Position3d.class, v3);
-			System.err.println("vertices = "+Rn.toString(new double[][]{p1,p2,p3}));
+//			System.err.println("vertices = "+Rn.toString(new double[][]{p1,p2,p3}));
 			double[] vec1 = Rn.subtract(null, p1, p2);
 			double[] vec2 = Rn.subtract(null, p3, p2);
 			double[] cross = Rn.crossProduct(null, vec1, vec2);
@@ -193,12 +193,12 @@ public class Triangulator {
 			if (cl > EPS) {
 				E be2 = be.getNextEdge();
 				double[][] pts = new double[bedges.size()-1][];
-				System.err.println((bedges.size()-1)+"pts");
+//				System.err.println((bedges.size()-1)+"pts");
 				int i = 0;
 				// collect remaining vertex positions into array
 				do {
 					V vt = be2.getTargetVertex();		// this is v3 at the beginning
-					System.err.println("index = "+vt.getIndex());
+//					System.err.println("index = "+vt.getIndex());
 					pts[i] = a.getD(Position3d.class, vt);
 					i++;
 					be2 = be2.getNextEdge();
