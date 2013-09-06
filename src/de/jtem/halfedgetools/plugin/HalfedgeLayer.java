@@ -749,5 +749,20 @@ public class HalfedgeLayer implements ActionListener {
 				.remove(a);
 		return pa || va;
 	}
+	
+	/**
+	 * Returns an half-edge node index for the given jReality
+	 * edge index based on the latest conversion result.
+	 * @param pickIndex a jReality edge pick index
+	 * @return a half-edge node index corresponding to the given edge pick
+	 */
+	public int pickToNodeEdgeIndex(int pickIndex) {
+		Edge<?,?,?> edge = edgeMap.get(pickIndex);
+		if (edge != null) {
+			return edge.getIndex();
+		} else {
+			return -1;
+		}
+	}
 
 }
