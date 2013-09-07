@@ -1361,6 +1361,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 
 	public void setConverterHds2Ifs(ConverterHds2Ifs converterHds2Ifs) {
 		this.converterHds2Ifs = converterHds2Ifs;
+		activeLayer.setConverterToIFS(converterHds2Ifs);
 	}
 
 	public ConverterHds2Ifs getConverterHds2Ifs() {
