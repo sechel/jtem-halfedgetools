@@ -1163,6 +1163,10 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	public HalfedgeLayer getActiveLayer() {
 		return activeLayer;
 	}
+	
+	public List<HalfedgeLayer> getAllLayers() {
+		return new LinkedList<HalfedgeLayer>(layers);
+	}
 
 	public void checkContent() {
 		if (scene == null)
