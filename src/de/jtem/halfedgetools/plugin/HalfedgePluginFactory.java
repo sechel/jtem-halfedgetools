@@ -66,6 +66,7 @@ import de.jtem.halfedgetools.plugin.algorithm.subdivision.QuadGraphLinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.Sqrt3LinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.Sqrt3Plugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.StellarLinearPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.subdivision.TriangulateCutCornersPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.TriangulatePlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.DelaunayPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.topology.EdgeCollapsePlugin;
@@ -151,6 +152,7 @@ public class HalfedgePluginFactory {
 		s.add(new Sqrt3Plugin());
 		s.add(new StellarLinearPlugin());
 		s.add(new TriangulatePlugin());
+		s.add(new TriangulateCutCornersPlugin());
 		return s;
 	}
 	
