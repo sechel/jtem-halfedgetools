@@ -83,7 +83,7 @@ public class TriangulateCutCornersPlugin extends AlgorithmPlugin {
 			addedEdges.addAll(te);
 		} else {
 			for(F f: faces) {
-				List<E> te = Triangulator.triangulateByCuttingCorners(hds, a);
+				List<E> te = Triangulator.triangulateByCuttingCorners(f, a);
 				addedEdges.addAll(te);
 			}
 		}

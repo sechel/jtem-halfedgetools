@@ -56,7 +56,7 @@ import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
  * @param <E> Edge class
  * @param <F> Face class
  */
-public class CatmullClark3 {
+public class SymmetricCatmullClark {
 	
 	/**
 	 * Subdivides a given surface with the Catmull-Clark rule

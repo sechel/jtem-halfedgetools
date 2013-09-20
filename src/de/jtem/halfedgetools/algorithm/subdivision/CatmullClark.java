@@ -51,7 +51,6 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
-import de.jtem.halfedgetools.adapter.type.generic.Position4d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
@@ -150,7 +149,7 @@ public class CatmullClark {
 			double[] sum = new double[3];
 			a.setParameter("refEdge", (Object)null);
 			sum = a.getD(BaryCenter4d.class, f);
-			a.set(Position4d.class, v, sum);
+			a.set(Position.class, v, sum);
 		}
 	}
 
@@ -191,7 +190,7 @@ public class CatmullClark {
 				a.setParameter("ignore", true);
 				coords[2] = a.getD(BaryCenter4d.class, e);
 				coords[3] = a.getD(BaryCenter4d.class, e.getOppositeEdge());
-				a.set(Position4d.class, v, average(null, coords));
+				a.set(Position.class, v, average(null, coords));
 			}
 		}
 	}
@@ -254,7 +253,7 @@ public class CatmullClark {
 							vHelp[0] = a.getD(BaryCenter4d.class, e);
 						} else {
 							vHelp[1] = a.getD(BaryCenter4d.class, e);
-							a.set(Position4d.class, nv, average(null, vHelp));
+							a.set(Position.class, nv, average(null, vHelp));
 						}
 						
 					}
@@ -262,7 +261,7 @@ public class CatmullClark {
 			} else if (isBoundaryVertex(v) && !bSplineBoundary){
 				V nv= newHeds.addNewVertex();
 				oldVnewVMap.put(v, nv);
-				a.set(Position4d.class, nv, a.getD(Position4d.class, v));
+				a.set(Position.class, nv, a.getD(Position.class, v));
 			} else if(sel.isSelected(v)){
 				V nv= newHeds.addNewVertex();
 				oldVnewVMap.put(v, nv);
@@ -277,7 +276,7 @@ public class CatmullClark {
 							vHelp[0] = a.getD(BaryCenter4d.class, e);
 						} else {
 							vHelp[1] = a.getD(BaryCenter4d.class, e);
-							a.set(Position4d.class, nv, average(null, vHelp));
+							a.set(Position.class, nv, average(null, vHelp));
 						}
 						
 					}

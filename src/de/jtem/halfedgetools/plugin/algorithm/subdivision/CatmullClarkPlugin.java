@@ -31,7 +31,6 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.subdivision;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.HashMap;
@@ -78,7 +77,7 @@ public class CatmullClarkPlugin extends AlgorithmDialogPlugin {
 		BSplineLines = new JRadioButton("B-Spline Lines"),
 		NoLines = new JRadioButton("No featured Lines");
 	private JCheckBox
-		useLinearChecker = new JCheckBox("Use Linear Interpolation");
+		useLinearChecker = new JCheckBox("Linear Interpolation");
 
 	private CatmullClark 
 		cc = new CatmullClark();
@@ -88,8 +87,8 @@ public class CatmullClarkPlugin extends AlgorithmDialogPlugin {
 		panel.setLayout(new GridBagLayout());
 		GridBagConstraints c = LayoutFactory.createRightConstraint();
 		boundaryPanel.setLayout(new GridBagLayout());
-		boundaryPanel.setPreferredSize(new Dimension(250, 120));
-		boundaryPanel.setBorder(BorderFactory.createTitledBorder("boundary"));
+//		boundaryPanel.setPreferredSize(new Dimension(250, 120));
+		boundaryPanel.setBorder(BorderFactory.createTitledBorder("Boundary"));
 		
 		BSplineButton.setSelected(true);
 		BoundaryGroup.add(BSplineButton);
@@ -101,8 +100,8 @@ public class CatmullClarkPlugin extends AlgorithmDialogPlugin {
 		boundaryPanel.add(NoBoundary,c);
 		
 		featuredLines.setLayout(new GridBagLayout());
-		featuredLines.setPreferredSize(new Dimension(250, 120));
-		featuredLines.setBorder(BorderFactory.createTitledBorder("featured lines"));
+//		featuredLines.setPreferredSize(new Dimension(250, 120));
+		featuredLines.setBorder(BorderFactory.createTitledBorder("Feature Lines"));
 		
 		BSplineLines.setSelected(true);
 		LinesGroup.add(BSplineLines);
@@ -111,9 +110,10 @@ public class CatmullClarkPlugin extends AlgorithmDialogPlugin {
 		featuredLines.add(BSplineLines,c);
 		featuredLines.add(NoLines,c);
 		
+		panel.add(useLinearChecker, c);
 		panel.add(boundaryPanel,c);
 		panel.add(featuredLines,c);
-		panel.add(useLinearChecker, c);
+
 	}
 		
 	@Override

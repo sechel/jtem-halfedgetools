@@ -41,7 +41,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.TypedAdapterSet;
-import de.jtem.halfedgetools.algorithm.subdivision.CatmullClark3;
+import de.jtem.halfedgetools.algorithm.subdivision.SymmetricCatmullClark;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
@@ -54,8 +54,8 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class SymmetricCatmullClarkPlugin extends AlgorithmPlugin {
 	
-	private CatmullClark3
-		subdivider = new CatmullClark3();
+	private SymmetricCatmullClark
+		subdivider = new SymmetricCatmullClark();
 	
 	@Override
 	public AlgorithmCategory getAlgorithmCategory() {
