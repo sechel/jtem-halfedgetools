@@ -5,7 +5,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,11 +16,9 @@ import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.plugin.basic.View;
 import de.jreality.scene.SceneGraphComponent;
-import de.jreality.scene.SceneGraphPath;
 import de.jreality.scene.tool.InputSlot;
 import de.jreality.tools.PointDragEvent;
 import de.jreality.tools.PointDragListener;
-import de.jreality.util.SceneGraphUtility;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
@@ -168,13 +165,9 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 	}
 
 	private void addTool(HalfedgeLayer layer) {
-		List<SceneGraphPath> paths = SceneGraphUtility.getPathsToNamedNodes(
-				layer.getLayerRoot(), "Geometry");
-		SceneGraphComponent comp;
-		for (SceneGraphPath path : paths) {
-			comp = path.getLastComponent();
-			if (!comp.getTools().contains(tool))
-				comp.addTool(tool);
+		SceneGraphComponent comp = layer.getGeometryRoot();
+		if (!comp.getTools().contains(tool)) {
+			comp.addTool(tool);
 		}
 	}
 

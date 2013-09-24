@@ -63,47 +63,68 @@ import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
 
 public class HalfedgeLayer implements ActionListener {
 
-	private static Logger layerLogger = LoggingSystem
-			.getLogger(HalfedgeLayer.class);
-	private HalfedgeInterface hif = null;
-	private HalfEdgeDataStructure<?, ?, ?> hds = new DefaultJRHDS();
-	private IndexedFaceSet geometry = new IndexedFaceSet();
-	private AdapterSet persistentAdapters = new AdapterSet(),
-			activeVolatileAdapters = new AdapterSet(),
-			volatileAdapters = new AdapterSet();
-	private SceneGraphComponent layerRoot = new SceneGraphComponent(
-			"Default Layer"), displayFacesRoot = new SceneGraphComponent(
-			"Display Faces"),
-			geometryRoot = new SceneGraphComponent("Geometry"),
-			selectionRoot = new SceneGraphComponent("Selection"),
-			visualizersRoot = new SceneGraphComponent("Visualizers"),
-			boundingBoxRoot = new SceneGraphComponent("Bounding Box"),
-			temporaryRoot = new SceneGraphComponent("Temporary Geometry"),
-			pivotRoot = CoordinatesPivot.createPivot();
-	private Appearance geometryAppearance = new Appearance(
-			"Geometry Appearance");
-	private Map<Integer, Edge<?, ?, ?>> edgeMap = new HashMap<Integer, Edge<?, ?, ?>>();
-	private HalfedgeSelection selection = new HalfedgeSelection();
-	private Set<VisualizerPlugin> visualizers = new TreeSet<VisualizerPlugin>();
+	private static Logger 
+		layerLogger = LoggingSystem.getLogger(HalfedgeLayer.class);
+	private HalfedgeInterface 
+		hif = null;
+	private HalfEdgeDataStructure<?, ?, ?> 
+		hds = new DefaultJRHDS();
+	private IndexedFaceSet 
+		geometry = new IndexedFaceSet();
+	private AdapterSet 
+		persistentAdapters = new AdapterSet(),
+		activeVolatileAdapters = new AdapterSet(),
+		volatileAdapters = new AdapterSet();
+	private SceneGraphComponent 
+		layerRoot = new SceneGraphComponent("Default Layer"), 
+		displayFacesRoot = new SceneGraphComponent("Display Faces"),
+		geometryRoot = new SceneGraphComponent("Geometry"),
+		selectionRoot = new SceneGraphComponent("Selection"),
+		visualizersRoot = new SceneGraphComponent("Visualizers"),
+		boundingBoxRoot = new SceneGraphComponent("Bounding Box"),
+		temporaryRoot = new SceneGraphComponent("Temporary Geometry"),
+		pivotRoot = CoordinatesPivot.createPivot();
+	private Appearance 
+		geometryAppearance = new Appearance("Geometry Appearance");
+	private Map<Integer, Edge<?, ?, ?>> 
+		edgeMap = new HashMap<Integer, Edge<?, ?, ?>>();
+	private HalfedgeSelection 
+		selection = new HalfedgeSelection();
+	private Set<VisualizerPlugin> 
+		visualizers = new TreeSet<VisualizerPlugin>();
 
-	private List<IndexedFaceSet> undoHistory = new ArrayList<IndexedFaceSet>();
-	private List<AdapterSet> adapterHistory = new ArrayList<AdapterSet>();
-	private int undoIndex = -1, undoSize = 10;
+	private List<IndexedFaceSet> 
+		undoHistory = new ArrayList<IndexedFaceSet>();
+	private List<AdapterSet> 
+		adapterHistory = new ArrayList<AdapterSet>();
+	private int 
+		undoIndex = -1, 
+		undoSize = 10;
 
 	// layer properties
-	private boolean thickenSurface = false, makeHoles = true, implode = false;
-	private int stepsPerEdge = 8;
-	private double[][] profileCurve = new double[][] { { 0, 0 }, { 0, .4 },
-			{ .1, .5 }, { .9, .5 }, { 1.0, .4 }, { 1, 0 } };
-	private double holeFactor = 0.4, thickness = 0.05, implodeFactor = -0.85;
+	private boolean 
+		thickenSurface = false, 
+		makeHoles = true, 
+		implode = false;
+	private int 
+		stepsPerEdge = 8;
+	private double[][] 
+		profileCurve = new double[][] { { 0, 0 }, { 0, .4 },{ .1, .5 }, { .9, .5 }, { 1.0, .4 }, { 1, 0 } };
+	private double 
+		holeFactor = 0.4, 
+		thickness = 0.05, 
+		implodeFactor = -0.85;
 
-	private boolean active = true;
+	private boolean 
+		active = true;
 
-	private ConverterHds2Ifs converterToIFS = new ConverterHeds2JR();
+	private ConverterHds2Ifs 
+		converterToIFS = new ConverterHeds2JR();
+	private ConverterJR2Heds 
+		converterToHDS = new ConverterJR2Heds();
 
-	private ConverterJR2Heds converterToHDS = new ConverterJR2Heds();
-
-	private ActionTool actionTool = new ActionTool("PrimaryAction");
+	private ActionTool 
+		actionTool = new ActionTool("PrimaryAction");
 
 	private HalfedgeLayer() {
 		layerRoot.addChild(geometryRoot);
@@ -215,8 +236,12 @@ public class HalfedgeLayer implements ActionListener {
 		layerRoot.addChild(visualizersRoot);
 	}
 
-	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> void setNoUndo(
-			HDS hds) {
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void setNoUndo(HDS hds) {
 		this.hds = hds;
 		convertHDS();
 		validateSelection();
@@ -265,8 +290,12 @@ public class HalfedgeLayer implements ActionListener {
 		updateUndoList();
 	}
 
-	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> void set(
-			HDS hds) {
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void set(HDS hds) {
 		setNoUndo(hds);
 		updateUndoList();
 		hif.checkContent();
@@ -308,8 +337,12 @@ public class HalfedgeLayer implements ActionListener {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> HDS get(
-			HDS template) {
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> HDS get(HDS template) {
 		if (template.getClass().isAssignableFrom(hds.getClass())) {
 			return (HDS) hds;
 		}
@@ -462,7 +495,9 @@ public class HalfedgeLayer implements ActionListener {
 
 	protected void updateBoundingBox() {
 		boundingBoxRoot.setGeometry(null);
-		boundingBoxRoot.removeChild(pivotRoot);
+		if (boundingBoxRoot.getChildNodes().contains(pivotRoot)) {
+			boundingBoxRoot.removeChild(pivotRoot);
+		}
 		Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(layerRoot);
 		if (euclideanNormSquared(bbox.getExtent()) == 0)
 			return;
@@ -576,6 +611,9 @@ public class HalfedgeLayer implements ActionListener {
 
 	public SceneGraphComponent getLayerRoot() {
 		return layerRoot;
+	}
+	public SceneGraphComponent getGeometryRoot() {
+		return geometryRoot;
 	}
 
 	public boolean canUndo() {
