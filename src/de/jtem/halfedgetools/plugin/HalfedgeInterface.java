@@ -29,9 +29,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -437,7 +439,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	private class NewLayerAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
-
+		
 		public NewLayerAction() {
 			putValue(NAME, "New Layer");
 			putValue(SMALL_ICON, ImageHook.getIcon("page_white_add.png"));
@@ -449,7 +451,15 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			HalfedgeLayer layer = new HalfedgeLayer(HalfedgeInterface.this);
-			layer.setName("New Layer");
+			int i = 1;
+			Set<String> layerNames = new HashSet<String>();
+			for(HalfedgeLayer l : layers) {
+				layerNames.add(l.getName());
+			}
+			while(layerNames.contains("New layer " + i)) {
+				++i;
+			}
+			layer.setName("New layer " + i);
 			addLayer(layer);
 			activateLayer(layer);
 			updateStates();
@@ -809,6 +819,14 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		fireDataChanged();
 	}
 
+	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> void setNoUndo(
+			final HDS hds) {
+		activeLayer.setNoUndo(hds);
+		updateStates();
+		clearVolatileAdapters();
+		fireDataChanged();
+	}
+	
 	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> HDS get(
 			HDS hds) {
 		HDS r = activeLayer.get(hds);

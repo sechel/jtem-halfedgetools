@@ -30,24 +30,31 @@ import de.jtem.jrworkspace.plugin.flavor.ToolBarFlavor;
 
 public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 
-	private Map<AlgorithmCategory, JComboBox>
-		comboMap = new HashMap<AlgorithmCategory, JComboBox>();
-	private Map<AlgorithmCategory, Set<AlgorithmPlugin>>
-		algoMap = new HashMap<AlgorithmCategory, Set<AlgorithmPlugin>>();
+	private Map<String, JComboBox>
+		comboMap = new HashMap<String, JComboBox>();
+	
+	private Map<String, Set<AlgorithmPlugin>>
+		algoMap = new HashMap<String, Set<AlgorithmPlugin>>();
+	
 	private JToolBar
 		comboToolBar = new JToolBar("Halfedge Algorithms");
 	
-	public AlgorithmDropdownToolbar() {
-		for (AlgorithmCategory cat : AlgorithmCategory.values()) {
-			JComboBox catCombo = new JComboBox();
-			AlgorithmComboModel model = new AlgorithmComboModel(cat);
-			catCombo.setModel(model);
-			AlgorithmCellRenderer renderer = new AlgorithmCellRenderer(cat);
-			catCombo.setRenderer(renderer);
-			comboMap.put(cat, catCombo);
-			algoMap.put(cat, new HashSet<AlgorithmPlugin>());
-		}
+	public AlgorithmDropdownToolbar(List<String> categories) {
+
+	}
+
+	private void addComboBox(String cat) {
+		JComboBox catCombo = new JComboBox();
+		AlgorithmComboModel model = new AlgorithmComboModel(cat);
+		catCombo.setModel(model);
+		AlgorithmCellRenderer renderer = new AlgorithmCellRenderer(cat);
+		catCombo.setRenderer(renderer);
+		comboMap.put(cat.toString(), catCombo);
+		algoMap.put(cat.toString(), new HashSet<AlgorithmPlugin>());
 		updateComboBoxes();
+	}
+	
+	public AlgorithmDropdownToolbar() {
 	}
 	
 	
@@ -55,11 +62,11 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 		
 		private static final long 
 			serialVersionUID = 1L;
-		private AlgorithmCategory
-			category = AlgorithmCategory.Custom;
+		private String
+			category = AlgorithmCategory.Custom.toString();
 
-		public AlgorithmCellRenderer(AlgorithmCategory category) {
-			this.category = category;
+		public AlgorithmCellRenderer(String cat) {
+			this.category = cat;
 		}
 		
 		@Override
@@ -84,11 +91,11 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 	
 	private class AlgorithmComboModel implements ComboBoxModel {
 
-		private AlgorithmCategory
-			category = AlgorithmCategory.Custom;
+		private String
+			category = AlgorithmCategory.Custom.toString();
 		
-		public AlgorithmComboModel(AlgorithmCategory category) {
-			this.category = category;
+		public AlgorithmComboModel(String cat) {
+			this.category = cat;
 		}
 		
 		@Override
@@ -128,7 +135,7 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 	}
 	
 	
-	protected List<AlgorithmPlugin> getAlgorithms(AlgorithmCategory cat) {
+	protected List<AlgorithmPlugin> getAlgorithms(String cat) {
 		List<AlgorithmPlugin> result = new LinkedList<AlgorithmPlugin>();
 		Set<AlgorithmPlugin> algoSet = algoMap.get(cat);
 		result.addAll(algoSet);
@@ -143,7 +150,10 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 1;
 		int numCombos = 0;
-		for (AlgorithmCategory cat : AlgorithmCategory.values()) {
+		LinkedList<String> algorithmCategories = new LinkedList<String>(comboMap.keySet());
+		Collections.sort(algorithmCategories);
+				
+		for (String cat : algorithmCategories) {
 			JComboBox combo = comboMap.get(cat);
 			Set<AlgorithmPlugin> algos = algoMap.get(cat);
 			if (algos.isEmpty()) continue;
@@ -172,10 +182,15 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 	}
 	
 	public void addAlgorithm(AlgorithmPlugin ap) {
-		Set<AlgorithmPlugin> plugins = algoMap.get(ap.getAlgorithmCategory());
+		String algoName = ap.getCategory();
+		if(!algoMap.containsKey(algoName)) {
+			addComboBox(algoName);
+		}
+		Set<AlgorithmPlugin> plugins = algoMap.get(algoName);
 		plugins.add(ap);
 		updateComboBoxes();
 	}
+	
 	public void removeAlgorithm(AlgorithmPlugin ap) {
 		Set<AlgorithmPlugin> plugins = algoMap.get(ap.getAlgorithmCategory());
 		plugins.remove(ap);
