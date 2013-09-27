@@ -246,6 +246,9 @@ public class HalfedgeLayer implements ActionListener {
 		convertHDS();
 		validateSelection();
 		hif.fireDataChanged();
+		hif.updateStates();
+		hif.checkContent();
+		hif.clearVolatileAdapters();
 	}
 
 	/**
@@ -277,6 +280,9 @@ public class HalfedgeLayer implements ActionListener {
 		updateBoundingBox();
 		resetTemporaryGeometry();
 		updateSelection();
+		hif.updateStates();
+		hif.checkContent();
+		hif.fireDataChanged();
 	}
 
 	/**
@@ -298,7 +304,6 @@ public class HalfedgeLayer implements ActionListener {
 	> void set(HDS hds) {
 		setNoUndo(hds);
 		updateUndoList();
-		hif.checkContent();
 	}
 
 	public void update() {
@@ -327,13 +332,14 @@ public class HalfedgeLayer implements ActionListener {
 		convertFaceSet();
 		clearSelection();
 		hif.fireDataChanged();
+		hif.checkContent();
+		hif.updateStates();
+		hif.clearVolatileAdapters();
 	}
 
 	public void set(Geometry g) {
 		setNoUndo(g);
 		updateUndoList();
-		updateNoUndo(); // update visualizers
-		hif.checkContent();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -363,6 +369,7 @@ public class HalfedgeLayer implements ActionListener {
 			newSelection.setSelected(nf, true);
 		}
 		selection = newSelection;
+		hif.updateStates();
 		return template;
 	}
 

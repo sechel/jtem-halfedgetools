@@ -116,59 +116,85 @@ import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		ListSelectionListener, ActionListener, PopupMenuListener {
 
-	private Controller controller = null;
-	private Scene scene = null;
-	private Content content = null;
-	private VisualizersManager visualizersManager = null;
-	private ViewMenuBar menuBar = null;
-	private JobQueuePlugin jobQueue = null;
+	private Controller 
+		controller = null;
+	private Scene 
+		scene = null;
+	private Content 
+		content = null;
+	private VisualizersManager 
+		visualizersManager = null;
+	private ViewMenuBar 
+		menuBar = null;
+	private JobQueuePlugin 
+		jobQueue = null;
 
-	private SceneGraphComponent root = new SceneGraphComponent("Halfedge Root");
-	private Transformation rootTransform = new Transformation("Normalization");
-	private JTable layersTable = new JTable();
-	private JScrollPane layersScroller = new JScrollPane(layersTable,
-			VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
-	private HalfedgeContentListener contentChangedListener = new HalfedgeContentListener();
-	private Action newLayerAction = new NewLayerAction(),
-			deleteLayerAction = new DeleteLayerAction(),
-			mergeLayersAction = new MergeLayersAction(),
-			importAction = new ImportAction(),
-			exportAction = new ExportAction(), undoAction = new UndoAction(),
-			redoAction = new RedoAction();
-	private JButton importButton = new JButton(importAction),
-			exportButton = new JButton(exportAction), undoButton = new JButton(
-					undoAction), redoButton = new JButton(redoAction);
-	private LayerPropertyWidget layerPropertyPanel = new LayerPropertyWidget();
-	private JToggleButton visualizersToggle = new JToggleButton(
-			ImageHook.getIcon("page_white_paint_arrow.png")),
-			layerOptionsToggle = new JToggleButton(
-					ImageHook.getIcon("page_white_gear_arrow.png"));
-	private JPopupMenu layerOptionsPopup = new JPopupMenu("Layer Options"),
-			visualizersPopup = new JPopupMenu("Visualizers");
-	private JToolBar layerToolbar = new JToolBar();
+	private SceneGraphComponent 
+		root = new SceneGraphComponent("Halfedge Root");
+	private Transformation 
+		rootTransform = new Transformation("Normalization");
+	private JTable 
+		layersTable = new JTable();
+	private JScrollPane 
+		layersScroller = new JScrollPane(layersTable,VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
+	private HalfedgeContentListener 
+		contentChangedListener = new HalfedgeContentListener();
+	private Action 
+		newLayerAction = new NewLayerAction(),
+		deleteLayerAction = new DeleteLayerAction(),
+		mergeLayersAction = new MergeLayersAction(),
+		importAction = new ImportAction(),
+		exportAction = new ExportAction(), undoAction = new UndoAction(),
+		redoAction = new RedoAction();
+	private JButton 
+		importButton = new JButton(importAction),
+		exportButton = new JButton(exportAction), 
+		undoButton = new JButton(undoAction), 
+		redoButton = new JButton(redoAction);
+	private LayerPropertyWidget 
+		layerPropertyPanel = new LayerPropertyWidget();
+	private JToggleButton 
+		visualizersToggle = new JToggleButton(ImageHook.getIcon("page_white_paint_arrow.png")),
+		layerOptionsToggle = new JToggleButton(ImageHook.getIcon("page_white_gear_arrow.png"));
+	private JPopupMenu 
+		layerOptionsPopup = new JPopupMenu("Layer Options"),
+		visualizersPopup = new JPopupMenu("Visualizers");
+	private JToolBar 
+		layerToolbar = new JToolBar();
 
-	private JLabel hdsLabel = new JLabel("No HDS cached");
-	private JFileChooser chooser = new JFileChooser();
+	private JLabel 
+		hdsLabel = new JLabel("No HDS cached");
+	private JFileChooser 
+		chooser = new JFileChooser();
 
-	private AdapterSet persistentAdapters = new AdapterSet(),
-			activeVolatileAdapters = new AdapterSet(),
-			volatileAdapters = new AdapterSet();
+	private AdapterSet 
+		persistentAdapters = new AdapterSet(),
+		activeVolatileAdapters = new AdapterSet(),
+		volatileAdapters = new AdapterSet();
 
-	private List<HalfedgeListener> listeners = Collections
-			.synchronizedList(new LinkedList<HalfedgeListener>());
+	private List<HalfedgeListener> 
+		listeners = Collections.synchronizedList(new LinkedList<HalfedgeListener>());
 
-	private ActionTool layerActivationTool = new ActionTool("PrimaryAction");
-	private boolean showBoundingBox = false, disableListeners = false;
-	private List<SelectionListener> selectionListeners = Collections
-			.synchronizedList(new LinkedList<SelectionListener>());
+	private ActionTool 
+		layerActivationTool = new ActionTool("PrimaryAction");
+	private boolean 
+		showBoundingBox = false, 
+		disableListeners = false;
+	private List<SelectionListener> 
+		selectionListeners = Collections.synchronizedList(new LinkedList<SelectionListener>());
 
-	private List<HalfedgeLayer> layers = new ArrayList<HalfedgeLayer>();
-	private HalfedgeLayer activeLayer = new HalfedgeLayer(this);
-	private HalfEdgeDataStructure<?, ?, ?> templateHDS = null;
+	private List<HalfedgeLayer> 
+		layers = new ArrayList<HalfedgeLayer>();
+	private HalfedgeLayer 
+		activeLayer = new HalfedgeLayer(this);
+	private HalfEdgeDataStructure<?, ?, ?> 
+		templateHDS = null;
 
-	private GeometryPreviewerPanel previewPanel = new GeometryPreviewerPanel();
+	private GeometryPreviewerPanel 
+		previewPanel = new GeometryPreviewerPanel();
 
-	private ConverterHds2Ifs converterHds2Ifs = null;
+	private ConverterHds2Ifs 
+		converterHds2Ifs = null;
 
 	public HalfedgeInterface() {
 		makeLayout();
@@ -439,7 +465,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	private class NewLayerAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		public NewLayerAction() {
 			putValue(NAME, "New Layer");
 			putValue(SMALL_ICON, ImageHook.getIcon("page_white_add.png"));
@@ -811,45 +837,50 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		}
 	}
 
-	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> void set(
-			final HDS hds) {
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void set(final HDS hds) {
 		activeLayer.set(hds);
-		updateStates();
-		clearVolatileAdapters();
-		fireDataChanged();
 	}
 
-	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> void setNoUndo(
-			final HDS hds) {
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void setNoUndo(HDS hds) {
 		activeLayer.setNoUndo(hds);
-		updateStates();
-		clearVolatileAdapters();
-		fireDataChanged();
 	}
 	
-	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> HDS get(
-			HDS hds) {
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> HDS get(HDS hds) {
 		HDS r = activeLayer.get(hds);
-		updateStates();
 		return r;
 	}
 
 	public void set(Geometry g) {
 		activeLayer.set(g);
-		updateStates();
-		clearVolatileAdapters();
-		fireDataChanged();
 	}
 
 	public HalfEdgeDataStructure<?, ?, ?> get() {
 		HalfEdgeDataStructure<?, ?, ?> r = activeLayer.get();
-		updateStates();
 		return r;
 	}
 
 	@SuppressWarnings("unchecked")
-	public <V extends Vertex<V, E, F>, E extends Edge<V, E, F>, F extends Face<V, E, F>, HDS extends HalfEdgeDataStructure<V, E, F>> HDS createEmpty(
-			HDS template) {
+	public <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> HDS createEmpty(HDS template) {
 		try {
 			return (HDS) template.getClass().newInstance();
 		} catch (Exception e) {
@@ -859,30 +890,18 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 
 	public void update() {
 		activeLayer.update();
-		updateStates();
-		checkContent();
-		fireDataChanged();
 	}
 
 	public void updateNoUndo() {
 		activeLayer.updateNoUndo();
-		updateStates();
-		checkContent();
-		fireDataChanged();
 	}
 
 	public void updateGeometry(Adapter<double[]> positionAdapter) {
 		activeLayer.updateGeometry(positionAdapter);
-		updateStates();
-		checkContent();
-		fireDataChanged();
 	}
 
 	public void updateGeometryNoUndo(Adapter<double[]> positionAdapter) {
 		activeLayer.updateGeometryNoUndo(positionAdapter);
-		updateStates();
-		checkContent();
-		fireDataChanged();
 	}
 
 	/**
@@ -974,7 +993,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		return pa || va || la;
 	}
 
-	private void clearVolatileAdapters() {
+	protected void clearVolatileAdapters() {
 		activeVolatileAdapters.clear();
 		activeVolatileAdapters.addAll(volatileAdapters);
 		volatileAdapters.clear();
