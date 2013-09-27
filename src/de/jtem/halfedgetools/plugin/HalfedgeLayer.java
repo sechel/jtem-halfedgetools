@@ -99,7 +99,7 @@ public class HalfedgeLayer implements ActionListener {
 		adapterHistory = new ArrayList<AdapterSet>();
 	private int 
 		undoIndex = -1, 
-		undoSize = 10;
+		undoSize = 20;
 
 	// layer properties
 	private boolean 
@@ -643,8 +643,9 @@ public class HalfedgeLayer implements ActionListener {
 	}
 
 	public void undo() {
-		if (!canUndo())
+		if (!canUndo()) {
 			return;
+		}
 		undoIndex--;
 		geometry = undoHistory.get(undoIndex);
 		persistentAdapters = adapterHistory.get(undoIndex);
@@ -657,8 +658,9 @@ public class HalfedgeLayer implements ActionListener {
 	}
 
 	public void redo() {
-		if (!canRedo())
+		if (!canRedo()) {
 			return;
+		}
 		undoIndex++;
 		geometry = undoHistory.get(undoIndex);
 		persistentAdapters = adapterHistory.get(undoIndex);
