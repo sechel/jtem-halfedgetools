@@ -274,8 +274,13 @@ public class HalfedgeLayer implements ActionListener {
 		}
 		// updateNoUndo();
 		DataList vData = new DoubleArrayArray.Array(posArr);
-		geometry.setVertexCountAndAttributes(COORDINATES, vData);
-		IndexedFaceSetUtility.calculateAndSetNormals(geometry);
+		IndexedFaceSet newGeometry = new IndexedFaceSet();
+		newGeometry.setVertexCountAndAttributes(geometry.getVertexAttributes());
+		newGeometry.setVertexCountAndAttributes(COORDINATES, vData);
+		newGeometry.setFaceCountAndAttributes(geometry.getFaceAttributes());
+		newGeometry.setEdgeCountAndAttributes(geometry.getEdgeAttributes());
+		IndexedFaceSetUtility.calculateAndSetNormals(newGeometry);
+		geometry = newGeometry;
 		createDisplayGeometry();
 		updateBoundingBox();
 		resetTemporaryGeometry();
