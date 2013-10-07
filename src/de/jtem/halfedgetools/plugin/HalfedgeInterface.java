@@ -10,6 +10,7 @@ import static java.awt.GridBagConstraints.BOTH;
 import static java.awt.event.InputEvent.CTRL_DOWN_MASK;
 import static javax.swing.JFileChooser.FILES_ONLY;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
 import static javax.swing.JOptionPane.PLAIN_MESSAGE;
 import static javax.swing.JOptionPane.YES_NO_OPTION;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
@@ -41,6 +42,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -67,6 +69,7 @@ import de.jreality.plugin.basic.Content.ContentChangedListener;
 import de.jreality.plugin.basic.Scene;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewMenuBar;
+import de.jreality.plugin.job.AbstractJob;
 import de.jreality.plugin.job.Job;
 import de.jreality.plugin.job.JobListener;
 import de.jreality.plugin.job.JobQueuePlugin;
@@ -531,21 +534,38 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Window w = getWindowAncestor(shrinkPanel);
-			HalfedgeLayer layer = getActiveLayer();
-			List<HalfedgeLayer> otherLayers = new LinkedList<HalfedgeLayer>(
-					layers);
+			final HalfedgeLayer layer = getActiveLayer();
+			List<HalfedgeLayer> otherLayers = new LinkedList<HalfedgeLayer>(layers);
 			otherLayers.remove(layer);
-			HalfedgeLayer[] layersArr = otherLayers
-					.toArray(new HalfedgeLayer[otherLayers.size()]);
-			HalfedgeLayer mergeLayer = (HalfedgeLayer) JOptionPane
-					.showInputDialog(w, "Merge Layer " + layer.getName(),
-							"Merge Layers", PLAIN_MESSAGE,
-							(Icon) getValue(SMALL_ICON), layersArr, layer);
-			if (mergeLayer == null)
+			HalfedgeLayer[] layersArr = otherLayers.toArray(new HalfedgeLayer[otherLayers.size()]);
+			final JList layerList = new JList(layersArr);
+			JScrollPane scroller = new JScrollPane(layerList);
+			scroller.setPreferredSize(new Dimension(200, 300));
+			
+			int r = JOptionPane.showConfirmDialog(w, scroller, "Merge Layers", OK_CANCEL_OPTION, PLAIN_MESSAGE, (Icon)getValue(SMALL_ICON));
+			if (r != JOptionPane.OK_OPTION) {
 				return;
-			mergeLayers(layer, mergeLayer);
-			updateStates();
-			checkContent();
+			}
+			
+			Job mergeJob = new AbstractJob() {
+				@Override
+				public String getJobName() {
+					return "Merge Layers";
+				}
+				@Override
+				protected void executeJob() throws Exception {
+					fireJobProgress(0.0);
+					Object[] selectedLayers = layerList.getSelectedValues();
+					double count = 0;
+					for (Object l : selectedLayers) {
+						HalfedgeLayer hl = (HalfedgeLayer)l;
+						mergeLayers(layer, hl);
+						fireJobProgress(count++ / selectedLayers.length);
+					}
+					updateStates();
+				}
+			};
+			jobQueue.queueJob(mergeJob);
 		}
 
 	}
@@ -1227,17 +1247,15 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 
 		@Override
 		public void contentChanged(ContentChangedEvent cce) {
-			if (cce.node == root || cce.node == null)
-				return; // update boomerang
+			if (cce.node == root || cce.node == null) return; // update boomerang
+			
 			final Map<HalfedgeLayer, Geometry> layersMap = new HashMap<HalfedgeLayer, Geometry>();
 			cce.node.accept(new SceneGraphVisitor() {
 				private SceneGraphPath path = new SceneGraphPath();
-				private boolean geometryFound = false;
 
 				@Override
 				public void visit(SceneGraphComponent c) {
-					if (!c.isVisible() || geometryFound)
-						return;
+					if (!c.isVisible()) return;
 					path.push(c);
 					c.childrenAccept(this);
 					path.pop();
@@ -1245,31 +1263,41 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 
 				@Override
 				public void visit(Geometry g) {
-					Transformation layerTransform = new Transformation(path
-							.getMatrix(null));
-					HalfedgeLayer layer = new HalfedgeLayer(
-							HalfedgeInterface.this);
+					Transformation layerTransform = new Transformation(path.getMatrix(null));
+					HalfedgeLayer layer = new HalfedgeLayer(HalfedgeInterface.this);
 					layer.setName(g.getName());
 					layer.setTransformation(layerTransform);
 					layersMap.put(layer, g);
-					geometryFound = true;
 				}
 			});
-			if (layersMap.isEmpty())
-				return;
-			List<HalfedgeLayer> oldLayers = new LinkedList<HalfedgeLayer>(
-					layers);
-			for (HalfedgeLayer l : layersMap.keySet()) {
-				l.set(layersMap.get(l));
-				addLayer(l);
-			}
-			for (HalfedgeLayer l : oldLayers) {
-				removeLayer(l);
-			}
-			activateLayer(layers.get(0));
-			checkContent();
-			updateStates();
-			encompassAll();
+			if (layersMap.isEmpty()) return;
+			
+			AbstractJob creteLayersJob = new AbstractJob() {
+				@Override
+				public String getJobName() {
+					return "Layer Creation";
+				}
+				@Override
+				protected void executeJob() throws Exception {
+					List<HalfedgeLayer> oldLayers = new LinkedList<HalfedgeLayer>(layers);
+					double count = 0.0;
+					for (HalfedgeLayer l : layersMap.keySet()) {
+						l.set(layersMap.get(l));
+						addLayer(l);
+						fireJobProgress(count++ / layersMap.keySet().size());
+					}
+					for (HalfedgeLayer l : oldLayers) {
+						removeLayer(l);
+					}
+					
+					activateLayer(layers.get(0));
+					checkContent();
+					updateStates();
+					encompassAll();					
+				}
+			};
+			
+			jobQueue.queueJob(creteLayersJob);
 		}
 
 	}
