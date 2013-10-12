@@ -33,6 +33,7 @@ package de.jtem.halfedgetools.util;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -47,7 +48,7 @@ import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 /**
  * Some utilities, not present in the current HalfEdgeUtils, that we need for alexandrov project
  * Feel free to add to HalfEdgeUtils, if they are considered universal.
- * @author josefsso
+ * @author josefsson, heydt
  *
  */
 public class HalfEdgeUtilsExtra {
@@ -714,6 +715,23 @@ public class HalfEdgeUtilsExtra {
 		
 		
 		return true;
+	}
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	> boolean hasBoundary(HalfEdgeDataStructure<V,E,F> hds){
+		
+		Collection<V> vlist = HalfEdgeUtils.boundaryVertices(hds);
+		Collection<E> elist = HalfEdgeUtils.boundaryEdges(hds);
+		Collection<F> flist = HalfEdgeUtils.boundaryFaces(hds);
+		
+		if (vlist.isEmpty() && elist.isEmpty() && flist.isEmpty())
+			return false;
+		
+		return true;
+		
 	}
 
 //	public static <
