@@ -9,11 +9,13 @@ import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
@@ -30,6 +32,7 @@ import de.jtem.halfedgetools.jreality.adapter.JRPositionAdapter;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
 import de.jtem.halfedgetools.jreality.node.DefaultJRVertex;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.visualizers.NodeIndexVisualizer;
 
 /**
  * Implements the ConvexHull algorithm from 
@@ -41,7 +44,9 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 public class ConvexHull {
 
 	private static Random
-		rnd = new Random();
+		rnd = new Random(0);
+	private boolean
+		deterministic = false;
 	
 	public static <
 		V extends Vertex<V, E, F>,
@@ -52,7 +57,7 @@ public class ConvexHull {
 		HDS hds,
 		AdapterSet vp
 	) { 
-		convexHull(hds, vp, 1E-8);
+		convexHull(hds, vp, 1E-8, false);
 	}
 	
 	
@@ -65,6 +70,20 @@ public class ConvexHull {
 		HDS hds,
 		AdapterSet vp,
 		double tolerance
+	) {
+		convexHull(hds, vp, 1E-8, false);
+	}
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void convexHull(
+		HDS hds,
+		AdapterSet vp,
+		double tolerance,
+		boolean deterministic
 	) { 
 		if (hds.numFaces() > 0) {
 			throw new IllegalArgumentException("HDS cannot have faces in convexHull()");
@@ -80,38 +99,39 @@ public class ConvexHull {
 		Map<V, Set<F>> pMap = new HashMap<V, Set<F>>();
 		Map<F, Plane> planeMap = new HashMap<F, Plane>();
 		
-		Set<V> initVertices = createInitialTetrahedron(hds, vp, tolerance);
+		Set<V> initVertices = createInitialTetrahedron(hds, vp, tolerance, deterministic);
 		
 		// initialize conflict graph
 		for (V v : hds.getVertices()) {
 			if (v.getIncomingEdge() != null) continue;
 			for (F f : hds.getFaces()) {
 				if (isFaceVisibleFrom(f, v, planeMap, vp, tolerance)) {
-					Set<F> conflictFaces = getConflictFaces(v, pMap);
-					Set<V> conflictVertices = getConflictVertices(f, fMap);
+					Set<F> conflictFaces = getConflictFaces(v, pMap, false);
+					Set<V> conflictVertices = getConflictVertices(f, fMap, deterministic);
 					conflictFaces.add(f);
 					conflictVertices.add(v);
 				}
 			}
 		}
 
-		Set<V> randomSet = new HashSet<V>(hds.getVertices());
+		Set<V> randomSet = createVertexSet(deterministic);
+		randomSet.addAll(hds.getVertices());
 		randomSet.removeAll(initVertices);
 		for (V pr : randomSet) {
-			Set<F> Fconflict = getConflictFaces(pr, pMap);
+			Set<F> Fconflict = getConflictFaces(pr, pMap, deterministic);
 			if (Fconflict.isEmpty()) {
 				continue;
 			}
-			Set<E> L = new HashSet<E>();
-			Set<E> deleteMe = new HashSet<E>();
+			Set<E> L = createEdgeSet(deterministic);
+			Set<E> deleteMe = createEdgeSet(deterministic);
 			Map<E, Set<V>> PconflictMap = new HashMap<E, Set<V>>();
 			for (F f : Fconflict) {
 				for (E e : HalfEdgeUtils.boundaryEdges(f)) {
 					if (!Fconflict.contains(e.getRightFace())) {
 						L.add(e);
-						Set<V> conflicts = new HashSet<V>();
-						conflicts.addAll(getConflictVertices(e.getLeftFace(), fMap));
-						conflicts.addAll(getConflictVertices(e.getRightFace(), fMap));
+						Set<V> conflicts = createVertexSet(deterministic);
+						conflicts.addAll(getConflictVertices(e.getLeftFace(), fMap, deterministic));
+						conflicts.addAll(getConflictVertices(e.getRightFace(), fMap, deterministic));
 						conflicts.remove(pr);
 						PconflictMap.put(e, conflicts);
 					} else {
@@ -181,8 +201,8 @@ public class ConvexHull {
 //				} else {
 					for (V v : PconflictMap.get(horizon)) {
 						if (isFaceVisibleFrom(f, v, planeMap, vp, tolerance)) {
-							getConflictFaces(v, pMap).add(f);
-							getConflictVertices(f, fMap).add(v);
+							getConflictFaces(v, pMap, deterministic).add(f);
+							getConflictVertices(f, fMap, deterministic).add(v);
 						}
 					}
 //				}
@@ -202,7 +222,9 @@ public class ConvexHull {
 				vertices.remove(pr);
 			}
 		}
-		for (V v : new HashSet<V>(hds.getVertices())) {
+		Set<V> vertices = createVertexSet(deterministic);
+		vertices.addAll(hds.getVertices());
+		for (V v : vertices) {
 			if (v.getIncomingEdge() == null) {
 				hds.removeVertex(v);				
 			}
@@ -216,10 +238,12 @@ public class ConvexHull {
 		F extends Face<V, E, F>
 	> Set<V> getConflictVertices(
 		F f,
-		Map<F, Set<V>> fMap
+		Map<F, Set<V>> fMap,
+		boolean deterministic
 	) {
 		if (!fMap.containsKey(f)) {
-			fMap.put(f, new HashSet<V>());
+			Set<V> vSet = createVertexSet(deterministic);
+			fMap.put(f, vSet);
 		}
 		return fMap.get(f);
 	}
@@ -231,10 +255,12 @@ public class ConvexHull {
 		F extends Face<V, E, F>
 	> Set<F> getConflictFaces(
 		V v,
-		Map<V, Set<F>> pMap
+		Map<V, Set<F>> pMap,
+		boolean deterministic
 	) {
 		if (!pMap.containsKey(v)) {
-			pMap.put(v, new HashSet<F>());
+			Set<F> fSet = createFaceSet(deterministic);
+			pMap.put(v, fSet);
 		}
 		return pMap.get(v);
 	}
@@ -289,9 +315,10 @@ public class ConvexHull {
 	> Set<V> createInitialTetrahedron(
 		HDS hds,
 		AdapterSet pos,
-		double tolerance
+		double tolerance,
+		boolean deterministic
 	) {
-		 Set<V> result = new HashSet<V>();
+		 Set<V> result = createVertexSet(deterministic);
 		 V v1 = hds.getVertex(rnd.nextInt(hds.numVertices()));
 		 double[] v1p = pos.getD(Position3d.class, v1);
 		 V v2 = null;
@@ -341,6 +368,56 @@ public class ConvexHull {
 		 return result;
 	}
 	
+	private static <
+		V extends Vertex<V, ?, ?>
+	> Set<V> createVertexSet(boolean deterministic) {
+		if (deterministic) {
+			return new TreeSet<V>(new Comparator<V>() {
+				@Override
+				public int compare(V v1, V v2) {
+					return v1.getIndex() - v2.getIndex();
+				}
+			});
+		} else {
+			return new HashSet<V>();
+		}
+	}
+	private static <
+		E extends Edge<?, E, ?>
+	> Set<E> createEdgeSet(boolean deterministic) {
+		if (deterministic) {
+			return new TreeSet<E>(new Comparator<E>() {
+				@Override
+				public int compare(E e1, E e2) {
+					return e1.getIndex() - e2.getIndex();
+				}
+			});
+		} else {
+			return new HashSet<E>();
+		}
+	}
+	private static <
+		F extends Face<?, ?, F>
+	> Set<F> createFaceSet(boolean deterministic) {
+		if (deterministic) {
+			return new TreeSet<F>(new Comparator<F>() {
+				@Override
+				public int compare(F f1, F f2) {
+					return f1.getIndex() - f2.getIndex();
+				}
+			});
+		} else {
+			return new HashSet<F>();
+		}
+	}	
+	
+	
+	public boolean isDeterministic() {
+		return deterministic;
+	}
+	public void setDeterministic(boolean deterministic) {
+		this.deterministic = deterministic;
+	}
 	
 	
 	private static class Plane {
@@ -384,11 +461,10 @@ public class ConvexHull {
 	
 	
 	
-	
 	public static void main(String[] args) {
 		// Construction of an error
 		DefaultJRHDS hds = new DefaultJRHDS();
-		int numPoints = 50;
+		int numPoints = 10;
 		
 		Matrix T = MatrixBuilder.euclidean().rotate(0.3, 1, 1, 1).getMatrix();
 		
@@ -404,7 +480,7 @@ public class ConvexHull {
 
 		AdapterSet a = AdapterSet.createGenericAdapters();
 		a.add(new JRPositionAdapter());
-		convexHull(hds, a, 1E-15);
+		convexHull(hds, a, 1E-15, true);
 		
 		System.out.println(HalfEdgeUtils.getGenus(hds));
 		
@@ -412,15 +488,9 @@ public class ConvexHull {
 		v.addContentUI();
 		v.addBasicUI();
 		v.registerPlugin(HalfedgeInterface.class);
+		v.registerPlugin(NodeIndexVisualizer.class);
 		v.startup();
 		v.getPlugin(HalfedgeInterface.class).set(hds);
 	}
-	
-	
-	
-	
-	
-	
-	
 	
 }
