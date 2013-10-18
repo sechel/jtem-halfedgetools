@@ -43,8 +43,6 @@ import de.jtem.halfedgetools.plugin.visualizers.NodeIndexVisualizer;
  */
 public class ConvexHull {
 
-	private static Random
-		rnd = new Random(0);
 	private boolean
 		deterministic = false;
 	
@@ -94,12 +92,12 @@ public class ConvexHull {
 		if (hds.numVertices() < 4) {
 			throw new IllegalArgumentException("HDS must have at least 4 points in convexHull()");
 		}
-		
+		Random rnd = new Random(0);
 		Map<F, Set<V>> fMap = new HashMap<F, Set<V>>();
 		Map<V, Set<F>> pMap = new HashMap<V, Set<F>>();
 		Map<F, Plane> planeMap = new HashMap<F, Plane>();
 		
-		Set<V> initVertices = createInitialTetrahedron(hds, vp, tolerance, deterministic);
+		Set<V> initVertices = createInitialTetrahedron(hds, vp, tolerance, deterministic, rnd);
 		
 		// initialize conflict graph
 		for (V v : hds.getVertices()) {
@@ -316,7 +314,8 @@ public class ConvexHull {
 		HDS hds,
 		AdapterSet pos,
 		double tolerance,
-		boolean deterministic
+		boolean deterministic,
+		Random rnd
 	) {
 		 Set<V> result = createVertexSet(deterministic);
 		 V v1 = hds.getVertex(rnd.nextInt(hds.numVertices()));
