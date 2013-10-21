@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry excluding="de/jtem/halfedgetools/plugin/HalfedgeSubdivisonPlugin.java|de/jtem/halfedgetools/plugin/HalfedgeConnectorPlugin.java|de/jtem/halfedgetools/plugin/algorithm/subdivision/AdaptiveSubdivisonPlugin.java" kind="src" path="src"/>
 	<classpathentry kind="src" path="src-test"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="lib/xstream/xpp3-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="lib/xstream/xstream-1.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/mtjoptimization/mjtOptimization.jar"/>
