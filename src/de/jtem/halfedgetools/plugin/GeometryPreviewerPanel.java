@@ -45,13 +45,14 @@ import de.jreality.scene.Transformation;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
+import de.jreality.util.SystemProperties;
 
 public class GeometryPreviewerPanel extends JPanel implements PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
 	
 	private	JRViewer 
-		viewer = new JRViewer(true);
+		viewer = null;
 	private Appearance
 		contentApp = new Appearance(),
 		rootApp = null;
@@ -59,6 +60,13 @@ public class GeometryPreviewerPanel extends JPanel implements PropertyChangeList
 	public GeometryPreviewerPanel() {
 		setLayout(new GridLayout());
 		setPreferredSize(new Dimension(300, 300));
+		
+		// setup viewer, inject viewer system property
+		String oldViewerProperty = System.getProperty(SystemProperties.VIEWER); 
+		System.setProperty(SystemProperties.VIEWER, SystemProperties.VIEWER_DEFAULT_JOGL);
+		viewer = new JRViewer(true);
+		System.setProperty(SystemProperties.VIEWER, oldViewerProperty);
+		
 		viewer.getController().setPropertyEngineEnabled(false);
 		viewer.addContentSupport(ContentType.Raw);
 		viewer.addContentUI();
