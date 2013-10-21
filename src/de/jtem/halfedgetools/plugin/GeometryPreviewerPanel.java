@@ -65,7 +65,9 @@ public class GeometryPreviewerPanel extends JPanel implements PropertyChangeList
 		String oldViewerProperty = System.getProperty(SystemProperties.VIEWER); 
 		System.setProperty(SystemProperties.VIEWER, SystemProperties.VIEWER_DEFAULT_JOGL);
 		viewer = new JRViewer(true);
-		System.setProperty(SystemProperties.VIEWER, oldViewerProperty);
+		if (oldViewerProperty != null) {
+			System.setProperty(SystemProperties.VIEWER, oldViewerProperty);
+		}
 		
 		viewer.getController().setPropertyEngineEnabled(false);
 		viewer.addContentSupport(ContentType.Raw);
