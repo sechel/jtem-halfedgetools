@@ -40,4 +40,23 @@ public class TriangulatorTest {
 		Assert.assertTrue(splitSet.contains(v2));
 	}
 	
+	@Test
+	public void testTriangulateByCuttingCorners() throws Exception {
+		DefaultJRHDS hds = new DefaultJRHDS();
+		DefaultJRFace f = HalfEdgeUtils.addNGon(hds, 4);
+		AdapterSet a = AdapterSet.createGenericAdapters();
+		a.add(new JRPositionAdapter());
+		DefaultJRVertex v0 = hds.getVertex(0);
+		DefaultJRVertex v1 = hds.getVertex(1);
+		DefaultJRVertex v2 = hds.getVertex(2);
+		DefaultJRVertex v3 = hds.getVertex(3);
+		a.set(Position.class, v0, new double[] {0, 0});
+		a.set(Position.class, v1, new double[] {1, 0});
+		a.set(Position.class, v2, new double[] {0, 1});
+		a.set(Position.class, v3, new double[] {-1, 0});
+		
+		Triangulator.triangulateByCuttingCorners(f, a);
+		Assert.assertEquals(3, HalfEdgeUtils.boundaryVertices(f).size());
+	}
+	
 }

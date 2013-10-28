@@ -138,8 +138,7 @@ public class Triangulator {
 			newEdges.add(newEdge);
 			newEdges.add(newEdge.getOppositeEdge());
 		}
-		numVerts = HalfEdgeUtils.boundaryVertices(f).size();
-		assert numVerts == 3 : "the input face is triangle";
+		assert HalfEdgeUtils.boundaryVertices(f).size() == 3 : "the input face is triangle";
 		assert numFaces + numVerts - 3 == hds.numFaces() : "number of faces has increased by the number of face vertices - 3";
 		return newEdges;
 	}
