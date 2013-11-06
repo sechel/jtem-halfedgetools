@@ -166,11 +166,27 @@ public class Delaunay {
 	}
 	
 	
+	/**
+	 * Constructs the delaunay triangulation of the given structure.
+	 * @param graph must be a triangulation
+	 * @throws TriangulationException if the given graph is no triangulation or 
+	 * if the trangle inequation doesn't hold for some triangle
+	 * @return The new delaunay edge lengths as adapter
+	 */	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> MappedLengthAdapter constructDelaunay(HDS graph, AdapterSet a) throws TriangulationException {
+		return constructDelaunay(graph, graph.getEdges(), a);
+	}
 	
 	
 	/**
 	 * Constructs the delaunay triangulation of the given structure.
 	 * @param graph must be a triangulation
+	 * @param edges the set of edges that can be flipped, all other edges stay untouched
 	 * @throws TriangulationException if the given graph is no triangulation or 
 	 * if the trangle inequation doesn't hold for some triangle
 	 * @return The new delaunay edge lengths as adapter
@@ -180,7 +196,7 @@ public class Delaunay {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> MappedLengthAdapter constructDelaunay(HDS graph, AdapterSet a) throws TriangulationException{
+	> MappedLengthAdapter constructDelaunay(HDS graph, List<E> flippableEdges, AdapterSet a) throws TriangulationException {
 		if (!ConsistencyCheck.isTriangulation(graph)) {
 			throw new TriangulationException("Graph is no triangulation!");
 		}
@@ -188,10 +204,15 @@ public class Delaunay {
 		a.add(la);
 		HashSet<E> markSet = new HashSet<E>();
 		Stack<E> stack = new Stack<E>();
-		for (E positiveEdge : graph.getPositiveEdges()){
-			if (isBoundaryEdge(positiveEdge)) continue;
-			markSet.add(positiveEdge);
-			stack.push(positiveEdge);
+		for (E e : graph.getPositiveEdges()){
+			boolean flippable = false;
+			flippable |= flippableEdges.contains(e);
+			flippable |= flippableEdges.contains(e.getOppositeEdge());
+			if (isBoundaryEdge(e) || !flippable){
+				continue;
+			}
+			markSet.add(e);
+			stack.push(e);
 		}
 		while (!stack.isEmpty()) {
 			E ab = stack.pop();
@@ -199,7 +220,10 @@ public class Delaunay {
 			if (!isDelaunay(ab, a)){
 				flip(ab, a);
 				for (E xy : getPositiveKiteBorder(ab)){
-					if (!markSet.contains(xy)){
+					boolean flippable = false;
+					flippable |= flippableEdges.contains(xy);
+					flippable |= flippableEdges.contains(xy.getOppositeEdge());
+					if (!markSet.contains(xy) && flippable){
 						markSet.add(xy);
 						stack.push(xy);
 					}
