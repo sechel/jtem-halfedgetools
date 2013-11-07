@@ -233,18 +233,17 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	}
 
 	protected void fireSelectionChanged(final HalfedgeSelection sel) {
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				synchronized (selectionListeners) {
-					for (SelectionListener l : selectionListeners) {
+		synchronized (selectionListeners) {
+			for (final SelectionListener l : selectionListeners) {
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
 						l.selectionChanged(sel, HalfedgeInterface.this);
 					}
-				}
-
+				};
+				EventQueue.invokeLater(r);
 			}
-		};
-		EventQueue.invokeLater(r);
+		}
 	}
 
 	private class LayerModel extends DefaultTableModel {
@@ -1310,8 +1309,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		listeners.remove(l);
 	}
 
-	protected void fireActiveLayerChanged(final HalfedgeLayer old,
-			final HalfedgeLayer active) {
+	protected void fireActiveLayerChanged(final HalfedgeLayer old, final HalfedgeLayer active) {
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
@@ -1327,63 +1325,59 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	}
 
 	protected void fireDataChanged() {
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				synchronized (listeners) {
-					for (HalfedgeListener l : new LinkedList<HalfedgeListener>(
-							listeners)) {
+		synchronized (listeners) {
+			for (final HalfedgeListener l : listeners) {
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
 						l.dataChanged(getActiveLayer());
 					}
-				}
+				};
+				EventQueue.invokeLater(r);
 			}
-		};
-		EventQueue.invokeLater(r);
+		}
 	}
 
 	protected void fireAdaptersChanged() {
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				synchronized (listeners) {
-					for (HalfedgeListener l : new LinkedList<HalfedgeListener>(
-							listeners)) {
+		synchronized (listeners) {
+			for (final HalfedgeListener l : listeners) {
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
 						l.adaptersChanged(getActiveLayer());
 					}
-				}
+				};
+				EventQueue.invokeLater(r);
 			}
-		};
-		EventQueue.invokeLater(r);
+		}
 	}
 
 	protected void fireLayerAdded(final HalfedgeLayer layer) {
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				synchronized (listeners) {
-					for (HalfedgeListener l : new LinkedList<HalfedgeListener>(
-							listeners)) {
+		synchronized (listeners) {
+			for (final HalfedgeListener l : listeners) {
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
 						l.layerCreated(layer);
 					}
-				}
+				};
+				EventQueue.invokeLater(r);
 			}
-		};
-		EventQueue.invokeLater(r);
+		}
 	}
 
 	protected void fireLayerRemoved(final HalfedgeLayer layer) {
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				synchronized (listeners) {
-					for (HalfedgeListener l : new LinkedList<HalfedgeListener>(
-							listeners)) {
+		synchronized (listeners) {
+			for (final HalfedgeListener l : listeners) {
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
 						l.layerRemoved(layer);
 					}
-				}
+				};
+				EventQueue.invokeLater(r);
 			}
-		};
-		EventQueue.invokeLater(r);
+		}
 	}
 
 	public HalfedgeSelection getSelection() {

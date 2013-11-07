@@ -49,9 +49,13 @@ import de.jtem.jrworkspace.plugin.simplecontroller.widget.SplashScreen;
 public class JRHalfedgeViewer {
 	
 	public static void initHalfedgeFronted() {
+		initHalfedgeFronted(false);
+	}
+	
+	public static void initHalfedgeFronted(boolean useGLJPanel) {
 		boolean overlaysSupported = false;
 		try {
-			overlaysSupported = supportsOverlay();
+			overlaysSupported = useGLJPanel && supportsOverlay();
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
@@ -68,7 +72,6 @@ public class JRHalfedgeViewer {
 				SystemProperties.VIEWER_DEFAULT_JOGL + " " + 
 				SystemProperties.VIEWER_DEFAULT_SOFT
 			);
-			System.err.println("Halfedge widget overlays not supported.");
 		}
 		UIManager.getDefaults().put("Slider.paintValue", false);
 	}
