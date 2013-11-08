@@ -53,6 +53,9 @@ public class JRHalfedgeViewer {
 	}
 	
 	public static void initHalfedgeFronted(boolean useGLJPanel) {
+		if (!useGLJPanel) {
+			supportsOverlay = false;
+		}
 		boolean overlaysSupported = false;
 		try {
 			overlaysSupported = useGLJPanel && supportsOverlay();
