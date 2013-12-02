@@ -100,7 +100,7 @@ public class DiscreteDifferentialOperators
 					dualVolume += h;
 				}
 				dualVolume += EPS;
-				int ei = adapters.get(EdgeIndex.class, e, Integer.class);
+				int ei = (int) adapters.get(EdgeIndex.class, e, Integer.class);
 				s1.set(ei,ei,dualVolume/primalVolume);
 			}
 			return s1;
@@ -279,7 +279,7 @@ public class DiscreteDifferentialOperators
 					List<E> 
 						tInEdges = HalfEdgeUtils.incomingEdges(e.getTargetVertex()),
 						sInEdges = HalfEdgeUtils.incomingEdges(e.getStartVertex());
-					int eIndex = adapters.get(EdgeIndex.class, e, Integer.class);
+					int eIndex = (int)adapters.get(EdgeIndex.class, e, Integer.class);
 					nz[eIndex] = new int[tInEdges.size()+sInEdges.size()-1];
 					
 					nz[eIndex][0] = eIndex;
@@ -352,13 +352,13 @@ public class DiscreteDifferentialOperators
 		{
 			int[][] nz = new int[heds.numEdges()/2][2];
 			for(E e : heds.getPositiveEdges()) {
-				int j = adapters.get(EdgeIndex.class,e,Integer.class);
+				int j = (int) adapters.get(EdgeIndex.class,e,Integer.class);
 				nz[j][0] = e.getStartVertex().getIndex();
 				nz[j][1] = e.getTargetVertex().getIndex();
 			}
 			CompColMatrix d0 = new CompColMatrix(heds.numVertices(), heds.numEdges()/2, nz);
 			for(E e : heds.getPositiveEdges()) {
-				int j = adapters.get(EdgeIndex.class,e,Integer.class);
+				int j = (int)adapters.get(EdgeIndex.class,e,Integer.class);
 				d0.set(e.getStartVertex().getIndex(),j,-1.0);
 				d0.set(e.getTargetVertex().getIndex(),j,1.0);
 			}
@@ -373,7 +373,7 @@ public class DiscreteDifferentialOperators
 				nz[j] = new int[edges.size()];
 				int i = 0;
 				for(E e : edges) {
-					int ei = adapters.get(EdgeIndex.class,e,Integer.class);
+					int ei = (int)adapters.get(EdgeIndex.class,e,Integer.class);
 					nz[j][i] = ei;
 					i++;
 				}
@@ -384,7 +384,7 @@ public class DiscreteDifferentialOperators
 				E e = f.getBoundaryEdge();
 				do {
 					double val = e.isPositive()?1.0:-1.0;
-					int ei = adapters.get(EdgeIndex.class,e,Integer.class);
+					int ei = (int)adapters.get(EdgeIndex.class,e,Integer.class);
 					d1.set(ei,j,val);
 					e = e.getNextEdge();
 				} while(e != f.getBoundaryEdge());

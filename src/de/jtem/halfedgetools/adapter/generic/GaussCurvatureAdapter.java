@@ -45,7 +45,7 @@ public class GaussCurvatureAdapter extends AbstractAdapter<Double> {
 			dualPath.add(e);
 			e = e.getNextEdge().getOppositeEdge();
 		} while(e != v.getIncomingEdge());
-		double angle = AngleUtilities.calculateRotationAngle(dualPath,a);
+		double angle = (double)AngleUtilities.calculateRotationAngle(dualPath,a);
 		return 2*Math.PI-Math.abs(angle);
 	}
 	

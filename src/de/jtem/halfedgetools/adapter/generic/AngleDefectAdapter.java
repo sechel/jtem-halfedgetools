@@ -49,9 +49,9 @@ public class AngleDefectAdapter extends AbstractAdapter<Double> {
 		if(!angleDefectMap.containsKey(e)) {
 			double angleDefect = 0.0;
 			if(!e.isPositive()) {
-				angleDefect = calculateAngleDefect(e.getOppositeEdge(),a);
+				angleDefect = (double)calculateAngleDefect(e.getOppositeEdge(),a);
 			} else {
-				angleDefect = calculateAngleDefect(e,a);
+				angleDefect = (double)calculateAngleDefect(e,a);
 			}
 			double sign = (e.isPositive())?1.0:-1.0;
 			angleDefectMap.put(e,sign*angleDefect);
