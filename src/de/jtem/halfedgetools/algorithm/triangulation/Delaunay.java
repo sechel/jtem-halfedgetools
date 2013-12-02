@@ -135,8 +135,8 @@ public class Delaunay {
 		V v4 = b1.getTargetVertex();
 
 		// new length
-		double la2 = a.get(Length.class, a2, Double.class);
-		double lb1 = a.get(Length.class, b1, Double.class);
+		double la2 = (double) a.get(Length.class, a2, Double.class);
+		double lb1 = (double) a.get(Length.class, b1, Double.class);
 		double alpha = getAngle(e, a) + getAngle(a2, a);
 		double flipLength = sqrt(la2*la2 + lb1*lb1 - 2*lb1*la2*cos(alpha));
 		
