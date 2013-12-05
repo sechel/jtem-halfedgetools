@@ -35,6 +35,10 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 
+/**
+ * @author Stefan Sechelmann, Andre Heydt 
+ */
+
 public class HalfedgeSelection {
 	
 	private Color defaultColor = Color.RED;
@@ -321,8 +325,8 @@ public class HalfedgeSelection {
 			edgeIndices[index/2 - 1][1] = index - 1;
 			Color ec = eMap.get(e);
 			eColors[i] = ec.getRGBColorComponents(null);
-			edgeColors[i] = new double[]{(double)eColors[index][0],
-					(double)eColors[index][1],(double)eColors[index][2]};
+			edgeColors[i] = new double[]{(double)eColors[i][0],
+					(double)eColors[i][1],(double)eColors[i][2]};
 			i++;
 		}
 		IndexedLineSetFactory lsf = new IndexedLineSetFactory();

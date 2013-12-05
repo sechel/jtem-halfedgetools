@@ -19,6 +19,11 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 
+/**
+ * @author Andre Heydt
+ * 
+ */
+
 public class SelectionColor extends AlgorithmDialogPlugin {
 	
 	private JPanel panel;
