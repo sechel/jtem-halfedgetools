@@ -36,7 +36,7 @@ public class BoundaryFaceSelection extends AlgorithmPlugin {
 		for (F f : hds.getFaces()){
 			if (!HalfEdgeUtils.isInteriorFace(f)) {
 				boolean selected = sel.isSelected(f);
-				sel.setSelected(f, !selected);
+				sel.setSelected(f, !selected, hcp.getSelectionColor());
 			}
 		}
 		hcp.setSelection(sel);

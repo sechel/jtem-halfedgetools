@@ -302,18 +302,18 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		
 		if(e.isShiftDown()){
 			for (Vertex<?,?,?> v : marqeeVertices) {
-				sel.setSelected(v, true);
+				sel.setSelected(v, true, hif.getSelectionColor());
 			}
 		}
 		if(e.isAltDown()){
 			for(Edge<?,?,?> edge : getMarqueeEdges(marqeeVertices)){
-				sel.setSelected(edge, true);
+				sel.setSelected(edge, true, hif.getSelectionColor());
 			}
 		}
 		
 		if(e.isControlDown()){
 			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
-				sel.setSelected(face, true);
+				sel.setSelected(face, true, hif.getSelectionColor());
 			}
 		}	
 		sel.addAll(startSelection.getNodes());
@@ -356,17 +356,17 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		contentTools.setDragEnabled(true);
 		if (e.isShiftDown()) {
 			for (Vertex<?,?,?> v : marqeeVertices) {
-				sel.setSelected(v, true);
+				sel.setSelected(v, true, hif.getSelectionColor());
 			}
 		}
 		if (e.isAltDown()){
 			for(Edge<?,?,?> edge : getMarqueeEdges(marqeeVertices)){
-				sel.setSelected(edge, true);
+				sel.setSelected(edge, true, hif.getSelectionColor());
 			}
 		}
 		if (e.isControlDown()){
 			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
-				sel.setSelected(face, true);
+				sel.setSelected(face, true, hif.getSelectionColor());
 			}
 		}
 		sel.addAll(startSelection.getNodes());

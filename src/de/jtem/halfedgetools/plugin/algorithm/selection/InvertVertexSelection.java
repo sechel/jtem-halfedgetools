@@ -34,7 +34,7 @@ public class InvertVertexSelection extends AlgorithmPlugin {
 		HalfedgeSelection sel = hcp.getSelection();
 		for (V v : hds.getVertices()){
 			boolean selected = sel.isSelected(v);
-			sel.setSelected(v, !selected);
+			sel.setSelected(v, !selected, hcp.getSelectionColor());
 		}
 		hcp.setSelection(sel);
 	}

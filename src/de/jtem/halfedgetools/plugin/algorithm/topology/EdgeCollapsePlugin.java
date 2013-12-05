@@ -42,7 +42,7 @@ public class EdgeCollapsePlugin extends AlgorithmPlugin {
 			V v = TopologyAlgorithms.collapseEdge(e);
 			a.set(Position.class, v, p);
 			a.set(TexturePosition.class, v, tp);
-			s.setSelected(v, true);
+			s.setSelected(v, true, hcp.getSelectionColor());
 		}
 		hcp.setSelection(s);
 		hcp.update();

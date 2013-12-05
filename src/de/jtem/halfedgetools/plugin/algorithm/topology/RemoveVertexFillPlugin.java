@@ -64,7 +64,7 @@ public class RemoveVertexFillPlugin extends AlgorithmPlugin {
 		HalfedgeSelection s = new HalfedgeSelection();
 		for (V v : vertices) {
 			F f = TopologyAlgorithms.removeVertexFill(v);
-			s.setSelected(f, true);
+			s.setSelected(f, true, hi.getSelectionColor());
 		}
 		hi.update();
 		hi.setSelection(s);

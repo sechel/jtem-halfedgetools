@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.plugin.algorithm.selection;
 
+import java.awt.Color;
 import java.awt.Window;
 import java.io.File;
 import java.io.FileReader;
@@ -90,19 +91,19 @@ public class ImportSelection extends AlgorithmPlugin implements UIFlavor {
 			for (int vi : indices[0]) {
 				if (vi < hds.numVertices()) {
 					Vertex<?,?,?> vertex = hds.getVertex(vi);
-					sel.setSelected(vertex, true);
+					sel.setSelected(vertex, true, Color.RED);
 				}
 			}
 			for (int ei : indices[1]) {
 				if (ei < hds.numEdges()) {
 					Edge<?,?,?> edge = hds.getEdge(ei);
-					sel.setSelected(edge, true);
+					sel.setSelected(edge, true, Color.RED);
 				}
 			}
 			for (int fi : indices[2]) {
 				if (fi < hds.numFaces()) {
 					Face<?,?,?> face = hds.getFace(fi);
-					sel.setSelected(face, true);
+					sel.setSelected(face, true, Color.RED);
 				}
 			}
 			hcp.setSelection(sel);

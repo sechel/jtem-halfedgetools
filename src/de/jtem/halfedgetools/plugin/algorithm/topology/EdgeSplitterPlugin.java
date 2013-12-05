@@ -31,6 +31,7 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
+import java.awt.Color;
 import java.awt.event.InputEvent;
 import java.util.LinkedList;
 import java.util.List;
@@ -76,10 +77,11 @@ public class EdgeSplitterPlugin extends AlgorithmPlugin {
 				V v = TopologyAlgorithms.splitEdge(e);
 				a.set(Position.class, v, p);
 				a.set(TexturePosition.class, v, tp);
-				s.setSelected(v, true);
+				Color color = hif.getSelectionColor();
+				s.setSelected(v, true, color);
 				for(E ae : HalfEdgeUtils.incomingEdges(v)) {
-					s.setSelected(ae, true);
-					s.setSelected(ae.getOppositeEdge(), true);
+					s.setSelected(ae, true, color);
+					s.setSelected(ae.getOppositeEdge(), true, color);
 				}
 			}
 			

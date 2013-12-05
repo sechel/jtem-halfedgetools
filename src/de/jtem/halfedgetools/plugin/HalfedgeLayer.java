@@ -360,18 +360,22 @@ public class HalfedgeLayer implements ActionListener {
 		hds = template;
 		convertFaceSet();
 		// convert selection
+		Color col;
 		HalfedgeSelection newSelection = new HalfedgeSelection();
 		for (Vertex<?, ?, ?> v : selection.getVertices()) {
 			Vertex<?, ?, ?> nv = hds.getVertex(v.getIndex());
-			newSelection.setSelected(nv, true);
+			col = selection.getColor(v);
+			newSelection.setSelected(nv, true, col);
 		}
 		for (Edge<?, ?, ?> e : selection.getEdges()) {
 			Edge<?, ?, ?> ne = hds.getEdge(e.getIndex());
-			newSelection.setSelected(ne, true);
+			col = selection.getColor(e);
+			newSelection.setSelected(ne, true, col);
 		}
 		for (Face<?, ?, ?> f : selection.getFaces()) {
 			Face<?, ?, ?> nf = hds.getFace(f.getIndex());
-			newSelection.setSelected(nf, true);
+			col = selection.getColor(f);
+			newSelection.setSelected(nf, true, col);
 		}
 		selection = newSelection;
 		hif.updateStates();
@@ -552,14 +556,14 @@ public class HalfedgeLayer implements ActionListener {
 			int index = pr.getIndex();
 			if (index < 0)
 				return;
-
+			Color color = hif.getSelectionColor();
 			switch (pr.getPickType()) {
 			case PickResult.PICK_TYPE_POINT:
 				if (hds.numVertices() <= index)
 					return;
 				Vertex<?, ?, ?> v = hds.getVertex(index);
 				boolean selected = selection.isSelected(v);
-				selection.setSelected(v, !selected);
+				selection.setSelected(v, !selected, color);
 				break;
 			case PickResult.PICK_TYPE_LINE:
 				Edge<?, ?, ?> e = edgeMap.get(index);
@@ -568,16 +572,16 @@ public class HalfedgeLayer implements ActionListener {
 					return;
 				}
 				selected = selection.isSelected(e);
-				selection.setSelected(e, !selected);
+				selection.setSelected(e, !selected, color);
 				selected = selection.isSelected(e.getOppositeEdge());
-				selection.setSelected(e.getOppositeEdge(), !selected);
+				selection.setSelected(e.getOppositeEdge(), !selected, color);
 				break;
 			case PickResult.PICK_TYPE_FACE:
 				if (hds.numFaces() <= index)
 					return;
 				Face<?, ?, ?> f = hds.getFace(index);
 				selected = selection.isSelected(f);
-				selection.setSelected(f, !selected);
+				selection.setSelected(f, !selected, color);
 				break;
 			default:
 				return;

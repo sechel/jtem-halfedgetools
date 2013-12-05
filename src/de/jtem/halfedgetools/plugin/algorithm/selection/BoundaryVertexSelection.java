@@ -36,7 +36,7 @@ public class BoundaryVertexSelection extends AlgorithmPlugin {
 		for (V v : hds.getVertices()){
 			if (HalfEdgeUtils.isBoundaryVertex(v)) {
 				boolean selected = sel.isSelected(v);
-				sel.setSelected(v, !selected);
+				sel.setSelected(v, !selected, hcp.getSelectionColor());
 			}
 		}
 		hcp.setSelection(sel);

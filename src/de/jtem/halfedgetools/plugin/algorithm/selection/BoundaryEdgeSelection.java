@@ -43,7 +43,7 @@ public class BoundaryEdgeSelection extends AlgorithmPlugin {
 		for (E e : hds.getEdges()){
 			if (HalfEdgeUtils.isBoundaryEdge(e)) {
 				boolean selected = sel.isSelected(e);
-				sel.setSelected(e, !selected);
+				sel.setSelected(e, !selected, hcp.getSelectionColor());
 			}
 		}
 		hcp.setSelection(sel);

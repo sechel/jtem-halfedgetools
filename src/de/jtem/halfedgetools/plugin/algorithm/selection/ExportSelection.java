@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.plugin.algorithm.selection;
 
+import java.awt.Color;
 import java.awt.Window;
 import java.io.File;
 import java.io.FileWriter;
@@ -79,22 +80,33 @@ public class ExportSelection extends AlgorithmPlugin implements UIFlavor {
 		File file = selChooser.getSelectedFile();
 		HalfedgeSelection sel = hcp.getSelection();
 		int[] vIndices = new int[sel.getVertices().size()];
+		Color[] vColors = new Color[sel.getFaces().size()];
 		int[] eIndices = new int[sel.getEdges().size()];
+		Color[] eColors = new Color[sel.getFaces().size()];
 		int[] fIndices = new int[sel.getFaces().size()];
+		Color[] fColors = new Color[sel.getFaces().size()];
 		int i = 0;
 		for (Vertex<?,?,?> vertex : sel.getVertices()) {
-			vIndices[i++] = vertex.getIndex();
+			vIndices[i] = vertex.getIndex();
+			vColors[i] = sel.getColor(vertex);
+			i++;
 		}
 		i = 0;
 		for (Edge<?,?,?> edge : sel.getEdges()) {
-			eIndices[i++] = edge.getIndex();
+			eIndices[i] = edge.getIndex();
+			eColors[i]= sel.getColor(edge);
+			i++;
 		}
 		i = 0;
 		for (Face<?,?,?> face : sel.getFaces()) {
-			fIndices[i++] = face.getIndex();
+			fIndices[i] = face.getIndex();
+			fColors[i] = sel.getColor(face);
+			i++;
 		}
 		int[][] indices = {vIndices, eIndices, fIndices};
+//		Color[][] colors = {vColors, eColors, fColors};
 		String selXML = xstream.toXML(indices);
+//		selXML += xstream.toXML(colors);
 		try {
 			FileWriter fw = new FileWriter(file);
 			fw.write(selXML);

@@ -34,7 +34,7 @@ public class ClearVertexSelection extends AlgorithmPlugin {
 		HalfedgeSelection sel = hcp.getSelection();
 		
 		for (V v : sel.getVertices(hds)){		
-				sel.setSelected(v,false);			
+				sel.remove(v);			
 		}
 		hcp.setSelection(sel);
 	}

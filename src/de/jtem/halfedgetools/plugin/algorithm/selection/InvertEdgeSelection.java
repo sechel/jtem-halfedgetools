@@ -34,7 +34,7 @@ public class InvertEdgeSelection extends AlgorithmPlugin {
 		HalfedgeSelection sel = hcp.getSelection();
 		for (E e : hds.getEdges()){
 			boolean selected = sel.isSelected(e);
-			sel.setSelected(e, !selected);
+			sel.setSelected(e, !selected, hcp.getSelectionColor());
 		}
 		hcp.setSelection(sel);
 	}

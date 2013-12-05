@@ -76,8 +76,8 @@ public class CornerVertexSelection extends AlgorithmDialogPlugin implements Chan
 		HDS extends HalfEdgeDataStructure<V, E, F>
 		> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
 		HalfedgeSelection sel = hcp.getSelection();
-		for(V v : selectCorners(hds, a).getVertices(hds)){
-			sel.setSelected(v,true);
+		for(V v : selectCorners(hcp, hds, a).getVertices(hds)){
+			sel.setSelected(v,true, hcp.getSelectionColor());
 		}
 		hcp.setSelection(sel);
 
@@ -117,7 +117,7 @@ public class CornerVertexSelection extends AlgorithmDialogPlugin implements Chan
 		if(oldSelection == null) {
 			oldSelection = hcp.getSelection();
 		}
-		HalfedgeSelection cornerSel = selectCorners(hcp.get(), hcp.getAdapters());
+		HalfedgeSelection cornerSel = selectCorners(hcp, hcp.get(), hcp.getAdapters());
 		hcp.setSelection(cornerSel);
 	}
 
@@ -126,7 +126,7 @@ public class CornerVertexSelection extends AlgorithmDialogPlugin implements Chan
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> HalfedgeSelection selectCorners(HDS hds, AdapterSet a) {
+	> HalfedgeSelection selectCorners(HalfedgeInterface hi, HDS hds, AdapterSet a) {
 		HalfedgeSelection selCorners = new HalfedgeSelection();
 		double eps = Math.PI / ratioPiModel.getNumber().intValue();
 		
@@ -139,7 +139,7 @@ public class CornerVertexSelection extends AlgorithmDialogPlugin implements Chan
 			Rn.add(u, a.get(Position.class, e.getStartVertex(), double[].class), n);
 			Rn.add(w, a.get(Position.class, e.getNextEdge().getTargetVertex(), double[].class), n);
 			if(Math.abs(Rn.euclideanAngle(u, w)-Math.PI) > eps){
-				selCorners.setSelected(e.getTargetVertex(), true);
+				selCorners.setSelected(e.getTargetVertex(), true, hi.getSelectionColor());
 			}
 		}
 		

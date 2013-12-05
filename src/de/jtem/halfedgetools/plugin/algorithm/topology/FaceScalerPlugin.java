@@ -94,7 +94,7 @@ public class FaceScalerPlugin extends AlgorithmPlugin {
 				a.set(TexturePosition.class, v, newTexPos);
 				i++;
 			}
-			s.setSelected(f, true);
+			s.setSelected(f, true, hif.getSelectionColor());
 		}
 		hif.setSelection(s);
 		hif.update();

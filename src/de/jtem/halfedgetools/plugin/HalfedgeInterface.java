@@ -18,6 +18,7 @@ import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 import static javax.swing.SwingUtilities.getWindowAncestor;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -198,6 +199,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 
 	private ConverterHds2Ifs 
 		converterHds2Ifs = null;
+	
+	private Color color = activeLayer.getSelection().getDefaultColor();
 
 	public HalfedgeInterface() {
 		makeLayout();
@@ -1393,12 +1396,20 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	}
 
 	public void setSelected(final Node<?, ?, ?> n, final boolean selected) {
-		getSelection().setSelected(n, selected);
+		getSelection().setSelected(n, selected, getSelectionColor());
 		activeLayer.updateSelection();
 	}
 
 	public boolean isSelected(Node<?, ?, ?> n) {
 		return getSelection().isSelected(n);
+	}
+	
+	public void setSelectionColor(Color color) {
+		this.color = color;
+	}
+	
+	public Color getSelectionColor(){
+		return this.color;
 	}
 
 	public boolean isShowBoundingBox() {

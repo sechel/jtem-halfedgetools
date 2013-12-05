@@ -34,7 +34,7 @@ public class ClearFaceSelection extends AlgorithmPlugin {
 		HalfedgeSelection sel = hcp.getSelection();
 		
 		for (F f : sel.getFaces(hds)){		
-				sel.setSelected(f,false);			
+				sel.remove(f);			
 		}
 		hcp.setSelection(sel);
 	}
