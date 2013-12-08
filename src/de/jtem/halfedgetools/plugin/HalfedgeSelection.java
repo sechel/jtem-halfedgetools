@@ -158,9 +158,9 @@ public class HalfedgeSelection {
 		return vMap.containsKey(n) | eMap.containsKey(n) | fMap.containsKey(n);
 	}
 	
-//	public void setSelected(Node<?,?,?> n, boolean selected) {
-//		setSelected(n, selected, defaultColor);
-//	}
+	public void setSelected(Node<?,?,?> n, boolean selected) {
+		setSelected(n, selected, defaultColor);
+	}
 	
 	public void setSelected(Node<?,?,?> n, boolean selected, Color color) {
 		if (selected == isSelected(n)) return;
