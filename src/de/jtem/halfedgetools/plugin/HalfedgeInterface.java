@@ -58,6 +58,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 import de.jreality.geometry.BoundingBoxUtility;
@@ -148,7 +149,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		deleteLayerAction = new DeleteLayerAction(),
 		mergeLayersAction = new MergeLayersAction(),
 		importAction = new ImportAction(),
-		exportAction = new ExportAction(), undoAction = new UndoAction(),
+		exportAction = new ExportAction(), 
+		undoAction = new UndoAction(),
 		redoAction = new RedoAction();
 	private JButton 
 		importButton = new JButton(importAction),
@@ -396,40 +398,10 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		chooser.setAcceptAllFileFilterUsed(false);
 		chooser.setFileSelectionMode(FILES_ONLY);
 		chooser.setMultiSelectionEnabled(false);
-		chooser.addChoosableFileFilter(new FileFilter() {
-			@Override
-			public boolean accept(File f) {
-				return f.isDirectory()
-						|| f.getName().toLowerCase().endsWith(".obj");
-			}
+		//add File Filters
+		chooser.setFileFilter(new FileNameExtensionFilter("Wavefront OBJ (*.obj)", "obj"));
+		chooser.setFileFilter(new FileNameExtensionFilter("Halfedge XML (*.heml)", "heml"));
 
-			@Override
-			public String getDescription() {
-				return "Wavefront OBJ (*.obj)";
-			}
-
-			@Override
-			public String toString() {
-				return getDescription();
-			}
-		});
-		chooser.addChoosableFileFilter(new FileFilter() {
-			@Override
-			public String getDescription() {
-				return "Halfedge XML (*.heml)";
-			}
-
-			@Override
-			public boolean accept(File f) {
-				return f.isDirectory()
-						|| f.getName().toLowerCase().endsWith(".heml");
-			}
-
-			@Override
-			public String toString() {
-				return getDescription();
-			}
-		});
 		chooser.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File f) {
