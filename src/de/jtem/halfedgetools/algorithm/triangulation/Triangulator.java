@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.jreality.math.P2;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -173,7 +172,6 @@ public class Triangulator {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> E cutCorner(F f, AdapterSet a) {
-//		System.err.println("Cutting corner "+f.getIndex());
 		double EPS = 1E-5;
 		E cornerEdge = null;
 		List<E> bedges = HalfEdgeUtils.boundaryEdges(f);
@@ -184,25 +182,11 @@ public class Triangulator {
 			double[] p1 = a.getD(Position3d.class, v1);
 			double[] p2 = a.getD(Position3d.class, v2);
 			double[] p3 = a.getD(Position3d.class, v3);
-//			System.err.println("vertices = "+Rn.toString(new double[][]{p1,p2,p3}));
 			double[] vec1 = Rn.subtract(null, p1, p2);
 			double[] vec2 = Rn.subtract(null, p3, p2);
 			double[] cross = Rn.crossProduct(null, vec1, vec2);
 			double cl = Rn.euclideanNorm(cross);
 			if (cl > EPS) {
-				E be2 = be.getNextEdge();
-				double[][] pts = new double[bedges.size()-1][];
-//				System.err.println((bedges.size()-1)+"pts");
-				int i = 0;
-				// collect remaining vertex positions into array
-				do {
-					V vt = be2.getTargetVertex();		// this is v3 at the beginning
-//					System.err.println("index = "+vt.getIndex());
-					pts[i] = a.getD(Position3d.class, vt);
-					i++;
-					be2 = be2.getNextEdge();
-				} while(be2.getTargetVertex() != v2);
-				if (isCollinear3d(pts))  continue;		// keep looking
 				cornerEdge = be;
 				V s = cornerEdge.getStartVertex();
 				V t = cornerEdge.getNextEdge().getTargetVertex();
@@ -214,15 +198,6 @@ public class Triangulator {
 			throw new RuntimeException("could not find three non-colinear vertices in cutCorner()");
 		}
 		return cornerEdge;
-	}
-	
-	static boolean isCollinear3d(double[][] pts)	{
-		for (int i = 0; i<pts.length; ++i) pts[i][2] = 1.0;		// terrible hack: 
-		double[] line = P2.lineFromPoints(null, pts[0], pts[1]);
-		for (int i = 2; i < pts.length; ++i)	{
-			if (Rn.innerProduct(line, pts[i]) > 10E-5) return false;
-		}
-		return true;
 	}
 	
 }
