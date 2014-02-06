@@ -147,52 +147,22 @@ public class Triangulator {
 	}
 	
 	static <
-	V extends Vertex<V, E, F>,
-	E extends Edge<V, E, F>,
-	F extends Face<V, E, F>
-	> boolean isDegenerate(F f, AdapterSet a) {
-		double EPS = 1E-5;
-		for (E be : HalfEdgeUtils.boundaryEdges(f)) {
-			V v1 = be.getStartVertex();
-			V v2 = be.getTargetVertex();
-			V v3 = be.getNextEdge().getTargetVertex();
-			double[] p1 = a.getD(Position3d.class, v1);
-			double[] p2 = a.getD(Position3d.class, v2);
-			double[] p3 = a.getD(Position3d.class, v3);
-//			System.err.println("vertices = "+Rn.toString(new double[][]{p1,p2,p3}));
-			double[] vec1 = Rn.subtract(null, p1, p2);
-			double[] vec2 = Rn.subtract(null, p3, p2);
-			double[] cross = Rn.crossProduct(null, vec1, vec2);
-			double cl = Rn.euclideanNorm(cross);
-			if (cl > EPS) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	static <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> E cutCorner(F f, AdapterSet a) {
-		double EPS = 1E-6;
 		E cornerEdge = null;
 		List<E> bedges = HalfEdgeUtils.boundaryEdges(f);
 		for (E be : bedges) {
-			V v1 = be.getStartVertex();
-			V v2 = be.getTargetVertex();
-			V v3 = be.getNextEdge().getTargetVertex();
-			double[] p1 = a.getD(Position3d.class, v1);
-			double[] p2 = a.getD(Position3d.class, v2);
-			double[] p3 = a.getD(Position3d.class, v3);
-			double[] vec1 = Rn.subtract(null, p1, p2);
-			double[] vec2 = Rn.subtract(null, p3, p2);
-			double[] cross = Rn.crossProduct(null, vec1, vec2);
-			double cl = Rn.euclideanNorm(cross);
-			if (cl > EPS) {
+			if (isDegenerate(be, a)) {
+				// degenerate vertex found, check for next 
+				// edge and use is if non degenerate
+				if (!isDegenerate(be.getNextEdge(), a)) {
+					cornerEdge = be.getNextEdge();
+					break;
+				}
+			} else {
 				cornerEdge = be;
-				break;
 			}
 		}
 		if (cornerEdge == null) {
@@ -202,6 +172,26 @@ public class Triangulator {
 		V s = cornerEdge.getStartVertex();
 		V t = cornerEdge.getNextEdge().getTargetVertex();
 		return TopologyAlgorithms.splitFaceAt(f, s, t);
+	}
+
+	protected static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	> boolean isDegenerate(E be, AdapterSet a) {
+		double EPS = 1E-7;
+		V v1 = be.getStartVertex();
+		V v2 = be.getTargetVertex();
+		V v3 = be.getNextEdge().getTargetVertex();
+		double[] p1 = a.getD(Position3d.class, v1);
+		double[] p2 = a.getD(Position3d.class, v2);
+		double[] p3 = a.getD(Position3d.class, v3);
+		double[] vec1 = Rn.subtract(null, p1, p2);
+		double[] vec2 = Rn.subtract(null, p3, p2);
+		Rn.normalize(vec1, vec1);
+		Rn.normalize(vec2, vec2);
+		double[] cross = Rn.crossProduct(null, vec1, vec2);
+		return Rn.euclideanNorm(cross) < EPS;
 	}
 	
 }
