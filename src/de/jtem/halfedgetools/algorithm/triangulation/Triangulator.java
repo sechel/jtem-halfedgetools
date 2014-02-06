@@ -34,6 +34,7 @@ package de.jtem.halfedgetools.algorithm.triangulation;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
@@ -47,6 +48,9 @@ import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 
 public class Triangulator {
 
+	private static Logger
+		log = Logger.getLogger(Triangulator.class.getName());
+	
 	public static <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -172,7 +176,7 @@ public class Triangulator {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> E cutCorner(F f, AdapterSet a) {
-		double EPS = 1E-5;
+		double EPS = 1E-6;
 		E cornerEdge = null;
 		List<E> bedges = HalfEdgeUtils.boundaryEdges(f);
 		for (E be : bedges) {
@@ -188,16 +192,16 @@ public class Triangulator {
 			double cl = Rn.euclideanNorm(cross);
 			if (cl > EPS) {
 				cornerEdge = be;
-				V s = cornerEdge.getStartVertex();
-				V t = cornerEdge.getNextEdge().getTargetVertex();
-				cornerEdge = TopologyAlgorithms.splitFaceAt(f, s, t);
 				break;
 			}
 		}
 		if (cornerEdge == null) {
-			throw new RuntimeException("could not find three non-colinear vertices in cutCorner()");
+			log.warning("could not find three non-colinear vertices in cutCorner()");
+			cornerEdge = bedges.get(0);
 		}
-		return cornerEdge;
+		V s = cornerEdge.getStartVertex();
+		V t = cornerEdge.getNextEdge().getTargetVertex();
+		return TopologyAlgorithms.splitFaceAt(f, s, t);
 	}
 	
 }
