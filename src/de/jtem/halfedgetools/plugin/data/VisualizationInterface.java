@@ -29,8 +29,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -122,8 +120,6 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 		activeTable.setDefaultRenderer(Icon.class, iconCellRenderer);
 		activeTable.setDefaultRenderer(JButton.class, removeCellRenderer);
 		activeTable.setDefaultEditor(JButton.class, removeCellEditor);
-		TableCellEditor boolEditor = activeTable.getDefaultEditor(Boolean.class);
-		boolEditor.addCellEditorListener(new ActivationListener());	
 		c1.weightx = 1.0;
 		c1.weighty = 1.0;
 		c1.gridwidth = GridBagConstraints.REMAINDER;
@@ -500,6 +496,17 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 			return column == 2 || column == 4;
 		}
 		
+		@Override
+		public void setValueAt(Object value, int row, int col) {
+			if (col == 2) {
+				List<DataVisualization> aSet = getActiveVisualizations();
+				Object[] objects = aSet.toArray();
+				DataVisualization op = (DataVisualization)objects[row];
+				op.setActive((Boolean)value);
+				updateActiveVisualizations();
+			}
+		}
+		
 	}
 	
 	
@@ -691,23 +698,6 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 				case 4: return true;
 				default: return false;
 			}
-		}
-		
-	}
-	
-	
-	private class ActivationListener implements CellEditorListener {
-
-		@Override
-		public void editingCanceled(ChangeEvent e) {
-		}
-
-		@Override
-		public void editingStopped(ChangeEvent e) {
-			DataVisualization vis = getSelectedVisualization();
-			if (vis == null) return; 
-			vis.setActive(!vis.isActive());
-			updateActiveVisualizations();
 		}
 		
 	}

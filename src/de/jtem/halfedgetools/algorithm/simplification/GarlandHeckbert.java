@@ -241,13 +241,12 @@ public class GarlandHeckbert <
 		double[] quadric_b = new double[3];
 		double quadric_c = 0;
 
-		double area;
 		double d;
 
 		List<F> faceStar = HalfEdgeUtilsExtra.getFaceStar(v);
 		for (F f : faceStar) {
 			double[] faceNormal = a.get(Normal.class, f, double[].class);
-			area = a.get(Area.class, f, Double.class); // weight by area maybe try 1 first...
+			Double area = a.get(Area.class, f, Double.class);
 			double[] p = a.get(Position3d.class, v, double[].class);
 			d = -Rn.innerProduct(faceNormal, p);
 			quadric_c += area * d * d;

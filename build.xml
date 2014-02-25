@@ -28,6 +28,9 @@
 	<property name="release" value="${release.dir}"/>
 	<property name="tmp" value="tmp"/>
 	
+	<path id="jre6.libraryclasspath">
+		<pathelement location="${lib}/jre6/rt.jar"/>
+	</path>	
 	<path id="jfreechart.libraryclasspath">
 		<pathelement location="${lib}/jfreechart/jcommon-1.0.18.jar"/>
 		<pathelement location="${lib}/jfreechart/jfreechart-1.0.14.jar"/>
@@ -63,7 +66,7 @@
 	</target>
 	
 	<target name="compile" depends="create build folders">
-        <javac debug="yes" destdir="${build}" excludesfile="build.exclude" source="${source}" target="${target}" includeantruntime="false" encoding="UTF-8">
+        <javac debug="yes" destdir="${build}" excludesfile="build.exclude" source="${source}" target="${target}" bootclasspathref="jre6.libraryclasspath" includeantruntime="false" encoding="UTF-8">
         	<compilerarg line="-Xlint:deprecation"/>
         	<compilerarg line="-Xlint:unchecked"/>
             <src path="${src}"/>
