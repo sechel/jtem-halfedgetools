@@ -19,6 +19,7 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 import static javax.swing.SwingUtilities.getWindowAncestor;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -38,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractCellEditor;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -59,7 +61,9 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 
 import de.jreality.geometry.BoundingBoxUtility;
 import de.jreality.geometry.IndexedFaceSetUtility;
@@ -255,11 +259,22 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 
 		private static final long serialVersionUID = 1L;
 
+		private final String[] header = new String[]{"","Name","V","E","F"}; 
+		
+		@Override
+		public String getColumnName(int column) {
+			return header[column];
+		}
+		
 		@Override
 		public Class<?> getColumnClass(int columnIndex) {
 			switch (columnIndex) {
 			case 0:
 				return Boolean.class;
+			case 2:
+			case 3:
+			case 4:
+				return Visibility.class;
 			case 1:
 				return String.class;
 			default:
@@ -269,7 +284,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 
 		@Override
 		public int getColumnCount() {
-			return 2;
+			return 5;
 		}
 
 		@Override
@@ -287,6 +302,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 				return layer.isVisible();
 			case 1:
 				return layer.getName();
+			case 2:
+				return layer.getVertexVisibility();
+			case 3:
+				return layer.getEdgeVisibility();
+			case 4:
+				return layer.getFaceVisibility();
 			default:
 				return "-";
 			}
@@ -297,6 +318,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 			switch (column) {
 			case 0:
 			case 1:
+			case 2:
+			case 3:
+			case 4:
 				return true;
 			default:
 				return false;
@@ -315,6 +339,15 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 			case 1:
 				layer.setName((String) aValue);
 				break;
+			case 2:
+				layer.setVertexVisiblity((Visibility)aValue);
+				break;
+			case 3:
+				layer.setEdgeVisibility((Visibility)aValue);
+				break;
+			case 4:
+				layer.setFaceVisibility((Visibility)aValue);
+				break;
 			default:
 				return;
 			}
@@ -322,6 +355,75 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 
 	}
 
+	private class VisibilityRenderer extends DefaultTableCellRenderer {
+		private static final long serialVersionUID = 1L;
+
+		public VisibilityRenderer() {
+			super();
+			setHorizontalAlignment(CENTER);
+		}
+		
+		@Override
+		protected void setValue(Object value) {
+			if(value == Visibility.INHERITED) {
+				setIcon(ImageHook.getIcon("bullet_arrow_up.png"));
+				setToolTipText("Inherited");
+			} else if(value == Visibility.SHOW) {
+				setIcon(ImageHook.getIcon("bullet_green.png"));
+				setToolTipText("Show");
+			} else {
+				setIcon(ImageHook.getIcon("bullet_red.png"));
+				setToolTipText("Hide");
+			}
+		}
+	}
+	
+	private class VisibilityEditor extends AbstractCellEditor implements TableCellEditor, ActionListener {
+		private static final long serialVersionUID = 1L;
+		private final JButton
+			greenButton = new JButton(ImageHook.getIcon("bullet_green.png")),
+			redButton = new JButton(ImageHook.getIcon("bullet_red.png")),
+			inheritButton = new JButton(ImageHook.getIcon("bullet_arrow_up.png"));
+		private Visibility currentValue = null;
+		
+		public VisibilityEditor() {
+			super();
+			greenButton.addActionListener(this);
+			redButton.addActionListener(this);
+			inheritButton.addActionListener(this);
+		}
+		
+		@Override
+		public Object getCellEditorValue() {
+			return currentValue;
+		}
+
+		@Override
+		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+			currentValue = (Visibility)value;
+			if(currentValue == Visibility.SHOW) {
+				return greenButton;	
+			} else if(currentValue == Visibility.HIDE) {
+				return redButton;
+			} else { //if(currentValue == Visibility.INHERITED){
+				return inheritButton;
+			}
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Object source = e.getSource();
+			if(greenButton == source) {
+				currentValue = Visibility.HIDE;
+			} else if(redButton == source) {
+				currentValue = Visibility.INHERITED;
+			} else if(inheritButton == source) {
+				currentValue = Visibility.SHOW;
+			}
+			fireEditingStopped();
+		}
+	}
+	
 	@Override
 	public void popupMenuCanceled(PopupMenuEvent e) {
 		if (visualizersPopup == e.getSource()) {
@@ -370,10 +472,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		layersPanel.setLayout(new GridLayout());
 		layersPanel.add(layersScroller);
 		layersScroller.setMinimumSize(new Dimension(30, 150));
-		layersTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
+//		layersTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
 		layersTable.setRowHeight(22);
 		layersTable.getSelectionModel().addListSelectionListener(this);
 		layersTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
+		layersTable.setDefaultEditor(Visibility.class, new VisibilityEditor());
+		layersTable.setDefaultRenderer(Visibility.class, new VisibilityRenderer());
 		layersTable.setComponentPopupMenu(visualizersPopup);
 
 		shrinkPanel.add(hdsLabel, c);
@@ -1041,6 +1145,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 
 		layersTable.setModel(new LayerModel());
 		layersTable.getColumnModel().getColumn(0).setMaxWidth(30);
+		layersTable.getColumnModel().getColumn(2).setMaxWidth(30);
+		layersTable.getColumnModel().getColumn(3).setMaxWidth(30);
+		layersTable.getColumnModel().getColumn(4).setMaxWidth(30);
 		layersTable.getSelectionModel().addListSelectionListener(this);
 		layersTable.setSelectionMode(SINGLE_SELECTION);
 

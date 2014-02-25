@@ -821,4 +821,49 @@ public class HalfedgeLayer implements ActionListener {
 		}
 	}
 
+	public Visibility getVertexVisibility() {
+		return getVisibility(VERTEX_DRAW);
+	}
+	
+	public Visibility getEdgeVisibility() {
+		return getVisibility(EDGE_DRAW);
+	}
+	
+	public Visibility getFaceVisibility() {
+		return getVisibility(FACE_DRAW);
+	}
+	
+	private Visibility getVisibility(String attr) {
+		Object val = geometryAppearance.getAttribute(attr);
+		if(val == INHERITED) { 
+			return Visibility.INHERITED;
+		} else if((Boolean)val){
+			return Visibility.SHOW;
+		} else {
+			return Visibility.HIDE;
+		}
+	}
+
+	public void setVertexVisiblity(Visibility vis) {
+		updateVisibility(VERTEX_DRAW, vis);
+	}
+
+	public void setEdgeVisibility(Visibility vis) {
+		updateVisibility(EDGE_DRAW, vis);
+	}
+	
+	public void setFaceVisibility(Visibility vis) {
+		updateVisibility(FACE_DRAW, vis);
+	}
+	
+	private void updateVisibility(String attr, Visibility aValue) {
+		if(aValue == Visibility.INHERITED) {
+			geometryAppearance.setAttribute(attr, INHERITED);
+		} else if(aValue == Visibility.SHOW) {
+			geometryAppearance.setAttribute(attr, true);
+		} else if(aValue == Visibility.HIDE) {
+			geometryAppearance.setAttribute(attr, false);
+		}
+	}
+	
 }
