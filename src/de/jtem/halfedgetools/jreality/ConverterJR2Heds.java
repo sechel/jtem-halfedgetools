@@ -69,12 +69,10 @@ public class ConverterJR2Heds {
 		for (Class<? extends Node<?,?,?>> nodeClass : nodeClasses) {
 			DataListSet AData= getDataListOfTyp(nodeClass, ifs);
 			int typNum=getTypNum(nodeClass);
-//			if (adapters.isAvailable(Position.class, nodeClass, double[].class)) {
-				ddData = (DoubleArrayArray)AData.getList(Attribute.COORDINATES);
-				if (ddData!=null) {
-					coords[typNum]= ddData.toDoubleArrayArray(null);
-				}
-//			}
+			ddData = (DoubleArrayArray)AData.getList(Attribute.COORDINATES);
+			if (ddData!=null) {
+				coords[typNum]= ddData.toDoubleArrayArray(null);
+			}
 			if (a.isAvailable(Color.class, nodeClass, double[].class)) {
 				ddData= (DoubleArrayArray)AData.getList(Attribute.COLORS);
 				if (ddData!=null) {
@@ -153,14 +151,8 @@ public class ConverterJR2Heds {
 				int s = f[j];
 				int t = f[(j + 1) % f.length];
 				if (s == t) continue;
-				if (vertexEdgeMap.containsKey(s,t)) {
-					throw new RuntimeException("Inconsistently oriented face found in ifs2HEDS, discontinued!");
-				}
 				E e = heds.addNewEdge();
 				e.setTargetVertex(heds.getVertex(t));
-				if (vertexEdgeMap.get(t, s) == e) {
-					System.out.println("ConverterJR2Heds.ifs2heds()");
-				}
 				vertexEdgeMap.put(s, t, e);
 				if (coords[1] != null) eAdapters.set(Position.class, e, coords[1][i]);
 				if (colors[1] != null) eAdapters.set(Color.class, e, colors[1][i]);
@@ -176,8 +168,6 @@ public class ConverterJR2Heds {
 		for (int i = 0; i < numE; i++){
 			int[] e = indices[1][i];
 			for (int j = 0; j < e.length-1; j++){
-//				V s = heds.getVertex(e[j]);
-//				V t = heds.getVertex(e[(j + 1)]);
 				int s = e[j];
 				int t = e[(j + 1)];
 				if (s == t) continue;
@@ -227,12 +217,9 @@ public class ConverterJR2Heds {
 			if (face.length < 3) continue;
 			F f = heds.addNewFace();
 			for (int j = 0; j < face.length; j++){
-//				V s = heds.getVertex(face[j]);
-//				V t = heds.getVertex(face[(j + 1) % face.length]);
 				int s = face[j];
 				int t = face[(j + 1) % face.length];
 				if (s == t) continue;
-//				V next = heds.getVertex(face[(j + 2) % face.length]);
 				int next = face[(j + 2) % face.length];
 				if (next == t) {
 					next = face[(j + 3) % face.length];
@@ -243,9 +230,6 @@ public class ConverterJR2Heds {
 					oppEdge = heds.addNewEdge();
 					oppEdge.setTargetVertex(heds.getVertex(s));
 					vertexEdgeMap.put(t, s, oppEdge);
-//					if (edgeMap != null) {
-//						edgeMap.put(oppEdge, edgeMap.get(faceEdge));
-//					}
 				}
 				E nextEdge = vertexEdgeMap.get(t, next);
 				if (faceEdge == oppEdge) {
