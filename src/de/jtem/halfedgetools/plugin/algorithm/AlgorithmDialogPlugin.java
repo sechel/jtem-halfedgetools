@@ -29,6 +29,8 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		view = null;
 	private static Icon
 		defaultIcon = ImageHook.getIcon("cog_edit.png");
+	private int 
+		dialogResult = OK_OPTION;
 	
 	private class AlgorithmBeforeJob extends AlgorithmJob {
 		
@@ -47,8 +49,6 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 	
 	private class AlgorithmShowDialogJob extends AlgorithmJob {
 		
-		private int dialogResult = OK_OPTION;
-	
 		@Override
 		public String getJobName() {
 			return "Dialog";
@@ -62,7 +62,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 				public void run() {
 					Window w = SwingUtilities.getWindowAncestor(view.getCenterComponent());
 					Icon icon = getPluginInfo().icon != null ? getPluginInfo().icon : defaultIcon;
-					dialogResult = JOptionPane.showConfirmDialog(
+					dialogResult = JOptionPane.showConfirmDialog (
 						w, getDialogPanel(), 
 						getPluginInfo().name, 
 						OK_CANCEL_OPTION, 
@@ -101,14 +101,6 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 	
 	private class AlgorithmAfterJob extends AlgorithmJob {
 		
-		private AlgorithmShowDialogJob
-			dialogJob = null;
-		
-		private AlgorithmAfterJob(AlgorithmShowDialogJob dialogJob) {
-			super();
-			this.dialogJob = dialogJob;
-		}
-
 		@Override
 		public String getJobName() {
 			return getAlgorithmName();
@@ -117,8 +109,10 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		@Override
 		public void executeJob() throws Exception {
 			currentJob = this;
-			if (dialogJob.dialogResult == OK_OPTION) {
+			if (dialogResult == OK_OPTION) {
 				executeAfterDialog(hcp.get(), hcp.getAdapters(), hcp);
+			} else {
+				executeAfterDialogCancel(hcp.get(), hcp.getAdapters(), hcp);
 			}
 		}
 		
@@ -126,7 +120,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 	
 	public void executeWithoutDialog() {
 		AlgorithmBeforeJob beforeJob = new AlgorithmBeforeJob();
-		AlgorithmAfterJob afterJob = new AlgorithmAfterJob(null);
+		AlgorithmAfterJob afterJob = new AlgorithmAfterJob();
 		jobQueue.queueJob(beforeJob);
 		jobQueue.queueJob(afterJob);
 	}
@@ -136,7 +130,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		AlgorithmBeforeJob beforeJob = new AlgorithmBeforeJob();
 		AlgorithmShowDialogJob dialogJob = new AlgorithmShowDialogJob();
 		AlgorithmExecuteDialogJob execDialogJob = new AlgorithmExecuteDialogJob();
-		AlgorithmAfterJob afterJob = new AlgorithmAfterJob(dialogJob);
+		AlgorithmAfterJob afterJob = new AlgorithmAfterJob();
 		jobQueue.queueJob(beforeJob);
 		if (getDialogPanel() != null) {
 			jobQueue.queueJob(dialogJob);
@@ -177,6 +171,13 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) {}
 	
+	public <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void executeAfterDialogCancel(HDS hds, AdapterSet a, HalfedgeInterface hi) {}	
+	
 	
 	@Override
 	public void install(Controller c) throws Exception {
@@ -186,6 +187,10 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 	
 	protected JPanel getDialogPanel() {
 		return null;
+	}
+	
+	protected int getDialogResult() {
+		return dialogResult;
 	}
 	
 	@Override

@@ -36,6 +36,8 @@ import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
@@ -45,6 +47,8 @@ import javax.swing.SwingUtilities;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewMenuBar;
 import de.jreality.plugin.job.AbstractJob;
+import de.jreality.plugin.job.Job;
+import de.jreality.plugin.job.JobListener;
 import de.jreality.plugin.job.JobQueuePlugin;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -58,8 +62,10 @@ import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.aggregators.ToolBarAggregator;
 
-public abstract class AlgorithmPlugin extends Plugin implements Comparable<AlgorithmPlugin> {
+public abstract class AlgorithmPlugin extends Plugin implements Comparable<AlgorithmPlugin>, JobListener {
 
+	private Logger
+		log = Logger.getLogger(getClass().getName());
 	protected JobQueuePlugin
 		jobQueue = null;
 	protected View
@@ -161,8 +167,28 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 	public void execute() {
 		lastAlgorithm = this;
 		currentJob = new AlgorithmJob();
+		currentJob.addJobListener(this);
 		jobQueue.queueJob(currentJob);
 	}
+	
+	@Override
+	public void jobStarted(Job job) {
+	}
+	@Override
+	public void jobCancelled(Job job) {
+	}
+	@Override
+	public void jobFinished(Job job) {
+	}
+	@Override
+	public void jobFailed(Job job, Exception e) {
+		log.log(Level.WARNING, e.getMessage(), e);
+	}
+	@Override
+	public void jobProgress(Job job, double progress) {
+	}
+	
+	
 	
 	@Override
 	public void install(Controller c) throws Exception {
