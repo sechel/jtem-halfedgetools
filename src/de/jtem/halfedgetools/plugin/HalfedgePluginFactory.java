@@ -86,11 +86,13 @@ import de.jtem.halfedgetools.plugin.algorithm.topology.VertexRemoverPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.vectorfield.CurvatureVectorFields;
 import de.jtem.halfedgetools.plugin.data.VisualizationInterface;
 import de.jtem.halfedgetools.plugin.data.source.FacePlanarityDataSource;
+import de.jtem.halfedgetools.plugin.data.source.SceneGraphTestSource;
 import de.jtem.halfedgetools.plugin.data.visualizer.ColoredBeadsVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.HistogramVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.Immersion3DVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.LabelVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.NodeColorVisualizer;
+import de.jtem.halfedgetools.plugin.data.visualizer.SceneGraphNodeVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.TableDataVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.TextDumpVisualizer;
 import de.jtem.halfedgetools.plugin.data.visualizer.VectorFieldVisualizer;
@@ -202,12 +204,15 @@ public class HalfedgePluginFactory {
 		s.add(new LabelVisualizer());
 		s.add(new TableDataVisualizer());
 		s.add(new TextDumpVisualizer());
-		s.add(new FacePlanarityDataSource());
 		s.add(new NodeColorVisualizer());
 		s.add(new ColoredBeadsVisualizer());
 		s.add(new HistogramVisualizer());	
 		s.add(new VectorFieldVisualizer());
 		s.add(new Immersion3DVisualizer());
+		s.add(new SceneGraphNodeVisualizer());
+		
+		s.add(new FacePlanarityDataSource());
+		s.add(new SceneGraphTestSource());
 		return s;
 	}
 	

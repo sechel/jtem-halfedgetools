@@ -64,4 +64,8 @@ public abstract class AbstractDataVisualization implements DataVisualization, Co
 		this.active = active;
 	}
 	
+	@Override
+	public void dispose() {
+	}
+	
 }

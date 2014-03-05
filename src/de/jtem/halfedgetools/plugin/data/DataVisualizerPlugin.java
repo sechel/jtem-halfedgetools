@@ -17,6 +17,11 @@ public abstract class DataVisualizerPlugin extends Plugin implements DataVisuali
 		return null;
 	}
 	@Override
+	public void disposeVisualization(DataVisualization vis) {
+		vis.dispose();
+	}
+	
+	@Override
 	public JPanel getDataDisplay() {
 		return null;
 	}

@@ -17,5 +17,6 @@ public interface DataVisualization {
 	public void update();
 	public boolean isActive();
 	public void setActive(boolean active);
+	public void dispose();
 
 }
