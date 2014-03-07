@@ -1,11 +1,7 @@
-package de.jtem.halfedgetools.plugin.widget;
+package de.jtem.halfedgetools.plugin;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -17,12 +13,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JPanel;
-
+import de.jreality.geometry.Primitives;
 import de.jreality.math.Matrix;
 import de.jreality.math.Pn;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.content.ContentTools;
+import de.jreality.scene.Appearance;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.SceneGraphPath;
 import de.jreality.util.CameraUtility;
@@ -33,13 +29,10 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.Position4d;
-import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
-import de.jtem.halfedgetools.plugin.WidgetInterface;
-import de.jtem.halfedgetools.plugin.WidgetPlugin;
 import de.jtem.jrworkspace.plugin.Controller;
+import de.jtem.jrworkspace.plugin.Plugin;
 
-public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, MouseListener {
+public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListener, MouseListener {
 	
 	private ContentTools
 		contentTools = null;
@@ -47,8 +40,6 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		view = null;
 	private HalfedgeInterface
 		hif = null;
-	private WidgetInterface
-		gui = null;
 	private boolean
 		activated = true,
 		rotateWasEnabled = false,
@@ -61,6 +52,16 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		selectInside = false;
 	private HalfedgeSelection 
 		startSelection = new HalfedgeSelection();
+	private SceneGraphComponent	
+		marqueeRoot = new SceneGraphComponent("Marquee");
+	private Appearance
+		marqueeAppearance = new Appearance("Marquee Appearance");
+	
+	public MarqueeSelectionPlugin() {
+		marqueeRoot.setGeometry(Primitives.regularPolygon(4));
+		marqueeRoot.setAppearance(marqueeAppearance);
+	}
+	
 	
 	private Set<Vertex<?,?,?>> getMarqueeVertices() {
 		Set<Vertex<?,?,?>> vSet = new HashSet<Vertex<?,?,?>>();
@@ -244,38 +245,64 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		view = c.getPlugin(View.class);
 		hif = c.getPlugin(HalfedgeInterface.class);
 		contentTools = c.getPlugin(ContentTools.class);
-		gui = c.getPlugin(WidgetInterface.class);
-		gui.getPanel().addMouseListener(this);
-		gui.getPanel().addMouseMotionListener(this);
+		view.getViewer().getViewingComponent().addMouseListener(this);
+		view.getViewer().getViewingComponent().addMouseMotionListener(this);
+//		Scene scene = c.getPlugin(Scene.class);
+//		scene.getSceneRoot().addChild(marqueeRoot);
+//		gui = c.getPlugin(WidgetInterface.class);
+//		gui.getPanel().addMouseListener(this);
+//		gui.getPanel().addMouseMotionListener(this);
+	}
+	
+	private void updateMarquee() {
+//		Component comp = view.getViewer().getViewingComponent();
+//		SceneGraphPath camPath = view.getViewer().getCameraPath();
+//		Camera cam = camPath.getLastComponent().getCamera();
+//		Matrix P = new Matrix(CameraUtility.getCameraToNDC(view.getViewer()));
+//		Matrix C = new Matrix(camPath.getInverseMatrix(null));
+//		Matrix T = new Matrix();
+//		T.multiplyOnLeft(C);
+//		T.multiplyOnLeft(P);
+//		T.invert();
+//		double w = Math.abs(active.x - start.x) / (double)comp.getWidth();
+//		double h = Math.abs(active.y - start.y) / (double)comp.getHeight();
+//		double x = Math.min(active.x, start.x) / (double)comp.getWidth() - 0.5; 
+//		double y = Math.min(active.y, start.y) / (double)comp.getHeight() - 0.5;
+//		MatrixBuilder mb = MatrixBuilder.euclidean();
+//		mb.translate(x, y, 0);
+//		mb.scale(w, h, 1.0);
+//		mb.translate(0,0,cam.getNear());
+//		T.multiplyOnLeft(mb.getMatrix());
+//		T.assignTo(marqueeRoot);
 	}
 	
 	
-	@Override
-	public void paint(Graphics2D g, JPanel canvas) {
-		if (!marqueeEnabled) return;
-		Stroke sOld = g.getStroke();
-		int w = Math.abs(active.x - start.x);
-		int h = Math.abs(active.y - start.y);
-		int x = Math.min(active.x, start.x);
-		int y = Math.min(active.y, start.y);
-
-		g.setColor(new Color(255, 0, 0, 50));
-		g.fillRect(x, y, w, h);
-		
-		float[] dash = {0f, 1f, 3f, 4f};
-		BasicStroke s = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, dash, 0);
-		g.setStroke(s);
-		g.setColor(Color.RED);
-		g.drawRect(x, y, w == 0 ? 1 : w, h == 0 ? 1 : h);
-		
-		g.setStroke(sOld);
-	}
+//	@Override
+//	public void paint(Graphics2D g, JPanel canvas) {
+//		if (!marqueeEnabled) return;
+//		Stroke sOld = g.getStroke();
+//		int w = Math.abs(active.x - start.x);
+//		int h = Math.abs(active.y - start.y);
+//		int x = Math.min(active.x, start.x);
+//		int y = Math.min(active.y, start.y);
+//
+//		g.setColor(new Color(255, 0, 0, 50));
+//		g.fillRect(x, y, w, h);
+//		
+//		float[] dash = {0f, 1f, 3f, 4f};
+//		BasicStroke s = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, dash, 0);
+//		g.setStroke(s);
+//		g.setColor(Color.RED);
+//		g.drawRect(x, y, w == 0 ? 1 : w, h == 0 ? 1 : h);
+//		
+//		g.setStroke(sOld);
+//	}
 
 	
 	private void cancelMarqee() {
 		marqueeEnabled = false;
 		hif.setSelection(startSelection);
-		repaint();
+		updateMarquee();
 		contentTools.setRotationEnabled(rotateWasEnabled);
 		contentTools.setDragEnabled(dragWasEnabled);
 	}
@@ -291,7 +318,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 			return;
 		}
 		active = e.getPoint();
-		repaint();
+		updateMarquee();
 		
 		HalfedgeSelection sel = new HalfedgeSelection();
 		Set<Vertex<?,?,?>> marqeeVertices = getMarqueeVertices();
@@ -372,7 +399,7 @@ public class MarqueeWidget extends WidgetPlugin implements MouseMotionListener, 
 		sel.addAll(startSelection.getNodes());
 		hif.setSelection(sel);
 		marqueeEnabled = false;
-		repaint();
+		updateMarquee();
 	}
 
 	@Override

@@ -105,7 +105,6 @@ import de.jtem.halfedgetools.plugin.visualizers.FacePlanarityVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.NodeIndexVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.NormalVisualizer;
 import de.jtem.halfedgetools.plugin.widget.ContextMenuWidget;
-import de.jtem.halfedgetools.plugin.widget.MarqueeWidget;
 import de.jtem.halfedgetools.plugin.widget.ViewSwitchWidget;
 import de.jtem.jrworkspace.plugin.Plugin;
 
@@ -183,6 +182,7 @@ public class HalfedgePluginFactory {
 		s.add(new ExportSelection());
 		s.add(new ImportSelection());
 		s.add(new SelectionColor());
+		s.add(new MarqueeSelectionPlugin());
 		return s;
 	}
 	
@@ -219,7 +219,6 @@ public class HalfedgePluginFactory {
 	
 	public static Set<Plugin> createWidgetPlugins() {
 		Set<Plugin> s = new HashSet<Plugin>();
-		s.add(new MarqueeWidget());
 		s.add(new ViewSwitchWidget());
 		s.add(new ContextMenuWidget());
 		return s;
