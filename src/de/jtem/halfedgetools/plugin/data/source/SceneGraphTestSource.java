@@ -50,6 +50,11 @@ public class SceneGraphTestSource extends Plugin implements DataSourceProvider {
 			return root;
 		}
 		
+		@Override
+		public String toString() {
+			return "Test Geometry";
+		}
+		
 	}
 	
 	@Override

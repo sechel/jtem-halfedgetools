@@ -72,6 +72,16 @@ public class SceneGraphNodeVisualizer extends DataVisualizerPlugin {
 			getLayer().removeTemporaryGeometry(root);
 		}
 		
+		@Override
+		public void setActive(boolean active) {
+			root.setVisible(active);
+		}
+		
+		@Override
+		public boolean isActive() {
+			return root.isVisible();
+		}
+		
 	}
 	
 	@Override
@@ -88,6 +98,7 @@ public class SceneGraphNodeVisualizer extends DataVisualizerPlugin {
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = super.getPluginInfo();
 		info.icon = ImageHook.getIcon("cog_go.png");
+		info.name = "Direct Geometry";
 		return info;
 	}
 	
