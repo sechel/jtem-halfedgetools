@@ -565,6 +565,24 @@ public class HalfEdgeUtilsExtra {
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
+	> F findCommonFace(V ... vertices) {
+		if (vertices.length < 2)
+			return null;
+		V v1 = vertices[0];
+		List<F> faces = HalfEdgeUtils.facesIncidentWithVertex(v1);
+		for(int i = 1; i < vertices.length; ++i) {
+			faces.retainAll(HalfEdgeUtils.facesIncidentWithVertex(vertices[i]));
+		}
+		if(faces.size() == 0) {
+			return null;
+		} 
+		return faces.get(0);
+	}
+	
+	public static < 
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
 	> V findCommonVertex(E ... edges) {
 		if (edges.length < 2)
 			return null;

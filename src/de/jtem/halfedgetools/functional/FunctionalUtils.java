@@ -13,10 +13,14 @@ public class FunctionalUtils {
 			E extends Edge<V, E, F>, 
 			F extends Face<V, E, F>
 		> 
-	void getPosition(V v, DomainValue x, double[] pos) {
+	double[] getPosition(V v, DomainValue x, double[] pos) {
+		if(pos == null) {
+			pos = new double[3];
+		}
 		pos[0] = x.get(v.getIndex() * 3 + 0);
 		pos[1] = x.get(v.getIndex() * 3 + 1);
 		pos[2] = x.get(v.getIndex() * 3 + 2);
+		return pos;
 	}
 	
 	public static double[] getHomogPosition(DomainValue x, Vertex<?,?,?> v) {

@@ -1,7 +1,11 @@
 package de.jtem.halfedgetools.plugin.data.visualizer;
 
+import javax.swing.JPanel;
+
+import de.jreality.scene.Appearance;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.SceneGraphNode;
+import de.jreality.ui.SimpleAppearanceInspector;
 import de.jreality.util.SceneGraphUtility;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -23,14 +27,22 @@ public class SceneGraphNodeVisualizer extends DataVisualizerPlugin {
 	private HalfedgeInterface
 		hif = null;
 	
+	private SimpleAppearanceInspector 
+		appInspector = new SimpleAppearanceInspector();
+	
 	private class SceneGraphComponentVisualization extends AbstractDataVisualization {
 
 		private SceneGraphComponent
-			root = new SceneGraphComponent();
+			root = new SceneGraphComponent("Scene Graph Visualizer Root");
+		
+		private Appearance 
+			appearance = new Appearance();
 		
 		public SceneGraphComponentVisualization(HalfedgeLayer layer, Adapter<?> source, DataVisualizer visualizer, NodeType type) {
 			super(layer, source, visualizer, type);
 			root.setName(source.toString());
+			root.setAppearance(appearance);
+			appInspector.setAppearance(appearance);
 		}
 
 		@Override
@@ -82,6 +94,9 @@ public class SceneGraphNodeVisualizer extends DataVisualizerPlugin {
 			return root.isVisible();
 		}
 		
+		public Appearance getAppearance() {
+			return appearance;
+		}
 	}
 	
 	@Override
@@ -106,6 +121,13 @@ public class SceneGraphNodeVisualizer extends DataVisualizerPlugin {
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
+	}
+	
+	@Override
+	public JPanel connectUserInterfaceFor(DataVisualization visualization) {
+		SceneGraphComponentVisualization vis = (SceneGraphComponentVisualization) visualization;
+		appInspector.setAppearance(vis.getAppearance());
+		return appInspector;
 	}
 
 }

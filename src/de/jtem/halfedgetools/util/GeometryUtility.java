@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.util;
 
+import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -31,7 +32,10 @@ public class GeometryUtility {
 		double[] circle = new double[4];
 		double[] cc = circumCenter(p1,p2,p3);
 		System.arraycopy(cc, 0, circle, 0, 3);
-		circle[3] = Rn.euclideanDistance(cc, p2);
+		double radius = Rn.euclideanDistance(cc, p1);
+		radius += Rn.euclideanDistance(cc, p2);
+		radius += Rn.euclideanDistance(cc, p3);
+		circle[3] = radius/3.0;
 		return circle;
 	}
 	
@@ -57,5 +61,20 @@ public class GeometryUtility {
 		return Rn.add(null, ac1, Rn.add(null,bc2,gc3));
 	}
 	
-	
+	public static boolean isOnSegment(double[] p, double[][] s) {
+		Pn.dehomogenize(p, p);
+		Pn.dehomogenize(s, s);
+		double[] ps0 = Rn.subtract(null, s[0], p);
+		double[] ps1 = Rn.subtract(null, s[1], p);
+		double d1 = Pn.norm(ps0, Pn.EUCLIDEAN);
+		double d2 = Pn.norm(ps0, Pn.EUCLIDEAN);
+		if (d1 < 0.0 || d2 < 0.0) return false;
+		double[] s0s1 = Rn.subtract(null, s[0], s[1]);
+		double[] cross = Rn.crossProduct(null, ps0, ps1);
+		double dot = Rn.innerProduct(ps0, ps1);
+		if (Rn.euclideanNorm(cross) > 1E-7) return false;
+		if (dot > 0) return false;
+		if (dot > Rn.euclideanNormSquared(s0s1)) return false;
+	    return true;
+	}
 }

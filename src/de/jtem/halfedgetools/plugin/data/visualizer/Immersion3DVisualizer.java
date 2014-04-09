@@ -14,6 +14,7 @@ import de.jreality.scene.Appearance;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.ui.LayoutFactory;
+import de.jreality.ui.SimpleAppearanceInspector;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -21,6 +22,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.generic.TexturePosition4d;
 import de.jtem.halfedgetools.jreality.node.DefaultJRVertex;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.data.AbstractDataVisualization;
@@ -43,6 +45,8 @@ public class Immersion3DVisualizer extends DataVisualizerPlugin implements
 	private Immersion3DVisualization actVis = null;
 	private boolean listenersDisabled = false;
 
+	private SimpleAppearanceInspector appearanceInspector = new SimpleAppearanceInspector();
+	
 	public Immersion3DVisualizer() {
 		initOptionPanel();
 	}
@@ -151,6 +155,7 @@ public class Immersion3DVisualizer extends DataVisualizerPlugin implements
 		public Immersion3DVisualization(HalfedgeLayer layer, Adapter<?> source,
 				DataVisualizer visualizer, NodeType type) {
 			super(layer, source, visualizer, type);
+			appearanceInspector.setAppearance(immersionAppearance);
 			immersionComponent.setAppearance(immersionAppearance);
 		}
 
@@ -176,6 +181,7 @@ public class Immersion3DVisualizer extends DataVisualizerPlugin implements
 
 			Object val;
 			double[][] p = null;
+			double[][] t = null;
 			int[][] ids = null;
 
 			switch (getType()) {
@@ -192,10 +198,12 @@ public class Immersion3DVisualizer extends DataVisualizerPlugin implements
 				ifsf.setFaceCount(hds.numFaces());
 
 				p = new double[hds.numVertices()][];
+				t = new double[hds.numVertices()][];
 				ids = new int[hds.numFaces()][];
 
 				for (Vertex<?,?,?> v : hds.getVertices()) {
 					p[v.getIndex()] = (double[]) imm.get(v, adapters);
+					t[v.getIndex()] = adapters.getD(TexturePosition4d.class, v);
 				}
 				for (Face f : hds.getFaces()) {
 					List<Edge> bd = HalfEdgeUtils.boundaryEdges((Face) f);
@@ -273,6 +281,9 @@ public class Immersion3DVisualizer extends DataVisualizerPlugin implements
 
 			if (ifsf != null) {
 				ifsf.setVertexCoordinates(p);
+				if(t != null) {
+					ifsf.setVertexTextureCoordinates(t);
+				}
 				ifsf.setFaceIndices(ids);
 				ifsf.setGenerateFaceNormals(true);
 				ifsf.setGenerateEdgesFromFaces(true);
@@ -315,7 +326,7 @@ public class Immersion3DVisualizer extends DataVisualizerPlugin implements
 		showFaces.setSelected(actVis.showFaces);
 		actVis.updateAppearance();
 		listenersDisabled = false;
-		return optionsPanel;
+		return appearanceInspector;
 	}
 
 }
