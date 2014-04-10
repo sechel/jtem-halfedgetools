@@ -447,8 +447,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 			visualizersPopup.removeAll();
 			visualizersPopup.setLayout(new GridLayout());
 			visualizersPopup.add(visualizersManager.getPanel());
-			visualizersPopup.setMinimumSize(new Dimension(250, 400));
-			visualizersPopup.setPreferredSize(new Dimension(250, 400));
+			visualizersPopup.setMinimumSize(new Dimension(300, 400));
+			visualizersPopup.setPreferredSize(new Dimension(300, 400));
 		}
 		if (layerOptionsPopup == e.getSource()) {
 			layerPropertyPanel.setLayer(activeLayer);
@@ -456,8 +456,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 			layerOptionsPopup.removeAll();
 			layerOptionsPopup.setLayout(new GridLayout());
 			layerOptionsPopup.add(layerPropertyPanel);
-			layerOptionsPopup.setMinimumSize(new Dimension(250, 400));
-			layerOptionsPopup.setPreferredSize(new Dimension(250, 400));
+			layerOptionsPopup.setMinimumSize(new Dimension(300, 430));
+			layerOptionsPopup.setPreferredSize(new Dimension(300, 430));
 		}
 	}
 

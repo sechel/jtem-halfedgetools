@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.plugin;
 
+import static de.jreality.geometry.IndexedFaceSetUtility.removeTextureCoordinateJumps;
 import static de.jreality.math.Rn.euclideanNormSquared;
 import static de.jreality.scene.Appearance.INHERITED;
 import static de.jreality.scene.data.Attribute.COORDINATES;
@@ -103,6 +104,7 @@ public class HalfedgeLayer implements ActionListener {
 
 	// layer properties
 	private boolean 
+		removeTextureJumps = false,
 		thickenSurface = false, 
 		makeHoles = true, 
 		implode = false;
@@ -111,6 +113,7 @@ public class HalfedgeLayer implements ActionListener {
 	private double[][] 
 		profileCurve = new double[][] { { 0, 0 }, { 0, .4 },{ .1, .5 }, { .9, .5 }, { 1.0, .4 }, { 1, 0 } };
 	private double 
+		textureJumpSize = 1.0,
 		holeFactor = 0.4, 
 		thickness = 0.05, 
 		implodeFactor = -0.85;
@@ -440,9 +443,11 @@ public class HalfedgeLayer implements ActionListener {
 			tsf.update();
 			shownGeometry = tsf.getThickenedSurface();
 		}
+		if (removeTextureJumps && geometry != null) {
+			shownGeometry = removeTextureCoordinateJumps(shownGeometry, textureJumpSize);
+		}		
 		if (implode && geometry != null) {
-			shownGeometry = IndexedFaceSetUtility.implode(shownGeometry,
-					implodeFactor);
+			shownGeometry = IndexedFaceSetUtility.implode(shownGeometry, implodeFactor);
 		}
 		geometryRoot.setGeometry(geometry);
 		if (shownGeometry != geometry) {
@@ -702,10 +707,23 @@ public class HalfedgeLayer implements ActionListener {
 		SceneGraphUtility.addChildNode(layerRoot, temporaryRoot);
 	}
 
+	public boolean isRemoveTextureJumps() {
+		return removeTextureJumps;
+	}
+	public void setRemoveTextureJumps(boolean removeTextureJumps) {
+		this.removeTextureJumps = removeTextureJumps;
+	}
+	
+	public double getTextureJumpSize() {
+		return textureJumpSize;
+	}
+	public void setTextureJumpSize(double textureJumpSize) {
+		this.textureJumpSize = textureJumpSize;
+	}
+	
 	public boolean isThickenSurface() {
 		return thickenSurface;
 	}
-
 	public void setThickenSurface(boolean thickenSurface) {
 		this.thickenSurface = thickenSurface;
 	}
@@ -713,7 +731,6 @@ public class HalfedgeLayer implements ActionListener {
 	public boolean isImplode() {
 		return implode;
 	}
-
 	public void setImplode(boolean implode) {
 		this.implode = implode;
 	}
@@ -721,7 +738,6 @@ public class HalfedgeLayer implements ActionListener {
 	public double getThickness() {
 		return thickness;
 	}
-
 	public void setThickness(double thickness) {
 		this.thickness = thickness;
 	}
@@ -729,7 +745,6 @@ public class HalfedgeLayer implements ActionListener {
 	public double getImplodeFactor() {
 		return implodeFactor;
 	}
-
 	public void setImplodeFactor(double implodeFactor) {
 		this.implodeFactor = implodeFactor;
 	}
@@ -737,7 +752,6 @@ public class HalfedgeLayer implements ActionListener {
 	public boolean isMakeHoles() {
 		return makeHoles;
 	}
-
 	public void setMakeHoles(boolean makeHoles) {
 		this.makeHoles = makeHoles;
 	}
@@ -745,7 +759,6 @@ public class HalfedgeLayer implements ActionListener {
 	public double getHoleFactor() {
 		return holeFactor;
 	}
-
 	public void setHoleFactor(double holeFactor) {
 		this.holeFactor = holeFactor;
 	}
@@ -753,7 +766,6 @@ public class HalfedgeLayer implements ActionListener {
 	public int getStepsPerEdge() {
 		return stepsPerEdge;
 	}
-
 	public void setStepsPerEdge(int stepsPerEdge) {
 		this.stepsPerEdge = stepsPerEdge;
 	}

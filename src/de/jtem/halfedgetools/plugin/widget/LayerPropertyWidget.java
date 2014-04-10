@@ -41,16 +41,19 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 	
 	private JRadioButton
 		noEffectChecker = new JRadioButton("No Geometry Effect"),
+		removeTextureJumpsRadio = new JRadioButton("Remove Texture Jumps"),
 		thickenChecker = new JRadioButton("Thicken"),
 		implodeChecker = new JRadioButton("Implode");
 	private JCheckBox
 		makeHolesChecker = new JCheckBox("Holes");
 	private SpinnerNumberModel
+		jumpSizeModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.1),
 		stepsPerEdgeModel = new SpinnerNumberModel(1, 1, 100, 1),
 		holeFactorModel = new SpinnerNumberModel(1.0, -100.0, 100.0, 0.01),
 		implodeFactorModel = new SpinnerNumberModel(0.5, -1.0, 1.0, 0.01),
 		thicknessModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.01);
 	private JSpinner
+		jumpSizeSpinner = new JSpinner(jumpSizeModel),
 		stepsPerEdgeSpinner = new JSpinner(stepsPerEdgeModel),
 		holeFactorSpinner = new JSpinner(holeFactorModel),
 		implodeFactorSpinner = new JSpinner(implodeFactorModel), 
@@ -78,6 +81,10 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 
 		add(noEffectChecker, c2);
 		add(new JSeparator(), c2);
+
+		add(removeTextureJumpsRadio, c1);
+		add(jumpSizeSpinner, c2);
+		add(new JSeparator(), c2);
 		
 		add(implodeChecker, c1);
 		add(implodeFactorSpinner, c2);
@@ -103,6 +110,8 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		implodeChecker.addActionListener(this);
 		thickenChecker.addActionListener(this);
 		implodeFactorSpinner.addChangeListener(this);
+		removeTextureJumpsRadio.addChangeListener(this);
+		jumpSizeSpinner.addChangeListener(this);
 		thicknessSpinner.addChangeListener(this);
 		makeHolesChecker.addActionListener(this);
 		holeFactorSpinner.addChangeListener(this);
@@ -112,6 +121,7 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		
 		ButtonGroup modeGroup = new ButtonGroup();
 		modeGroup.add(noEffectChecker);
+		modeGroup.add(removeTextureJumpsRadio);
 		modeGroup.add(thickenChecker);
 		modeGroup.add(implodeChecker);
 	}
@@ -132,6 +142,8 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 	
 	private void updateLayer() {
 		if (layer == null) return;
+		layer.setRemoveTextureJumps(removeTextureJumpsRadio.isSelected());
+		layer.setTextureJumpSize(jumpSizeModel.getNumber().doubleValue());
 		layer.setImplode(implodeChecker.isSelected());
 		layer.setThickenSurface(thickenChecker.isSelected());
 		layer.setImplodeFactor(implodeFactorModel.getNumber().doubleValue());
@@ -162,6 +174,8 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 	public void setLayer(HalfedgeLayer layer) {
 		this.layer = layer;
 		disableListeners = true;
+		jumpSizeModel.setValue(layer.getTextureJumpSize());
+		removeTextureJumpsRadio.setSelected(layer.isRemoveTextureJumps());
 		implodeChecker.setSelected(layer.isImplode());
 		thickenChecker.setSelected(layer.isThickenSurface());
 		implodeFactorModel.setValue(layer.getImplodeFactor());
@@ -169,7 +183,11 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		makeHolesChecker.setSelected(layer.isMakeHoles());
 		holeFactorModel.setValue(layer.getHoleFactor());
 		stepsPerEdgeModel.setValue(layer.getStepsPerEdge());
-		noEffectChecker.setSelected(!layer.isImplode() && !layer.isThickenSurface());
+		noEffectChecker.setSelected(
+			!layer.isImplode() && 
+			!layer.isThickenSurface() && 
+			!layer.isRemoveTextureJumps()
+		);
 		StringBuffer sb = new StringBuffer();
 		for (double[] p : layer.getProfileCurve()) {
 			sb.append(p[0] + "\t" + p[1] + "\n");
