@@ -33,7 +33,6 @@ package de.jtem.halfedgetools.plugin.algorithm.subdivision;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -76,7 +75,7 @@ public class TriangulateCutCornersPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		Set<F> faces = hi.getSelection().getFaces(hds);
+		List<F> faces = hi.getSelection().getFaces(hds);
 		List<E> addedEdges = new LinkedList<E>(); 
 		if(faces.size() == 0) {
 			List<E> te = Triangulator.triangulateByCuttingCorners(hds, a);

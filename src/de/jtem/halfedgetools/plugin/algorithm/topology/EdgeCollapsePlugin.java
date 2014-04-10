@@ -1,7 +1,7 @@
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
 import java.awt.event.InputEvent;
-import java.util.Set;
+import java.util.List;
 
 import javax.swing.KeyStroke;
 
@@ -31,7 +31,7 @@ public class EdgeCollapsePlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
-		Set<E> edges = hcp.getSelection().getEdges(hds);
+		List<E> edges = hcp.getSelection().getEdges(hds);
 		if (edges.isEmpty()) return;
 		TypedAdapterSet<double[]> da = a.querySet(double[].class);
 		HalfedgeSelection s = new HalfedgeSelection();

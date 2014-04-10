@@ -7,11 +7,12 @@ import static de.jreality.shader.CommonAttributes.TRANSPARENCY;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -44,11 +45,11 @@ public class HalfedgeSelection {
 	private Color defaultColor = Color.RED;
 
 	private Map<Vertex<?, ?, ?>,Color>
-		vMap = new HashMap<Vertex<?,?,?>,Color>();
+		vMap = new LinkedHashMap<Vertex<?,?,?>,Color>();
 	private Map<Edge<?, ?, ?>,Color>
-		eMap = new HashMap<Edge<?,?,?>,Color>();
+		eMap = new LinkedHashMap<Edge<?,?,?>,Color>();
 	private Map<Face<?, ?, ?>,Color>
-		fMap = new HashMap<Face<?,?,?>,Color>();
+		fMap = new LinkedHashMap<Face<?,?,?>,Color>();
 	
 	
 	public HalfedgeSelection() {
@@ -63,9 +64,9 @@ public class HalfedgeSelection {
 	}
 	
 	public HalfedgeSelection(HalfedgeSelection sel) {
-		vMap = new HashMap<Vertex<?,?,?>,Color>(sel.vMap);
-		eMap = new HashMap<Edge<?,?,?>,Color>(sel.eMap);
-		fMap = new HashMap<Face<?,?,?>,Color>(sel.fMap);
+		vMap = new LinkedHashMap<Vertex<?,?,?>,Color>(sel.vMap);
+		eMap = new LinkedHashMap<Edge<?,?,?>,Color>(sel.eMap);
+		fMap = new LinkedHashMap<Face<?,?,?>,Color>(sel.fMap);
 	}	
 	
 	public Set<Vertex<?,?,?>> getVertices() {
@@ -94,8 +95,8 @@ public class HalfedgeSelection {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> Set<V> getVertices(HDS hds) {
-		Set<V> result = new HashSet<V>();
+	> List<V> getVertices(HDS hds) {
+		List<V> result = new ArrayList<V>();
 		for (Vertex<?, ?, ?> v : vMap.keySet()) {
 			if (v.getHalfEdgeDataStructure() == hds) {
 				result.add((V)v);
@@ -109,8 +110,8 @@ public class HalfedgeSelection {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> Set<E> getEdges(HDS hds) {
-		Set<E> result = new HashSet<E>();
+	> List<E> getEdges(HDS hds) {
+		List<E> result = new ArrayList<E>();
 		for (Edge<?, ?, ?> e : eMap.keySet()) {
 			if (e.getHalfEdgeDataStructure() == hds) {
 				result.add((E)e);
@@ -124,8 +125,8 @@ public class HalfedgeSelection {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> Set<F> getFaces(HDS hds) {
-		Set<F> result = new HashSet<F>();
+	> List<F> getFaces(HDS hds) {
+		List<F> result = new ArrayList<F>();
 		for (Face<?, ?, ?> f : fMap.keySet()) {
 			if (f.getHalfEdgeDataStructure() == hds) {
 				result.add((F)f);
@@ -135,7 +136,7 @@ public class HalfedgeSelection {
 	}
 	
 	public List<Node<?,?,?>> getNodes() {
-		List<Node<?,?,?>> result = new LinkedList<Node<?,?,?>>();
+		List<Node<?,?,?>> result = new ArrayList<Node<?,?,?>>();
 		for (Vertex<?,?,?> v : getVertices()) {
 			result.add(v);
 		}

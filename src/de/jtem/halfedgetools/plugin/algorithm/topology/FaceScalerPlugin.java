@@ -32,7 +32,7 @@ OF SUCH DAMAGE.
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
 import java.awt.event.InputEvent;
-import java.util.Set;
+import java.util.List;
 
 import javax.swing.KeyStroke;
 
@@ -70,7 +70,7 @@ public class FaceScalerPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		Set<F> faces = hif.getSelection().getFaces(hds);
+		List<F> faces = hif.getSelection().getFaces(hds);
 		if (faces.isEmpty()) return;
 		HalfedgeSelection s = new HalfedgeSelection();
 		for (F oldF : faces) {

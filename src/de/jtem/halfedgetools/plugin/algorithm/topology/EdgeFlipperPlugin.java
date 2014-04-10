@@ -33,7 +33,6 @@ package de.jtem.halfedgetools.plugin.algorithm.topology;
 
 import java.awt.event.InputEvent;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.KeyStroke;
 
@@ -61,7 +60,7 @@ public class EdgeFlipperPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
-		Set<E> edges = hcp.getSelection().getEdges(hds);
+		List<E> edges = hcp.getSelection().getEdges(hds);
 		if (edges.isEmpty()) return;
 		for (E e : edges) {
 			if (e.isPositive()) continue;

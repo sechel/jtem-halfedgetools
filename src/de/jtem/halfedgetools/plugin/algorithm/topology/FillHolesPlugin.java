@@ -31,7 +31,7 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
-import java.util.Set;
+import java.util.List;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -56,7 +56,7 @@ public class FillHolesPlugin extends AlgorithmPlugin {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
 		HalfedgeSelection sel = new HalfedgeSelection(hi.getSelection());
-		Set<E> edges = sel.getEdges(hds);
+		List<E> edges = sel.getEdges(hds);
 		if(edges.size() == 0) {
 			HalfEdgeUtils.fillAllHoles(hds);
 		} else {

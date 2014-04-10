@@ -31,7 +31,7 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
-import java.util.Set;
+import java.util.List;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -54,7 +54,7 @@ public class VertexRemoverPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		Set<V> vertices = hif.getSelection().getVertices(hds);
+		List<V> vertices = hif.getSelection().getVertices(hds);
 		if (vertices.isEmpty()) return;
 		int numVertices = 0;
 		for (V v : vertices) {

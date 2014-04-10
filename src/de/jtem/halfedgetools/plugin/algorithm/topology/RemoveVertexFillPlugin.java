@@ -32,7 +32,7 @@ OF SUCH DAMAGE.
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
 import java.awt.event.InputEvent;
-import java.util.Set;
+import java.util.List;
 
 import javax.swing.KeyStroke;
 
@@ -59,7 +59,7 @@ public class RemoveVertexFillPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		Set<V> vertices = hi.getSelection().getVertices(hds);
+		List<V> vertices = hi.getSelection().getVertices(hds);
 		if (vertices.isEmpty()) return;
 		HalfedgeSelection s = new HalfedgeSelection();
 		for (V v : vertices) {
