@@ -307,6 +307,35 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 		contentTools.setDragEnabled(dragWasEnabled);
 	}
 	
+
+	private void updateMarqueeSelection(MouseEvent e) {
+		Set<Vertex<?,?,?>> marqeeVertices = getMarqueeVertices();
+		if (marqeeVertices.isEmpty()) {
+			hif.setSelection(startSelection);
+			return;
+		}
+		
+		HalfedgeSelection marqueeSelection = new HalfedgeSelection();
+		if(e.isShiftDown()){
+			for (Vertex<?,?,?> v : marqeeVertices) {
+				marqueeSelection.setSelected(v, true, hif.getSelectionColor());
+			}
+		}
+		if(e.isAltDown()){
+			for(Edge<?,?,?> edge : getMarqueeEdges(marqeeVertices)){
+				marqueeSelection.setSelected(edge, true, hif.getSelectionColor());
+			}
+		}
+		
+		if(e.isControlDown()){
+			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
+				marqueeSelection.setSelected(face, true, hif.getSelectionColor());
+			}
+		}	
+		HalfedgeSelection newSelection = new HalfedgeSelection(startSelection);
+		newSelection.addAll(marqueeSelection.getNodes());
+		hif.setSelection(newSelection);
+	}
 	
 	
 	@Override
@@ -319,32 +348,7 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 		}
 		active = e.getPoint();
 		updateMarquee();
-		
-		HalfedgeSelection sel = new HalfedgeSelection();
-		Set<Vertex<?,?,?>> marqeeVertices = getMarqueeVertices();
-		if (marqeeVertices.isEmpty()) {
-			hif.setSelection(startSelection);
-			return;
-		}
-		
-		if(e.isShiftDown()){
-			for (Vertex<?,?,?> v : marqeeVertices) {
-				sel.setSelected(v, true, hif.getSelectionColor());
-			}
-		}
-		if(e.isAltDown()){
-			for(Edge<?,?,?> edge : getMarqueeEdges(marqeeVertices)){
-				sel.setSelected(edge, true, hif.getSelectionColor());
-			}
-		}
-		
-		if(e.isControlDown()){
-			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
-				sel.setSelected(face, true, hif.getSelectionColor());
-			}
-		}	
-		sel.addAll(startSelection.getNodes());
-		hif.setSelection(sel);
+		updateMarqueeSelection(e);
 	}
 
 	@Override
@@ -377,29 +381,11 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 			cancelMarqee();
 			return;
 		}
-		Set<Vertex<?,?,?>> marqeeVertices = getMarqueeVertices();
-		HalfedgeSelection sel = new HalfedgeSelection();
 		contentTools.setRotationEnabled(true);
 		contentTools.setDragEnabled(true);
-		if (e.isShiftDown()) {
-			for (Vertex<?,?,?> v : marqeeVertices) {
-				sel.setSelected(v, true, hif.getSelectionColor());
-			}
-		}
-		if (e.isAltDown()){
-			for(Edge<?,?,?> edge : getMarqueeEdges(marqeeVertices)){
-				sel.setSelected(edge, true, hif.getSelectionColor());
-			}
-		}
-		if (e.isControlDown()){
-			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
-				sel.setSelected(face, true, hif.getSelectionColor());
-			}
-		}
-		sel.addAll(startSelection.getNodes());
-		hif.setSelection(sel);
 		marqueeEnabled = false;
 		updateMarquee();
+		updateMarqueeSelection(e);
 	}
 
 	@Override
