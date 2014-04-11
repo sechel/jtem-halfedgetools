@@ -190,9 +190,8 @@ public class Immersion3DVisualizer extends DataVisualizerPlugin implements
 				if (!(val instanceof double[]))
 					throw new RuntimeException("No immersion!");
 				double[] tmp = (double[]) val;
-				if (tmp.length != 3)
-					throw new RuntimeException("No 3D vector!");
-
+				if (tmp.length > 4)
+					throw new RuntimeException("Value must be of dimension at most 4!");
 				// build up geometry
 				ifsf.setVertexCount(hds.numVertices());
 				ifsf.setFaceCount(hds.numFaces());
