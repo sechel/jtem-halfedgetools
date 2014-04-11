@@ -48,4 +48,10 @@ public class TriangleVolumeAdapter extends AbstractAdapter<Double> {
 	public double getPriority() {
 		return 0;
 	}
+	
+	@Override
+	public String toString() {
+		return "Triangle Volume";
+	}
+	
 }

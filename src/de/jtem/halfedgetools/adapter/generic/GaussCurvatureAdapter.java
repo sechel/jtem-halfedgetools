@@ -49,48 +49,9 @@ public class GaussCurvatureAdapter extends AbstractAdapter<Double> {
 		return 2*Math.PI-Math.abs(angle);
 	}
 	
-//	@Override
-//	public <
-//		V extends Vertex<V, E, F>,
-//		E extends Edge<V, E, F>,
-//		F extends Face<V, E, F>
-//	> Double getV(V v, AdapterSet a) {
-//		if(HalfEdgeUtils.isBoundaryVertex(v)) {
-//			return null;
-//		}
-//		double totalAngleDefect = 0.0;
-//		System.out.println(v);
-//		E e = v.getIncomingEdge();
-//		do {
-//			Double d = ada.get(e, a);
-//			if(d != null) {
-//				totalAngleDefect += d;
-//			}
-//			e = e.getNextEdge().getOppositeEdge();
-//		} while(e != v.getIncomingEdge());
-//		return totalAngleDefect/Math.PI;
-////		return 2*Math.PI-Math.abs(totalAngleDefect);
-//	}
-	
-//	@Override
-//	public <
-//		V extends Vertex<V, E, F>,
-//		E extends Edge<V, E, F>,
-//		F extends Face<V, E, F>
-//	> Double getV(V v, AdapterSet a) {
-//		if(HalfEdgeUtils.isBoundaryVertex(v)) {
-//			return null;
-//		}
-//		double gaussCurvature = Math.PI*2.0;
-//		E e = v.getIncomingEdge();
-//		do {
-//			double[] 
-//			       v1 = a.get(Position.class,e.getStartVertex(),double[].class),
-//			       v2 = a.get(Position.class,e.getTargetVertex(),double[].class),
-//			       v3 = a.get(Position.class,e.getNextEdge().getTargetVertex(),double[].class);
-//			gaussCurvature -= FunctionalUtils.angle(v1,v2,v3);
-//			e = e.getNextEdge().getOppositeEdge();
-//		} while(e != v.getIncomingEdge());
-//		return gaussCurvature;
-//	}
+	@Override
+	public String toString() {
+		return "Gauss Curvature";
+	}
+
 }

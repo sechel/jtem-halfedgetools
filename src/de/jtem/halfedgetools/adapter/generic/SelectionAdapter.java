@@ -85,4 +85,9 @@ public class SelectionAdapter extends AbstractAdapter<Boolean> {
 		hif.setSelected(f, value);
 	}
 	
+	@Override
+	public String toString() {
+		return "Selection";
+	}
+	
 }

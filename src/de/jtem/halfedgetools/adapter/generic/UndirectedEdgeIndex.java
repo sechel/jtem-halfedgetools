@@ -58,4 +58,9 @@ public class UndirectedEdgeIndex extends AbstractAdapter<Integer> {
 		}
 	}
 	
+	@Override
+	public String toString() {
+		return "Undirected Edge Index";
+	}
+	
 }

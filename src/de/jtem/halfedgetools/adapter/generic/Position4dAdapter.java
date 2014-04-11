@@ -75,4 +75,9 @@ public class Position4dAdapter extends AbstractAdapter<double[]> {
 		}
 	}
 	
+	@Override
+	public String toString() {
+		return "Position 4D";
+	}
+	
 }

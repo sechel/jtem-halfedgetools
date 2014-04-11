@@ -91,4 +91,9 @@ public class TexturePosition3dAdapter extends AbstractAdapter<double[]> {
 		}
 	}
 	
+	@Override
+	public String toString() {
+		return "Texture Position 3D";
+	}
+	
 }

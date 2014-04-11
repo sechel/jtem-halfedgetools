@@ -101,4 +101,10 @@ public class AngleDefectAdapter extends AbstractAdapter<Double> {
 //		System.out.println(e + ":" + angle);// +"="+ ra +"-"+la);
 		return (angle>Math.PI)?angle-2*Math.PI:angle;
 	}
+	
+	@Override
+	public String toString() {
+		return "Edge Angle Defect";
+	}
+	
 }

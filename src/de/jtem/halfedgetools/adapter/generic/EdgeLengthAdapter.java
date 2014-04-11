@@ -33,4 +33,9 @@ public class EdgeLengthAdapter extends AbstractAdapter<Double> {
 		return Edge.class.isAssignableFrom(nodeClass);
 	}
 
+	@Override
+	public String toString() {
+		return "Edge Length";
+	}
+	
 }

@@ -7,10 +7,12 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.VectorField;
 import de.jtem.halfedgetools.adapter.type.generic.EdgeVector;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 
 @EdgeVector
+@VectorField
 public class EdgeVectorAdapter extends AbstractAdapter<double[]> {
 
 	public EdgeVectorAdapter() {
@@ -37,5 +39,10 @@ public class EdgeVectorAdapter extends AbstractAdapter<double[]> {
 		double[] t = a.getDefault(Position3d.class, e.getTargetVertex(), new double[] {0,0,0});
 		return Rn.subtract(null, t, s);
 	}	
+
+	@Override
+	public String toString() {
+		return "Edge Vector";
+	}
 	
 }

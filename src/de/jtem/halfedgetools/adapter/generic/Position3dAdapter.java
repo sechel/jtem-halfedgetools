@@ -77,4 +77,9 @@ public class Position3dAdapter extends AbstractAdapter<double[]> {
 		}
 	}
 	
+	@Override
+	public String toString() {
+		return "Position 3D";
+	}
+	
 }

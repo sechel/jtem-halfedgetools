@@ -70,7 +70,7 @@ public class TextureBaryCenter3dAdapter extends AbstractAdapter<double[]> {
 	
 	@Override
 	public String toString() {
-		return "Barycenter 3D";
+		return "Texture Barycenter 3D";
 	}
 	
 }

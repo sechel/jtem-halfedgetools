@@ -46,5 +46,10 @@ public class FaceAreaAdapter extends AbstractAdapter<Double> {
 	public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
 		return Face.class.isAssignableFrom(nodeClass);
 	}
+	
+	@Override
+	public String toString() {
+		return "Triangle Area";
+	}
 
 }

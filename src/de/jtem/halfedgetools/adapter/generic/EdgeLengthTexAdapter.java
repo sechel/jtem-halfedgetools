@@ -32,5 +32,10 @@ public class EdgeLengthTexAdapter extends AbstractAdapter<Double> {
 	public <N extends Node<?, ?, ?>> boolean canAccept(Class<N> nodeClass) {
 		return Edge.class.isAssignableFrom(nodeClass);
 	}
+	
+	@Override
+	public String toString() {
+		return "Texture Edge length";
+	}
 
 }

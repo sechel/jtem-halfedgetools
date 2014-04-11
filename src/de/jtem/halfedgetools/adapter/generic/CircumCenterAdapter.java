@@ -41,6 +41,10 @@ public class CircumCenterAdapter extends AbstractAdapter<double[]> {
 		return GeometryUtility.circumCenter(c1, c2, c3);
 	}
 
+	@Override
+	public String toString() {
+		return "Circum Center";
+	}
 
 	@Override
 	public double getPriority() {

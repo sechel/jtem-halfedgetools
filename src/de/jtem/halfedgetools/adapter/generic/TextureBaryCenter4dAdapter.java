@@ -68,7 +68,7 @@ public class TextureBaryCenter4dAdapter extends AbstractAdapter<double[]> {
 	
 	@Override
 	public String toString() {
-		return "Barycenter 4D";
+		return "Texture Barycenter 4D";
 	}
 	
 }

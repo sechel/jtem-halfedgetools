@@ -85,4 +85,9 @@ public class TexturePosition4dAdapter extends AbstractAdapter<double[]> {
 		}
 	}
 	
+	@Override
+	public String toString() {
+		return "Texture Position 4D";
+	}
+	
 }
