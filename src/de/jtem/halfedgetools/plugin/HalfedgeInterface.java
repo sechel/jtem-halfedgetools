@@ -1475,7 +1475,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	}
 
 	public void setSelected(final Node<?, ?, ?> n, final boolean selected) {
-		getSelection().setSelected(n, selected, getSelectionColor());
+		HalfedgeSelection s = activeLayer.getSelection();
+		s.setSelected(n, selected);
+		activeLayer.setSelection(s);
 		activeLayer.updateSelection();
 	}
 
