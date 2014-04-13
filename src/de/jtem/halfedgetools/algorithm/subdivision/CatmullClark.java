@@ -46,13 +46,15 @@ import java.util.Set;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
+import de.jtem.halfedgetools.selection.Selection;
+import de.jtem.halfedgetools.selection.TypedSelection;
 import de.jtem.halfedgetools.util.HalfEdgeUtilsExtra;
 
 /**
@@ -87,6 +89,7 @@ public class CatmullClark {
 	 */
 
 	public <
+		N extends Node<V,E,F>,
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>, 
@@ -95,7 +98,7 @@ public class CatmullClark {
 		HDS oldHeds, 
 		HDS newHeds, 
 		AdapterSet a,
-		HalfedgeSelection sel, 
+		Selection sel,
 		boolean bSplineBoundary,
 		boolean bSplineFeatureLines,
 		boolean removeBoundary,
@@ -110,6 +113,7 @@ public class CatmullClark {
 	}
 
 	private <
+		N extends Node<V,E,F>,
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
@@ -118,7 +122,7 @@ public class CatmullClark {
 		HDS oldHeds, 
 		HDS newHeds, 
 		AdapterSet a,
-		HalfedgeSelection sel, 
+		Selection sel, 
 		Map<F, V> oldFnewVMap,
 		Map<E, V> oldEnewVMap, 
 		Map<V, V> oldVnewVMap,
@@ -126,7 +130,7 @@ public class CatmullClark {
 		boolean bSplineFeatureLines,
 		boolean linearInterpolation
 	) {
-		HalfedgeSelection vertex = new HalfedgeSelection();
+		Selection vertex = new Selection();
 		setNewFaceCoordinates(oldHeds, newHeds, oldFnewVMap, a);
 		setNewEdgeCoordinates(oldHeds, newHeds, oldFnewVMap, oldEnewVMap, oldVnewVMap, a, sel, bSplineFeatureLines, linearInterpolation);
 		setNewVertexCoordinates(oldHeds, newHeds, oldFnewVMap, oldVnewVMap, sel, vertex, a, bSplineBoundary, bSplineFeatureLines, linearInterpolation);
@@ -154,6 +158,7 @@ public class CatmullClark {
 	}
 
 	private  <
+		N extends Node<V,E,F>,
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
@@ -165,13 +170,13 @@ public class CatmullClark {
 		Map<E, V> oldEnewVMap, 
 		Map<V, V> oldVnewVMap,
 		AdapterSet a, 
-		HalfedgeSelection sel, 
+		Selection sel, 
 		boolean bSplineFeatureLines,
 		boolean linearInterpolation
 	) {
 	
 		for (E e : oldHeds.getPositiveEdges()) {
-			if (!isInteriorEdge(e)||(bSplineFeatureLines && sel.isSelected(e)) || linearInterpolation) {
+			if (!isInteriorEdge(e)||(bSplineFeatureLines && sel.contains(e)) || linearInterpolation) {
 				V v = newHeds.addNewVertex();
 				oldEnewVMap.put(e, v);
 				oldEnewVMap.put(e.getOppositeEdge(), v);
@@ -196,6 +201,7 @@ public class CatmullClark {
 	}
 	
 	private  <
+		N extends Node<V,E,F>,
 		V extends Vertex<V, E, F>, 
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
@@ -205,8 +211,8 @@ public class CatmullClark {
 		HDS newHeds, 
 		Map<F, V> oldFnewVMap,
 		Map<V, V> oldVnewVMap,
-		HalfedgeSelection sel,
-		HalfedgeSelection vertex,
+		Selection sel,
+		Selection vertex,
 		AdapterSet a,
 		boolean bSplineBoundary, 
 		boolean bSplineFeatureLines,
@@ -216,7 +222,7 @@ public class CatmullClark {
 			for (E e1 : sel.getEdges(oldHeds)) {
 				int counter = 0;
 				for (E e : incomingEdges(e1.getTargetVertex())) {
-					if (sel.isSelected(e)) {
+					if (sel.contains(e)) {
 						counter++;
 					}
 				}
@@ -262,14 +268,14 @@ public class CatmullClark {
 				V nv= newHeds.addNewVertex();
 				oldVnewVMap.put(v, nv);
 				a.set(Position.class, nv, a.getD(Position.class, v));
-			} else if(sel.isSelected(v)){
+			} else if(sel.contains(v)){
 				V nv= newHeds.addNewVertex();
 				oldVnewVMap.put(v, nv);
 				List<E> star= incomingEdges(v);
 				double[][] vHelp = new double[2][];
 				vHelp[0] = null;
 				for (E e : star){
-					if(sel.isSelected(e)){
+					if(sel.contains(e)){
 						a.setParameter("alpha", 0.75);
 						a.setParameter("ignore", true);
 						if(vHelp[0] ==null){
@@ -281,7 +287,7 @@ public class CatmullClark {
 						
 					}
 				}
-			} else if (vertex.isSelected(v)) {
+			} else if (vertex.contains(v)) {
 				V nv = newHeds.addNewVertex();
 				oldVnewVMap.put(v, nv);
 				a.set(Position.class, nv, a.getD(Position.class, v));
@@ -323,7 +329,7 @@ public class CatmullClark {
 	> Map<E, Set<E>> createCombinatorics(
 		HDS oldHeds, 
 		HDS newHeds,
-		HalfedgeSelection sel, 
+		Selection sel, 
 		Map<F, V> oldFnewVMap,
 		Map<E, V> oldEnewVMap, 
 		Map<V, V> oldVnewVMap,
@@ -333,7 +339,7 @@ public class CatmullClark {
 		Map<E, E> evOutEmap = new HashMap<E, E>();
 		Map<E, E> edgeMap = new HashMap<E, E>();
 		Map<E, Set<E>> oldEtoSubDivEs = new HashMap<E, Set<E>>();
-		HalfedgeSelection outSel = new HalfedgeSelection();
+		TypedSelection<E> outSel = new TypedSelection<E>();
 
 		// face vertex connections and linkage
 
@@ -385,7 +391,7 @@ public class CatmullClark {
 				in.linkOppositeEdge(out);
 				in.setTargetVertex(vv);
 				out.setTargetVertex(ev);
-				if (sel.isSelected(e) && bSplineFeatureLines && !(removeBoundary && isBoundaryVertex(v))) {
+				if (sel.contains(e) && bSplineFeatureLines && !(removeBoundary && isBoundaryVertex(v))) {
 					outSel.add(in);
 					outSel.add(out);
 				}

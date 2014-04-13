@@ -32,7 +32,7 @@ OF SUCH DAMAGE.
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
 import java.awt.event.InputEvent;
-import java.util.List;
+import java.util.Set;
 
 import javax.swing.KeyStroke;
 
@@ -43,7 +43,6 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -58,16 +57,13 @@ public class EdgeRemoverFillPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		HalfedgeSelection s = new HalfedgeSelection(hif.getSelection());
-		List<E> edges = s.getEdges(hds);
+		Set<E> edges = hif.getSelection().getEdges(hds);
 		if (edges.isEmpty()) return;
 		for (E e : edges) {
 			if (e.isPositive() || !e.isValid()) continue;
 			TopologyAlgorithms.removeEdgeFill(e);
 		}
-		s.removeAll(edges);
 		hif.update();
-		hif.setSelection(s);
 	}
 
 	@Override

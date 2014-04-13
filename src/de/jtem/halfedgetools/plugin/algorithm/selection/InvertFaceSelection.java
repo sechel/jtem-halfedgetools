@@ -6,10 +6,10 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class InvertFaceSelection extends AlgorithmPlugin {
@@ -31,12 +31,10 @@ public class InvertFaceSelection extends AlgorithmPlugin {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		HalfedgeSelection sel = hcp.getSelection();
-		for (F f : hds.getFaces()){
-			boolean selected = sel.isSelected(f);
-			sel.setSelected(f, !selected, hi.getSelectionColor());
-		}
-		hcp.setSelection(sel);
+		Selection sel = hcp.getSelection();
+		Selection newSel = new Selection(hds.getFaces());
+		newSel.removeAll(sel.getFaces());
+		hcp.setSelection(newSel);
 	}
 
 	@Override

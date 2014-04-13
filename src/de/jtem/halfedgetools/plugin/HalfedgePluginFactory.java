@@ -55,7 +55,6 @@ import de.jtem.halfedgetools.plugin.algorithm.selection.ImportSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.InvertEdgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.InvertFaceSelection;
 import de.jtem.halfedgetools.plugin.algorithm.selection.InvertVertexSelection;
-import de.jtem.halfedgetools.plugin.algorithm.selection.SelectionColor;
 import de.jtem.halfedgetools.plugin.algorithm.simplification.GarlandHeckbertPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkLinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkPlugin;
@@ -181,7 +180,6 @@ public class HalfedgePluginFactory {
 		s.add(new ClearFaceSelection());
 		s.add(new ExportSelection());
 		s.add(new ImportSelection());
-		s.add(new SelectionColor());
 		s.add(new MarqueeSelectionPlugin());
 		return s;
 	}

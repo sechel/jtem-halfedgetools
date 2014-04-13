@@ -7,10 +7,10 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class BoundaryVertexSelection extends AlgorithmPlugin {
@@ -32,11 +32,14 @@ public class BoundaryVertexSelection extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
-		HalfedgeSelection sel = hcp.getSelection();
+		Selection sel = hcp.getSelection();
 		for (V v : hds.getVertices()){
 			if (HalfEdgeUtils.isBoundaryVertex(v)) {
-				boolean selected = sel.isSelected(v);
-				sel.setSelected(v, !selected, hcp.getSelectionColor());
+				if (sel.contains(v)) {
+					sel.remove(v);
+				} else {
+					sel.add(v);
+				}
 			}
 		}
 		hcp.setSelection(sel);

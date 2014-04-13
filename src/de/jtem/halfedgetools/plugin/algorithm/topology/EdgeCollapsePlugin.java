@@ -1,7 +1,6 @@
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
 import java.awt.event.InputEvent;
-import java.util.List;
 
 import javax.swing.KeyStroke;
 
@@ -10,16 +9,16 @@ import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.adapter.type.TexturePosition;
 import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.selection.Selection;
+import de.jtem.halfedgetools.selection.TypedSelection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class EdgeCollapsePlugin extends AlgorithmPlugin {
@@ -31,21 +30,20 @@ public class EdgeCollapsePlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
-		List<E> edges = hcp.getSelection().getEdges(hds);
+		TypedSelection<E> edges = hcp.getSelection().getEdges(hds);
 		if (edges.isEmpty()) return;
-		TypedAdapterSet<double[]> da = a.querySet(double[].class);
-		HalfedgeSelection s = new HalfedgeSelection();
+		Selection s = new Selection();
 		for (E e : edges) {
 			if (e.isPositive()) continue;
-			double[] p = da.get(BaryCenter3d.class, e);
-			double[] tp = da.get(TexturePosition2d.class, e);
+			double[] p = a.getD(BaryCenter3d.class, e);
+			double[] tp = a.getD(TexturePosition2d.class, e);
 			V v = TopologyAlgorithms.collapseEdge(e);
 			a.set(Position.class, v, p);
 			a.set(TexturePosition.class, v, tp);
-			s.setSelected(v, true, hcp.getSelectionColor());
+			s.add(v);
 		}
-		hcp.setSelection(s);
 		hcp.update();
+		hcp.setSelection(s);
 	}
 
 	@Override

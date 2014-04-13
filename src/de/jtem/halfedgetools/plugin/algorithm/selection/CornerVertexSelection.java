@@ -4,7 +4,6 @@ package de.jtem.halfedgetools.plugin.algorithm.selection;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.Collection;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -18,15 +17,17 @@ import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
+import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.selection.Selection;
+import de.jtem.halfedgetools.selection.TypedSelection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
@@ -41,7 +42,7 @@ public class CornerVertexSelection extends AlgorithmDialogPlugin implements Chan
 	private JSpinner
 		ratioPiSpinner = new JSpinner(ratioPiModel);
 	
-	private HalfedgeSelection oldSelection = null;
+	private Selection oldSelection = null;
 	
 	public CornerVertexSelection() {
 		panel .setLayout(new GridBagLayout());
@@ -65,7 +66,7 @@ public class CornerVertexSelection extends AlgorithmDialogPlugin implements Chan
 
 	@Override
 	public String getAlgorithmName() {
-		return "Corner boundary verticies";
+		return "Corner boundary vertices";
 	}
 
 	@Override
@@ -74,17 +75,8 @@ public class CornerVertexSelection extends AlgorithmDialogPlugin implements Chan
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-		> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
-		HalfedgeSelection sel = hcp.getSelection();
-		for(V v : selectCorners(hcp, hds, a).getVertices(hds)){
-			sel.setSelected(v,true, hcp.getSelectionColor());
-		}
-		hcp.setSelection(sel);
-
-	}
-	
-	public static  <E extends Edge<?,E,?>> Collection<E> boundaryEgdesPolygon(HalfEdgeDataStructure<?,E,?> heds){
-		return null;
+	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
+		hcp.setSelection(selectCorners(hcp, hds, a));
 	}
 	
 	@Override
@@ -117,7 +109,7 @@ public class CornerVertexSelection extends AlgorithmDialogPlugin implements Chan
 		if(oldSelection == null) {
 			oldSelection = hcp.getSelection();
 		}
-		HalfedgeSelection cornerSel = selectCorners(hcp, hcp.get(), hcp.getAdapters());
+		TypedSelection<? extends Node<?,?,?>> cornerSel = selectCorners(hcp, hcp.get(), hcp.getAdapters());
 		hcp.setSelection(cornerSel);
 	}
 
@@ -126,8 +118,8 @@ public class CornerVertexSelection extends AlgorithmDialogPlugin implements Chan
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> HalfedgeSelection selectCorners(HalfedgeInterface hi, HDS hds, AdapterSet a) {
-		HalfedgeSelection selCorners = new HalfedgeSelection();
+	> TypedSelection<V> selectCorners(HalfedgeInterface hi, HDS hds, AdapterSet a) {
+		TypedSelection<V> selCorners = new TypedSelection<V>();
 		double eps = Math.PI / ratioPiModel.getNumber().intValue();
 		
 		double [] n = new double[3];
@@ -139,7 +131,7 @@ public class CornerVertexSelection extends AlgorithmDialogPlugin implements Chan
 			Rn.add(u, a.get(Position.class, e.getStartVertex(), double[].class), n);
 			Rn.add(w, a.get(Position.class, e.getNextEdge().getTargetVertex(), double[].class), n);
 			if(Math.abs(Rn.euclideanAngle(u, w)-Math.PI) > eps){
-				selCorners.setSelected(e.getTargetVertex(), true, hi.getSelectionColor());
+				selCorners.add(e.getTargetVertex());
 			}
 		}
 		

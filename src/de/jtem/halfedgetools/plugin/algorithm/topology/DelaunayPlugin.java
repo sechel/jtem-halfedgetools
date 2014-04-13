@@ -32,7 +32,7 @@ OF SUCH DAMAGE.
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -41,7 +41,6 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.triangulation.Delaunay;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.util.ConsistencyCheck;
@@ -60,13 +59,12 @@ public class DelaunayPlugin extends AlgorithmPlugin {
 		if (!ConsistencyCheck.isTriangulation(hds)) {
 			throw new RuntimeException("Surface is no triangulation in Delaunay()");
 		}
-		HalfedgeSelection s = hi.getSelection();
-		List<E> selectedEdges = new LinkedList<E>(s.getEdges(hds));
+		Set<E> selectedEdges = hi.getSelection().getEdges(hds);
 		try {
 			if (selectedEdges.isEmpty()) {
 				Delaunay.constructDelaunay(hds, a);
 			} else {
-				Delaunay.constructDelaunay(hds, selectedEdges, a);
+				Delaunay.constructDelaunay(hds, new LinkedList<E>(selectedEdges), a);
 			}
 		} catch (TriangulationException e) {
 			throw new RuntimeException(e.getLocalizedMessage());

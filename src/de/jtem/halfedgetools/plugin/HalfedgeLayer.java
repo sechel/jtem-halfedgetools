@@ -15,6 +15,7 @@ import static de.jreality.shader.CommonAttributes.PICKABLE;
 import static de.jreality.shader.CommonAttributes.TUBES_DRAW;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 import static de.jreality.shader.CommonAttributes.Z_BUFFER_ENABLED;
+import static de.jtem.halfedgetools.selection.SelectionUtility.createSelectionGeometry;
 import static java.util.Collections.unmodifiableSet;
 
 import java.awt.Color;
@@ -61,6 +62,8 @@ import de.jtem.halfedgetools.jreality.ConverterHds2Ifs;
 import de.jtem.halfedgetools.jreality.ConverterHeds2JR;
 import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
+import de.jtem.halfedgetools.selection.Selection;
+import de.jtem.halfedgetools.selection.TypedSelection;
 
 public class HalfedgeLayer implements ActionListener {
 
@@ -89,8 +92,8 @@ public class HalfedgeLayer implements ActionListener {
 		geometryAppearance = new Appearance("Geometry Appearance");
 	private Map<Integer, Edge<?, ?, ?>> 
 		edgeMap = new HashMap<Integer, Edge<?, ?, ?>>();
-	private HalfedgeSelection 
-		selection = new HalfedgeSelection();
+	private Selection 
+		selection = new Selection();
 	private Set<VisualizerPlugin> 
 		visualizers = new TreeSet<VisualizerPlugin>();
 
@@ -363,22 +366,18 @@ public class HalfedgeLayer implements ActionListener {
 		hds = template;
 		convertFaceSet();
 		// convert selection
-		Color col;
-		HalfedgeSelection newSelection = new HalfedgeSelection();
-		for (Vertex<?, ?, ?> v : selection.getVertices()) {
-			Vertex<?, ?, ?> nv = hds.getVertex(v.getIndex());
-			col = selection.getColor(v);
-			newSelection.setSelected(nv, true, col);
+		Selection newSelection = new Selection();
+		for (Vertex<?,?,?> v : selection.getVertices()) {
+			Vertex<?,?,?> nv = hds.getVertex(v.getIndex());
+			newSelection.add(nv, selection.getChannel(v));
 		}
 		for (Edge<?, ?, ?> e : selection.getEdges()) {
 			Edge<?, ?, ?> ne = hds.getEdge(e.getIndex());
-			col = selection.getColor(e);
-			newSelection.setSelected(ne, true, col);
+			newSelection.add(ne, selection.getChannel(e));
 		}
 		for (Face<?, ?, ?> f : selection.getFaces()) {
 			Face<?, ?, ?> nf = hds.getFace(f.getIndex());
-			col = selection.getColor(f);
-			newSelection.setSelected(nf, true, col);
+			newSelection.add(nf, selection.getChannel(f));
 		}
 		selection = newSelection;
 		hif.updateStates();
@@ -459,12 +458,12 @@ public class HalfedgeLayer implements ActionListener {
 		}
 	}
 
-	public HalfedgeSelection getSelection() {
-		return new HalfedgeSelection(selection);
+	public Selection getSelection() {
+		return new Selection(selection);
 	}
 
-	public void setSelection(HalfedgeSelection sel) {
-		this.selection = new HalfedgeSelection(sel);
+	public void setSelection(TypedSelection<? extends Node<?,?,?>> sel) {
+		this.selection = new Selection(sel);
 		updateSelection();
 		hif.fireSelectionChanged(selection);
 	}
@@ -476,9 +475,8 @@ public class HalfedgeLayer implements ActionListener {
 	}
 
 	protected void validateSelection() {
-		for (Node<?, ?, ?> checkNode : selection.getNodes()) {
-			if (!checkNode.isValid()
-					|| checkNode.getHalfEdgeDataStructure() != hds) {
+		for (Node<?, ?, ?> checkNode : new Selection(selection)) {
+			if (!checkNode.isValid() || checkNode.getHalfEdgeDataStructure() != hds) {
 				selection.remove(checkNode);
 			}
 		}
@@ -507,7 +505,7 @@ public class HalfedgeLayer implements ActionListener {
 		layerRoot.removeChild(selectionRoot);
 		AdapterSet a = hif.getAdapters();
 		a.addAll(hif.getActiveVolatileAdapters());
-		selectionRoot = selection.createSelectionGeometry(a);
+		selectionRoot = createSelectionGeometry(selection, a);
 		selectionRoot.setPickable(false);
 		Appearance app = selectionRoot.getAppearance();
 		hif.createSelectionAppearance(app, this, 0.1);
@@ -556,40 +554,44 @@ public class HalfedgeLayer implements ActionListener {
 			} catch (Exception e) {
 				return;
 			}
-			if (pr == null)
+			if (pr == null) {
 				return;
+			}
 			int index = pr.getIndex();
-			if (index < 0)
+			if (index < 0) {
 				return;
-			Color color = hif.getSelectionColor();
+			}
 			switch (pr.getPickType()) {
-			case PickResult.PICK_TYPE_POINT:
-				if (hds.numVertices() <= index)
-					return;
-				Vertex<?, ?, ?> v = hds.getVertex(index);
-				boolean selected = selection.isSelected(v);
-				selection.setSelected(v, !selected, color);
-				break;
-			case PickResult.PICK_TYPE_LINE:
-				Edge<?, ?, ?> e = edgeMap.get(index);
-				if (e == null) {
-					System.err.println("Edge index not found");
-					return;
-				}
-				selected = selection.isSelected(e);
-				selection.setSelected(e, !selected, color);
-				selected = selection.isSelected(e.getOppositeEdge());
-				selection.setSelected(e.getOppositeEdge(), !selected, color);
-				break;
-			case PickResult.PICK_TYPE_FACE:
-				if (hds.numFaces() <= index)
-					return;
-				Face<?, ?, ?> f = hds.getFace(index);
-				selected = selection.isSelected(f);
-				selection.setSelected(f, !selected, color);
-				break;
-			default:
-				return;
+				case PickResult.PICK_TYPE_POINT:
+					if (index < hds.numVertices()) {
+						Vertex<?,?,?> v = hds.getVertex(index);
+						if (selection.contains(v)) {
+							selection.remove(v);
+						} else {
+							selection.add(v);
+						}
+					}
+					break;
+				case PickResult.PICK_TYPE_LINE:
+					Edge<?,?,?> e = edgeMap.get(index);
+					if (selection.contains(e)) {
+						selection.remove(e);
+						selection.remove(e.getOppositeEdge());
+					} else {
+						selection.add(e);
+						selection.add(e.getOppositeEdge());
+					}
+					break;
+				case PickResult.PICK_TYPE_FACE:
+					if (index < hds.numFaces()) {
+						Face<?,?,?> f = hds.getFace(index);
+						if (selection.contains(f)) {
+							selection.remove(f);
+						} else {
+							selection.add(f);
+						}
+					}
+					break;
 			}
 			hif.fireSelectionChanged(selection);
 			updateSelection();

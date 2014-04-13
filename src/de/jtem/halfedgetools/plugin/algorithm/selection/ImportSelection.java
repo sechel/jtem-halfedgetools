@@ -1,6 +1,5 @@
 package de.jtem.halfedgetools.plugin.algorithm.selection;
 
-import java.awt.Color;
 import java.awt.Window;
 import java.io.File;
 import java.io.FileReader;
@@ -19,10 +18,10 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
@@ -85,25 +84,22 @@ public class ImportSelection extends AlgorithmPlugin implements UIFlavor {
 		File file = selChooser.getSelectedFile();
 		try {
 			hcp.clearSelection();
-			HalfedgeSelection sel = new HalfedgeSelection();
+			Selection sel = new Selection();
 			FileReader fr = new FileReader(file);
 			int[][] indices = (int[][])xstream.fromXML(fr);
 			for (int vi : indices[0]) {
 				if (vi < hds.numVertices()) {
-					Vertex<?,?,?> vertex = hds.getVertex(vi);
-					sel.setSelected(vertex, true, Color.RED);
+					sel.add(hds.getVertex(vi));
 				}
 			}
 			for (int ei : indices[1]) {
 				if (ei < hds.numEdges()) {
-					Edge<?,?,?> edge = hds.getEdge(ei);
-					sel.setSelected(edge, true, Color.RED);
+					sel.add(hds.getEdge(ei));
 				}
 			}
 			for (int fi : indices[2]) {
 				if (fi < hds.numFaces()) {
-					Face<?,?,?> face = hds.getFace(fi);
-					sel.setSelected(face, true, Color.RED);
+					sel.add(hds.getFace(fi));
 				}
 			}
 			hcp.setSelection(sel);

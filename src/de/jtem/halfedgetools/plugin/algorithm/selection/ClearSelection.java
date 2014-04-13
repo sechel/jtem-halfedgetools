@@ -13,6 +13,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class ClearSelection extends AlgorithmPlugin {
@@ -39,7 +40,7 @@ public class ClearSelection extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
-		hcp.clearSelection();
+		hcp.setSelection(new Selection());
 	}
 
 	@Override

@@ -32,7 +32,7 @@ OF SUCH DAMAGE.
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
 import java.awt.event.InputEvent;
-import java.util.List;
+import java.util.Set;
 
 import javax.swing.KeyStroke;
 
@@ -50,9 +50,9 @@ import de.jtem.halfedgetools.adapter.type.generic.Position3d;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class FaceScalerPlugin extends AlgorithmPlugin {
@@ -70,9 +70,9 @@ public class FaceScalerPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		List<F> faces = hif.getSelection().getFaces(hds);
+		Set<F> faces = hif.getSelection().getFaces(hds);
 		if (faces.isEmpty()) return;
-		HalfedgeSelection s = new HalfedgeSelection();
+		Selection s = new Selection();
 		for (F oldF : faces) {
 			double[] p = a.get(BaryCenter3d.class, oldF, double[].class);
 			double[] tp = a.get(TexturePosition2d.class, oldF, double[].class);
@@ -94,12 +94,10 @@ public class FaceScalerPlugin extends AlgorithmPlugin {
 				a.set(TexturePosition.class, v, newTexPos);
 				i++;
 			}
-			s.setSelected(f, true, hif.getSelectionColor());
+			s.add(f);
 		}
-		hif.setSelection(s);
 		hif.update();
-		
-		
+		hif.setSelection(s);		
 	}
 
 	@Override
@@ -121,6 +119,5 @@ public class FaceScalerPlugin extends AlgorithmPlugin {
 	public PluginInfo getPluginInfo() {
 		return new PluginInfo("Face Scaler", "Kristoffer Josefsson");
 	}
-
 
 }

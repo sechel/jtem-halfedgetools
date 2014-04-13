@@ -55,6 +55,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import de.jtem.halfedgetools.plugin.swing.IconCellRenderer;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
@@ -206,7 +207,7 @@ public class VisualizersManager extends Plugin implements ListSelectionListener,
 	
 	
 	public void updateContent() {
-		HalfedgeSelection sel = hif.getSelection();
+		Selection sel = hif.getSelection();
 		hif.updateNoUndo();
 		hif.setSelection(sel);
 	}

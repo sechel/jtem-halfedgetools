@@ -31,8 +31,6 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.subdivision;
 
-import java.util.List;
-
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -44,6 +42,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.selection.TypedSelection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class StellarLinearPlugin extends AlgorithmPlugin {
@@ -60,12 +59,12 @@ public class StellarLinearPlugin extends AlgorithmPlugin {
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
 		HDS hds2 = hcp.createEmpty(hds);
 		TypedAdapterSet<double[]> da = a.querySet(double[].class);
-		List<F> faces = hcp.getSelection().getFaces(hds);
+		TypedSelection<F> faces = hcp.getSelection().getFaces(hds);
 		if(faces.size() == 0) {
 			subdivider.execute(hds, hds2, da);
 			hcp.set(hds2);	
 		} else {
-			for(F f: faces) {
+			for (F f: faces) {
 				subdivider.subdivideFace(hds, f, da);
 			}
 			hcp.set(hds);	

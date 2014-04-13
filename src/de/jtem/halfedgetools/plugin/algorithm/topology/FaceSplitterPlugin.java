@@ -32,7 +32,7 @@ OF SUCH DAMAGE.
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
 import java.awt.event.InputEvent;
-import java.util.List;
+import java.util.Set;
 
 import javax.swing.KeyStroke;
 
@@ -47,9 +47,9 @@ import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class FaceSplitterPlugin extends AlgorithmPlugin {
@@ -61,9 +61,9 @@ public class FaceSplitterPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		List<F> faces = hi.getSelection().getFaces(hds);
+		Set<F> faces = hi.getSelection().getFaces(hds);
 		if (faces.isEmpty()) return;
-		HalfedgeSelection s = new HalfedgeSelection();
+		Selection s = new Selection();
 		for (F f : faces) {
 			double[] p = a.get(BaryCenter3d.class, f, double[].class);
 			double[] tp = a.get(TexturePosition2d.class, f, double[].class);
@@ -71,8 +71,8 @@ public class FaceSplitterPlugin extends AlgorithmPlugin {
 			a.set(Position.class, v, p);
 			a.set(TexturePosition.class, v, tp);
 		}
-		hi.setSelection(s);
 		hi.update();
+		hi.setSelection(s);
 	}
 
 	@Override

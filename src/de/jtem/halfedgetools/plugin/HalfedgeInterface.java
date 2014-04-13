@@ -18,7 +18,6 @@ import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 import static javax.swing.SwingUtilities.getWindowAncestor;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -117,6 +116,8 @@ import de.jtem.halfedgetools.jreality.adapter.JRTexturePositionAdapter;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.halfedgetools.plugin.widget.LayerPropertyWidget;
+import de.jtem.halfedgetools.selection.Selection;
+import de.jtem.halfedgetools.selection.TypedSelection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
@@ -206,8 +207,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	private ConverterHds2Ifs 
 		converterHds2Ifs = null;
 	
-	private Color color = activeLayer.getSelection().getDefaultColor();
-
 	public HalfedgeInterface() {
 		makeLayout();
 		// add generic and default adapters
@@ -241,7 +240,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		return selectionListeners.remove(l);
 	}
 
-	protected void fireSelectionChanged(final HalfedgeSelection sel) {
+	protected void fireSelectionChanged(final Selection sel) {
 		synchronized (selectionListeners) {
 			for (final SelectionListener l : selectionListeners) {
 				Runnable r = new Runnable() {
@@ -1462,35 +1461,18 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		}
 	}
 
-	public HalfedgeSelection getSelection() {
+	public Selection getSelection() {
 		return activeLayer.getSelection();
 	}
 
-	public void setSelection(final HalfedgeSelection s) {
+	public <
+		S extends TypedSelection<? extends Node<?,?,?>>
+	> void setSelection(S s) {
 		activeLayer.setSelection(s);
 	}
-
+	
 	public void clearSelection() {
-		activeLayer.clearSelection();
-	}
-
-	public void setSelected(final Node<?, ?, ?> n, final boolean selected) {
-		HalfedgeSelection s = activeLayer.getSelection();
-		s.setSelected(n, selected);
-		activeLayer.setSelection(s);
-		activeLayer.updateSelection();
-	}
-
-	public boolean isSelected(Node<?, ?, ?> n) {
-		return getSelection().isSelected(n);
-	}
-	
-	public void setSelectionColor(Color color) {
-		this.color = color;
-	}
-	
-	public Color getSelectionColor(){
-		return this.color;
+		activeLayer.setSelection(new Selection());
 	}
 
 	public boolean isShowBoundingBox() {

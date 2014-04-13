@@ -50,10 +50,10 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.subdivision.CatmullClark;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmDialogPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 
@@ -128,7 +128,7 @@ public class CatmullClarkPlugin extends AlgorithmDialogPlugin {
 		boolean bSplineBoundary = BSplineButton.isSelected();
 		boolean removeBoundary = NoBoundary.isSelected();
 		boolean linearInterpolation = useLinearChecker.isSelected();
-		HalfedgeSelection sel = new HalfedgeSelection(hcp.getSelection());
+		Selection sel = new Selection(hcp.getSelection());
 		
 		Map<F, V> oldFnewVMap = new HashMap<F, V>();
 		Map<E, V> oldEnewVMap = new HashMap<E, V>();

@@ -32,7 +32,7 @@ OF SUCH DAMAGE.
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
 import java.awt.event.InputEvent;
-import java.util.List;
+import java.util.Set;
 
 import javax.swing.KeyStroke;
 
@@ -43,10 +43,10 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class RemoveVertexFillPlugin extends AlgorithmPlugin {
@@ -59,12 +59,11 @@ public class RemoveVertexFillPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
-		List<V> vertices = hi.getSelection().getVertices(hds);
+		Set<V> vertices = hi.getSelection().getVertices(hds);
 		if (vertices.isEmpty()) return;
-		HalfedgeSelection s = new HalfedgeSelection();
+		Selection s = new Selection();
 		for (V v : vertices) {
-			F f = TopologyAlgorithms.removeVertexFill(v);
-			s.setSelected(f, true, hi.getSelectionColor());
+			s.add(TopologyAlgorithms.removeVertexFill(v));
 		}
 		hi.update();
 		hi.setSelection(s);

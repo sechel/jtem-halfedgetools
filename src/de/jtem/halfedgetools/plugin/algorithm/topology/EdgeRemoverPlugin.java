@@ -31,7 +31,7 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
-import java.util.List;
+import java.util.Set;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -40,7 +40,6 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -55,7 +54,7 @@ public class EdgeRemoverPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		List<E> edges = hif.getSelection().getEdges(hds);
+		Set<E> edges = hif.getSelection().getEdges(hds);
 		if (edges.isEmpty()) return;
 		int numEdges = 0;
 		for (E e : edges) {
@@ -64,8 +63,6 @@ public class EdgeRemoverPlugin extends AlgorithmPlugin {
 			getCurrentJob().fireJobProgress(progress);
 			TopologyAlgorithms.removeEdge(e);
 		}
-		HalfedgeSelection s = hif.getSelection();
-		s.removeAll(edges);
 		hif.update();
 	}
 

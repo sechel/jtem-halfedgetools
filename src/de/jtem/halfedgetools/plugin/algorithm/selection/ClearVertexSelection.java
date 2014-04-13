@@ -6,10 +6,10 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class ClearVertexSelection extends AlgorithmPlugin {
@@ -31,11 +31,8 @@ public class ClearVertexSelection extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
-		HalfedgeSelection sel = hcp.getSelection();
-		
-		for (V v : sel.getVertices(hds)){		
-				sel.remove(v);			
-		}
+		Selection sel = hcp.getSelection();
+		sel.removeAll(sel.getVertices());
 		hcp.setSelection(sel);
 	}
 

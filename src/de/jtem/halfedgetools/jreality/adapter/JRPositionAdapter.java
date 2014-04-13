@@ -8,6 +8,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.Position;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
 import de.jtem.halfedgetools.jreality.node.JREdge;
 import de.jtem.halfedgetools.jreality.node.JRFace;
 import de.jtem.halfedgetools.jreality.node.JRVertex;
@@ -54,6 +55,9 @@ public class JRPositionAdapter extends Adapter<double[]> {
 		F extends Face<V, E, F>
 	> double[] getE(E e, AdapterSet a) {
 		JREdge<?, ?, ?> je = (JREdge<?, ?, ?>)e;
+		if (je.position == null) {
+			return a.getD(BaryCenter4d.class, e);
+		}
 		return je.position;
 	}	
 	@Override
@@ -63,6 +67,9 @@ public class JRPositionAdapter extends Adapter<double[]> {
 		F extends Face<V, E, F>
 	> double[] getF(F f, AdapterSet a) {
 		JRFace<?, ?, ?> jf = (JRFace<?, ?, ?>)f; 
+		if (jf.position == null) {
+			return a.getD(BaryCenter4d.class, f);
+		}
 		return jf.position;
 	}
 	

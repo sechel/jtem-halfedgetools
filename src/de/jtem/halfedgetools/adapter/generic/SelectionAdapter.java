@@ -6,17 +6,17 @@ import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.Selection;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.selection.Selection;
 
-@Selection
-public class SelectionAdapter extends AbstractAdapter<Boolean> {
+@de.jtem.halfedgetools.adapter.type.Selection
+public class SelectionAdapter extends AbstractAdapter<Integer> {
 
 	private HalfedgeInterface
 		hif = null;
 	
 	public SelectionAdapter(HalfedgeInterface hif) {
-		super(Boolean.class, true, true);
+		super(Integer.class, true, true);
 		this.hif = hif;
 	}
 	
@@ -32,57 +32,28 @@ public class SelectionAdapter extends AbstractAdapter<Boolean> {
 
 	@Override
 	public boolean checkType(Class<?> typeClass) {
-		return Boolean.class == typeClass;
+		return Integer.class == typeClass;
 	}
 
 	@Override
 	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>
-	> Boolean getV(V v, AdapterSet a) {
-		return hif.isSelected(v);
-	}
-	@Override
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>
-	> Boolean getE(E e, AdapterSet a) {
-		return hif.isSelected(e);
-	}	
-	@Override
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>
-	> Boolean getF(F f, AdapterSet a) {
-		return hif.isSelected(f);
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		N extends Node<V, E, F>
+	> Integer get(N n, AdapterSet a) {
+		return hif.getSelection().getChannel(n);
 	}
 	
 	@Override
 	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>
-	> void setV(V v, Boolean value, AdapterSet a) {
-		hif.setSelected(v, value);
-	}
-	@Override
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>
-	> void setE(E e, Boolean value, AdapterSet a) {
-		hif.setSelected(e, value);
-	}
-	@Override
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>,
-		F extends Face<V, E, F>
-	> void setF(F f, Boolean value, AdapterSet a) {
-		hif.setSelected(f, value);
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		N extends Node<V, E, F>
+	> void set(N n, Integer value, AdapterSet a) {
+		Selection s = hif.getSelection();
+		s.add(n, value);
 	}
 	
 	@Override

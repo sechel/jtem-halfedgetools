@@ -29,6 +29,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.Position4d;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 
@@ -50,8 +51,8 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 		active = new Point();
 	private boolean 
 		selectInside = false;
-	private HalfedgeSelection 
-		startSelection = new HalfedgeSelection();
+	private Selection 
+		startSelection = new Selection();
 	private SceneGraphComponent	
 		marqueeRoot = new SceneGraphComponent("Marquee");
 	private Appearance
@@ -315,25 +316,25 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 			return;
 		}
 		
-		HalfedgeSelection marqueeSelection = new HalfedgeSelection();
+		Selection marqueeSelection = new Selection();
 		if(e.isShiftDown()){
 			for (Vertex<?,?,?> v : marqeeVertices) {
-				marqueeSelection.setSelected(v, true, hif.getSelectionColor());
+				marqueeSelection.add(v);
 			}
 		}
 		if(e.isAltDown()){
 			for(Edge<?,?,?> edge : getMarqueeEdges(marqeeVertices)){
-				marqueeSelection.setSelected(edge, true, hif.getSelectionColor());
+				marqueeSelection.add(edge);
 			}
 		}
 		
 		if(e.isControlDown()){
 			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
-				marqueeSelection.setSelected(face, true, hif.getSelectionColor());
+				marqueeSelection.add(face);
 			}
 		}	
-		HalfedgeSelection newSelection = new HalfedgeSelection(startSelection);
-		newSelection.addAll(marqueeSelection.getNodes());
+		Selection newSelection = new Selection(startSelection);
+		newSelection.addAll(marqueeSelection);
 		hif.setSelection(newSelection);
 	}
 	

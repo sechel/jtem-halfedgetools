@@ -31,10 +31,7 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
-import java.awt.Color;
 import java.awt.event.InputEvent;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.swing.KeyStroke;
 
@@ -50,9 +47,10 @@ import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
+import de.jtem.halfedgetools.selection.Selection;
+import de.jtem.halfedgetools.selection.TypedSelection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class EdgeSplitterPlugin extends AlgorithmPlugin {
@@ -65,8 +63,8 @@ public class EdgeSplitterPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hif) {
-		HalfedgeSelection s = new HalfedgeSelection(hif.getSelection());
-		List<E> edges = new LinkedList<E>(s.getEdges(hds));
+		Selection s = hif.getSelection();
+		TypedSelection<E> edges = s.getEdges(hds);
 		if (edges.isEmpty()) return;
 		a.setParameter("alpha", 0.5);
 		a.setParameter("ignore", true);
@@ -77,14 +75,12 @@ public class EdgeSplitterPlugin extends AlgorithmPlugin {
 				V v = TopologyAlgorithms.splitEdge(e);
 				a.set(Position.class, v, p);
 				a.set(TexturePosition.class, v, tp);
-				Color color = hif.getSelectionColor();
-				s.setSelected(v, true, color);
+				s.add(v);
 				for(E ae : HalfEdgeUtils.incomingEdges(v)) {
-					s.setSelected(ae, true, color);
-					s.setSelected(ae.getOppositeEdge(), true, color);
+					s.add(ae);
+					s.add(ae.getOppositeEdge());
 				}
 			}
-			
 		}
 		hif.update();
 		hif.setSelection(s);

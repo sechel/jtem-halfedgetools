@@ -44,10 +44,10 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
-import de.jtem.halfedgetools.plugin.HalfedgeSelection;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.selection.TypedSelection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class EdgeFlipperPlugin extends AlgorithmPlugin {
@@ -60,7 +60,7 @@ public class EdgeFlipperPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
-		List<E> edges = hcp.getSelection().getEdges(hds);
+		TypedSelection<E> edges = hcp.getSelection().getEdges(hds);
 		if (edges.isEmpty()) return;
 		for (E e : edges) {
 			if (e.isPositive()) continue;
@@ -83,8 +83,7 @@ public class EdgeFlipperPlugin extends AlgorithmPlugin {
 			TopologyAlgorithms.flipEdge(e);
 		}
 		hcp.update();
-		HalfedgeSelection s = new HalfedgeSelection(edges);
-		hcp.setSelection(s);
+		hcp.setSelection(edges);
 	}
 
 	
