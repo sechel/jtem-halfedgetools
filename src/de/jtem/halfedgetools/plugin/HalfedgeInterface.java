@@ -117,6 +117,7 @@ import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.halfedgetools.plugin.widget.LayerPropertyWidget;
 import de.jtem.halfedgetools.selection.Selection;
+import de.jtem.halfedgetools.selection.SelectionListener;
 import de.jtem.halfedgetools.selection.TypedSelection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
@@ -471,7 +472,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		layersPanel.setLayout(new GridLayout());
 		layersPanel.add(layersScroller);
 		layersScroller.setMinimumSize(new Dimension(30, 150));
-//		layersTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
 		layersTable.setRowHeight(22);
 		layersTable.getSelectionModel().addListSelectionListener(this);
 		layersTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);

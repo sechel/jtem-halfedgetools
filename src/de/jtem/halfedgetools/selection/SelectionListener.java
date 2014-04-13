@@ -1,6 +1,6 @@
-package de.jtem.halfedgetools.plugin;
+package de.jtem.halfedgetools.selection;
 
-import de.jtem.halfedgetools.selection.Selection;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 
 public interface SelectionListener {
 

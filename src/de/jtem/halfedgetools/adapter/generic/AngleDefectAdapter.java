@@ -58,7 +58,6 @@ public class AngleDefectAdapter extends AbstractAdapter<Double> {
 			angleDefectMap.put(e.getOppositeEdge(),-sign*angleDefect);
 			
 		} 
-		System.out.println(e +":"+angleDefectMap.get(e));
 		return angleDefectMap.get(e);			
 	}
 	

@@ -168,6 +168,7 @@ public class HalfedgePluginFactory {
 	
 	public static Set<Plugin> createSelectionPlugins() {
 		Set<Plugin> s = new HashSet<Plugin>();
+		s.add(new SelectionInterface());
 		s.add(new BoundaryVertexSelection());
 		s.add(new BoundaryEdgeSelection());
 		s.add(new BoundaryFaceSelection());

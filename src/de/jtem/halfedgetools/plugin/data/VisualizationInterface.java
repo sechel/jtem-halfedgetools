@@ -4,7 +4,6 @@ import static javax.swing.JSplitPane.HORIZONTAL_SPLIT;
 import static javax.swing.JTabbedPane.WRAP_TAB_LAYOUT;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -18,11 +17,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -31,9 +28,7 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
 
 import de.jreality.plugin.basic.View;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -45,6 +40,8 @@ import de.jtem.halfedgetools.plugin.HalfedgeListener;
 import de.jtem.halfedgetools.plugin.data.DataVisualizer.NodeType;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.halfedgetools.plugin.swing.IconCellRenderer;
+import de.jtem.halfedgetools.ui.ButtonCellEditor;
+import de.jtem.halfedgetools.ui.ButtonCellRenderer;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
@@ -92,9 +89,7 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 	private ButtonCellEditor
 		createCellEditor = new ButtonCellEditor(),
 		removeCellEditor = new ButtonCellEditor();
-	private JButton
-		noActionButton = new JButton();
-	
+
 	public VisualizationInterface() {
 		shrinkPanel.setTitle("Halfedge Data Visualitazion");
 		shrinkPanel.setShrinked(true);
@@ -571,62 +566,6 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 	}
 	
 	
-	private class ButtonCellRenderer extends DefaultTableCellRenderer {
-
-		private static final long serialVersionUID = 1L;
-		private JButton renderButton = new JButton();
-		
-		@Override
-		public Component getTableCellRendererComponent(JTable table,
-				Object value, boolean isSelected, boolean hasFocus, int row,
-				int column) {
-			if (value instanceof JButton && value != noActionButton) {
-				JButton buttonValue = (JButton)value;
-				renderButton.setIcon(buttonValue.getIcon());
-				renderButton.setText(buttonValue.getText());
-				return renderButton;
-			} else {
-				return super.getTableCellRendererComponent(table, "", isSelected, hasFocus, row, column);
-			}
-		}
-		
-		@Override
-		public void updateUI() {
-			super.updateUI();
-			if (renderButton != null) {
-				renderButton.updateUI();
-			}
-		}
-		
-	}
-	
-	
-	private class ButtonCellEditor extends AbstractCellEditor implements TableCellEditor {
-
-		private static final long 	
-			serialVersionUID = 1L;
-		private JLabel
-			defaultEditor = new JLabel("-");
-		private Object 
-			activeValue = null;
-		
-		@Override
-		public Component getTableCellEditorComponent(JTable table,
-				Object value, boolean isSelected, int row, int column) {
-			this.activeValue = value;
-			if (value instanceof Component) {
-				return (Component)value;
-			}
-			return defaultEditor;
-		}
-		@Override
-		public Object getCellEditorValue() {
-			return activeValue;
-		}
-		
-	}
-	
-	
 	private class VisualizerModel extends DefaultTableModel {
 		
 		private static final long 
@@ -672,19 +611,19 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 					if (v.canRead(source, NodeType.Vertex) && source.canAccept(hds.getVertexClass())) {
 						return new CreateVisualizerButton(layer, source, v, NodeType.Vertex);
 					} else {
-						return noActionButton;
+						return null;
 					}
 				case 3: 					
 					if (v.canRead(source, NodeType.Edge) && source.canAccept(hds.getEdgeClass())) {
 						return new CreateVisualizerButton(layer, source, v, NodeType.Edge);
 					} else {
-						return noActionButton;
+						return null;
 					}
 				case 4: 
 					if (v.canRead(source, NodeType.Face) && source.canAccept(hds.getFaceClass())) {
 						return new CreateVisualizerButton(layer, source, v, NodeType.Face);
 					} else {
-						return noActionButton;
+						return null;
 					}
 				default: return "";
 			}
