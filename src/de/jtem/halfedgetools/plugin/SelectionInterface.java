@@ -26,6 +26,8 @@ import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
 public class SelectionInterface extends ShrinkPanelPlugin implements ActionListener {
 
+	private Icon
+		removeIcon = ImageHook.getIcon("remove.png");
 	private ButtonGroup
 		activationButtonGroup = new ButtonGroup();	
 	private List<Channel>
@@ -35,8 +37,6 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 	private Channel
 		activeChannel = defaultChannel;
 
-	private Icon
-		removeIcon = ImageHook.getIcon("remove.png");
 	private JButton
 		addChannelButton = new JButton("New Channel");
 	private ChannelModel
@@ -130,7 +130,7 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 			channels.remove(channel);
 			activeChannel = defaultChannel;
 			activationButtonGroup.remove(channel.activationButton);
-			channelModel.fireTableDataChanged();
+			updateChannelTable();
 		}
 		
 	}
@@ -176,8 +176,14 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 			case 0:
 				return c;
 			case 1:
+				if (activeChannel == c) {
+					c.activationButton.setSelected(true);
+				}
 				return c.activationButton;
 			case 2:
+				if (c == defaultChannel) {
+					c.deleteButton.setEnabled(false);
+				}
 				return c.deleteButton;
 			}
 			return null;
@@ -195,6 +201,7 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 	}
 	
 	private void updateChannelTable() {
+		channelModel = new ChannelModel();
 		channelTable.setModel(channelModel);
 		channelTable.setRowHeight(22);
 		channelTable.getTableHeader().setPreferredSize(new Dimension(10, 0));
