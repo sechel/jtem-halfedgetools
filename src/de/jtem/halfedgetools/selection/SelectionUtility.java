@@ -6,9 +6,11 @@ import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
 import static de.jreality.shader.CommonAttributes.TRANSPARENCY;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 
+import java.awt.Color;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.jreality.geometry.IndexedFaceSetFactory;
@@ -23,17 +25,17 @@ import de.jreality.scene.PointSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
-import de.jtem.halfedge.Node;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.Position3d;
+import de.jtem.halfedgetools.plugin.SelectionInterface;
 
 public final class SelectionUtility {
 
 	private SelectionUtility() {
 	}
 
-	public static IndexedFaceSet createOffsetFaces(FaceSelection fSel, AdapterSet a, double offset) {
+	public static IndexedFaceSet createOffsetFaces(FaceSelection fSel, AdapterSet a, double offset, Map<Integer, Color> colorMap) {
 			double[][] faceVerts = null;
 			int[][] faceIndices = new int[fSel.size() * 2][];
 			float[][] fColors = new float[fSel.size()][3];
@@ -84,12 +86,15 @@ public final class SelectionUtility {
 				}
 				vList.addAll(fvList);
 				vIndex += fvList.size();
-	//			Color fc = fMap.get(f);
-				fColors[k] = new float[]{1,0,0};//fc.getRGBColorComponents(null);
-				double[] color = new double[]{(double)fColors[k][0],
-						(double)fColors[k][1],(double)fColors[k][2]};
-				faceColors[2*k] = color;
-				faceColors[2*k+1] = color;
+				Color color = SelectionInterface.DEFAULT_COLOR;
+				Integer channel = fSel.getChannel(f);
+				if (colorMap.containsKey(channel)) {
+					color = colorMap.get(channel);
+				}
+				fColors[k] = color.getRGBColorComponents(null);
+				double[] col = new double[]{fColors[k][0], fColors[k][1], fColors[k][2]};
+				faceColors[2*k] = col;
+				faceColors[2*k+1] = col;
 				k++;
 			}
 			faceVerts = vList.toArray(new double[][] {});
@@ -106,7 +111,7 @@ public final class SelectionUtility {
 			return fsf.getIndexedFaceSet();
 		}
 
-	public static IndexedLineSet createEdges(EdgeSelection eSel, AdapterSet a) {
+	public static IndexedLineSet createEdges(EdgeSelection eSel, AdapterSet a, Map<Integer, Color> colorMap) {
 			Set<Edge<?,?,?>> drawSet = new HashSet<Edge<?,?,?>>();
 			for (Edge<?,?,?> e : eSel) {
 				if (drawSet.contains(e.getOppositeEdge())) {
@@ -130,10 +135,13 @@ public final class SelectionUtility {
 				edgeVerts[index++] = tp;
 				edgeIndices[index/2 - 1][0] = index - 2;
 				edgeIndices[index/2 - 1][1] = index - 1;
-	//			Color ec = eMap.get(e);
-				eColors[i] = new float[]{1,0,0};//ec.getRGBColorComponents(null);
-				edgeColors[i] = new double[]{(double)eColors[i][0],
-						(double)eColors[i][1],(double)eColors[i][2]};
+				Color color = SelectionInterface.DEFAULT_COLOR;
+				Integer channel = eSel.getChannel(e);
+				if (colorMap.containsKey(channel)) {
+					color = colorMap.get(channel);
+				}
+				eColors[i] = color.getRGBColorComponents(null);
+				edgeColors[i] = new double[]{eColors[i][0], eColors[i][1], eColors[i][2]};
 				i++;
 			}
 			IndexedLineSetFactory lsf = new IndexedLineSetFactory();
@@ -146,7 +154,7 @@ public final class SelectionUtility {
 			return lsf.getIndexedLineSet();
 		}
 
-	public static PointSet createVertices(VertexSelection vSel, AdapterSet a) {
+	public static PointSet createVertices(VertexSelection vSel, AdapterSet a, Map<Integer, Color> colorMap) {
 			if (vSel.size() == 0) return new PointSet();
 			int index = 0;
 			double[][] vertexPos = new double[vSel.size()][];
@@ -156,10 +164,13 @@ public final class SelectionUtility {
 			for (Vertex<?,?,?> v : vSel) {
 				double[] pos = a.getD(Position3d.class, v);
 				vertexPos[index] = pos;
-	//			Integer vc = vSel.get(v);
-				vColors[index] = new float[]{1,0,0};//vc.getRGBColorComponents(null);
-				vertexColors[index] = new double[]{(double)vColors[index][0],
-						(double)vColors[index][1],(double)vColors[index][2]};
+				Color color = SelectionInterface.DEFAULT_COLOR;
+				Integer channel = vSel.getChannel(v);
+				if (colorMap.containsKey(channel)) {
+					color = colorMap.get(channel);
+				}
+				vColors[index] = color.getRGBColorComponents(null);
+				vertexColors[index] = new double[]{vColors[index][0], vColors[index][1], vColors[index][2]};
 				index++;
 			}
 			PointSetFactory psf = new PointSetFactory();
@@ -170,7 +181,7 @@ public final class SelectionUtility {
 			return psf.getPointSet();
 		}
 
-	public static SceneGraphComponent createSelectionGeometry(TypedSelection<Node<?,?,?>> sel, AdapterSet a) {
+	public static SceneGraphComponent createSelectionGeometry(Selection sel, AdapterSet a, Map<Integer, Color> colorMap) {
 			Appearance edgeAppearance = new Appearance("Edge Appearance");
 			Appearance faceAppearance = new Appearance("Face Appearance");
 			Appearance selectionAppearance = new Appearance("Selection Appearance");
@@ -190,20 +201,20 @@ public final class SelectionUtility {
 			
 			SceneGraphComponent root = new SceneGraphComponent("Selection");
 			if (vSel.size() > 0) {
-				PointSet ps = createVertices(vSel, a);
+				PointSet ps = createVertices(vSel, a, colorMap);
 				SceneGraphComponent pc = new SceneGraphComponent("Point Selection");
 				pc.setGeometry(ps);
 				root.addChild(pc);
 			}
 			if (eSel.size() > 0) {
-				IndexedLineSet ils = createEdges(eSel, a);
+				IndexedLineSet ils = createEdges(eSel, a, colorMap);
 				SceneGraphComponent ec = new SceneGraphComponent("Edge Selection");
 				ec.setGeometry(ils);
 				ec.setAppearance(edgeAppearance);
 				root.addChild(ec);
 			}
 			if (fSel.size() > 0) {
-				IndexedFaceSet ifs = createOffsetFaces(fSel, a, 0.01);
+				IndexedFaceSet ifs = createOffsetFaces(fSel, a, 0.01, colorMap);
 				SceneGraphComponent fc = new SceneGraphComponent("Face Selection");
 				fc.setGeometry(ifs);
 				fc.setAppearance(faceAppearance);

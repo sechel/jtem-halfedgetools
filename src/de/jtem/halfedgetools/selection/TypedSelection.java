@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -30,7 +31,10 @@ public class TypedSelection <N extends Node<?,?,?>> implements Set<N>, Serializa
 	public TypedSelection(Collection<? extends N> c) {
 		addAll(c);
 	}
-	public TypedSelection(N... nArr) {
+	public TypedSelection(TypedSelection<? extends N> c) {
+		M.putAll(c.M);
+	}
+	public <NN extends N> TypedSelection(NN... nArr) {
 		addAll(Arrays.asList(nArr));
 	}
 	
@@ -113,10 +117,10 @@ public class TypedSelection <N extends Node<?,?,?>> implements Set<N>, Serializa
 		return r;
 	}
 	
-	public TypedSelection<N> getChannel(Integer channel) {
-		TypedSelection<N> r = new TypedSelection<N>();
+	public Selection getChannel(Integer channel) {
+		Selection r = new Selection();
 		for (N n : this) {
-			Integer c = M.get(n);
+			Integer c = getChannel(n);
 			if (c.equals(channel)) {
 				r.M.put(n, c);
 			}
@@ -126,6 +130,10 @@ public class TypedSelection <N extends Node<?,?,?>> implements Set<N>, Serializa
 	
 	public Integer getChannel(N n) {
 		return M.get(n);
+	}
+	
+	public Set<Integer> getChannels() {
+		return new TreeSet<Integer>(M.values());
 	}
 	
 	
@@ -143,6 +151,11 @@ public class TypedSelection <N extends Node<?,?,?>> implements Set<N>, Serializa
 	public boolean addAll(Collection<? extends N> c) {
 		return addAll(c, CHANNEL_DEFAULT);
 	}
+	public boolean addAll(TypedSelection<? extends N> c) {
+		boolean r = !M.keySet().containsAll(c);
+		M.putAll(c.M);
+		return r;
+	}
 	public boolean addAll(Collection<? extends N> c, Integer channel) {
 		boolean r = false;
 		for (N n : c) {
@@ -154,6 +167,13 @@ public class TypedSelection <N extends Node<?,?,?>> implements Set<N>, Serializa
 	@Override
 	public void clear() {
 		M.clear();
+	}
+	public void clear(Integer channel) {
+		for (N n : new HashSet<N>(this)) {
+			if (channel.equals(getChannel(n))) {
+				remove(n);
+			}
+		}
 	}
 
 	@Override

@@ -30,6 +30,7 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.Position4d;
 import de.jtem.halfedgetools.selection.Selection;
+import de.jtem.halfedgetools.selection.TypedSelection;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
 
@@ -316,22 +317,20 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 			return;
 		}
 		
+		HalfedgeLayer layer = hif.getActiveLayer();
 		Selection marqueeSelection = new Selection();
+		Integer channel = TypedSelection.CHANNEL_DEFAULT;
+		if (hif.getSelectionInterface() != null) {
+			channel = hif.getSelectionInterface().getActiveInputChannel(layer);
+		}
 		if(e.isShiftDown()){
-			for (Vertex<?,?,?> v : marqeeVertices) {
-				marqueeSelection.add(v);
-			}
+			marqueeSelection.addAll(marqeeVertices, channel);
 		}
 		if(e.isAltDown()){
-			for(Edge<?,?,?> edge : getMarqueeEdges(marqeeVertices)){
-				marqueeSelection.add(edge);
-			}
+			marqueeSelection.addAll(getMarqueeEdges(marqeeVertices), channel);
 		}
-		
 		if(e.isControlDown()){
-			for (Face<?,?,?> face : getMarqueeFaces(marqeeVertices)){
-				marqueeSelection.add(face);
-			}
+			marqueeSelection.addAll(getMarqueeFaces(marqeeVertices), channel);
 		}	
 		Selection newSelection = new Selection(startSelection);
 		newSelection.addAll(marqueeSelection);

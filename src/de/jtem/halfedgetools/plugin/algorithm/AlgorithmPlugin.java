@@ -233,7 +233,7 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		return 0;
 	}
 	
-	public abstract<
+	public abstract <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,

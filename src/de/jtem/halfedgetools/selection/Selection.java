@@ -12,7 +12,10 @@ public class Selection extends TypedSelection<Node<?,?,?>> {
 	public Selection() {
 		super();
 	}
-	public Selection(Collection<? extends Node<?, ?, ?>> c) {
+	public <N extends Node<?,?,?>> Selection(Collection<N> c) {
+		super(c);
+	}
+	public <N extends Node<?,?,?>> Selection(TypedSelection<N> c) {
 		super(c);
 	}
 	public <N extends Node<?,?,?>> Selection(N... nArr) {

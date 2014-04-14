@@ -467,9 +467,20 @@ public class HalfedgeLayer implements ActionListener {
 		updateSelection();
 		hif.fireSelectionChanged(selection);
 	}
+	
+	public void addSelection(TypedSelection<? extends Node<?,?,?>> sel) {
+		this.selection.addAll(sel);
+		updateSelection();
+		hif.fireSelectionChanged(selection);
+	}
 
 	public void clearSelection() {
 		this.selection.clear();
+		updateSelection();
+		hif.fireSelectionChanged(selection);
+	}
+	public void clearSelection(Integer channel) {
+		this.selection.clear(channel);
 		updateSelection();
 		hif.fireSelectionChanged(selection);
 	}
@@ -505,7 +516,11 @@ public class HalfedgeLayer implements ActionListener {
 		layerRoot.removeChild(selectionRoot);
 		AdapterSet a = hif.getAdapters();
 		a.addAll(hif.getActiveVolatileAdapters());
-		selectionRoot = createSelectionGeometry(selection, a);
+		Map<Integer, Color> colorMap = new HashMap<Integer, Color>();
+		if (hif.getSelectionInterface() != null) {
+			colorMap = hif.getSelectionInterface().getChannelColors(this);
+		}
+		selectionRoot = createSelectionGeometry(selection, a, colorMap);
 		selectionRoot.setPickable(false);
 		Appearance app = selectionRoot.getAppearance();
 		hif.createSelectionAppearance(app, this, 0.1);
@@ -561,6 +576,10 @@ public class HalfedgeLayer implements ActionListener {
 			if (index < 0) {
 				return;
 			}
+			Integer channel = TypedSelection.CHANNEL_DEFAULT;
+			if (hif.getSelectionInterface() != null) {
+				channel = hif.getSelectionInterface().getActiveInputChannel(HalfedgeLayer.this);
+			}
 			switch (pr.getPickType()) {
 				case PickResult.PICK_TYPE_POINT:
 					if (index < hds.numVertices()) {
@@ -568,7 +587,7 @@ public class HalfedgeLayer implements ActionListener {
 						if (selection.contains(v)) {
 							selection.remove(v);
 						} else {
-							selection.add(v);
+							selection.add(v, channel);
 						}
 					}
 					break;
@@ -578,8 +597,8 @@ public class HalfedgeLayer implements ActionListener {
 						selection.remove(e);
 						selection.remove(e.getOppositeEdge());
 					} else {
-						selection.add(e);
-						selection.add(e.getOppositeEdge());
+						selection.add(e, channel);
+						selection.add(e.getOppositeEdge(), channel);
 					}
 					break;
 				case PickResult.PICK_TYPE_FACE:
@@ -588,7 +607,7 @@ public class HalfedgeLayer implements ActionListener {
 						if (selection.contains(f)) {
 							selection.remove(f);
 						} else {
-							selection.add(f);
+							selection.add(f, channel);
 						}
 					}
 					break;

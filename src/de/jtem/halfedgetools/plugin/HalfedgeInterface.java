@@ -139,6 +139,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		menuBar = null;
 	private JobQueuePlugin 
 		jobQueue = null;
+	private SelectionInterface
+		selectionInterface = null;
 
 	private SceneGraphComponent 
 		root = new SceneGraphComponent("Halfedge Root");
@@ -1135,6 +1137,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		persistentAdapters.add(new SelectionAdapter(this));
 		menuBar = c.getPlugin(ViewMenuBar.class);
 		jobQueue = c.getPlugin(JobQueuePlugin.class);
+		selectionInterface = c.getPlugin(SelectionInterface.class);
 
 		menuBar.addMenuItem(getClass(), -101, undoAction, "Halfedge");
 		menuBar.addMenuItem(getClass(), -100, redoAction, "Halfedge");
@@ -1182,7 +1185,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	@Override
 	public PluginInfo getPluginInfo() {
 		PluginInfo info = new PluginInfo();
-		info.name = "Halfedge JReality Interface";
+		info.name = "Halfedge Interface";
 		info.vendorName = "Stefan Sechelmann";
 		info.icon = ImageHook.getIcon("asterisk_orange.png");
 		return info;
@@ -1462,13 +1465,23 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	}
 
 	public Selection getSelection() {
-		return activeLayer.getSelection();
+		if (selectionInterface == null) {
+			return activeLayer.getSelection();
+		} else {
+			return selectionInterface.getFilteredSelection(activeLayer);
+		}
 	}
 
 	public <
 		S extends TypedSelection<? extends Node<?,?,?>>
 	> void setSelection(S s) {
 		activeLayer.setSelection(s);
+	}
+	
+	public <
+		S extends TypedSelection<? extends Node<?,?,?>>
+	> void addSelection(S s) {
+		activeLayer.addSelection(s);
 	}
 	
 	public void clearSelection() {
@@ -1516,4 +1529,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		return null;
 	}
 
+	public SelectionInterface getSelectionInterface() {
+		return selectionInterface;
+	}
+	
 }

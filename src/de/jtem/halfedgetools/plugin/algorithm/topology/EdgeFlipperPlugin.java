@@ -44,14 +44,19 @@ import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.algorithm.topology.TopologyAlgorithms;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.SelectionInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.halfedgetools.selection.TypedSelection;
+import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class EdgeFlipperPlugin extends AlgorithmPlugin {
 
+	private final Integer
+		CHANNEL_FLIPPED_EDGES = 23423433;
 
 	@Override
 	public <
@@ -60,6 +65,7 @@ public class EdgeFlipperPlugin extends AlgorithmPlugin {
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
+		Selection flippedEdges = new Selection();
 		TypedSelection<E> edges = hcp.getSelection().getEdges(hds);
 		if (edges.isEmpty()) return;
 		for (E e : edges) {
@@ -81,9 +87,11 @@ public class EdgeFlipperPlugin extends AlgorithmPlugin {
 				throw new RuntimeException("Can only flip edges between triangles");
 			}
 			TopologyAlgorithms.flipEdge(e);
+			flippedEdges.add(e, CHANNEL_FLIPPED_EDGES);
+			flippedEdges.add(e.getOppositeEdge(), CHANNEL_FLIPPED_EDGES);
 		}
 		hcp.update();
-		hcp.setSelection(edges);
+		hcp.addSelection(flippedEdges);
 	}
 
 	
@@ -111,7 +119,11 @@ public class EdgeFlipperPlugin extends AlgorithmPlugin {
 		return info;
 	}
 	
-	
+	@Override
+	public void install(Controller c) throws Exception {
+		super.install(c);
+		c.getPlugin(SelectionInterface.class).registerChannelName(CHANNEL_FLIPPED_EDGES, "Flipped Edges");
+	}
 	
 
 }
