@@ -54,6 +54,7 @@
 	</path>	
 	<path id="jreality.libraryclasspath">
 		<pathelement location="${lib}/jreality/jReality.jar"/>
+		<pathelement location="${lib}/jreality/colorpicker.jar"/>
 	</path>	
 	<path id="junit.libraryclasspath">
 		<pathelement location="${lib}/junit/junit-4.11.jar"/>	

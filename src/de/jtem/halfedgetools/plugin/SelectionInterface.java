@@ -163,8 +163,11 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 	}
 	
 	public Map<Integer, Color> getChannelColors(HalfedgeLayer layer) {
-		LayerChannels channels = layerMap.get(layer);
 		Map<Integer, Color> colorMap = new HashMap<Integer, Color>();
+		LayerChannels channels = layerMap.get(layer);
+		if (channels == null) {
+			return colorMap;
+		}
 		for (Channel c : channels) {
 			colorMap.put(c.channel, c.color);
 		}
@@ -382,7 +385,11 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 
 		@Override
 		public int getRowCount() {
-			return channels.size();
+			if (channels == null) {
+				return 0;
+			} else {
+				return channels.size();
+			}
 		}
 		
 		@Override

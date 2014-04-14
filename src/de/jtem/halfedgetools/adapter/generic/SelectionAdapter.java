@@ -54,6 +54,7 @@ public class SelectionAdapter extends AbstractAdapter<Integer> {
 	> void set(N n, Integer value, AdapterSet a) {
 		Selection s = hif.getSelection();
 		s.add(n, value);
+		hif.addSelection(s);
 	}
 	
 	@Override
