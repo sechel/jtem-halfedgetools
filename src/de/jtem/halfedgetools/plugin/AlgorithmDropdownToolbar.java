@@ -178,7 +178,7 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 
 	@Override
 	public double getToolBarPriority() {
-		return 0;
+		return 100;
 	}
 	
 	public void addAlgorithm(AlgorithmPlugin ap) {
