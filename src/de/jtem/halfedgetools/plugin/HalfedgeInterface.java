@@ -840,7 +840,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 			}
 			updateStates();
 			checkContent();
-			encompassAll();
+			encompassContent();
 		}
 
 		@Override
@@ -1191,36 +1191,24 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		return info;
 	}
 
-	public void createSelectionAppearance(Appearance app, HalfedgeLayer layer,
-			double offset) {
+	public void createSelectionAppearance(Appearance app, HalfedgeLayer layer, double offset) {
 		EffectiveAppearance ea = getEffectiveAppearance(layer.getLayerRoot());
-		if(ea == null) {
-			return;
-		}
-		DefaultGeometryShader dgs1 = ShaderUtility
-				.createDefaultGeometryShader(ea);
+		if(ea == null) return;
+		DefaultGeometryShader dgs1 = ShaderUtility .createDefaultGeometryShader(ea);
 		DefaultPointShader dps1 = (DefaultPointShader) dgs1.getPointShader();
 		DefaultLineShader dls1 = (DefaultLineShader) dgs1.getLineShader();
-		app.setAttribute(POINT_SHADER + "." + RADII_WORLD_COORDINATES,
-				dps1.getRadiiWorldCoordinates());
-		app.setAttribute(POINT_SHADER + "." + POINT_RADIUS,
-				dps1.getPointRadius() * (1 + offset));
-		app.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, dls1.getTubeRadius()
-				* (1 + offset));
-		app.setAttribute(LINE_SHADER + "." + RADII_WORLD_COORDINATES,
-				dls1.getRadiiWorldCoordinates());
+		app.setAttribute(POINT_SHADER + "." + RADII_WORLD_COORDINATES, dps1.getRadiiWorldCoordinates());
+		app.setAttribute(POINT_SHADER + "." + POINT_RADIUS, dps1.getPointRadius() * (1 + offset));
+		app.setAttribute(LINE_SHADER + "." + TUBE_RADIUS, dls1.getTubeRadius() * (1 + offset));
+		app.setAttribute(LINE_SHADER + "." + RADII_WORLD_COORDINATES, dls1.getRadiiWorldCoordinates());
 	}
 
 	public EffectiveAppearance getEffectiveAppearance(SceneGraphComponent sgc) {
-		if (scene == null)
-			return null;
+		if (scene == null) return null;
 		SceneGraphComponent sceneRoot = scene.getSceneRoot();
-		List<SceneGraphPath> pathList = SceneGraphUtility.getPathsBetween(
-				sceneRoot, sgc);
-		if (pathList.isEmpty())
-			return null;
-		EffectiveAppearance ea = EffectiveAppearance.create(pathList.get(0));
-		return ea;
+		List<SceneGraphPath> pathList = SceneGraphUtility.getPathsBetween(sceneRoot, sgc);
+		if (pathList.isEmpty())	return null;
+		return EffectiveAppearance.create(pathList.get(0));
 	}
 
 	public HalfedgeLayer createLayer(String name) {
@@ -1255,10 +1243,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		}
 		updateStates();
 		fireLayerRemoved(layer);
-	}
-
-	public void encompassAll() {
-		JRViewerUtility.encompassEuclidean(scene);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -1309,12 +1293,15 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	}
 
 	public void checkContent() {
-		if (scene == null)
-			return;
+		if (scene == null) return;
 		List<SceneGraphPath> paths = getPathsBetween(scene.getSceneRoot(), root);
 		if (paths.isEmpty()) {
 			content.setContent(root);
 		}
+		encompassContent();
+	}
+
+	private void normalizeContent() {
 		MatrixBuilder mb = MatrixBuilder.euclidean();
 		rootTransform.setMatrix(mb.getArray());
 		Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(root);
@@ -1324,6 +1311,17 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		for (HalfedgeLayer l : layers) {
 			l.updateBoundingBox();
 		}
+	}
+	
+	public void encompassContent() {
+		Runnable encompassJob = new Runnable() {
+			@Override
+			public void run() {
+				normalizeContent();
+				JRViewerUtility.encompassEuclidean(scene);
+			}
+		};
+		EventQueue.invokeLater(encompassJob);
 	}
 
 	public class HalfedgeContentListener implements ContentChangedListener {
@@ -1376,7 +1374,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 					activateLayer(layers.get(0));
 					checkContent();
 					updateStates();
-					encompassAll();					
+					encompassContent();					
 				}
 			};
 			

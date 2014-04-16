@@ -577,8 +577,9 @@ public class HalfedgeLayer implements ActionListener {
 				return;
 			}
 			Integer channel = TypedSelection.CHANNEL_DEFAULT;
-			if (hif.getSelectionInterface() != null) {
-				channel = hif.getSelectionInterface().getActiveInputChannel(HalfedgeLayer.this);
+			SelectionInterface sif = hif.getSelectionInterface();
+			if (sif != null) {
+				channel = sif.getActiveInputChannel(HalfedgeLayer.this);
 			}
 			switch (pr.getPickType()) {
 				case PickResult.PICK_TYPE_POINT:

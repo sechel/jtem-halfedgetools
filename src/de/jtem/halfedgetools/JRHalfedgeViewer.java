@@ -49,10 +49,10 @@ import de.jtem.jrworkspace.plugin.simplecontroller.widget.SplashScreen;
 public class JRHalfedgeViewer {
 	
 	public static void initHalfedgeFronted() {
-		initHalfedgeFronted(false);
+		initHalfedgeFronted(false, false);
 	}
 	
-	public static void initHalfedgeFronted(boolean useGLJPanel) {
+	public static void initHalfedgeFronted(boolean useGLJPanel, boolean useJOGL3) {
 		if (!useGLJPanel) {
 			supportsOverlay = false;
 		}
@@ -62,17 +62,23 @@ public class JRHalfedgeViewer {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
+		String JOGL3 = "";
+		if (useGLJPanel) {
+			JOGL3 = SystemProperties.VIEWER_DEFAULT_JOGL3 + " "; 
+		}
 		if (overlaysSupported) {
 			System.setProperty(
 				SystemProperties.VIEWER,
 				"de.jreality.jogl.GLJPanelViewer" + " " + 
 				SystemProperties.VIEWER_DEFAULT_JOGL + " " + 
+				JOGL3 +
 				SystemProperties.VIEWER_DEFAULT_SOFT
 			);
 		} else {
 			System.setProperty(
 				SystemProperties.VIEWER,
-				SystemProperties.VIEWER_DEFAULT_JOGL + " " + 
+				SystemProperties.VIEWER_DEFAULT_JOGL + " " +
+				JOGL3 +
 				SystemProperties.VIEWER_DEFAULT_SOFT
 			);
 		}
@@ -107,7 +113,7 @@ public class JRHalfedgeViewer {
 	public static void main(String[] args) {
 		SplashScreen splash = new JRealitySplashScreen();
 		splash.setVisible(true);
-		initHalfedgeFronted();
+		initHalfedgeFronted(false, true);
 		JRViewer v = new JRViewer();
 		v.setSplashScreen(splash);
 		v.setPropertiesFile("JRHalfedgeViewer.xml");

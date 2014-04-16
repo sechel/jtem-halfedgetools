@@ -20,7 +20,6 @@
 	<classpathentry kind="lib" path="lib/jtem/modelling.jar"/>
 	<classpathentry kind="lib" path="lib/jreality/colorpicker.jar"/>
 	<classpathentry kind="lib" path="lib/jreality/janino.jar"/>
-	<classpathentry kind="lib" path="lib/jreality/jReality.jar" sourcepath="/jreality"/>
 	<classpathentry kind="lib" path="lib/jreality/jterm.jar"/>
 	<classpathentry kind="lib" path="lib/jreality/jython_console.jar"/>
 	<classpathentry kind="lib" path="lib/jreality/jython-standalone-2.5.3.jar"/>
@@ -29,5 +28,6 @@
 	<classpathentry kind="lib" path="lib/jogamp/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="lib/jogamp/jogl-all.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/beans.jar"/>
+	<classpathentry kind="lib" path="lib/jreality/jReality.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

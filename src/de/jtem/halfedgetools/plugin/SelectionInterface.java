@@ -1,8 +1,10 @@
 package de.jtem.halfedgetools.plugin;
 
 import static de.jtem.halfedgetools.selection.TypedSelection.CHANNEL_DEFAULT;
+import static java.util.Collections.synchronizedMap;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -31,6 +33,8 @@ import javax.swing.JTable;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
 import com.bric.swing.ColorPicker;
 
@@ -60,7 +64,7 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 	private LayerChannels
 		channels = null;
 	private Map<HalfedgeLayer, LayerChannels>
-		layerMap = new HashMap<HalfedgeLayer, LayerChannels>();
+		layerMap = synchronizedMap(new HashMap<HalfedgeLayer, LayerChannels>());
 	private HalfedgeInterface
 		hif = null;
 	private Map<Integer, String>
@@ -99,10 +103,6 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 	}
 	
 	public Selection getFilteredSelection(HalfedgeLayer layer) {
-		LayerChannels channels = layerMap.get(layer);
-		if (channels == null) {
-			return layer.getSelection();
-		}
 		Set<Integer> activeChannels = getAlgorithmChannels(layer);
 		Selection input = layer.getSelection();
 		Selection result = new Selection();
@@ -116,6 +116,11 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 	}
 	
 	public void updateChannels(HalfedgeLayer layer) {
+		this.channels = getLayerChannels(layer);
+		updateChannelTable();
+	}
+
+	private synchronized LayerChannels getLayerChannels(HalfedgeLayer layer) {
 		if (!layerMap.containsKey(layer)) {
 			layerMap.put(layer, new LayerChannels(layer));
 		}
@@ -138,12 +143,11 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 				channels.add(c);
 			}
 		}
-		this.channels = channels;
-		updateChannelTable();
+		return channels;
 	}
 	
 	public Set<Integer> getAlgorithmChannels(HalfedgeLayer layer) {
-		List<Channel> channels = layerMap.get(layer);
+		List<Channel> channels = getLayerChannels(layer);
 		Set<Integer> result = new TreeSet<Integer>();
 		for (Channel c : channels) {
 			if (c.includeChannel) {
@@ -154,17 +158,13 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 	}
 	
 	public Integer getActiveInputChannel(HalfedgeLayer layer) {
-		LayerChannels channels = layerMap.get(layer);
-		if (channels == null) {
-			return CHANNEL_DEFAULT;
-		} else {
-			return channels.activeChannel.channel;
-		}
+		LayerChannels channels = getLayerChannels(layer);
+		return channels.activeChannel.channel;
 	}
 	
 	public Map<Integer, Color> getChannelColors(HalfedgeLayer layer) {
 		Map<Integer, Color> colorMap = new HashMap<Integer, Color>();
-		LayerChannels channels = layerMap.get(layer);
+		LayerChannels channels = getLayerChannels(layer);
 		if (channels == null) {
 			return colorMap;
 		}
@@ -199,7 +199,7 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 			this.defaultChannel = new Channel(layer, CHANNEL_DEFAULT, "Default Channel", DEFAULT_COLOR);
 			this.activeChannel = this.defaultChannel;
 			add(defaultChannel);
-			activeChannel.activationButton.setSelected(true);
+			activeChannel.getActivationButton().setSelected(true);
 		}
 		
 	}
@@ -216,21 +216,20 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 			color = null;
 		public boolean
 			includeChannel = true;
-		public DeleteChannelButton
-			deleteButton = new DeleteChannelButton(this);
-		public ActivationRadioButton
-			activationButton = new ActivationRadioButton(this);
-		public AlgorithmIncludeCheckBox
-			algorithmIncludeCheckBox = new AlgorithmIncludeCheckBox(this);
-		public ColorChooserButton
-			colorChooseButton = new ColorChooserButton(this);
+		private DeleteChannelButton
+			deleteButton = null;
+		private ActivationRadioButton
+			activationButton = null;
+		private AlgorithmIncludeCheckBox
+			algorithmIncludeCheckBox = null;
+		private ColorChooserButton
+			colorChooseButton = null;
 
 		private Channel(HalfedgeLayer layer, Integer channel, String name) {
 			this.layer = layer;
 			this.channel = channel;
 			this.name = name;
-			rnd.setSeed(channel);
-			this.color = new Color(rnd.nextFloat(), rnd.nextFloat(), rnd.nextFloat());
+			this.color = createChannelColor(channel);
 		}
 		
 		private Channel(HalfedgeLayer layer, Integer channel, String name, Color color) {
@@ -240,13 +239,67 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 			this.color = color;
 		}
 		
+		private Color createChannelColor(Integer channel) {
+			rnd.setSeed(channel); rnd.nextLong();
+			rnd.setSeed(rnd.nextLong());
+			float h = rnd.nextFloat();
+			float s = 1.0f;
+			float b = 1.0f;
+			return Color.getHSBColor(h, s, b);
+		}
+		
+		public DeleteChannelButton getDeleteButton() {
+			if (deleteButton == null) {
+				deleteButton = new DeleteChannelButton(this);
+			}
+			return deleteButton;
+		}
+		public ActivationRadioButton getActivationButton() {
+			if (activationButton == null) {
+				activationButton = new ActivationRadioButton(this);
+			}
+			return activationButton;
+		}
+		public AlgorithmIncludeCheckBox getAlgorithmIncludeCheckBox() {
+			if (algorithmIncludeCheckBox == null) {
+				algorithmIncludeCheckBox = new AlgorithmIncludeCheckBox(this);
+			}
+			return algorithmIncludeCheckBox;
+		}
+		public ColorChooserButton getColorChooseButton() {
+			if (colorChooseButton == null) {
+				colorChooseButton = new ColorChooserButton(this);
+			}
+			return colorChooseButton;
+		}
+		
 		@Override
 		public String toString() {
+			return name;
+		}
+		
+		public String getStatisticsString() {
 			Selection s = layer.getSelection().getChannel(channel);
 			int v = s.getVertices().size();
 			int e = s.getEdges().size();
 			int f = s.getFaces().size();
-			return name + " - " + v + "/" + e + "/" + f;
+			return v + "/" + e + "/" + f;
+		}
+		
+	}
+	
+	private class StatisticsNameRenderer extends DefaultTableCellRenderer implements TableCellRenderer {
+
+		private static final long serialVersionUID = 1L;
+		
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			if (value instanceof Channel) {
+				Channel channel = (Channel)value;
+				setText(channel + " - " + channel.getStatisticsString());
+			}
+			return c;
 		}
 		
 	}
@@ -366,7 +419,7 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 		public void actionPerformed(ActionEvent e) {
 			channels.remove(channel);
 			channels.activeChannel = channels.defaultChannel;
-			activationButtonGroup.remove(channel.activationButton);
+			activationButtonGroup.remove(channel.getActivationButton());
 			channel.layer.clearSelection(channel.channel);
 			updateChannelTable();
 		}
@@ -400,13 +453,11 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 		@Override
 		public Class<?> getColumnClass(int columnIndex) {
 			switch (columnIndex) {
-			case 1:
-			case 2:
-			case 3:
-			case 4:
+			case 0:
+				return String.class;
+			default:
 				return AbstractButton.class;
 			}
-			return String.class;
 		}
 
 		@Override
@@ -416,28 +467,28 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 			case 0:
 				return c;
 			case 1:
-				c.algorithmIncludeCheckBox.setSelected(c.includeChannel);
-				return c.algorithmIncludeCheckBox;
+				c.getAlgorithmIncludeCheckBox().setSelected(c.includeChannel);
+				return c.getAlgorithmIncludeCheckBox();
 			case 2:
 				if (channels.activeChannel == c) {
-					c.activationButton.setSelected(true);
+					c.getActivationButton().setSelected(true);
 				}
-				return c.activationButton;
+				return c.getActivationButton();
 			case 3:
-				c.colorChooseButton.setColor(c.color);
-				return c.colorChooseButton;
+				c.getColorChooseButton().setColor(c.color);
+				return c.getColorChooseButton();
 			case 4:
 				if (channels.defaultChannel == c) {
-					c.deleteButton.setEnabled(false);
+					c.getDeleteButton().setEnabled(false);
 				}
-				return c.deleteButton;
+				return c.getDeleteButton();
 			}
 			return null;
 		}
 		
 		@Override
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-			if (columnIndex == 0 && rowIndex > 0 && aValue instanceof String) {
+			if (columnIndex == 0 && aValue instanceof String) {
 				Channel c = channels.get(rowIndex);
 				c.name = (String)aValue;
 				fireTableCellUpdated(rowIndex, columnIndex);
@@ -455,6 +506,7 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 		channelTable.getColumnModel().getColumn(2).setMaxWidth(30);
 		channelTable.getColumnModel().getColumn(3).setMaxWidth(30);
 		channelTable.getColumnModel().getColumn(4).setMaxWidth(30);
+		channelTable.setDefaultRenderer(String.class, new StatisticsNameRenderer());
 		channelTable.setDefaultRenderer(AbstractButton.class, new ButtonCellRenderer());
 		channelTable.setDefaultEditor(AbstractButton.class, new ButtonCellEditor());
 	}
