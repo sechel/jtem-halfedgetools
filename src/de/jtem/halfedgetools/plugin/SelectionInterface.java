@@ -82,7 +82,7 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 		channelScroller = new JScrollPane(channelTable);
 	
 	public SelectionInterface() {
-		mainPanel.setPreferredSize(new Dimension(100, 150));
+		mainPanel.setPreferredSize(new Dimension(100, 130));
 		mainPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.weightx = 1.0;
@@ -199,7 +199,6 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 			this.defaultChannel = new Channel(layer, CHANNEL_DEFAULT, "Default Channel", DEFAULT_COLOR);
 			this.activeChannel = this.defaultChannel;
 			add(defaultChannel);
-			activeChannel.getActivationButton().setSelected(true);
 		}
 		
 	}

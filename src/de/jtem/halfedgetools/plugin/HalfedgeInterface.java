@@ -1298,7 +1298,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		if (paths.isEmpty()) {
 			content.setContent(root);
 		}
-		encompassContent();
 	}
 
 	private void normalizeContent() {
@@ -1308,6 +1307,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		double maxExtend = bbox.getMaxExtent();
 		mb.scale(10 / maxExtend);
 		rootTransform.setMatrix(mb.getArray());
+		root.setTransformation(rootTransform);
 		for (HalfedgeLayer l : layers) {
 			l.updateBoundingBox();
 		}
