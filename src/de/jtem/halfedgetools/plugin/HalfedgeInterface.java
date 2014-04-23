@@ -1307,6 +1307,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		if (paths.isEmpty()) {
 			content.setContent(root);
 		}
+		encompassContent();
 	}
 
 	private void normalizeContent() {
