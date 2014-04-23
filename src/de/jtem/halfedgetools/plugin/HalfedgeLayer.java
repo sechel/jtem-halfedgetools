@@ -250,11 +250,11 @@ public class HalfedgeLayer implements ActionListener {
 	> void setNoUndo(HDS hds) {
 		this.hds = hds;
 		convertHDS();
-		validateSelection();
 		hif.fireDataChanged();
 		hif.updateStates();
 		hif.checkContent();
 		hif.clearVolatileAdapters();
+		updateSelection();
 	}
 
 	/**
@@ -485,16 +485,6 @@ public class HalfedgeLayer implements ActionListener {
 		hif.fireSelectionChanged(selection);
 	}
 
-	protected void validateSelection() {
-		for (Node<?, ?, ?> checkNode : new Selection(selection)) {
-			if (!checkNode.isValid() || checkNode.getHalfEdgeDataStructure() != hds) {
-				selection.remove(checkNode);
-			}
-		}
-		updateSelection();
-		hif.fireSelectionChanged(selection);
-	}
-
 	public boolean isActive() {
 		return active;
 	}
@@ -513,6 +503,11 @@ public class HalfedgeLayer implements ActionListener {
 	}
 
 	protected void updateSelection() {
+		for (Node<?, ?, ?> checkNode : new Selection(selection)) {
+			if (!checkNode.isValid() || checkNode.getHalfEdgeDataStructure() != hds) {
+				selection.remove(checkNode);
+			}
+		}
 		layerRoot.removeChild(selectionRoot);
 		AdapterSet a = hif.getAdapters();
 		a.addAll(hif.getActiveVolatileAdapters());
@@ -690,7 +685,7 @@ public class HalfedgeLayer implements ActionListener {
 		geometryRoot.setGeometry(geometry);
 		convertFaceSet();
 		convertHDS();
-		validateSelection();
+		updateSelection();
 	}
 
 	public void redo() {
@@ -705,7 +700,7 @@ public class HalfedgeLayer implements ActionListener {
 		geometryRoot.setGeometry(geometry);
 		convertFaceSet();
 		convertHDS();
-		validateSelection();
+		updateSelection();
 	}
 
 	public void addTemporaryGeometry(SceneGraphComponent root) {
