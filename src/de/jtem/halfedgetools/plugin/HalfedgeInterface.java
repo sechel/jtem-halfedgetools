@@ -4,6 +4,8 @@ import static de.jreality.shader.CommonAttributes.LINE_SHADER;
 import static de.jreality.shader.CommonAttributes.POINT_RADIUS;
 import static de.jreality.shader.CommonAttributes.POINT_SHADER;
 import static de.jreality.shader.CommonAttributes.RADII_WORLD_COORDINATES;
+import static de.jreality.shader.CommonAttributes.TRANSPARENCY;
+import static de.jreality.shader.CommonAttributes.TRANSPARENCY_DEFAULT;
 import static de.jreality.shader.CommonAttributes.TUBE_RADIUS;
 import static de.jreality.util.SceneGraphUtility.getPathsBetween;
 import static java.awt.GridBagConstraints.BOTH;
@@ -146,6 +148,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		root = new SceneGraphComponent("Halfedge Root");
 	private Transformation 
 		rootTransform = new Transformation("Normalization");
+	private Appearance
+		rootAppearance = new Appearance("Halfedge Apprearance");
 	private JTable 
 		layersTable = new JTable();
 	private JScrollPane 
@@ -225,6 +229,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		layerActivationTool.setDescription("Layer Activation");
 		root.addTool(layerActivationTool);
 		root.setTransformation(rootTransform);
+		root.setAppearance(rootAppearance);
+		rootAppearance.setAttribute(POINT_SHADER + "." + RADII_WORLD_COORDINATES, true);
+		rootAppearance.setAttribute(LINE_SHADER + "." + RADII_WORLD_COORDINATES, true);
 		layerActivationTool.addActionListener(this);
 		visualizersPopup.addPopupMenuListener(this);
 
@@ -445,6 +452,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 		if (visualizersPopup == e.getSource()) {
 			visualizersManager.update();
+			visualizersPopup.setLightWeightPopupEnabled(false);
 			visualizersPopup.setBorderPainted(true);
 			visualizersPopup.removeAll();
 			visualizersPopup.setLayout(new GridLayout());
@@ -454,6 +462,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		}
 		if (layerOptionsPopup == e.getSource()) {
 			layerPropertyPanel.setLayer(activeLayer);
+			layerOptionsPopup.setLightWeightPopupEnabled(false);
 			layerOptionsPopup.setBorderPainted(true);
 			layerOptionsPopup.removeAll();
 			layerOptionsPopup.setLayout(new GridLayout());
@@ -1194,7 +1203,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	public void createSelectionAppearance(Appearance app, HalfedgeLayer layer, double offset) {
 		EffectiveAppearance ea = getEffectiveAppearance(layer.getLayerRoot());
 		if(ea == null) return;
-		DefaultGeometryShader dgs1 = ShaderUtility .createDefaultGeometryShader(ea);
+		DefaultGeometryShader dgs1 = ShaderUtility.createDefaultGeometryShader(ea);
 		DefaultPointShader dps1 = (DefaultPointShader) dgs1.getPointShader();
 		DefaultLineShader dls1 = (DefaultLineShader) dgs1.getLineShader();
 		app.setAttribute(POINT_SHADER + "." + RADII_WORLD_COORDINATES, dps1.getRadiiWorldCoordinates());
@@ -1311,6 +1320,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		for (HalfedgeLayer l : layers) {
 			l.updateBoundingBox();
 		}
+		// tube and sphere radius update hack
+		rootAppearance.setAttribute(TRANSPARENCY, TRANSPARENCY_DEFAULT);
 	}
 	
 	public void encompassContent() {

@@ -238,7 +238,7 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi);
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) throws Exception;
 		
 	public AlgorithmJob getCurrentJob() {
 		return currentJob;

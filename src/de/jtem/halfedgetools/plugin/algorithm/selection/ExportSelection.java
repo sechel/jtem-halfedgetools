@@ -1,5 +1,8 @@
 package de.jtem.halfedgetools.plugin.algorithm.selection;
 
+import static javax.swing.JFileChooser.APPROVE_OPTION;
+
+import java.awt.EventQueue;
 import java.awt.Window;
 import java.io.File;
 import java.io.FileWriter;
@@ -32,6 +35,8 @@ public class ExportSelection extends AlgorithmPlugin implements UIFlavor {
 		view = null;
 	private JFileChooser
 		selChooser = new JFileChooser();
+	private volatile int
+		fileChooserResult = -1;
 	private XStream 
 		xstream = new XStream(new PureJavaReflectionProvider());
 	
@@ -71,12 +76,20 @@ public class ExportSelection extends AlgorithmPlugin implements UIFlavor {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
-		Window w = SwingUtilities.getWindowAncestor(view.getCenterComponent());
-		if (selChooser.showSaveDialog(w) != JFileChooser.APPROVE_OPTION) {
-			return;
-		}
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) throws Exception {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				Window w = SwingUtilities.getWindowAncestor(view.getCenterComponent());
+				fileChooserResult = selChooser.showSaveDialog(w);
+			}
+		};
+		EventQueue.invokeAndWait(r);
+		if (fileChooserResult != APPROVE_OPTION) return;
 		File file = selChooser.getSelectedFile();
+		if (!file.getName().toLowerCase().endsWith(".sml")) {
+			file = new File(file.getPath() + ".sml");
+		}
 		Selection sel = hcp.getSelection();
 		int[] vIndices = new int[sel.getVertices().size()];
 		int[] eIndices = new int[sel.getEdges().size()];
@@ -98,12 +111,12 @@ public class ExportSelection extends AlgorithmPlugin implements UIFlavor {
 		}
 		int[][] indices = {vIndices, eIndices, fIndices};
 		String selXML = xstream.toXML(indices);
+		FileWriter fw = null;
 		try {
-			FileWriter fw = new FileWriter(file);
+			fw = new FileWriter(file);
 			fw.write(selXML);
+		} finally {
 			fw.close();
-		} catch (Exception ex) {
-			ex.printStackTrace();
 		}
 	}
 	
@@ -112,6 +125,19 @@ public class ExportSelection extends AlgorithmPlugin implements UIFlavor {
 		super.install(c);
 		view = c.getPlugin(View.class);
 	} 
+	
+	
+	@Override
+	public void storeStates(Controller c) throws Exception {
+		super.storeStates(c);
+		c.storeProperty(getClass(), "fileChooserLocation", selChooser.getCurrentDirectory().toString());
+	}
+	
+	@Override
+	public void restoreStates(Controller c) throws Exception {
+		super.restoreStates(c);
+		selChooser.setCurrentDirectory(new File(c.getProperty(getClass(), "fileChooserLocation", selChooser.getCurrentDirectory().toString())));
+	}
 	
 
 	@Override

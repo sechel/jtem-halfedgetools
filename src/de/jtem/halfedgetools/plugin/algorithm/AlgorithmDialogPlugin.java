@@ -6,6 +6,7 @@ import static javax.swing.JOptionPane.PLAIN_MESSAGE;
 
 import java.awt.EventQueue;
 import java.awt.Window;
+import java.util.logging.Logger;
 
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
@@ -25,6 +26,8 @@ import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
 
 public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements UIFlavor {
 
+	private Logger 
+		log = Logger.getLogger(AlgorithmExecuteDialogJob.class.getName());
 	private View
 		view = null;
 	private static Icon
@@ -90,7 +93,11 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 			Runnable r = new Runnable() {
 				@Override
 				public void run() {
-					executeDialog(hcp.get(), hcp.getAdapters(), hcp);
+					try {
+						executeDialog(hcp.get(), hcp.getAdapters(), hcp);
+					} catch (Exception e) {
+						log.warning(e.toString());
+					}
 				}
 			};
 			EventQueue.invokeAndWait(r);
@@ -146,7 +153,7 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) {
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hi) throws Exception {
 		execute();
 	}
 	
@@ -155,28 +162,28 @@ public abstract class AlgorithmDialogPlugin extends AlgorithmPlugin implements U
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void executeBeforeDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) {}
+	> void executeBeforeDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) throws Exception {}
 	
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void executeDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) {}
+	> void executeDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) throws Exception {}
 	
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) {}
+	> void executeAfterDialog(HDS hds, AdapterSet a, HalfedgeInterface hi) throws Exception {}
 	
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void executeAfterDialogCancel(HDS hds, AdapterSet a, HalfedgeInterface hi) {}	
+	> void executeAfterDialogCancel(HDS hds, AdapterSet a, HalfedgeInterface hi) throws Exception {}	
 	
 	
 	@Override

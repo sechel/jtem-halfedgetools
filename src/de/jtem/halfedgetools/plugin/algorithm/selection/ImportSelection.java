@@ -1,5 +1,8 @@
 package de.jtem.halfedgetools.plugin.algorithm.selection;
 
+import static javax.swing.JFileChooser.APPROVE_OPTION;
+
+import java.awt.EventQueue;
 import java.awt.Window;
 import java.io.File;
 import java.io.FileReader;
@@ -18,6 +21,7 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
+import de.jtem.halfedgetools.plugin.SelectionInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
@@ -28,10 +32,14 @@ import de.jtem.jrworkspace.plugin.flavor.UIFlavor;
 
 public class ImportSelection extends AlgorithmPlugin implements UIFlavor {
 
+	private final int
+		CHANNEL_IMPORTED_SELECTION = 234234;
 	private View
 		view = null;
 	private JFileChooser
 		selChooser = new JFileChooser();
+	private volatile int
+		fileChooserResult = -1;
 	private XStream 
 		xstream = new XStream(new PureJavaReflectionProvider());
 	
@@ -76,43 +84,59 @@ public class ImportSelection extends AlgorithmPlugin implements UIFlavor {
 		E extends Edge<V, E, F>, 
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
-		Window w = SwingUtilities.getWindowAncestor(view.getCenterComponent());
-		if (selChooser.showOpenDialog(w) != JFileChooser.APPROVE_OPTION) {
-			return;
-		}
-		File file = selChooser.getSelectedFile();
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) throws Exception {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				Window w = SwingUtilities.getWindowAncestor(view.getCenterComponent());	
+				fileChooserResult = selChooser.showOpenDialog(w);
+			}
+		};
 		try {
-			hcp.clearSelection();
-			Selection sel = new Selection();
-			FileReader fr = new FileReader(file);
-			int[][] indices = (int[][])xstream.fromXML(fr);
-			for (int vi : indices[0]) {
-				if (vi < hds.numVertices()) {
-					sel.add(hds.getVertex(vi));
-				}
+			EventQueue.invokeAndWait(r);
+		} catch (Exception e) {}
+		if (fileChooserResult != APPROVE_OPTION) return;
+		File file = selChooser.getSelectedFile();
+		Selection sel = new Selection();
+		FileReader fr = new FileReader(file);
+		int[][] indices = (int[][])xstream.fromXML(fr);
+		for (int vi : indices[0]) {
+			if (vi < hds.numVertices()) {
+				sel.add(hds.getVertex(vi));
 			}
-			for (int ei : indices[1]) {
-				if (ei < hds.numEdges()) {
-					sel.add(hds.getEdge(ei));
-				}
-			}
-			for (int fi : indices[2]) {
-				if (fi < hds.numFaces()) {
-					sel.add(hds.getFace(fi));
-				}
-			}
-			hcp.setSelection(sel);
-		} catch (Exception ex) {
-			ex.printStackTrace();
 		}
+		for (int ei : indices[1]) {
+			if (ei < hds.numEdges()) {
+				sel.add(hds.getEdge(ei));
+			}
+		}
+		for (int fi : indices[2]) {
+			if (fi < hds.numFaces()) {
+				sel.add(hds.getFace(fi));
+			}
+		}
+		hcp.addSelection(sel);
 	}
 	
 	@Override
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		view = c.getPlugin(View.class);
+		SelectionInterface sif = c.getPlugin(SelectionInterface.class);
+		sif.registerChannelName(CHANNEL_IMPORTED_SELECTION, "Imported Selection");
 	} 
+	
+	@Override
+	public void storeStates(Controller c) throws Exception {
+		super.storeStates(c);
+		c.storeProperty(getClass(), "fileChooserLocation", selChooser.getCurrentDirectory().toString());
+	}
+	
+	@Override
+	public void restoreStates(Controller c) throws Exception {
+		super.restoreStates(c);
+		selChooser.setCurrentDirectory(new File(c.getProperty(getClass(), "fileChooserLocation", selChooser.getCurrentDirectory().toString())));
+	}
 	
 
 	@Override

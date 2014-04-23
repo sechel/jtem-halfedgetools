@@ -31,6 +31,7 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools;
 
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
 import de.jreality.jogl.GLJPanelViewer;
@@ -82,6 +83,8 @@ public class JRHalfedgeViewer {
 				SystemProperties.VIEWER_DEFAULT_SOFT
 			);
 		}
+		ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
+		toolTipManager.setLightWeightPopupEnabled(false);
 		UIManager.getDefaults().put("Slider.paintValue", false);
 	}
 	
