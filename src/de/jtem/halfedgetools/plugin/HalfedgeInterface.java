@@ -1225,6 +1225,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		newLayer.setName(name);
 		layers.add(0, newLayer);
 		root.addChild(newLayer.getLayerRoot());
+		checkContent();
 		updateStates();
 		fireLayerAdded(newLayer);
 		return newLayer;
@@ -1236,6 +1237,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		layers.add(0, layer);
 		root.addChild(layer.getLayerRoot());
 		fireLayerAdded(layer);
+		checkContent();
 		updateStates();
 		activateLayer(layer);
 	}
@@ -1250,6 +1252,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 			HalfedgeLayer newActLayer = layers.get(index);
 			activateLayer(newActLayer);
 		}
+		checkContent();
 		updateStates();
 		fireLayerRemoved(layer);
 	}

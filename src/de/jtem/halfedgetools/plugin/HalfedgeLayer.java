@@ -631,6 +631,7 @@ public class HalfedgeLayer implements ActionListener {
 
 	public void setVisible(boolean visible) {
 		layerRoot.setVisible(visible);
+		hif.checkContent();
 		hif.updateStates();
 	}
 
