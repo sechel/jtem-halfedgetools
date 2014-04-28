@@ -45,6 +45,7 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 
 	private void addComboBox(String cat) {
 		JComboBox catCombo = new JComboBox();
+		catCombo.setMaximumRowCount(50);
 		AlgorithmComboModel model = new AlgorithmComboModel(cat);
 		catCombo.setModel(model);
 		AlgorithmCellRenderer renderer = new AlgorithmCellRenderer(cat);
