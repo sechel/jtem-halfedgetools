@@ -250,6 +250,7 @@ public class HalfedgePluginFactory {
 		s.add(new CoordinatesPivot());
 		s.add(new SwapPosTexPos());
 		s.add(new JobMonitorPlugin());
+		s.add(new PresetContentLoader());
 		return s;
 	}
 	
