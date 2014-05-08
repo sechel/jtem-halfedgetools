@@ -22,6 +22,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
@@ -41,6 +42,7 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -68,6 +70,7 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 		folderFiles = new ArrayList<File>();
 	
 	private Icon
+		folderIcon = ImageHook.getIcon("folder_brick.png"),
 		fileIcon = ImageHook.getIcon("brick.png");
 	private PresetTreeNode
 		presetRoot = new PresetTreeNode(null);
@@ -86,9 +89,9 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 	private JFileChooser
 		locationChooser = new JFileChooser();
 	private JButton
-		addFolderButton = new JButton("Add", ImageHook.getIcon("folder.png")),
-		removeFolderButton = new JButton("Remove", ImageHook.getIcon("remove.png")),
-		loadButton = new JButton("Load", ImageHook.getIcon("cog_go.png"));
+		addFolderButton = new JButton("Add", ImageHook.getIcon("folder_add.png")),
+		removeFolderButton = new JButton("Remove", ImageHook.getIcon("folder_delete.png")),
+		loadButton = new JButton("Load", ImageHook.getIcon("brick_go.png"));
 	
 	public PresetContentLoader() {
 		shrinkPanel.setTitle("Content Presets");
@@ -124,12 +127,12 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 		locationChooser.setMultiSelectionEnabled(true);
 		locationChooser.setDialogTitle("Choose Preset Directories");
 		
-		presetTree.setShowsRootHandles(false);
 		presetTree.setRootVisible(false);
 		presetTree.getSelectionModel().setSelectionMode(SINGLE_TREE_SELECTION);
 		fileList.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
 		
-		fileList.setCellRenderer(new PresetListCellRenderer());
+		presetTree.setCellRenderer(new PresetTreeCellRenderer());
+		fileList.setCellRenderer(new FileListCellRenderer());
 		
 		fileList.addMouseListener(new DoubleClickLoadListener());
 		addFolderButton.addActionListener(this);
@@ -203,8 +206,7 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 
 		@Override
 		public boolean isLeaf() {
-			// show folder icon at all nodes
-			return false;
+			return getChildCount() == 0;
 		}
 		
 		@Override
@@ -234,18 +236,24 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 			if (folder == null) {
 				return "Presets";
 			} 
+			String name = null;
 			if (presetRoot.equals(getParent())) {
 				File parent = folder.getParentFile().getParentFile();
 				URI uri = parent.toURI().relativize(folder.toURI());
-				return uri.toString();
+				name = uri.toString();
 			} else {
-				return folder.getName();
+				name = folder.getName();
 			}
+			File[] filesArray = folder.listFiles(SUPPORTED_FILES_FILTER);
+			if (filesArray != null && filesArray.length != 0) {
+				name += " (" + filesArray.length + ")";
+			}
+			return name;
 		}
 		
 	}
 	
-	private class PresetListCellRenderer extends DefaultListCellRenderer {
+	private class FileListCellRenderer extends DefaultListCellRenderer {
 
 		private static final long serialVersionUID = 1L;
 
@@ -258,6 +266,21 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 			}
 			if (result instanceof JLabel) {
 				((JLabel) result).setIcon(fileIcon);
+			}
+			return result;
+		}
+		
+	}
+	
+	private class PresetTreeCellRenderer extends DefaultTreeCellRenderer {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+			Component result = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+			if (result instanceof JLabel) {
+				((JLabel) result).setIcon(folderIcon);
 			}
 			return result;
 		}
@@ -328,9 +351,9 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 		File folder = getSelectedPresetFolder();
 		folderFiles.clear();
 		if (folder != null) {
-			for (String filename : folder.list(SUPPORTED_FILES_FILTER)) {
-				folderFiles.add(new File(folder, filename));
-			}
+			File[] filesArray = folder.listFiles(SUPPORTED_FILES_FILTER);
+			List<File> files = Arrays.asList(filesArray);
+			folderFiles.addAll(files);
 		}
 		fileList.setModel(new FileModel());
 	}
