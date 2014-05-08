@@ -2,12 +2,15 @@ package de.jtem.halfedgetools.plugin;
 
 import static de.jreality.util.SceneGraphUtility.getFirstGeometry;
 import static javax.swing.JFileChooser.DIRECTORIES_ONLY;
+import static javax.swing.JSplitPane.VERTICAL_SPLIT;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
+import static javax.swing.tree.TreeSelectionModel.SINGLE_TREE_SELECTION;
 
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -19,18 +22,28 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTree;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.plugin.JRViewer;
@@ -42,22 +55,34 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.Controller;
 
-public class PresetContentLoader extends ViewShrinkPanelPlugin implements ActionListener, ListSelectionListener {
+public class PresetContentLoader extends ViewShrinkPanelPlugin implements ActionListener, TreeSelectionListener {
 
-	private final SupportedFilesFilter 
-		SUPPORTED_FILES_FILTER = new SupportedFilesFilter();
+	private final FilenameFilter		
+		SUPPORTED_FILES_FILTER = new SupportedFilesFilter(),
+		FOLDERS_FILES_FILTER = new FoldersFilesFilter();
+	
 	private HalfedgeInterface
 		hif = null;
 	private List<File>
 		presetFolders = new ArrayList<File>(),
 		folderFiles = new ArrayList<File>();
 	
+	private Icon
+		fileIcon = ImageHook.getIcon("brick.png");
+	private PresetTreeNode
+		presetRoot = new PresetTreeNode(null);
+	private JTree
+		presetTree = new JTree(new DefaultTreeModel(presetRoot, false));
 	private JList
-		presetList = new JList(new FolderModel()),
 		fileList = new JList(new FileModel());
 	private JScrollPane
-		presetScroller = new JScrollPane(presetList),
+		presetTreeScroller = new JScrollPane(presetTree),
 		fileScroller = new JScrollPane(fileList);
+	private JPanel
+		topPanel = new JPanel(),
+		bottomPanel = new JPanel();
+	private JSplitPane
+		splitter = new JSplitPane(VERTICAL_SPLIT, true, topPanel, bottomPanel);
 	private JFileChooser
 		locationChooser = new JFileChooser();
 	private JButton
@@ -67,43 +92,157 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 	
 	public PresetContentLoader() {
 		shrinkPanel.setTitle("Content Presets");
+		shrinkPanel.setLayout(new GridLayout());
+		topPanel.setLayout(new GridBagLayout());
+		bottomPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.weightx = 1.0;
 		c.weighty = 1.0;
 		c.insets = new Insets(2, 2, 2, 2);
 		c.fill = GridBagConstraints.BOTH;
 		c.gridwidth = GridBagConstraints.REMAINDER;
-		presetScroller.setPreferredSize(new Dimension(10, 100));
-		fileScroller.setPreferredSize(new Dimension(10, 100));
-		shrinkPanel.setLayout(new GridBagLayout());
-		shrinkPanel.add(presetScroller, c);
+		presetTreeScroller.setPreferredSize(new Dimension(10, 100));
+		fileScroller.setPreferredSize(new Dimension(10, 150));
+		
+		topPanel.add(presetTreeScroller, c);
 		c.weighty = 0.0;
 		c.weightx = 0.5;
 		c.gridwidth = GridBagConstraints.RELATIVE;
-		shrinkPanel.add(addFolderButton, c);
+		topPanel.add(addFolderButton, c);
 		c.gridwidth = GridBagConstraints.REMAINDER;
-		shrinkPanel.add(removeFolderButton, c);
+		topPanel.add(removeFolderButton, c);
 		c.weighty = 1.0;
 		c.weightx = 1.0;
-		shrinkPanel.add(fileScroller, c);
+		bottomPanel.add(fileScroller, c);
 		c.weighty = 0.0;
-		shrinkPanel.add(loadButton, c);
+		bottomPanel.add(loadButton, c);
+		
+		splitter.setDividerLocation(0.3);
+		shrinkPanel.add(splitter);
 		
 		locationChooser.setFileSelectionMode(DIRECTORIES_ONLY);
 		locationChooser.setMultiSelectionEnabled(true);
 		locationChooser.setDialogTitle("Choose Preset Directories");
 		
-		presetList.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
+		presetTree.setShowsRootHandles(false);
+		presetTree.setRootVisible(false);
+		presetTree.getSelectionModel().setSelectionMode(SINGLE_TREE_SELECTION);
 		fileList.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
 		
-		presetList.setCellRenderer(new PresetListCellRenderer());
 		fileList.setCellRenderer(new PresetListCellRenderer());
 		
 		fileList.addMouseListener(new DoubleClickLoadListener());
 		addFolderButton.addActionListener(this);
 		removeFolderButton.addActionListener(this);
 		loadButton.addActionListener(this);
-		presetList.getSelectionModel().addListSelectionListener(this);
+		presetTree.getSelectionModel().addTreeSelectionListener(this);
+	}
+	
+	
+	private class PresetTreeNode implements TreeNode {
+
+		private File folder = null;
+		
+		public PresetTreeNode(File folder) {
+			this.folder = folder;
+		}
+		
+		protected Vector<TreeNode> getChildren() {
+			Vector<TreeNode> children = new Vector<TreeNode>();
+			if (folder == null) {
+				for (File f : presetFolders) {
+					children.add(new PresetTreeNode(f));
+				}
+			} else {
+				for (File f : folder.listFiles(FOLDERS_FILES_FILTER)) {
+					if (f.getName().startsWith(".")) continue;
+					children.add(new PresetTreeNode(f));
+				}
+			}
+			return children;
+		}
+		
+		@Override
+		public Enumeration<TreeNode> children() {
+			Vector<TreeNode> children = getChildren();
+			return children.elements();
+		}
+
+		@Override
+		public boolean getAllowsChildren() {
+			return true;
+		}
+
+		@Override
+		public TreeNode getChildAt(int childIndex) {
+			return getChildren().elementAt(childIndex);
+		}
+
+		@Override
+		public int getChildCount() {
+			return getChildren().size();
+		}
+
+		@Override
+		public int getIndex(TreeNode node) {
+			return getChildren().indexOf(node);
+		}
+
+		@Override
+		public TreeNode getParent() {
+			if (folder == null) {
+				return null;
+			} else {
+				if (presetFolders.contains(folder)) {
+					return new PresetTreeNode(null);
+				} else {
+					return new PresetTreeNode(folder.getParentFile());
+				}
+			}
+		}
+
+		@Override
+		public boolean isLeaf() {
+			// show folder icon at all nodes
+			return false;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof PresetTreeNode) {
+				PresetTreeNode p = (PresetTreeNode)obj;
+				if (folder == null || p.folder == null) {
+					return folder == p.folder;
+				} else {
+					return folder.equals(p.folder);
+				}
+			}
+			return false;
+		}
+		
+		@Override
+		public int hashCode() {
+			if (folder == null) {
+				return super.hashCode();
+			} else {
+				return folder.hashCode();
+			}
+		}
+		
+		@Override
+		public String toString() {
+			if (folder == null) {
+				return "Presets";
+			} 
+			if (presetRoot.equals(getParent())) {
+				File parent = folder.getParentFile().getParentFile();
+				URI uri = parent.toURI().relativize(folder.toURI());
+				return uri.toString();
+			} else {
+				return folder.getName();
+			}
+		}
+		
 	}
 	
 	private class PresetListCellRenderer extends DefaultListCellRenderer {
@@ -115,28 +254,12 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 			Component result = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value instanceof File) {
 				File f = (File)value;
-				File parent = f.getParentFile().getParentFile();
-				URI uri = parent.toURI().relativize(f.toURI());
-				setText(uri.toString());
+				setText(f.getName());
+			}
+			if (result instanceof JLabel) {
+				((JLabel) result).setIcon(fileIcon);
 			}
 			return result;
-		}
-		
-	}
-	
-	private class FolderModel extends AbstractListModel {
-
-		private static final long 	
-			serialVersionUID = 1L;
-
-		@Override
-		public Object getElementAt(int index) {
-			return presetFolders.get(index);
-		}
-
-		@Override
-		public int getSize() {
-			return presetFolders.size();
 		}
 		
 	}
@@ -179,14 +302,30 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 		
 	}
 	
+	private class FoldersFilesFilter implements FilenameFilter {
+
+		@Override
+		public boolean accept(File parent, String name) {
+			File f = new File(parent, name);
+			return f.isDirectory();
+		}
+		
+	}
 	
 	public void updateStates() {
-		presetList.setModel(new FolderModel());
+		presetTree.setModel(new DefaultTreeModel(presetRoot, false));
 		fileList.setModel(new FileModel());
 	}
 	
+	protected File getSelectedPresetFolder() {
+		TreePath path = presetTree.getSelectionPath();
+		if (path == null) return null;
+		PresetTreeNode node = (PresetTreeNode)path.getLastPathComponent();
+		return node.folder;
+	}
+	
 	public void updateFiles() {
-		File folder = (File)presetList.getSelectedValue();
+		File folder = getSelectedPresetFolder();
 		folderFiles.clear();
 		if (folder != null) {
 			for (String filename : folder.list(SUPPORTED_FILES_FILTER)) {
@@ -197,8 +336,8 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 	}
 	
 	@Override
-	public void valueChanged(ListSelectionEvent e) {
-		if (presetList.getSelectionModel() == e.getSource()) {
+	public void valueChanged(TreeSelectionEvent e) {
+		if (presetTree.getSelectionModel() == e.getSource()) {
 			updateFiles();
 		}
 	}
@@ -207,7 +346,7 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 	public void actionPerformed(ActionEvent e) {
 		Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
 		if (addFolderButton == e.getSource()) {
-			File selectedFolder = (File)presetList.getSelectedValue();
+			File selectedFolder = getSelectedPresetFolder();
 			if (selectedFolder != null) {
 				locationChooser.setCurrentDirectory(selectedFolder.getParentFile());
 			}
@@ -222,7 +361,7 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 			updateFiles();
 		}
 		if (removeFolderButton == e.getSource()) {
-			File selectedFolder = (File)presetList.getSelectedValue();
+			File selectedFolder = getSelectedPresetFolder();
 			if (selectedFolder != null) {
 				presetFolders.remove(selectedFolder);
 				updateStates();
@@ -272,6 +411,7 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 		v.addContentSupport(ContentType.Raw);
 		v.addContentUI();
 		v.setPropertiesResource(PresetContentLoader.class, null);
+		v.setPropertiesFile("PresetContentLoader.xml");
 		v.registerPlugin(PresetContentLoader.class);
 		v.startup();
 	}
