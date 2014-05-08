@@ -38,6 +38,7 @@ public class EdgeCollapsePlugin extends AlgorithmPlugin {
 			double[] p = a.getD(BaryCenter3d.class, e);
 			double[] tp = a.getD(TexturePosition2d.class, e);
 			V v = TopologyAlgorithms.collapseEdge(e);
+			TopologyAlgorithms.removeDigonsAt(v);
 			a.set(Position.class, v, p);
 			a.set(TexturePosition.class, v, tp);
 			s.add(v);
@@ -45,7 +46,7 @@ public class EdgeCollapsePlugin extends AlgorithmPlugin {
 		hcp.update();
 		hcp.setSelection(s);
 	}
-
+	
 	@Override
 	public String getAlgorithmName() {
 		return "Collapse Edge";

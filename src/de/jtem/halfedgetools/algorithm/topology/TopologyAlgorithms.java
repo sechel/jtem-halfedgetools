@@ -32,6 +32,8 @@ OF SUCH DAMAGE.
 package de.jtem.halfedgetools.algorithm.topology;
 
 
+import static de.jtem.halfedge.util.HalfEdgeUtils.incomingEdges;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -191,32 +193,30 @@ public class TopologyAlgorithms {
 		F extends Face<V, E, F>
 	> V collapseEdge(E e, V keep) {
 		HalfEdgeDataStructure<V,E,F> graph = e.getHalfEdgeDataStructure();
-
 		if(keep != e.getTargetVertex()) {
 			e = e.getOppositeEdge();
 		}
-		
 		E en = e.getNextEdge();
 		E ep = e.getPreviousEdge();
-		
 		E eo = e.getOppositeEdge();
 		E eon = eo.getNextEdge();
 		E eop = eo.getPreviousEdge();
-//		E eono = eon.getOppositeEdge();
-		
 		V vToRemove = e.getStartVertex();
-		
-		for(E ie : HalfEdgeUtils.incomingEdges(vToRemove)) {
-			ie.setTargetVertex(keep);
-		}
-		
-		ep.linkNextEdge(en);
-		eop.linkNextEdge(eon);
+		List<E> incoming1 = incomingEdges(vToRemove);
+		List<E> incoming2 = incomingEdges(keep);
 		
 		graph.removeEdge(e);
 		graph.removeEdge(eo);
-	
 		graph.removeVertex(vToRemove);
+		
+		for(E ie : incoming1) {
+			if (ie.isValid()) ie.setTargetVertex(keep);
+		}
+		for(E ie : incoming2) {
+			if (ie.isValid()) ie.setTargetVertex(keep);
+		}
+		ep.linkNextEdge(en);
+		eop.linkNextEdge(eon);
 		
 		return keep;	
 	}
@@ -397,99 +397,116 @@ public class TopologyAlgorithms {
 	}
 	
 	public  <
-	V extends Vertex<V, E, F>,
-	E extends Edge<V, E, F>,
-	F extends Face<V, E, F>
-> void split(E e) {
-	       F leftFace = e.getLeftFace();
-	       F rightFace = e.getRightFace();
-	       // dont split if we are the boundary
-	       // TODO: implement for the boundary
-	       if (leftFace == null || rightFace == null)
-	               return;
-	       
-	       HalfEdgeDataStructure<V,E,F> graph = e.getHalfEdgeDataStructure();
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>
+	> void split(E e) {
+       F leftFace = e.getLeftFace();
+       F rightFace = e.getRightFace();
+       // dont split if we are the boundary
+       // TODO: implement for the boundary
+       if (leftFace == null || rightFace == null)
+               return;
+       
+       HalfEdgeDataStructure<V,E,F> graph = e.getHalfEdgeDataStructure();
 
-	       V E = graph.addNewVertex();
-	       E ne1 = graph.addNewEdge();
-	       E ne2 = graph.addNewEdge();
-	       E ne3 = graph.addNewEdge();
-	       E ne4 = graph.addNewEdge();
-	       E ne5 = graph.addNewEdge();
-	       E ne6 = graph.addNewEdge();
+       V E = graph.addNewVertex();
+       E ne1 = graph.addNewEdge();
+       E ne2 = graph.addNewEdge();
+       E ne3 = graph.addNewEdge();
+       E ne4 = graph.addNewEdge();
+       E ne5 = graph.addNewEdge();
+       E ne6 = graph.addNewEdge();
 
-	       F f3 = graph.addNewFace();
-	       F f4 = graph.addNewFace();
+       F f3 = graph.addNewFace();
+       F f4 = graph.addNewFace();
 
-	       E o = e.getOppositeEdge();
-	       E a = e.getNextEdge();
-	       E b = a.getNextEdge();
-	       E c = o.getNextEdge();
-	       E d = c.getNextEdge();
-	       F f1 = e.getLeftFace();
-	       F f2 = o.getLeftFace();
+       E o = e.getOppositeEdge();
+       E a = e.getNextEdge();
+       E b = a.getNextEdge();
+       E c = o.getNextEdge();
+       E d = c.getNextEdge();
+       F f1 = e.getLeftFace();
+       F f2 = o.getLeftFace();
 
-	       V A = e.getTargetVertex();
-	       V B = a.getTargetVertex();
-	       V C = b.getTargetVertex();
-	       V D = c.getTargetVertex();
+       V A = e.getTargetVertex();
+       V B = a.getTargetVertex();
+       V C = b.getTargetVertex();
+       V D = c.getTargetVertex();
 
-	       // face 1
-	       b.linkNextEdge(e);
-	       e.linkNextEdge(ne4);
-	       ne4.linkNextEdge(b);
-	       b.setLeftFace(f1);
-	       e.setLeftFace(f1);
-	       ne4.setLeftFace(f1);
-	       e.linkOppositeEdge(ne1);
-	       ne4.linkOppositeEdge(ne3);
+       // face 1
+       b.linkNextEdge(e);
+       e.linkNextEdge(ne4);
+       ne4.linkNextEdge(b);
+       b.setLeftFace(f1);
+       e.setLeftFace(f1);
+       ne4.setLeftFace(f1);
+       e.linkOppositeEdge(ne1);
+       ne4.linkOppositeEdge(ne3);
 
-	       // face 2
-	       ne1.linkNextEdge(c);
-	       c.linkNextEdge(ne6);
-	       ne6.linkNextEdge(ne1);
-	       ne1.setLeftFace(f2);
-	       c.setLeftFace(f2);
-	       ne6.setLeftFace(f2);
-	       ne6.linkOppositeEdge(ne5);
+       // face 2
+       ne1.linkNextEdge(c);
+       c.linkNextEdge(ne6);
+       ne6.linkNextEdge(ne1);
+       ne1.setLeftFace(f2);
+       c.setLeftFace(f2);
+       ne6.setLeftFace(f2);
+       ne6.linkOppositeEdge(ne5);
 
-	       // face 3
-	       o.linkNextEdge(ne5);
-	       ne5.linkNextEdge(d);
-	       d.linkNextEdge(o);
-	       o.setLeftFace(f3);
-	       ne5.setLeftFace(f3);
-	       d.setLeftFace(f3);
-	       o.linkOppositeEdge(ne2);
+       // face 3
+       o.linkNextEdge(ne5);
+       ne5.linkNextEdge(d);
+       d.linkNextEdge(o);
+       o.setLeftFace(f3);
+       ne5.setLeftFace(f3);
+       d.setLeftFace(f3);
+       o.linkOppositeEdge(ne2);
 
-	       // face 4
-	       ne2.linkNextEdge(a);
-	       a.linkNextEdge(ne3);
-	       ne3.linkNextEdge(ne2);
-	       ne2.setLeftFace(f4);
-	       a.setLeftFace(f4);
-	       ne3.setLeftFace(f4);
+       // face 4
+       ne2.linkNextEdge(a);
+       a.linkNextEdge(ne3);
+       ne3.linkNextEdge(ne2);
+       ne2.setLeftFace(f4);
+       a.setLeftFace(f4);
+       ne3.setLeftFace(f4);
 
-	       // target vertex
-	       b.setTargetVertex(C);
-	       e.setTargetVertex(E);
-	       ne4.setTargetVertex(B);
+       // target vertex
+       b.setTargetVertex(C);
+       e.setTargetVertex(E);
+       ne4.setTargetVertex(B);
 
-	       c.setTargetVertex(D);
-	       ne6.setTargetVertex(E);
-	       ne1.setTargetVertex(C);
+       c.setTargetVertex(D);
+       ne6.setTargetVertex(E);
+       ne1.setTargetVertex(C);
 
-	       d.setTargetVertex(A);
-	       o.setTargetVertex(E);
-	       ne5.setTargetVertex(D);
+       d.setTargetVertex(A);
+       o.setTargetVertex(E);
+       ne5.setTargetVertex(D);
 
-	       a.setTargetVertex(B);
-	       ne3.setTargetVertex(E);
-	       ne2.setTargetVertex(A);
-
-	   }
+       a.setTargetVertex(B);
+       ne3.setTargetVertex(E);
+       ne2.setTargetVertex(A);
+    }
 	
-	  // @SuppressWarnings("unchecked")
+	public static <
+		V extends Vertex<V, E, F>, 
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>, 
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void removeDigonsAt(V v) {
+		for (E e : HalfEdgeUtils.incomingEdges(v)) {
+			if (e.getNextEdge() == e.getPreviousEdge()) {
+				E eo = e.getOppositeEdge();
+				eo.linkOppositeEdge(e.getNextEdge().getOppositeEdge());
+				eo.getHalfEdgeDataStructure().removeFace(e.getLeftFace());
+				eo.getHalfEdgeDataStructure().removeEdge(e.getNextEdge());
+				eo.getHalfEdgeDataStructure().removeEdge(e);
+			}
+		}
+	}
+
+
+	// @SuppressWarnings("unchecked")
 	   public static <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
