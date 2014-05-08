@@ -427,6 +427,7 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
+		updateStates();
 	}
 	
 	public static void main(String[] args) {
