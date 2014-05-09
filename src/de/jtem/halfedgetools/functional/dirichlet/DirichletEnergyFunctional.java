@@ -189,4 +189,9 @@ public class DirichletEnergyFunctional <V extends Vertex<V, E, F>, E extends Edg
 		return val;
 	}
 
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
+
 }

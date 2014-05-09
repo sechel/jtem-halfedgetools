@@ -256,6 +256,12 @@ public class EdgeLengthFunctional <
     public boolean hasHessian() {
     	return true;
     }
+
+
+	@Override
+	public boolean hasGradient() {
+		return true;
+	}
     
 	
 }

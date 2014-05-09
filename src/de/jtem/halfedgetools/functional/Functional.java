@@ -48,6 +48,8 @@ public interface Functional <
 	
 	public boolean hasHessian();
 	
+	public boolean hasGradient();
+	
 	public <
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> int getDimension(HDS hds);
