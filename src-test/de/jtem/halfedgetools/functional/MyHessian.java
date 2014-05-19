@@ -46,6 +46,11 @@ public class MyHessian implements Hessian {
 	public void add(int i, int j, double value) {
 		H.add(i, j, value);
 	}
+	
+	@Override
+	public void add(double coeff, Hessian h) {
+		H.add(coeff, ((MyHessian)h).H);
+	}
 
 	@Override
 	public void set(int i, int j, double value) {

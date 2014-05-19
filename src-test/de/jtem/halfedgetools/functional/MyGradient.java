@@ -33,38 +33,15 @@ package de.jtem.halfedgetools.functional;
 
 import no.uib.cipr.matrix.Vector;
 
-public class MyGradient implements Gradient {
+public class MyGradient extends MyDomainValue implements Gradient {
 
-	protected Vector
-		G = null;
-	
-	public MyGradient(Vector G) {
-		this.G = G;
-	}
-	
-	@Override
-	public void add(int i, double value) {
-		G.add(i, value);
+	public MyGradient(Vector u) {
+		super(u);
 	}
 
 	@Override
-	public void set(int i, double value) {
-		G.set(i, value);
-	}
-
-	@Override
-	public void setZero() {
-		G.zero();
-	}
-	
-	@Override
-	public double get(int i) {
-		return G.get(i);
-	}
-	
-	@Override
-	public String toString() {
-		return G.toString();
+	public void add(double coeff, Gradient g) {
+		add(coeff, (MyDomainValue)g);
 	}
 
 }

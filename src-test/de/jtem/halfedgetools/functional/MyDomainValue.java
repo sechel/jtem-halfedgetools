@@ -46,6 +46,11 @@ public class MyDomainValue implements DomainValue {
 	public void add(int i, double value) {
 		u.add(i, value);
 	}
+	
+	@Override
+	public void add(double coeff, DomainValue x) {
+		u.add(coeff, ((MyDomainValue)x).u);
+	}
 
 	@Override
 	public void set(int i, double value) {

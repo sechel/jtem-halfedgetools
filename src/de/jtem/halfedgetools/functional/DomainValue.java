@@ -36,6 +36,7 @@ public interface DomainValue {
 	public double get(int i);
 	public void set(int i, double value);
 	public void add(int i, double value);
+	public void add(double coeff, DomainValue x);
 	public void setZero();
 	
 }

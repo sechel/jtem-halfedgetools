@@ -9,7 +9,7 @@ import de.jtem.halfedge.Vertex;
 public class FunctionalUtils {
 
 	private static final double
-		eps = 1E-5;
+		EPS = 1E-5;
 	
 	public static <
 		V extends Vertex<V, E, F>,
@@ -17,6 +17,15 @@ public class FunctionalUtils {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void calculateFDGradient(HDS hds, Functional<V, E, F> app, int dim, DomainValue x, Gradient G) {
+		calculateFDGradient(hds, app, dim, x, G, EPS);
+	}
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void calculateFDGradient(HDS hds, Functional<V, E, F> app, int dim, DomainValue x, Gradient G, double eps) {
 		MyEnergy E = new MyEnergy();
 		for (int i = 0; i < dim; i++){
 			double xi = x.get(i);
@@ -38,6 +47,15 @@ public class FunctionalUtils {
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void calculateFDHessian(HDS hds, Functional<V, E, F> app, int dim, DomainValue x, Hessian H) {
+		calculateFDHessian(hds, app, dim, x, H, EPS);
+	}
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void calculateFDHessian(HDS hds, Functional<V, E, F> app, int dim, DomainValue x, Hessian H, double eps) {
 		MyEnergy E = new MyEnergy();
 		app.evaluate(hds, x, E, null, null);
 		double y = E.get();
