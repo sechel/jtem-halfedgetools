@@ -3,10 +3,89 @@ package de.jtem.halfedgetools.functional;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
+import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 
 public class FunctionalUtils {
 
+	private static final double
+		eps = 1E-5;
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void calculateFDGradient(HDS hds, Functional<V, E, F> app, int dim, DomainValue x, Gradient G) {
+		MyEnergy E = new MyEnergy();
+		for (int i = 0; i < dim; i++){
+			double xi = x.get(i);
+			x.set(i, xi + eps);
+			app.evaluate(hds, x, E, null, null);
+			double f1 = E.get();
+			x.set(i, xi - eps);
+			app.evaluate(hds, x, E, null, null);
+			double f2 = E.get();
+			double fdGrad = (f1 - f2) / (2 * eps);
+			G.set(i, fdGrad);
+			x.set(i, xi);
+		}
+	}
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>,
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void calculateFDHessian(HDS hds, Functional<V, E, F> app, int dim, DomainValue x, Hessian H) {
+		MyEnergy E = new MyEnergy();
+		app.evaluate(hds, x, E, null, null);
+		double y = E.get();
+		for (int i = 0; i < dim; i++){
+			for (int j = 0; j < dim; j++){
+				double fdHessian = 0.0;
+				double xi = x.get(i);
+				double xj = x.get(j);
+				if (i == j) {
+					x.set(i, xi + eps);
+					app.evaluate(hds, x, E, null, null);
+					double iPlus = E.get();
+					x.set(i, xi + 2*eps);
+					app.evaluate(hds, x, E, null, null);
+					double i2Plus = E.get();
+					x.set(i, xi - eps);
+					app.evaluate(hds, x, E, null, null);
+					double iMinus = E.get();
+					x.set(i, xi - 2*eps);
+					app.evaluate(hds, x, E, null, null);
+					double i2Minus = E.get();
+					fdHessian = (-i2Plus/eps + 16*iPlus/eps - 30*y/eps + 16*iMinus/eps - i2Minus/eps) / (12 * eps);
+				} else {
+					x.set(i, xi + eps);
+					x.set(j, xj + eps);
+					app.evaluate(hds, x, E, null, null);
+					double iPlusjPlus = E.get();
+					x.set(i, xi + eps);
+					x.set(j, xj - eps);
+					app.evaluate(hds, x, E, null, null);
+					double iPlusjMinus = E.get();
+					x.set(i, xi - eps);
+					x.set(j, xj + eps);
+					app.evaluate(hds, x, E, null, null);
+					double iMinusjPlus = E.get();
+					x.set(i, xi - eps);
+					x.set(j, xj - eps);
+					app.evaluate(hds, x, E, null, null);
+					double iMinusjMinus = E.get();
+					fdHessian = (iPlusjPlus/eps - iPlusjMinus/eps - iMinusjPlus/eps + iMinusjMinus/eps) / (4 * eps);
+				}
+				x.set(i, xi);
+				x.set(j, xj);
+				H.set(i, j, fdHessian);
+			}
+		}
+	}
+	
 	public static 
 		<
 			V extends Vertex<V, E, F>, 
