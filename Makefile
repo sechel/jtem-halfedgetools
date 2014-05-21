@@ -39,7 +39,7 @@ EXCLTESTS=
 JUNIT=junit.jar
 
 #compile options
-JAVACOPTS=-target 1.5 -source 1.5
+JAVACOPTS=-target 1.6 -source 1.6
 
 #javadoc options
 JAVADOCOPTS= -author -protected -nodeprecated -nodeprecatedlist \
