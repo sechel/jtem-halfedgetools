@@ -21,7 +21,7 @@ PACKAGESUMHTML=$(DOCDIR)/de/jtem/$(NAME)/package-summary.html
 #location of the web site, may be empty
 SERVER=gauss.math.tu-berlin.de
 #directory of the website on the server, or local if SERVER is empty
-SRVDIR=/net/www/pub/jtem
+SRVDIR=/net/www3/pub/jtem
 
 #directory for the dependencies
 LIBDIR=lib
@@ -61,7 +61,7 @@ CLEAN=$(BINDIR) $(DOCDIR) $(WEBDIR) $(RELDIR) .testscompiled \
 	$(LIBDIR)/.lastUpdateDepsPlusADay $(LIBDIR)/.lastUpdateDepsCheck
 
 #jtem site url
-JTEMURL=http://www.math.tu-berlin.de/jtem
+JTEMURL=http://www3.math.tu-berlin.de/jtem
 
 
 
