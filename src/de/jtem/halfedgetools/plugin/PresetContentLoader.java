@@ -24,8 +24,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultListCellRenderer;
@@ -62,6 +64,9 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 	private final FilenameFilter		
 		SUPPORTED_FILES_FILTER = new SupportedFilesFilter(),
 		FOLDERS_FILES_FILTER = new FoldersFilesFilter();
+	
+	private Logger
+		log = Logger.getLogger(PresetContentLoader.class.getName());
 	
 	private HalfedgeInterface
 		hif = null;
@@ -421,6 +426,12 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 	public void restoreStates(Controller c) throws Exception {
 		super.restoreStates(c);
 		presetFolders = c.getProperty(getClass(), "folders", presetFolders);
+		for (File f : new LinkedList<File>(presetFolders)) {
+			if (!f.exists() || !f.isDirectory()) {
+				presetFolders.remove(f);
+				log.warning("preset folder " + f.getName() + " does not exist or is no directory.");
+			}
+		}
 	}
 	
 	@Override
