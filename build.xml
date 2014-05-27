@@ -99,7 +99,10 @@
 				<attribute name="Implementation-Vendor" value="${vendor}"/>
 				<attribute name="Implementation-Title" value="jTEM halfedgetools"/>
 				<attribute name="Implementation-Version" value="${version}"/>
-				<attribute name="Implementation-URL" value="http://www.jtem.com/"/>
+				<attribute name="Implementation-URL" value="https://svn.math.tu-berlin.de/svn/jtem/halfedgetools/"/>
+				<attribute name="Implementation-Homepage" value="http://jtem.de"/>
+				<attribute name="Permissions" value="all-permissions"/>	
+				<attribute name="Codebase" value="*.math.tu-berlin.de"/>
 			</manifest>
 		</jar>
 	</target>
