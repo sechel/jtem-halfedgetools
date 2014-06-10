@@ -15,6 +15,7 @@ import static de.jreality.shader.CommonAttributes.PICKABLE;
 import static de.jreality.shader.CommonAttributes.TUBES_DRAW;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 import static de.jreality.shader.CommonAttributes.Z_BUFFER_ENABLED;
+import static de.jtem.halfedgetools.selection.FaceSetSelection.toFaceSetSelection;
 import static de.jtem.halfedgetools.selection.SelectionUtility.createSelectionGeometry;
 import static java.util.Collections.unmodifiableSet;
 
@@ -62,6 +63,7 @@ import de.jtem.halfedgetools.jreality.ConverterHds2Ifs;
 import de.jtem.halfedgetools.jreality.ConverterHeds2JR;
 import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
+import de.jtem.halfedgetools.selection.FaceSetSelection;
 import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.halfedgetools.selection.TypedSelection;
 
@@ -98,11 +100,13 @@ public class HalfedgeLayer implements ActionListener {
 		visualizers = new TreeSet<VisualizerPlugin>();
 
 	private List<IndexedFaceSet> 
-		undoHistory = new ArrayList<IndexedFaceSet>();
+		geometryHistory = new ArrayList<IndexedFaceSet>();
 	private List<AdapterSet> 
 		adapterHistory = new ArrayList<AdapterSet>();
+	private List<FaceSetSelection>
+		selectionHistory = new ArrayList<FaceSetSelection>();
 	private int 
-		undoIndex = -1, 
+		undoIndex = 0, 
 		undoSize = 20;
 
 	// layer properties
@@ -166,6 +170,10 @@ public class HalfedgeLayer implements ActionListener {
 		displayFacesRoot.setAppearance(facesAppearance);
 
 		geometryRoot.setAppearance(geometryAppearance);
+		
+		geometryHistory.add(geometry);
+		adapterHistory.add(persistentAdapters);
+		selectionHistory.add(new FaceSetSelection());
 	}
 
 	public HalfedgeLayer(HalfedgeInterface hif) {
@@ -304,7 +312,7 @@ public class HalfedgeLayer implements ActionListener {
 	 */
 	public void updateGeometry(Adapter<double[]> positionAdapter) {
 		updateGeometryNoUndo(positionAdapter);
-		updateUndoList();
+		appendHistoryState();
 	}
 
 	public <
@@ -314,7 +322,7 @@ public class HalfedgeLayer implements ActionListener {
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void set(HDS hds) {
 		setNoUndo(hds);
-		updateUndoList();
+		appendHistoryState();
 	}
 
 	public void update() {
@@ -350,7 +358,7 @@ public class HalfedgeLayer implements ActionListener {
 
 	public void set(Geometry g) {
 		setNoUndo(g);
-		updateUndoList();
+		appendHistoryState();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -465,23 +473,27 @@ public class HalfedgeLayer implements ActionListener {
 	public void setSelection(TypedSelection<? extends Node<?,?,?>> sel) {
 		this.selection = new Selection(sel);
 		updateSelection();
+		updateSelectionHistory();
 		hif.fireSelectionChanged(selection);
 	}
 	
 	public void addSelection(TypedSelection<? extends Node<?,?,?>> sel) {
 		this.selection.addAll(sel);
 		updateSelection();
+		updateSelectionHistory();
 		hif.fireSelectionChanged(selection);
 	}
 
 	public void clearSelection() {
 		this.selection.clear();
 		updateSelection();
+		updateSelectionHistory();
 		hif.fireSelectionChanged(selection);
 	}
 	public void clearSelection(Integer channel) {
 		this.selection.clear(channel);
 		updateSelection();
+		updateSelectionHistory();
 		hif.fireSelectionChanged(selection);
 	}
 
@@ -660,32 +672,44 @@ public class HalfedgeLayer implements ActionListener {
 	}
 
 	public boolean canRedo() {
-		return undoIndex < undoHistory.size() - 1;
+		return undoIndex < geometryHistory.size() - 1;
 	}
 
-	private void updateUndoList() {
-		undoHistory = undoHistory.subList(0, undoIndex + 1);
-		undoHistory.add(geometry);
+	protected void updateSelectionHistory() {
+		FaceSetSelection fss = toFaceSetSelection(selection);
+		selectionHistory.set(undoIndex, fss);
+	}
+	
+	private void appendHistoryState() {
+		geometryHistory = new ArrayList<IndexedFaceSet>(geometryHistory.subList(0, undoIndex + 1));
+		adapterHistory = new ArrayList<AdapterSet>(adapterHistory.subList(0, undoIndex + 1));
+		selectionHistory = new ArrayList<FaceSetSelection>(selectionHistory.subList(0, undoIndex + 1));
+		geometryHistory.add(geometry);
 		adapterHistory.add(new AdapterSet(persistentAdapters));
-		if (undoHistory.size() > undoSize) {
-			undoHistory.remove(0);
+		selectionHistory.add(toFaceSetSelection(selection));
+		if (geometryHistory.size() > undoSize) {
+			geometryHistory.remove(0);
 			adapterHistory.remove(0);
+			selectionHistory.remove(0);
 		}
-		undoIndex = undoHistory.size() - 1;
+		undoIndex = geometryHistory.size() - 1;
 	}
 
 	public void undo() {
 		if (!canUndo()) {
 			return;
 		}
+		updateSelectionHistory();
 		undoIndex--;
-		geometry = undoHistory.get(undoIndex);
+		geometry = geometryHistory.get(undoIndex);
 		persistentAdapters = adapterHistory.get(undoIndex);
 		activeVolatileAdapters.clear();
 		volatileAdapters.clear();
 		geometryRoot.setGeometry(geometry);
 		convertFaceSet();
 		convertHDS();
+		FaceSetSelection fss = selectionHistory.get(undoIndex);
+		selection = FaceSetSelection.toSelection(fss, hds);
 		updateSelection();
 	}
 
@@ -693,14 +717,17 @@ public class HalfedgeLayer implements ActionListener {
 		if (!canRedo()) {
 			return;
 		}
+		updateSelectionHistory();
 		undoIndex++;
-		geometry = undoHistory.get(undoIndex);
+		geometry = geometryHistory.get(undoIndex);
 		persistentAdapters = adapterHistory.get(undoIndex);
 		activeVolatileAdapters.clear();
 		volatileAdapters.clear();
 		geometryRoot.setGeometry(geometry);
 		convertFaceSet();
 		convertHDS();
+		FaceSetSelection fss = selectionHistory.get(undoIndex);
+		selection = FaceSetSelection.toSelection(fss, hds);
 		updateSelection();
 	}
 
