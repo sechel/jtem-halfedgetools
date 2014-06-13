@@ -5,6 +5,13 @@
             This is the VaryLab dependency update ant build file.
     </description>
     
+	<property file="dependencies.properties"/>
+	
+	<!-- default values if not set in dependencies.prop --> 
+	<property name="jreality.dir" value="../jreality"/>
+	<property name="jrworkspace.dir" value="../jrworkspace"/>
+	<property name="halfedge.dir" value="../halfedge"/>
+	
 	<target name="default">
 		<echo>Please choose a dependency target to update.</echo>
 	</target>
@@ -14,23 +21,23 @@
 	</target>
 	
 	<target name="halfedge">
-		<ant antfile="build.xml" dir="../halfedge" target="release"/>
+		<ant antfile="build.xml" dir="${halfedge.dir}" target="release"/>
 		<copy todir="lib/jtem">
-			<fileset dir="../halfedge/release" includes="halfedge.jar"/>
+			<fileset dir="${halfedge.dir}/release" includes="halfedge.jar"/>
 		</copy>
 	</target>
 	
 	<target name="jrworkspace">
-		<ant antfile="build.xml" dir="../jrworkspace" target="jrworkspace"/>
+		<ant antfile="build.xml" dir="${jrworkspace.dir}" target="jrworkspace"/>
 		<copy todir="lib/jtem">
-			<fileset dir="../jrworkspace/jar" includes="jrworkspace.jar"/>
+			<fileset dir="${jrworkspace.dir}/jar" includes="jrworkspace.jar"/>
 		</copy>
 	</target>
 	
 	<target name="jreality">
-		<ant antfile="build.xml" dir="../jreality" target="release-jar"/>
+		<ant antfile="build.xml" dir="${jreality.dir}" target="release-jar"/>
 		<copy todir="lib/jreality">
-			<fileset dir="../jreality/release" includes="jReality.jar"/>
+			<fileset dir="${jreality.dir}/release" includes="jReality.jar"/>
 		</copy>
 	</target>
 	
