@@ -28,6 +28,6 @@
 	<classpathentry kind="lib" path="lib/jogamp/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="lib/jogamp/jogl-all.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/beans.jar"/>
-	<classpathentry kind="lib" path="lib/jreality/jReality.jar"/>
+	<classpathentry kind="lib" path="lib/jreality/jReality.jar" sourcepath="/jreality"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

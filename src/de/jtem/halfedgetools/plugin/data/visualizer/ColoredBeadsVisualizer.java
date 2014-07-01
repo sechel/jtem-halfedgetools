@@ -54,29 +54,38 @@ import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
-public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements
-		ActionListener, ChangeListener {
+public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements ActionListener, ChangeListener {
 
-	private JComboBox beadsPosCombo = new JComboBox(),
-			colorMapCombo = new JComboBox(ColorMap.values());
-	private MyClampModel clampLowModel = new MyClampModel(),
-			clampHighModel = new MyClampModel();
-	private SpinnerNumberModel spanModel = new SpinnerNumberModel(1.0, 0.0,
-			100.0, 0.1), scaleModel = new SpinnerNumberModel(1.0, 0.1, 100.0,
-			0.1);
-	private JCheckBox clampChecker = new JCheckBox("C"),
-			invertChecker = new JCheckBox("Invert Scale"),
-			absoluteChecker = new JCheckBox("Absolute Size");
-	private JSpinner clampLowSpinner = new JSpinner(clampLowModel),
-			clampHighSpinner = new JSpinner(clampHighModel),
-			spanSpinner = new JSpinner(spanModel), scaleSpinner = new JSpinner(
-					scaleModel);
-	private JPanel optionsPanel = new JPanel();
-	private ColoredBeadsVisualization actVis = null;
-	private boolean listenersDisabled = false;
-	private Appearance appBeads = new Appearance("Beads Appearance");
-	private SimpleBeadsPositionAdapter simpleBeadsPositionAdapter = new SimpleBeadsPositionAdapter();
-	private HalfedgeInterface hif = null;
+	private JComboBox 
+		beadsPosCombo = new JComboBox(),
+		colorMapCombo = new JComboBox(ColorMap.values());
+	private MyClampModel 
+		clampLowModel = new MyClampModel(),
+		clampHighModel = new MyClampModel();
+	private SpinnerNumberModel 
+		spanModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.1), 
+		scaleModel = new SpinnerNumberModel(1.0, 0.1, 100.0, 0.1);
+	private JCheckBox 
+		clampChecker = new JCheckBox("C"),
+		invertChecker = new JCheckBox("Invert Scale"),
+		absoluteChecker = new JCheckBox("Absolute Size");
+	private JSpinner 
+		clampLowSpinner = new JSpinner(clampLowModel),
+		clampHighSpinner = new JSpinner(clampHighModel),
+		spanSpinner = new JSpinner(spanModel), 
+		scaleSpinner = new JSpinner(scaleModel);
+	private JPanel 
+		optionsPanel = new JPanel();
+	private ColoredBeadsVisualization 
+		actVis = null;
+	private boolean 
+		listenersDisabled = false;
+	private Appearance 
+		appBeads = new Appearance("Beads Appearance");
+	private SimpleBeadsPositionAdapter 
+		simpleBeadsPositionAdapter = new SimpleBeadsPositionAdapter();
+	private HalfedgeInterface 
+		hif = null;
 
 	private class MyClampModel extends SpinnerNumberModel {
 
@@ -126,11 +135,9 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements
 		optionsPanel.add(new JLabel("Position"), cl);
 		optionsPanel.add(beadsPosCombo, cr);
 
-		JComponent highEditor = new JSpinner.NumberEditor(clampHighSpinner,
-				"0.00E0");
+		JComponent highEditor = new JSpinner.NumberEditor(clampHighSpinner, "0.00E0");
 		clampHighSpinner.setEditor(highEditor);
-		JComponent lowEditor = new JSpinner.NumberEditor(clampLowSpinner,
-				"0.00E0");
+		JComponent lowEditor = new JSpinner.NumberEditor(clampLowSpinner, "0.00E0");
 		clampLowSpinner.setEditor(lowEditor);
 
 		scaleSpinner.addChangeListener(this);
@@ -147,8 +154,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements
 
 		appBeads.setAttribute(VERTEX_DRAW, true);
 		appBeads.setAttribute(POINT_SHADER + "." + SPHERES_DRAW, true);
-		appBeads.setAttribute(POINT_SHADER + "." + POLYGON_SHADER + "."
-				+ SMOOTH_SHADING, true);
+		appBeads.setAttribute(POINT_SHADER + "." + POLYGON_SHADER + "." + SMOOTH_SHADING, true);
 		appBeads.setAttribute(POINT_SHADER + "." + POINT_RADIUS, 1.0);
 	}
 
@@ -161,21 +167,22 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements
 	@SuppressWarnings("unchecked")
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (actVis == null || listenersDisabled)
+		if (actVis == null || listenersDisabled) {
 			return;
+		}
 		actVis.colorMap = (ColorMap) colorMapCombo.getSelectedItem();
 		actVis.invert = invertChecker.isSelected();
 		actVis.absolute = absoluteChecker.isSelected();
-		actVis.beadPosAdapter = (Adapter<double[]>) beadsPosCombo
-				.getSelectedItem();
+		actVis.beadPosAdapter = (Adapter<double[]>) beadsPosCombo.getSelectedItem();
 		actVis.clamp = clampChecker.isSelected();
 		actVis.update();
 	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		if (actVis == null || listenersDisabled)
+		if (actVis == null || listenersDisabled) {
 			return;
+		}
 		actVis.scale = scaleModel.getNumber().doubleValue();
 		actVis.span = spanModel.getNumber().doubleValue();
 		actVis.clampHigh = clampHighModel.getNumber().doubleValue();
@@ -185,21 +192,37 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements
 
 	public class ColoredBeadsVisualization extends AbstractDataVisualization {
 
-		private double clampLow = 0.0, clampHigh = 0.0, span = 1.0,
-				scale = 1.0;
-		private boolean clamp = false, clampInited = false, invert = false,
-				absolute = false;
-		private ColorMap colorMap = ColorMap.Hue;
-		private SceneGraphComponent beadsComponent = new SceneGraphComponent(
-				"Beads");
-		private PointSetFactory psf = new PointSetFactory();
-		private Adapter<double[]> beadPosAdapter = null;
-		private boolean cutSmallValues = false;
-		private double smallestAbsolutValue = 1E-10;
-		private double minValue = 0.0, maxValue = 0.0;
+		private double 
+			clampLow = 0.0, 
+			clampHigh = 0.0, 
+			span = 1.0,
+			scale = 1.0;
+		private boolean 
+			clamp = false, 
+			clampInited = false, 
+			invert = false,
+			absolute = false;
+		private ColorMap 
+			colorMap = ColorMap.Hue;
+		private SceneGraphComponent 
+			beadsComponent = new SceneGraphComponent("Beads");
+		private PointSetFactory 
+			psf = new PointSetFactory();
+		private Adapter<double[]> 
+			beadPosAdapter = null;
+		private boolean 
+			cutSmallValues = false;
+		private double 
+			smallestAbsolutValue = 1E-10,
+			minValue = 0.0, 
+			maxValue = 0.0;
 
-		public ColoredBeadsVisualization(HalfedgeLayer layer,
-				Adapter<?> source, DataVisualizer visualizer, NodeType type) {
+		public ColoredBeadsVisualization(
+			HalfedgeLayer layer, 
+			Adapter<?> source, 
+			DataVisualizer visualizer, 
+			NodeType type
+		) {
 			super(layer, source, visualizer, type);
 			beadsComponent.setAppearance(appBeads);
 		}
@@ -271,8 +294,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements
 			}
 			mean /= nodes.size();
 			if (foundNullValues > 0) {
-				System.err.println("Null value in adapter " + genericAdapter
-						+ " for " + foundNullValues + " nodes found.");
+				System.err.println("Null value in adapter " + genericAdapter + " for " + foundNullValues + " nodes found.");
 			}
 
 			double[][] vertexDataArr = vertexData.toArray(new double[0][0]);
@@ -291,13 +313,11 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements
 					}
 					if (clamp) {
 						v = ColorMap.clamp(v, clampLow, clampHigh);
-						colorData[i] = colorMap
-								.getColor(v, clampLow, clampHigh);
+						colorData[i] = colorMap.getColor(v, clampLow, clampHigh);
 					} else {
 						colorData[i] = colorMap.getColor(v, minValue, maxValue);
 					}
-					sizeData[i++] = mapScale(v, scale, span, invert, absolute,
-							minValue, maxValue, mean, meanEdgeLength / 4);
+					sizeData[i++] = mapScale(v, scale, span, invert, absolute, minValue, maxValue, mean, meanEdgeLength / 4);
 				}
 			}
 			if (vertexDataArr.length == 0) {
@@ -317,16 +337,24 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements
 			updateBeadsComponent();
 		}
 
-		private double mapScale(double val, double scale, double span,
-				boolean invert, boolean absolute, double min, double max,
-				double mean, double resultMean) {
-			if (Math.abs(val) < smallestAbsolutValue)
+		private double mapScale(
+			double val, 
+			double scale, 
+			double span, 
+			boolean invert, 
+			boolean absolute, 
+			double min, 
+			double max, 
+			double mean, 
+			double resultMean
+		) {
+			if (Math.abs(val) < smallestAbsolutValue) {
 				return 0;
+			}
 			double dist = max - min;
 			double offset = (1 - span) * resultMean * scale;
 			double nomaleVal = ((absolute ? Math.abs(val) : val) - min) / dist;
-			double result = offset + span * resultMean * scale
-					* (invert ? 1 - nomaleVal : nomaleVal);
+			double result = offset + span * resultMean * scale * (invert ? 1 - nomaleVal : nomaleVal);
 			return max(result, 0);
 		}
 
