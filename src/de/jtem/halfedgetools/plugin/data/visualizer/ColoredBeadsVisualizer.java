@@ -59,14 +59,14 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 	private JComboBox 
 		beadsPosCombo = new JComboBox(),
 		colorMapCombo = new JComboBox(ColorMap.values());
-	private MyClampModel 
-		clampLowModel = new MyClampModel(),
-		clampHighModel = new MyClampModel();
+	private ClampSpinnerModel 
+		clampLowModel = new ClampSpinnerModel(),
+		clampHighModel = new ClampSpinnerModel();
 	private SpinnerNumberModel 
 		spanModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.1), 
 		scaleModel = new SpinnerNumberModel(1.0, 0.1, 100.0, 0.1);
 	private JCheckBox 
-		clampChecker = new JCheckBox("C"),
+		clampChecker = new JCheckBox("Clamp"),
 		invertChecker = new JCheckBox("Invert Scale"),
 		absoluteChecker = new JCheckBox("Absolute Size");
 	private JSpinner 
@@ -86,32 +86,6 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		simpleBeadsPositionAdapter = new SimpleBeadsPositionAdapter();
 	private HalfedgeInterface 
 		hif = null;
-
-	private class MyClampModel extends SpinnerNumberModel {
-
-		private static final long serialVersionUID = 1L;
-		private Double stepsize = 1E-1;
-
-		public MyClampModel() {
-			super(0.0, null, null, 1.0);
-		}
-
-		@Override
-		public Object getNextValue() {
-			return getNumber().doubleValue() + stepsize;
-		}
-
-		@Override
-		public Object getPreviousValue() {
-			return getNumber().doubleValue() - stepsize;
-		}
-
-		@Override
-		public void setStepSize(Number stepSize) {
-			this.stepsize = stepSize.doubleValue();
-		}
-
-	}
 
 	public ColoredBeadsVisualizer() {
 		optionsPanel.setLayout(new GridBagLayout());
@@ -503,10 +477,8 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public DataVisualization createVisualization(HalfedgeLayer layer,
-			NodeType type, Adapter<?> source) {
-		ColoredBeadsVisualization vis = new ColoredBeadsVisualization(layer,
-				source, this, type);
+	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source) {
+		ColoredBeadsVisualization vis = new ColoredBeadsVisualization(layer, source, this, type);
 		// copy last values
 		vis.colorMap = (ColorMap) colorMapCombo.getSelectedItem();
 		vis.scale = scaleModel.getNumber().doubleValue();

@@ -11,6 +11,7 @@ import static java.lang.Integer.MAX_VALUE;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
@@ -53,6 +54,12 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionListener, ChangeListener {
 
+	private ClampSpinnerModel 
+		clampLowModel = new ClampSpinnerModel(),
+		clampHighModel = new ClampSpinnerModel();
+	private JSpinner 
+		clampLowSpinner = new JSpinner(clampLowModel),
+		clampHighSpinner = new JSpinner(clampHighModel);
 	private JComboBox
 		colorMapCombo = new JComboBox(ColorMap.values());
 	private SpinnerNumberModel
@@ -60,7 +67,8 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 	private JSpinner
 		offsetSpinner = new JSpinner(offsetModel);
 	private JCheckBox 
-		maxabsSelection= new JCheckBox("Center Color of Zero");
+		clampChecker = new JCheckBox("Clamp"),
+		maxAbsSelection= new JCheckBox("Center Color of Zero");
 	private JPanel
 		optionsPanel = new JPanel();
 	private NodeColorVisualization
@@ -74,23 +82,35 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 		optionsPanel.setLayout(new GridBagLayout());
 		GridBagConstraints cl = LayoutFactory.createLeftConstraint();
 		GridBagConstraints cr = LayoutFactory.createRightConstraint();
+		GridBagConstraints c = new GridBagConstraints();
+		c.weightx = 1.0;
+		c.gridwidth = 1;
+		c.insets = new Insets(1, 1, 1, 1);
+		c.fill = GridBagConstraints.BOTH;
 		optionsPanel.add(new JLabel("Colors"), cl);
 		optionsPanel.add(colorMapCombo, cr);
+		optionsPanel.add(clampChecker, c);
+		optionsPanel.add(clampLowSpinner, c);
+		optionsPanel.add(clampHighSpinner, cr);
 		optionsPanel.add(new JLabel("Offset"), cl);
 		optionsPanel.add(offsetSpinner, cr);
-		optionsPanel.add(maxabsSelection, cr);
+		optionsPanel.add(maxAbsSelection, cr);
 		
-		maxabsSelection.setSelected(false);
+		maxAbsSelection.setSelected(false);
 		colorMapCombo.setSelectedItem(ColorMap.Hue);
 		
+		clampChecker.addActionListener(this);
+		clampHighSpinner.addChangeListener(this);
+		clampLowSpinner.addChangeListener(this);
 		colorMapCombo.addActionListener(this);
 		offsetSpinner.addChangeListener(this);
-		maxabsSelection.addActionListener(this);
+		maxAbsSelection.addActionListener(this);
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (actVis == null || listenersDisabled) return;
+		actVis.clamp = clampChecker.isSelected();
 		actVis.colorMap = (ColorMap)colorMapCombo.getSelectedItem();
 		actVis.update();
 	}
@@ -98,6 +118,8 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		if (actVis == null || listenersDisabled) return;
+		actVis.clampLow = clampLowModel.getNumber().doubleValue();
+		actVis.clampHigh = clampHighModel.getNumber().doubleValue();
 		actVis.offset = offsetModel.getNumber().doubleValue();
 		actVis.update();
 	}
@@ -110,7 +132,12 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 			geomComponent = new SceneGraphComponent("Node Colors");
 		private Appearance
 			nodeAppearance = new Appearance("Node Colors Appearance");
+		private boolean
+			clampInited = false, 
+			clamp = false;
 		private double
+			clampLow = 0.0, 
+			clampHigh = 0.0, 
 			offset = 0.005;
 		private double[]
 			minmax = {0, 0};
@@ -191,10 +218,18 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 					if (dval < min) min = dval;
 				}
 			}
-			minmax[0] = maxabsSelection.isSelected() ? -Math.max(Math.abs(min),
-					Math.abs(max)) : min;
-			minmax[1] = maxabsSelection.isSelected() ? Math.max(Math.abs(min),
-					Math.abs(max)) : max;
+			if (!clampInited) {
+				clampHigh = max;
+				clampLow = min;
+				clampInited = true;
+			}
+			if (clamp) {
+				minmax[0] = clampLow;
+				minmax[1] = clampHigh;
+			} else {
+				minmax[0] = maxAbsSelection.isSelected() ? -Math.max(Math.abs(min), Math.abs(max)) : min;
+				minmax[1] = maxAbsSelection.isSelected() ? Math.max(Math.abs(min), Math.abs(max)) : max;
+			}
 			return r;
 		}
 		
@@ -230,6 +265,7 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 				if (val instanceof Number) {
 					Number num = (Number)val;
 					double dval = num.doubleValue();
+					dval = ColorMap.clamp(dval, min, max);
 					colorMap.getColor(dval, min, max).getRGBColorComponents(colorValues);
 					color[0] = colorValues[0];
 					color[1] = colorValues[1];
@@ -253,6 +289,24 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 		listenersDisabled = true;
 		colorMapCombo.setSelectedItem(actVis.colorMap);
 		offsetModel.setValue(actVis.offset);
+		clampChecker.setSelected(actVis.clamp);
+		if (actVis.clampHigh < actVis.minmax[0]) {
+			actVis.clampHigh = actVis.minmax[0];
+		}
+		if (actVis.clampLow < actVis.minmax[0]) {
+			actVis.clampLow = actVis.minmax[0];
+		}
+		if (actVis.clampHigh > actVis.minmax[1]) {
+			actVis.clampHigh = actVis.minmax[1];
+		}
+		if (actVis.clampLow > actVis.minmax[1]) {
+			actVis.clampLow = actVis.minmax[1];
+		}
+		double stepSize = Math.abs(actVis.minmax[1] - actVis.minmax[0]) / 100.0;
+		clampHighModel.setStepSize(stepSize);
+		clampLowModel.setStepSize(stepSize);
+		clampHighModel.setValue(actVis.clampHigh);
+		clampLowModel.setValue(actVis.clampLow);
 		listenersDisabled = false;
 		return optionsPanel;
 	}
