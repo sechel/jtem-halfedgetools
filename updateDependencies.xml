@@ -9,6 +9,7 @@
 	
 	<!-- default values if not set in dependencies.prop --> 
 	<property name="jreality.dir" value="../jreality"/>
+	<property name="java2d.dir" value="../java2d"/>
 	<property name="jrworkspace.dir" value="../jrworkspace"/>
 	<property name="halfedge.dir" value="../halfedge"/>
 	
@@ -40,5 +41,12 @@
 			<fileset dir="${jreality.dir}/release" includes="jReality.jar"/>
 		</copy>
 	</target>
+	
+	<target name="java2d">
+		<ant antfile="build.xml" dir="${java2d.dir}" target="release"/>
+		<copy todir="lib/jtem" overwrite="true">
+			<fileset dir="${java2d.dir}/release" includes="java2d.jar"/>
+		</copy>
+	</target>	
 	
 </project>

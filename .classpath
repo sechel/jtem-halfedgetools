@@ -29,5 +29,8 @@
 	<classpathentry kind="lib" path="lib/jogamp/jogl-all.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/beans.jar"/>
 	<classpathentry kind="lib" path="lib/jreality/jReality.jar" sourcepath="/jreality"/>
+	<classpathentry kind="lib" path="lib/itext/itextpdf-5.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/itext/itext-pdfa-5.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/itext/itext-xtra-5.5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
