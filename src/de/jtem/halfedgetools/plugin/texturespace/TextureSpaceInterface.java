@@ -40,6 +40,8 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
 import de.jtem.halfedgetools.plugin.PresetContentLoader;
+import de.jtem.java2d.AppearanceChangeEvent;
+import de.jtem.java2d.AppearanceChangeListener;
 import de.jtem.java2d.SceneComponent;
 import de.jtem.java2d.Viewer2D;
 import de.jtem.jrworkspace.plugin.Controller;
@@ -49,7 +51,7 @@ import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkSlot;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkSlotVertical;
 
 public class TextureSpaceInterface extends ViewShrinkPanelPlugin 
-implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListener {
+implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListener, AppearanceChangeListener {
 
 	private ShrinkSlot
 		leftSlot = new ShrinkSlotVertical(250),
@@ -82,7 +84,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 	private JCheckBox
 		antiAliasChecker = new JCheckBox("Anti-Aliasing", true),
 		gridChecker = new JCheckBox("Grid", true),
-		verticesChecker = new JCheckBox("Vertices", true),
+		verticesChecker = new JCheckBox("Vertices", false),
 		vertexFillChecker = new JCheckBox("Vertex Color", true),
 		vertexOutlineChecker = new JCheckBox("Vertex Outline", true),
 		edgesChecker = new JCheckBox("Edges", true),
@@ -91,7 +93,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		backgroundColorButton = new ColorChooseJButton(new Color(232, 232, 232), true),
 		vertexColorButton = new ColorChooseJButton(Color.WHITE, true),
 		vertexOutlineColorButton = new ColorChooseJButton(new Color(153, 0, 0), true),
-		edgeColorButton = new ColorChooseJButton(Color.BLACK, true),
+		edgeColorButton = new ColorChooseJButton(new Color(102, 102, 102), true),
 		faceColorButton = new ColorChooseJButton(Color.WHITE, true);
 	private JPanel
 		visibilityPanel = new JPanel(new GridLayout(1, 3));
@@ -144,6 +146,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		optionsShrinker.add(faceAlphaSpinner, rc);
 		leftSlot.addShrinkPanel(optionsShrinker);
 		
+		antiAliasChecker.addActionListener(this);
 		backgroundColorButton.addColorChangedListener(this);
 		gridChecker.addActionListener(this);
 		rotationSpinner.addChangeListener(this);
@@ -161,6 +164,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 	}
 	
 	private void updateAppearances() {
+		viewer.setAntialias(antiAliasChecker.isSelected());
 		viewer.setBackground(backgroundColorButton.getColor());
 		viewer.setGridEnabled(gridChecker.isSelected());
 		AffineTransform R = new AffineTransform();
@@ -183,6 +187,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		int alpha = (int)(faceAlphaModel.getNumber().doubleValue() * 255);
 		Color faceColorAlpha = new Color(fc.getRed(), fc.getGreen(), fc.getBlue(), alpha);
 		faces.setPaint(faceColorAlpha);
+		viewer.repaint();
 	}
 	
 	@Override
@@ -197,6 +202,11 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 	
 	@Override
 	public void stateChanged(ChangeEvent e) {
+		updateAppearances();
+	}
+	
+	@Override
+	public void appearanceChange(AppearanceChangeEvent arg0) {
 		updateAppearances();
 	}
 	
@@ -217,7 +227,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 				} else {
 					viewer.getRoot().addChild(0, tp.getSceneComponent());
 				}
-				
+				tp.getSceneComponent().addAppearanceChangeListener(this);
 			}
 		}
 	}
