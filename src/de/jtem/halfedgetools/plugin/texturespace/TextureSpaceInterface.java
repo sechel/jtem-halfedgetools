@@ -40,11 +40,13 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
 import de.jtem.halfedgetools.plugin.PresetContentLoader;
+import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.java2d.AppearanceChangeEvent;
 import de.jtem.java2d.AppearanceChangeListener;
 import de.jtem.java2d.SceneComponent;
 import de.jtem.java2d.Viewer2D;
 import de.jtem.jrworkspace.plugin.Controller;
+import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerLayout;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkSlot;
@@ -100,7 +102,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		
 	
 	public TextureSpaceInterface() {
-		shrinkPanel.setTitle("Texture Space Viewer");
+		shrinkPanel.setTitle("Texture Space Viewer 2D");
 		shrinkPanel.setPreferredPosition(SHRINKER_TOP);
 		shrinkPanel.setLayout(mainLayout);
 		shrinkPanel.add(viewer);
@@ -258,6 +260,13 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		layerComponent.setLayer(layer);
 		layerComponent.update();
 		viewer.encompass(viewer.getBounds2D());
+	}
+	
+	@Override
+	public PluginInfo getPluginInfo() {
+		PluginInfo info = super.getPluginInfo();
+		info.icon = ImageHook.getIcon("paintbrush.png");
+		return info;
 	}
 	
 	@Override
