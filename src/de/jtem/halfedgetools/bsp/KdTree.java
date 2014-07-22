@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
@@ -138,13 +139,13 @@ public class KdTree <
 	 * @return An array containing the points or null, if there weren't any points
 	 * in that radius 
 	 */
-	final public Collection<V> collectInRadius(double[] p, double radius) {
+	final public List<V> collectInRadius(double[] p, double radius) {
 		// Only search in a radius greater than zero
 		if(radius <= 0) {
-			return Collections.emptySet();
+			return Collections.emptyList();
 		}
 		// Start the collectInRadius search
-		Collection<V> result = new LinkedList<V>();
+		List<V> result = new LinkedList<V>();
 		collectInRadius(root, p, radius, result);
 		return result;
 	}
@@ -162,14 +163,14 @@ public class KdTree <
 		KdNode node, 
 		double[] target, 
 		double radius2,
-		Collection<V> vec
+		List<V> vec
 	) {
 		// If we reached a leaf, perform a linear search
 		if (node instanceof KdLeaf) {
 			for (int i = node.getStartIndex(); i <= node.getEndIndex(); i++) {
 				double[] pos = getPos(i);
 				double dist2 = distance2(pos, target);
-				if (dist2 != 0 && dist2 < radius2) {
+				if (dist2 < radius2) {
 					vec.add(points.get(i));
 				}
 			}
@@ -199,8 +200,8 @@ public class KdTree <
 	 * @param knearest
 	 * @return An array containing the points or null
 	 */
-	final public Collection<V> collectKNearest(double[] p, int knearest) {
-		Collection<V> result = new LinkedList<V>();
+	final public List<V> collectKNearest(double[] p, int knearest) {
+		List<V> result = new LinkedList<V>();
 		if( knearest <= 0 ) { 
 			return result;
 		} 

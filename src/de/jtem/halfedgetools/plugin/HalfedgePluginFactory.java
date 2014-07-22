@@ -98,6 +98,7 @@ import de.jtem.halfedgetools.plugin.data.visualizer.VectorFieldVisualizer;
 import de.jtem.halfedgetools.plugin.misc.RerunLastAlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.modes.EditMode;
 import de.jtem.halfedgetools.plugin.modes.SelectionMode;
+import de.jtem.halfedgetools.plugin.texturespace.TextureSpaceInterface;
 import de.jtem.halfedgetools.plugin.visualizers.DirichletEnergyVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.EdgeLengthVisualizer;
 import de.jtem.halfedgetools.plugin.visualizers.FacePlanarityVisualizer;
@@ -251,6 +252,7 @@ public class HalfedgePluginFactory {
 		s.add(new SwapPosTexPos());
 		s.add(new JobMonitorPlugin());
 		s.add(new PresetContentLoader());
+		s.add(new TextureSpaceInterface());
 		return s;
 	}
 	

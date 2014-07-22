@@ -35,6 +35,9 @@ import static de.jtem.halfedge.util.HalfEdgeUtils.constructFaceByVertices;
 import static java.lang.Math.sqrt;
 import static no.uib.cipr.matrix.Matrix.Norm.Frobenius;
 import static no.uib.cipr.matrix.Vector.Norm.TwoRobust;
+
+import java.util.logging.Logger;
+
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Matrix;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
@@ -60,6 +63,8 @@ public abstract class FunctionalTest <
 	F extends Face<V, E, F>
 > {
 
+	private static Logger logger = Logger.getLogger(FunctionalTest.class.getSimpleName());
+	
 	private Double
 		eps = 1E-5,
 		error = 1E-4;
@@ -134,7 +139,7 @@ public abstract class FunctionalTest <
 			f.evaluate(hds, xGrad, f2, null, null);
 			
 			fdGrad = (f1.get() - f2.get()) / (2 * eps);
-			
+			logger.info("fdGrad["+i+"] = "+fdGrad+ "; G["+i+"] = " + G.get(i));
 			normDif += (fdGrad - G.get(i)) * (fdGrad - G.get(i));
 			xGrad.set(i, xi);
 		}

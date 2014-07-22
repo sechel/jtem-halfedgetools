@@ -277,11 +277,14 @@ $(RELDIR)/$(NAME)-api.tgz:  $(DOCDIR)
 #Manifest
 $(RELDIR)/manifest.txt: $(RELDIR)/current.txt
 	@if [ ! -d $(RELDIR) ]; then mkdir $(RELDIR); fi
+	@echo "Built-By: ${USER}" >> $(RELDIR)/manifest.txt
 	@echo "Implementation-Title: $(NAME)" > $(RELDIR)/manifest.txt
 	@echo "Implementation-Version: "`cat $(RELDIR)/current.txt` >> $(RELDIR)/manifest.txt
 	@echo "Implementation-Vendor: jTEM ($(JTEMURL))" >> $(RELDIR)/manifest.txt
 	@echo "Implementation-URL: $(JTEMURL)/downloads/$(NAME).jar" >> $(RELDIR)/manifest.txt
-	
+	@echo "Permissions: all-permissions" >> $(RELDIR)/manifest.txt
+	@echo "Codebase: *.math.tu-berlin.de" >> $(RELDIR)/manifest.txt
+		
 #release date
 .PHONY: $(RELDIR)/current.txt
 $(RELDIR)/current.txt:

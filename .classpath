@@ -14,7 +14,7 @@
 	<classpathentry kind="lib" path="lib/junit/junit-4.11.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/discretegroup.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/halfedge.jar"/>
-	<classpathentry kind="lib" path="lib/jtem/java2d.jar"/>
+	<classpathentry kind="lib" path="lib/jtem/java2d.jar" sourcepath="/java2d"/>
 	<classpathentry kind="lib" path="lib/jtem/java2dx.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/jrworkspace.jar" sourcepath="/jrworkspace"/>
 	<classpathentry kind="lib" path="lib/jtem/modelling.jar"/>
@@ -28,6 +28,9 @@
 	<classpathentry kind="lib" path="lib/jogamp/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="lib/jogamp/jogl-all.jar"/>
 	<classpathentry kind="lib" path="lib/jtem/beans.jar"/>
-	<classpathentry kind="lib" path="lib/jreality/jReality.jar"/>
+	<classpathentry kind="lib" path="lib/jreality/jReality.jar" sourcepath="/jreality"/>
+	<classpathentry kind="lib" path="lib/itext/itextpdf-5.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/itext/itext-pdfa-5.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/itext/itext-xtra-5.5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

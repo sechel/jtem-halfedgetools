@@ -214,6 +214,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	private ConverterHds2Ifs 
 		converterHds2Ifs = null;
 	
+	private boolean
+		normalizeContent = true;
+	
 	public HalfedgeInterface() {
 		makeLayout();
 		// add generic and default adapters
@@ -1310,10 +1313,13 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		if (paths.isEmpty()) {
 			content.setContent(root);
 		}
-		encompassContent();
+		normalizeContent();
 	}
 
 	private void normalizeContent() {
+		if(!normalizeContent) { 
+			return;
+		}
 		MatrixBuilder mb = MatrixBuilder.euclidean();
 		rootTransform.setMatrix(mb.getArray());
 		Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(root);
@@ -1544,6 +1550,10 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 
 	public SelectionInterface getSelectionInterface() {
 		return selectionInterface;
+	}
+
+	public void setNormalizeContent(boolean normalizeContent) {
+		this.normalizeContent = normalizeContent;
 	}
 	
 }

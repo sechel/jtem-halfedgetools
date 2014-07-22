@@ -410,6 +410,7 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 			IndexedFaceSet g = (IndexedFaceSet)getFirstGeometry(c);
 			IndexedFaceSetUtility.calculateAndSetNormals(g);
 			hif.set(g);
+			hif.encompassContent();
 		} catch (IOException e1) {
 			JOptionPane.showMessageDialog(w, "Could not load file " + selectedFile.getName() + "\n" + e1.getMessage());
 			return;

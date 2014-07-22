@@ -40,13 +40,18 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 	private VisualizationInterface vif = null;
 	private SwingDragEventTool tool = new SwingDragEventTool(
 			InputSlot.SHIFT_LEFT_BUTTON);
-	private JCheckBox xBox = new JCheckBox("X"), yBox = new JCheckBox("Y"),
-			zBox = new JCheckBox("Z");
+	private JCheckBox 
+			xBox = new JCheckBox("X"), 
+			yBox = new JCheckBox("Y"),
+			zBox = new JCheckBox("Z"),
+			normalizeBox = new JCheckBox("Normalize");
+	
 	private JPanel panel = new JPanel();
 	private MarqueeSelectionPlugin
 		marqee = null;
 	private boolean
 		marqeeWasActive = false;
+	
 
 	public VertexEditorPlugin() {
 		tool.addPointDragListener(this);
@@ -69,6 +74,9 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 		panel.add(xBox, gbc1);
 		panel.add(yBox, gbc1);
 		panel.add(zBox, gbc2);
+		
+		panel.add(normalizeBox, gbc2);
+		
 		panel.add(new JLabel("(Shift-LeftClick to Drag)"), gbc2);
 
 		shrinkPanel.add(panel);
@@ -100,6 +108,7 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 
 	@Override
 	public void pointDragStart(PointDragEvent e) {
+		hif.setNormalizeContent(normalizeBox.isSelected());
 		selectedVertices = hif.getSelection().getVertices();
 		adapters = hif.getAdapters();
 		pointerpos = new double[] { xBox.isSelected() ? 0 : e.getX(),
@@ -151,6 +160,7 @@ public class VertexEditorPlugin extends ShrinkPanelPlugin implements PointDragLi
 		differences.clear();
 		marqee.setActivated(marqeeWasActive);
 		hif.update();
+		hif.setNormalizeContent(true);
 	}
 
 	@Override

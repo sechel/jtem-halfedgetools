@@ -38,6 +38,7 @@
 	<path id="jtem.libraryclasspath">
 		<pathelement location="${lib}/jtem/discretegroup.jar"/>
 		<pathelement location="${lib}/jtem/halfedge.jar"/>
+		<pathelement location="${lib}/jtem/beans.jar"/>
 		<pathelement location="${lib}/jtem/java2d.jar"/>
 		<pathelement location="${lib}/jtem/java2dx.jar"/>
 		<pathelement location="${lib}/jtem/jrworkspace.jar"/>
@@ -56,6 +57,11 @@
 		<pathelement location="${lib}/jreality/jReality.jar"/>
 		<pathelement location="${lib}/jreality/colorpicker.jar"/>
 	</path>	
+	<path id="itext.libraryclasspath">
+		<pathelement location="${lib}/itext/itextpdf-5.5.0.jar"/>
+		<pathelement location="${lib}/itext/itext-pdfa-5.5.0.jar"/>
+		<pathelement location="${lib}/itext/itext-xtra-5.5.0.jar"/>
+	</path>		
 	<path id="junit.libraryclasspath">
 		<pathelement location="${lib}/junit/junit-4.11.jar"/>	
 		<pathelement location="${lib}/junit/hamcrest-core-1.3.jar"/>	
@@ -77,6 +83,7 @@
             <classpath refid="mtjoptimization.libraryclasspath"/>
             <classpath refid="xstream.libraryclasspath"/>
             <classpath refid="jreality.libraryclasspath"/>
+            <classpath refid="itext.libraryclasspath"/>
             <classpath refid="junit.libraryclasspath"/>
         </javac>
 		<copy todir="${build}" description="copy resources to output folder">
@@ -99,7 +106,10 @@
 				<attribute name="Implementation-Vendor" value="${vendor}"/>
 				<attribute name="Implementation-Title" value="jTEM halfedgetools"/>
 				<attribute name="Implementation-Version" value="${version}"/>
-				<attribute name="Implementation-URL" value="http://www.jtem.com/"/>
+				<attribute name="Implementation-URL" value="https://svn.math.tu-berlin.de/svn/jtem/halfedgetools/"/>
+				<attribute name="Implementation-Homepage" value="http://jtem.de"/>
+				<attribute name="Permissions" value="all-permissions"/>	
+				<attribute name="Codebase" value="*.math.tu-berlin.de"/>
 			</manifest>
 		</jar>
 	</target>
