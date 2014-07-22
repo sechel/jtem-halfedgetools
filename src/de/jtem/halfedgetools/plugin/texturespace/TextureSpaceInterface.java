@@ -41,6 +41,8 @@ import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
 import de.jtem.halfedgetools.plugin.PresetContentLoader;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.selection.Selection;
+import de.jtem.halfedgetools.selection.SelectionListener;
 import de.jtem.java2d.AppearanceChangeEvent;
 import de.jtem.java2d.AppearanceChangeListener;
 import de.jtem.java2d.SceneComponent;
@@ -53,13 +55,14 @@ import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkSlot;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkSlotVertical;
 
 public class TextureSpaceInterface extends ViewShrinkPanelPlugin 
-implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListener, AppearanceChangeListener {
+implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListener, AppearanceChangeListener, SelectionListener {
 
+	private HalfedgeInterface
+		hif = null;
+	
 	private ShrinkSlot
 		leftSlot = new ShrinkSlotVertical(250),
 		rightSlot = new ShrinkSlotVertical(250);
-	private HalfedgeInterface
-		hif = null;
 	private Viewer2D
 		viewer = new Viewer2D();
 	private LayoutManager
@@ -74,7 +77,8 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		faceColorLabel = new JLabel("Face Color"),
 		faceAlphaLabel = new JLabel("Face Opacity"),
 		rotationLabel = new JLabel("Rotation °"),
-		backgroundLabel = new JLabel("Background");
+		backgroundLabel = new JLabel("Background"),
+		selectionLabel = new JLabel("Selection");
 	private SpinnerNumberModel
 		rotationModel = new SpinnerNumberModel(0.0, -360.0, 360.0, 1.0),
 		edgeWidthModel = new SpinnerNumberModel(1.0, 0.01, 20.0, 0.1),
@@ -96,7 +100,8 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		vertexColorButton = new ColorChooseJButton(Color.WHITE, true),
 		vertexOutlineColorButton = new ColorChooseJButton(new Color(153, 0, 0), true),
 		edgeColorButton = new ColorChooseJButton(new Color(102, 102, 102), true),
-		faceColorButton = new ColorChooseJButton(Color.WHITE, true);
+		faceColorButton = new ColorChooseJButton(Color.WHITE, true),
+		selectionColorButton = new ColorChooseJButton(new Color(204, 102, 0), true);
 	private JPanel
 		visibilityPanel = new JPanel(new GridLayout(1, 3));
 		
@@ -146,6 +151,8 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		optionsShrinker.add(faceColorButton, rc);
 		optionsShrinker.add(faceAlphaLabel, lc);
 		optionsShrinker.add(faceAlphaSpinner, rc);
+		optionsShrinker.add(selectionLabel, lc);
+		optionsShrinker.add(selectionColorButton, rc);
 		leftSlot.addShrinkPanel(optionsShrinker);
 		
 		antiAliasChecker.addActionListener(this);
@@ -163,6 +170,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		edgeWidthSpinner.addChangeListener(this);
 		faceColorButton.addColorChangedListener(this);
 		faceAlphaSpinner.addChangeListener(this);
+		selectionColorButton.addColorChangedListener(this);
 	}
 	
 	private void updateAppearances() {
@@ -176,6 +184,9 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		SceneComponent vertices = layerComponent.getVertexComponent();
 		SceneComponent edges = layerComponent.getEdgeComponent();
 		SceneComponent faces = layerComponent.getFaceComponent();
+		SceneComponent vertexSelection = layerComponent.getVertexSelectionComponent();
+		SceneComponent edgeSelection = layerComponent.getEdgeSelectionComponent();
+		SceneComponent faceSelection = layerComponent.getFaceSelectionComponent();
 		vertices.setVisible(verticesChecker.isSelected());
 		edges.setVisible(edgesChecker.isSelected());
 		faces.setVisible(facesChecker.isSelected());
@@ -189,6 +200,13 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		int alpha = (int)(faceAlphaModel.getNumber().doubleValue() * 255);
 		Color faceColorAlpha = new Color(fc.getRed(), fc.getGreen(), fc.getBlue(), alpha);
 		faces.setPaint(faceColorAlpha);
+		Color sc = selectionColorButton.getColor();
+		vertexSelection.setPointPaint(sc);
+		edgeSelection.setOutlinePaint(sc);
+		edgeSelection.setStroke(new BasicStroke(edgeWidthModel.getNumber().floatValue() * 2));
+		int selAlpha = (int)(0.6 * 255);
+		Color faceSelColor = new Color(sc.getRed(), sc.getGreen(), sc.getBlue(), selAlpha);
+		faceSelection.setPaint(faceSelColor);
 		viewer.repaint();
 	}
 	
@@ -232,6 +250,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 				tp.getSceneComponent().addAppearanceChangeListener(this);
 			}
 		}
+		hif.addSelectionListener(this);
 	}
 	
 	public static void main(String[] args) throws Exception {
@@ -260,6 +279,13 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		layerComponent.setLayer(layer);
 		layerComponent.update();
 		viewer.encompass(viewer.getBounds2D());
+		viewer.repaint();
+	}
+	
+	private void updateLayerSelection(HalfedgeLayer layer) {
+		layerComponent.setLayer(layer);
+		layerComponent.updateSelection();
+		viewer.repaint();
 	}
 	
 	@Override
@@ -286,6 +312,11 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 	}
 	@Override
 	public void layerRemoved(HalfedgeLayer layer) {
+	}
+	
+	@Override
+	public void selectionChanged(Selection s, HalfedgeInterface hif) {
+		updateLayerSelection(hif.getActiveLayer());
 	}
 	
 }
