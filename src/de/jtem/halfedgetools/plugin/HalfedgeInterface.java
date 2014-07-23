@@ -77,6 +77,7 @@ import de.jreality.plugin.basic.Scene;
 import de.jreality.plugin.basic.View;
 import de.jreality.plugin.basic.ViewMenuBar;
 import de.jreality.plugin.job.AbstractJob;
+import de.jreality.plugin.job.BlockerJob;
 import de.jreality.plugin.job.Job;
 import de.jreality.plugin.job.JobListener;
 import de.jreality.plugin.job.JobQueuePlugin;
@@ -954,7 +955,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void set(final HDS hds) {
+		BlockerJob b = jobQueue.block("Halfedge SET");
 		activeLayer.set(hds);
+		b.unblock();
 	}
 
 	public <
@@ -963,7 +966,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> void setNoUndo(HDS hds) {
+		BlockerJob b = jobQueue.block("Halfedge SET");
 		activeLayer.setNoUndo(hds);
+		b.unblock();
 	}
 	
 	public <
@@ -972,17 +977,17 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		F extends Face<V, E, F>, 
 		HDS extends HalfEdgeDataStructure<V, E, F>
 	> HDS get(HDS hds) {
-		HDS r = activeLayer.get(hds);
-		return r;
+		return activeLayer.get(hds);
 	}
 
 	public void set(Geometry g) {
+		BlockerJob b = jobQueue.block("Halfedge SET");
 		activeLayer.set(g);
+		b.unblock();
 	}
 
 	public HalfEdgeDataStructure<?, ?, ?> get() {
-		HalfEdgeDataStructure<?, ?, ?> r = activeLayer.get();
-		return r;
+		return activeLayer.get();
 	}
 
 	@SuppressWarnings("unchecked")
