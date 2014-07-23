@@ -8,7 +8,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,7 +17,6 @@ import java.io.File;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
@@ -73,16 +71,12 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		optionsShrinker = new ShrinkPanel("Texture Space Options");
 	private JLabel
 		edgeWidthLabel = new JLabel("Edge Width"),
-		edgeColorLabel = new JLabel("Edge Color"),
-		faceColorLabel = new JLabel("Face Color"),
 		faceAlphaLabel = new JLabel("Face Opacity"),
-		rotationLabel = new JLabel("Rotation °"),
-		backgroundLabel = new JLabel("Background"),
-		selectionLabel = new JLabel("Selection");
+		rotationLabel = new JLabel("Rotation °");
 	private SpinnerNumberModel
 		rotationModel = new SpinnerNumberModel(0.0, -360.0, 360.0, 1.0),
 		edgeWidthModel = new SpinnerNumberModel(1.0, 0.01, 20.0, 0.1),
-		faceAlphaModel = new SpinnerNumberModel(0.6, 0.0, 1.0, 0.1);
+		faceAlphaModel = new SpinnerNumberModel(0.2, 0.0, 1.0, 0.1);
 	private JSpinner
 		edgeWidthSpinner = new JSpinner(edgeWidthModel),
 		rotationSpinner = new JSpinner(rotationModel),
@@ -94,17 +88,15 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		vertexFillChecker = new JCheckBox("Vertex Color", true),
 		vertexOutlineChecker = new JCheckBox("Vertex Outline", true),
 		edgesChecker = new JCheckBox("Edges", true),
-		facesChecker = new JCheckBox("Faces", true);
+		facesChecker = new JCheckBox("Faces", true),
+		selectionChecker = new JCheckBox("Selection", true);
 	private ColorChooseJButton
 		backgroundColorButton = new ColorChooseJButton(new Color(232, 232, 232), true),
 		vertexColorButton = new ColorChooseJButton(Color.WHITE, true),
 		vertexOutlineColorButton = new ColorChooseJButton(new Color(153, 0, 0), true),
 		edgeColorButton = new ColorChooseJButton(new Color(102, 102, 102), true),
-		faceColorButton = new ColorChooseJButton(Color.WHITE, true),
+		faceColorButton = new ColorChooseJButton(new Color(0, 102, 204), true),
 		selectionColorButton = new ColorChooseJButton(new Color(204, 102, 0), true);
-	private JPanel
-		visibilityPanel = new JPanel(new GridLayout(1, 3));
-		
 	
 	public TextureSpaceInterface() {
 		shrinkPanel.setTitle("Texture Space Viewer 2D");
@@ -129,29 +121,25 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		optionsShrinker.setLayout(new GridBagLayout());
 		GridBagConstraints lc = LayoutFactory.createLeftConstraint();
 		GridBagConstraints rc = LayoutFactory.createRightConstraint();
-		optionsShrinker.add(backgroundLabel, lc);
-		optionsShrinker.add(backgroundColorButton, rc);
 		optionsShrinker.add(gridChecker, lc);
+		optionsShrinker.add(backgroundColorButton, rc);
 		optionsShrinker.add(antiAliasChecker, rc);
 		optionsShrinker.add(rotationLabel, lc);
 		optionsShrinker.add(rotationSpinner, rc);
-		visibilityPanel.add(verticesChecker);
-		visibilityPanel.add(edgesChecker);
-		visibilityPanel.add(facesChecker, rc);
-		optionsShrinker.add(visibilityPanel, rc);
+		optionsShrinker.add(verticesChecker, rc);
 		optionsShrinker.add(vertexFillChecker, lc);
 		optionsShrinker.add(vertexColorButton, rc);
 		optionsShrinker.add(vertexOutlineChecker, lc);
 		optionsShrinker.add(vertexOutlineColorButton, rc);
-		optionsShrinker.add(edgeColorLabel, lc);
+		optionsShrinker.add(edgesChecker, lc);
 		optionsShrinker.add(edgeColorButton, rc);
 		optionsShrinker.add(edgeWidthLabel, lc);
 		optionsShrinker.add(edgeWidthSpinner, rc);
-		optionsShrinker.add(faceColorLabel, lc);
+		optionsShrinker.add(facesChecker, lc);
 		optionsShrinker.add(faceColorButton, rc);
 		optionsShrinker.add(faceAlphaLabel, lc);
 		optionsShrinker.add(faceAlphaSpinner, rc);
-		optionsShrinker.add(selectionLabel, lc);
+		optionsShrinker.add(selectionChecker, lc);
 		optionsShrinker.add(selectionColorButton, rc);
 		leftSlot.addShrinkPanel(optionsShrinker);
 		
@@ -170,6 +158,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		edgeWidthSpinner.addChangeListener(this);
 		faceColorButton.addColorChangedListener(this);
 		faceAlphaSpinner.addChangeListener(this);
+		selectionChecker.addActionListener(this);
 		selectionColorButton.addColorChangedListener(this);
 	}
 	
@@ -207,6 +196,9 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		int selAlpha = (int)(0.6 * 255);
 		Color faceSelColor = new Color(sc.getRed(), sc.getGreen(), sc.getBlue(), selAlpha);
 		faceSelection.setPaint(faceSelColor);
+		vertexSelection.setVisible(selectionChecker.isSelected());
+		edgeSelection.setVisible(selectionChecker.isSelected());
+		faceSelection.setVisible(selectionChecker.isSelected());
 		viewer.repaint();
 	}
 	
