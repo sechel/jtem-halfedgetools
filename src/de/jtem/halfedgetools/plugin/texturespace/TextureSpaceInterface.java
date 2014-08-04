@@ -166,9 +166,10 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		viewer.setAntialias(antiAliasChecker.isSelected());
 		viewer.setBackground(backgroundColorButton.getColor());
 		viewer.setGridEnabled(gridChecker.isSelected());
+		SceneComponent root = viewer.getRoot();
 		AffineTransform R = new AffineTransform();
 		R.rotate(toRadians(rotationModel.getNumber().doubleValue()));
-		viewer.getRoot().setTransform(R);
+		root.setTransform(R);
 		
 		SceneComponent vertices = layerComponent.getVertexComponent();
 		SceneComponent edges = layerComponent.getEdgeComponent();
@@ -199,6 +200,13 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		vertexSelection.setVisible(selectionChecker.isSelected());
 		edgeSelection.setVisible(selectionChecker.isSelected());
 		faceSelection.setVisible(selectionChecker.isSelected());
+		
+		// global appearance
+		root.setStroke(edges.getStroke());
+		root.setOutlinePaint(edges.getOutlinePaint());
+		root.setPaint(faces.getPaint());
+		root.setPointPaint(vertices.getPointPaint());
+		
 		viewer.repaint();
 	}
 	
