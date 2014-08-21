@@ -2,6 +2,7 @@ package de.jtem.halfedgetools.jreality;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.data.Attribute;
@@ -28,6 +29,9 @@ import de.jtem.halfedgetools.adapter.type.TexturePosition;
 
 public class ConverterJR2Heds {
 
+	private static Logger
+		log = Logger.getLogger(ConverterJR2Heds.class.getName());
+	
 	public <
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>, 
@@ -153,7 +157,10 @@ public class ConverterJR2Heds {
 				if (s == t) continue;
 				E e = heds.addNewEdge();
 				e.setTargetVertex(heds.getVertex(t));
-				vertexEdgeMap.put(s, t, e);
+				E old = vertexEdgeMap.put(s, t, e);
+				if (old != null) {
+					log.warning("there is more than one edge between vertex " + s + " and " + t);
+				}
 				if (coords[1] != null) eAdapters.set(Position.class, e, coords[1][i]);
 				if (colors[1] != null) eAdapters.set(Color.class, e, colors[1][i]);
 				if (labels[1] != null) eAdapters.set(Label.class, e, labels[1][i]);
@@ -229,7 +236,10 @@ public class ConverterJR2Heds {
 				if (oppEdge == null){
 					oppEdge = heds.addNewEdge();
 					oppEdge.setTargetVertex(heds.getVertex(s));
-					vertexEdgeMap.put(t, s, oppEdge);
+					E old = vertexEdgeMap.put(t, s, oppEdge);
+					if (old != null) {
+						log.warning("there is more than one edge between vertex " + s + " and " + t);
+					}
 				}
 				E nextEdge = vertexEdgeMap.get(t, next);
 				if (faceEdge == oppEdge) {
