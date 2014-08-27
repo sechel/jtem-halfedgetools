@@ -12,7 +12,7 @@ import de.jtem.halfedgetools.adapter.AbstractAdapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.Parameter;
 import de.jtem.halfedgetools.adapter.type.TextureBaryCenter;
-import de.jtem.halfedgetools.adapter.type.TexturePosition;
+import de.jtem.halfedgetools.adapter.type.generic.TexturePosition3d;
 
 @TextureBaryCenter
 public class TextureBaryCenterAdapter extends AbstractAdapter<double[]> {
@@ -40,7 +40,7 @@ public class TextureBaryCenterAdapter extends AbstractAdapter<double[]> {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>
 	> double[] getV(V v, AdapterSet a) {
-		return a.getDefault(TexturePosition.class, v, new double[] {0, 0, 0});
+		return a.getDefault(TexturePosition3d.class, v, new double[] {0, 0, 0});
 	}
 	
 	@Override

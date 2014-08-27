@@ -12,9 +12,11 @@ import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
 import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.AdapterSet;
+import de.jtem.halfedgetools.adapter.type.generic.TextureBaryCenter2d;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.selection.Selection;
+import de.jtem.java2d.Annotation;
 import de.jtem.java2d.SceneComponent;
 
 public class LayerComponent extends SceneComponent {
@@ -73,8 +75,11 @@ public class LayerComponent extends SceneComponent {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public synchronized void updateGeometry() {
 		vertexComponent.getPoints().clear();
+		vertexComponent.getAnnotations().clear();
 		edges.reset();
+		edgeComponent.getAnnotations().clear();
 		faces.reset();
+		faceComponent.getAnnotations().clear();
 		if (layer == null) return;
 		HalfEdgeDataStructure<?, ?, ?> hds = layer.get();
 		AdapterSet a = layer.getEffectiveAdapters();
@@ -84,19 +89,28 @@ public class LayerComponent extends SceneComponent {
 			if (!f.isValid()) continue;
 			Shape faceShape = getFaceShape(a, f);
 			faces.append(faceShape, false);
+			double[] p = a.getDefault(TextureBaryCenter2d.class, f, defaultCoord);
+			Annotation indexAnnotation = new Annotation("" + f.getIndex(), p[0], p[1], Annotation.CENTER);
+			faceComponent.getAnnotations().add(indexAnnotation);
 		}
 		// edges
 		for (Edge e : new LinkedList<Edge>(hds.getEdges())) {
 			if (e.isPositive() || !e.isValid()) continue;
 			Shape edgeShape = getEdgeShape(e, a);
 			edges.append(edgeShape, false);
+			double[] p = a.getDefault(TextureBaryCenter2d.class, e, defaultCoord);
+			String annotationText = e.getOppositeEdge().getIndex() + "/" + e.getIndex();
+			Annotation indexAnnotation = new Annotation(annotationText, p[0], p[1], Annotation.CENTER);
+			edgeComponent.getAnnotations().add(indexAnnotation);
 		}
 		// vertices
 		for (Vertex v : new LinkedList<Vertex>(hds.getVertices())) {
 			if (!v.isValid()) continue;
-			double[] p = a.getDefault(TexturePosition2d.class, v, defaultCoord);
+			double[] p = a.getDefault(TextureBaryCenter2d.class, v, defaultCoord);
 			Point2D.Double p2d = new Point2D.Double(p[0], p[1]);
 			vertexComponent.getPoints().add(p2d);
+			Annotation indexAnnotation = new Annotation("" + v.getIndex(), p[0], p[1], Annotation.SOUTH);
+			vertexComponent.getAnnotations().add(indexAnnotation);
 		}
 	}
 

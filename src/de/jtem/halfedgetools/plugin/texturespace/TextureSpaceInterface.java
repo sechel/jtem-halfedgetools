@@ -17,6 +17,7 @@ import java.io.File;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
@@ -89,7 +90,10 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		vertexOutlineChecker = new JCheckBox("Vertex Outline", true),
 		edgesChecker = new JCheckBox("Edges", true),
 		facesChecker = new JCheckBox("Faces", true),
-		selectionChecker = new JCheckBox("Selection", true);
+		selectionChecker = new JCheckBox("Selection", true),
+		vertexIndexChecker = new JCheckBox("Indices"),
+		edgeIndexChecker = new JCheckBox("Indices"),
+		faceIndexChecker = new JCheckBox("Indices");
 	private ColorChooseJButton
 		backgroundColorButton = new ColorChooseJButton(new Color(232, 232, 232), true),
 		vertexColorButton = new ColorChooseJButton(Color.WHITE, true),
@@ -126,17 +130,23 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		optionsShrinker.add(antiAliasChecker, rc);
 		optionsShrinker.add(rotationLabel, lc);
 		optionsShrinker.add(rotationSpinner, rc);
+		optionsShrinker.add(new JSeparator(JSeparator.HORIZONTAL), rc);
 		optionsShrinker.add(verticesChecker, rc);
+		optionsShrinker.add(vertexIndexChecker, rc);
 		optionsShrinker.add(vertexFillChecker, lc);
 		optionsShrinker.add(vertexColorButton, rc);
 		optionsShrinker.add(vertexOutlineChecker, lc);
 		optionsShrinker.add(vertexOutlineColorButton, rc);
+		optionsShrinker.add(new JSeparator(JSeparator.HORIZONTAL), rc);
 		optionsShrinker.add(edgesChecker, lc);
 		optionsShrinker.add(edgeColorButton, rc);
+		optionsShrinker.add(edgeIndexChecker, rc);
 		optionsShrinker.add(edgeWidthLabel, lc);
 		optionsShrinker.add(edgeWidthSpinner, rc);
+		optionsShrinker.add(new JSeparator(JSeparator.HORIZONTAL), rc);
 		optionsShrinker.add(facesChecker, lc);
 		optionsShrinker.add(faceColorButton, rc);
+		optionsShrinker.add(faceIndexChecker, rc);
 		optionsShrinker.add(faceAlphaLabel, lc);
 		optionsShrinker.add(faceAlphaSpinner, rc);
 		optionsShrinker.add(selectionChecker, lc);
@@ -150,6 +160,9 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		verticesChecker.addActionListener(this);
 		edgesChecker.addActionListener(this);
 		facesChecker.addActionListener(this);
+		vertexIndexChecker.addActionListener(this);
+		edgeIndexChecker.addActionListener(this);
+		faceIndexChecker.addActionListener(this);
 		vertexFillChecker.addActionListener(this);
 		vertexColorButton.addColorChangedListener(this);
 		vertexOutlineChecker.addActionListener(this);
@@ -182,14 +195,20 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		faces.setVisible(facesChecker.isSelected());
 		vertices.setPointFilled(vertexFillChecker.isSelected());
 		vertices.setPointPaint(vertexColorButton.getColor());
+		vertices.setAnnotationPaint(vertexOutlineColorButton.getColor().darker());
 		vertices.setPointOutlined(vertexOutlineChecker.isSelected());
 		vertices.setOutlinePaint(vertexOutlineColorButton.getColor());
+		vertices.setAnnotated(vertexIndexChecker.isSelected());
+		edges.setAnnotationPaint(edgeColorButton.getColor().darker());
 		edges.setOutlinePaint(edgeColorButton.getColor());
 		edges.setStroke(new BasicStroke(edgeWidthModel.getNumber().floatValue()));
+		edges.setAnnotated(edgeIndexChecker.isSelected());
 		Color fc = faceColorButton.getColor();
 		int alpha = (int)(faceAlphaModel.getNumber().doubleValue() * 255);
 		Color faceColorAlpha = new Color(fc.getRed(), fc.getGreen(), fc.getBlue(), alpha);
 		faces.setPaint(faceColorAlpha);
+		faces.setAnnotationPaint(fc.darker());
+		faces.setAnnotated(faceIndexChecker.isSelected());
 		Color sc = selectionColorButton.getColor();
 		vertexSelection.setPointPaint(sc);
 		edgeSelection.setOutlinePaint(sc);
@@ -267,6 +286,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		// load cat head
 		HalfedgeInterface hif = v.getPlugin(HalfedgeInterface.class);
 		ReaderOBJ objReader = new ReaderOBJ();
+		objReader.setUseMultipleTexAndNormalCoords(false);
 		Input in = new Input(TextureSpaceInterface.class.getResource("cathead.obj"));
 		SceneGraphComponent c = objReader.read(in);
 		IndexedFaceSet g = (IndexedFaceSet)SceneGraphUtility.getFirstGeometry(c);
