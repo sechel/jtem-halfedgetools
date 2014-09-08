@@ -53,6 +53,9 @@ import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ViewShrinkPanelPlugin;
+import de.jreality.plugin.job.AbstractJob;
+import de.jreality.plugin.job.Job;
+import de.jreality.plugin.job.JobQueuePlugin;
 import de.jreality.reader.ReaderOBJ;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
@@ -97,6 +100,9 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 		addFolderButton = new JButton("Add", ImageHook.getIcon("folder_add.png")),
 		removeFolderButton = new JButton("Remove", ImageHook.getIcon("folder_delete.png")),
 		loadButton = new JButton("Load", ImageHook.getIcon("brick_go.png"));
+
+	private JobQueuePlugin
+		jobQueue = null;
 	
 	public PresetContentLoader() {
 		shrinkPanel.setTitle("Content Presets");
@@ -402,19 +408,34 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 	}
 
 	private void loadSelectedFile() {
-		Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
-		File selectedFile = (File)fileList.getSelectedValue();
-		ReaderOBJ objReader = new ReaderOBJ();
-		try {
-			SceneGraphComponent c = objReader.read(selectedFile);
-			IndexedFaceSet g = (IndexedFaceSet)getFirstGeometry(c);
-			IndexedFaceSetUtility.calculateAndSetNormals(g);
-			hif.set(g);
-			hif.encompassContent();
-		} catch (IOException e1) {
-			JOptionPane.showMessageDialog(w, "Could not load file " + selectedFile.getName() + "\n" + e1.getMessage());
-			return;
-		}
+		Job job = new AbstractJob() {
+			
+			@Override
+			public String getJobName() {
+				return "Loading ...";
+			}
+			
+			@Override
+			protected void executeJob() throws Exception {
+				Window w = SwingUtilities.getWindowAncestor(shrinkPanel);
+				File selectedFile = (File)fileList.getSelectedValue();
+				ReaderOBJ objReader = new ReaderOBJ();
+				try {
+					HalfedgeLayer layer = hif.getActiveLayer();
+					SceneGraphComponent c = objReader.read(selectedFile);
+					IndexedFaceSet g = (IndexedFaceSet)getFirstGeometry(c);
+					IndexedFaceSetUtility.calculateAndSetNormals(g);
+					layer.set(g);
+					if(hif.getActiveLayer() == layer) {
+						hif.encompassContent();
+					}
+				} catch (IOException e1) {
+					JOptionPane.showMessageDialog(w, "Could not load file " + selectedFile.getName() + "\n" + e1.getMessage());
+					return;
+				}
+			}
+		};
+		jobQueue .queueJob(job);
 	}
 	
 	@Override
@@ -439,6 +460,7 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
+		jobQueue = c.getPlugin(JobQueuePlugin.class);
 		updateStates();
 	}
 	

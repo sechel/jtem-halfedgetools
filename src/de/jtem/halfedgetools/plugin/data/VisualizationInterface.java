@@ -213,7 +213,9 @@ public class VisualizationInterface extends ShrinkPanelPlugin implements Halfedg
 	
 	public void activateVisualization(DataVisualization v) {
 		List<DataVisualization> vList = getActiveVisualizations();
-		vList.add(v);
+		if(!vList.contains(v)) {
+			vList.add(v);
+		}
 		updateActiveTable();
 		updateVisualizerTable();
 		updateVisualization(v);
