@@ -142,6 +142,7 @@ public class TypedSelection <N extends Node<?,?,?>> implements Set<N>, Serializa
 		return add(n, CHANNEL_DEFAULT);
 	}
 	public boolean add(N n, Integer channel) {
+		if (n == null) throw new NullPointerException("cannot add null to selection");
 		boolean r = !M.containsKey(n);
 		M.put(n, channel);
 		return r;
