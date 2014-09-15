@@ -923,4 +923,8 @@ public class HalfedgeLayer implements ActionListener {
 		}
 	}
 	
+	public HalfedgeInterface getHalfedgeInterface() {
+		return hif;
+	}
+	
 }

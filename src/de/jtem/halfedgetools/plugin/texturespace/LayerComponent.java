@@ -1,10 +1,13 @@
 package de.jtem.halfedgetools.plugin.texturespace;
 
+import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -15,6 +18,7 @@ import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.TextureBaryCenter2d;
 import de.jtem.halfedgetools.adapter.type.generic.TexturePosition2d;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
+import de.jtem.halfedgetools.plugin.SelectionInterface;
 import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.java2d.Annotation;
 import de.jtem.java2d.SceneComponent;
@@ -25,9 +29,7 @@ public class LayerComponent extends SceneComponent {
 		defaultCoord = {0, 0};
 	private Path2D
 		edges = new Path2D.Float(),
-		faces = new Path2D.Float(),
-		edgeSelection = new Path2D.Float(),
-		faceSelection = new Path2D.Float();
+		faces = new Path2D.Float();
 	private HalfedgeLayer
 		layer = null;
 	private SceneComponent
@@ -49,10 +51,8 @@ public class LayerComponent extends SceneComponent {
 		faceComponent.setOutlined(false);
 		vertexSelectionComponent.setPointFilled(true);
 		vertexSelectionComponent.setPointOutlined(true);
-		edgeSelectionComponent.setShape(edgeSelection);
 		edgeSelectionComponent.setFilled(false);
 		edgeSelectionComponent.setOutlined(true);
-		faceSelectionComponent.setShape(faceSelection);
 		faceSelectionComponent.setOutlined(false);
 		faceSelectionComponent.setFilled(true);
 		addChild(faceComponent);
@@ -116,28 +116,67 @@ public class LayerComponent extends SceneComponent {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public synchronized void updateSelection() {
-		vertexSelectionComponent.getPoints().clear();
-		edgeSelection.reset();
-		faceSelection.reset();
 		if (layer == null) return;
+		SelectionInterface sif = layer.getHalfedgeInterface().getSelectionInterface();
+		Map<Integer, Color> channelColors = sif.getChannelColors(layer);
+		vertexSelectionComponent.removeAllChildren();
+		edgeSelectionComponent.removeAllChildren();
+		faceSelectionComponent.removeAllChildren();
 		AdapterSet a = layer.getEffectiveAdapters();
 		Selection s = new Selection(layer.getSelection());
+		Map<Integer, SceneComponent> vMap = new HashMap<Integer, SceneComponent>();
+		Map<Integer, SceneComponent> eMap = new HashMap<Integer, SceneComponent>();
+		Map<Integer, SceneComponent> fMap = new HashMap<Integer, SceneComponent>();
 		// selection
 		for (Vertex v : s.getVertices()) {
 			if (!v.isValid()) continue;
 			double[] p = a.getDefault(TexturePosition2d.class, v, defaultCoord);
 			Point2D.Double p2d = new Point2D.Double(p[0], p[1]);
-			vertexSelectionComponent.getPoints().add(p2d);
+			Integer channel = s.getChannel(v);
+			SceneComponent vComp = vMap.get(channel);
+			if (!vMap.containsKey(channel)) {
+				vComp = new SceneComponent();
+				vComp.setName("Vertex Channel " + channel);
+				vComp.setPointPaint(channelColors.get(channel));
+				vertexSelectionComponent.addChild(vComp);
+				vMap.put(channel, vComp);
+			}
+			vComp.getPoints().add(p2d);
 		}
 		for (Edge e : s.getEdges()) {
 			if (e.isPositive() || !e.isValid()) continue;
 			Shape edgeShape = getEdgeShape(e, a);
-			edgeSelection.append(edgeShape, false);
+			Integer channel = s.getChannel(e);
+			SceneComponent eComp = eMap.get(channel);
+			if (!eMap.containsKey(channel)) {
+				eComp = new SceneComponent();
+				eComp.setName("Edge Channel " + channel);
+				eComp.setOutlinePaint(channelColors.get(channel));
+				eComp.setShape(new Path2D.Float());
+				eMap.put(channel, eComp);
+				edgeSelectionComponent.addChild(eComp);
+			}
+			Path2D path = (Path2D)eComp.getShape();
+			path.append(edgeShape, false);
 		}
 		for (Face f : s.getFaces()) {
 			if (!f.isValid()) return;
 			Shape faceShape = getFaceShape(a, f);
-			faceSelection.append(faceShape, false);
+			Integer channel = s.getChannel(f);
+			SceneComponent fComp = fMap.get(channel);
+			if (!fMap.containsKey(channel)) {
+				fComp = new SceneComponent();
+				fComp.setName("Face Channel " + channel);
+				Color fc = channelColors.get(channel);
+				int selAlpha = (int)(0.6 * 255);
+				Color faceSelColor = new Color(fc.getRed(), fc.getGreen(), fc.getBlue(), selAlpha);
+				fComp.setPaint(faceSelColor);
+				fComp.setShape(new Path2D.Float());
+				fMap.put(channel, fComp);
+				faceSelectionComponent.addChild(fComp);
+			}
+			Path2D path = (Path2D)fComp.getShape();
+			path.append(faceShape, false);
 		}
 	}
 	

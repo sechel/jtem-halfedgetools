@@ -56,7 +56,7 @@ public class SelectionInterface extends ShrinkPanelPlugin implements ActionListe
 	private static Random
 		rnd = new Random(0);
 	public static final Color
-		DEFAULT_COLOR = new Color(1,0.4f,0.2f); 
+		DEFAULT_COLOR = new Color(204, 102, 0); 
 	private Icon
 		removeIcon = ImageHook.getIcon("remove.png");
 	private ButtonGroup

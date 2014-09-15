@@ -38,6 +38,7 @@ import de.jreality.util.SceneGraphUtility;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.HalfedgeListener;
+import de.jtem.halfedgetools.plugin.MarqueeSelectionPlugin;
 import de.jtem.halfedgetools.plugin.PresetContentLoader;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
 import de.jtem.halfedgetools.selection.Selection;
@@ -99,8 +100,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		vertexColorButton = new ColorChooseJButton(Color.WHITE, true),
 		vertexOutlineColorButton = new ColorChooseJButton(new Color(153, 0, 0), true),
 		edgeColorButton = new ColorChooseJButton(new Color(102, 102, 102), true),
-		faceColorButton = new ColorChooseJButton(new Color(0, 102, 204), true),
-		selectionColorButton = new ColorChooseJButton(new Color(204, 102, 0), true);
+		faceColorButton = new ColorChooseJButton(new Color(0, 102, 204), true);
 	
 	public TextureSpaceInterface() {
 		shrinkPanel.setTitle("Texture Space Viewer 2D");
@@ -149,8 +149,8 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		optionsShrinker.add(faceIndexChecker, rc);
 		optionsShrinker.add(faceAlphaLabel, lc);
 		optionsShrinker.add(faceAlphaSpinner, rc);
+		optionsShrinker.add(new JSeparator(JSeparator.HORIZONTAL), rc);
 		optionsShrinker.add(selectionChecker, lc);
-		optionsShrinker.add(selectionColorButton, rc);
 		leftSlot.addShrinkPanel(optionsShrinker);
 		
 		antiAliasChecker.addActionListener(this);
@@ -172,7 +172,6 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		faceColorButton.addColorChangedListener(this);
 		faceAlphaSpinner.addChangeListener(this);
 		selectionChecker.addActionListener(this);
-		selectionColorButton.addColorChangedListener(this);
 	}
 	
 	private void updateAppearances() {
@@ -209,13 +208,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		faces.setPaint(faceColorAlpha);
 		faces.setAnnotationPaint(fc.darker());
 		faces.setAnnotated(faceIndexChecker.isSelected());
-		Color sc = selectionColorButton.getColor();
-		vertexSelection.setPointPaint(sc);
-		edgeSelection.setOutlinePaint(sc);
 		edgeSelection.setStroke(new BasicStroke(edgeWidthModel.getNumber().floatValue() * 2));
-		int selAlpha = (int)(0.6 * 255);
-		Color faceSelColor = new Color(sc.getRed(), sc.getGreen(), sc.getBlue(), selAlpha);
-		faceSelection.setPaint(faceSelColor);
 		vertexSelection.setVisible(selectionChecker.isSelected());
 		edgeSelection.setVisible(selectionChecker.isSelected());
 		faceSelection.setVisible(selectionChecker.isSelected());
@@ -281,6 +274,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		v.getController().setStaticPropertiesFile(new File("TextureSpace.xml"));
 		v.registerPlugin(TextureSpaceInterface.class);
 		v.registerPlugin(PresetContentLoader.class);
+		v.registerPlugin(MarqueeSelectionPlugin.class);
 		v.startup();
 		
 		// load cat head
