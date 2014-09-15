@@ -38,7 +38,9 @@ public class LayerComponent extends SceneComponent {
 		faceComponent = new SceneComponent(),
 		vertexSelectionComponent = new SceneComponent(),
 		edgeSelectionComponent = new SceneComponent(),
-		faceSelectionComponent = new SceneComponent();
+		faceSelectionComponent = new SceneComponent(),
+		addonComponentBack = new SceneComponent(),
+		addonComponentFront = new SceneComponent();
 	
 	public LayerComponent() {
 		vertexComponent.setPointOutlined(false);
@@ -55,9 +57,11 @@ public class LayerComponent extends SceneComponent {
 		edgeSelectionComponent.setOutlined(true);
 		faceSelectionComponent.setOutlined(false);
 		faceSelectionComponent.setFilled(true);
+		addChild(addonComponentBack);
 		addChild(faceComponent);
 		addChild(edgeComponent);
 		addChild(vertexComponent);
+		addChild(addonComponentFront);
 		addChild(faceSelectionComponent);
 		addChild(edgeSelectionComponent);
 		addChild(vertexSelectionComponent);
@@ -227,6 +231,14 @@ public class LayerComponent extends SceneComponent {
 	
 	public SceneComponent getFaceSelectionComponent() {
 		return faceSelectionComponent;
+	}
+	
+	public SceneComponent getAddonComponentBack() {
+		return addonComponentBack;
+	}
+	
+	public SceneComponent getAddonComponentFront() {
+		return addonComponentFront;
 	}
 	
 }

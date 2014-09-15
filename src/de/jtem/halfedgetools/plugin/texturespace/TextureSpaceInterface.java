@@ -253,11 +253,13 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 			if (tp.getOptionPanel() != null) {
 				leftSlot.addShrinkPanel(tp.getOptionPanel());
 			}
+			SceneComponent back = layerComponent.getAddonComponentBack();
+			SceneComponent front = layerComponent.getAddonComponentFront();
 			if (tp.getSceneComponent() != null) {
 				if (tp.getRenderOnTop()) {
-					viewer.getRoot().addChild(tp.getSceneComponent());
+					front.addChild(tp.getSceneComponent());
 				} else {
-					viewer.getRoot().addChild(0, tp.getSceneComponent());
+					back.addChild(0, tp.getSceneComponent());
 				}
 				tp.getSceneComponent().addAppearanceChangeListener(this);
 			}
