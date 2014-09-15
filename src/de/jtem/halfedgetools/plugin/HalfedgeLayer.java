@@ -114,7 +114,8 @@ public class HalfedgeLayer implements ActionListener {
 		removeTextureJumps = false,
 		thickenSurface = false, 
 		makeHoles = true, 
-		implode = false;
+		implode = false,
+		linearHoles = true;
 	private int 
 		stepsPerEdge = 8;
 	private double[][] 
@@ -447,6 +448,7 @@ public class HalfedgeLayer implements ActionListener {
 			tsf.setHoleFactor(holeFactor);
 			tsf.setStepsPerEdge(stepsPerEdge);
 			tsf.setProfileCurve(profileCurve);
+			tsf.setLinearHole(linearHoles);
 			tsf.update();
 			shownGeometry = tsf.getThickenedSurface();
 		}
@@ -797,6 +799,11 @@ public class HalfedgeLayer implements ActionListener {
 	public boolean isMakeHoles() {
 		return makeHoles;
 	}
+	
+	public void setLinearHoles(boolean linearHoles) {
+		this.linearHoles = linearHoles;
+	}
+	
 	public void setMakeHoles(boolean makeHoles) {
 		this.makeHoles = makeHoles;
 	}

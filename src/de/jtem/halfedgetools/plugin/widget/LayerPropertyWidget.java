@@ -45,7 +45,8 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		thickenChecker = new JRadioButton("Thicken"),
 		implodeChecker = new JRadioButton("Implode");
 	private JCheckBox
-		makeHolesChecker = new JCheckBox("Holes");
+		makeHolesChecker = new JCheckBox("Holes"),
+		linearHolesChecker = new JCheckBox("linear");
 	private SpinnerNumberModel
 		jumpSizeModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.1),
 		stepsPerEdgeModel = new SpinnerNumberModel(1, 1, 100, 1),
@@ -92,6 +93,7 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		
 		add(thickenChecker, c1);
 		add(thicknessSpinner, c2);
+		add(linearHolesChecker,c1);
 		add(makeHolesChecker, c2);
 		add(new JLabel("Hole Factor"), c1);
 		add(holeFactorSpinner, c2);
@@ -149,6 +151,7 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		layer.setImplodeFactor(implodeFactorModel.getNumber().doubleValue());
 		layer.setThickness(thicknessModel.getNumber().doubleValue());
 		layer.setMakeHoles(makeHolesChecker.isSelected());
+		layer.setLinearHoles(linearHolesChecker.isSelected());
 		layer.setHoleFactor(holeFactorModel.getNumber().doubleValue());
 		layer.setStepsPerEdge(stepsPerEdgeModel.getNumber().intValue());
 		
