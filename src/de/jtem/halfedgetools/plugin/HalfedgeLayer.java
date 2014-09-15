@@ -112,19 +112,21 @@ public class HalfedgeLayer implements ActionListener {
 	// layer properties
 	private boolean 
 		removeTextureJumps = false,
-		thickenSurface = false, 
-		makeHoles = true, 
 		implode = false,
-		linearHoles = true;
+		thickenSurface = false, 
+		thickenMakeHoles = true, 
+		thickenLinearHoles = true,
+		thickenCurvedEdge = false;
 	private int 
-		stepsPerEdge = 8;
+		thickenStepsPerEdge = 8;
 	private double[][] 
-		profileCurve = new double[][] { { 0, 0 }, { 0, .4 },{ .1, .5 }, { .9, .5 }, { 1.0, .4 }, { 1, 0 } };
-	private double 
+		thickenProfileCurve = new double[][] { { 0, 0 }, { 0, .4 },{ .1, .5 }, { .9, .5 }, { 1.0, .4 }, { 1, 0 } };
+	private double
+		implodeFactor = -0.85,
 		textureJumpSize = 1.0,
-		holeFactor = 0.4, 
-		thickness = 0.05, 
-		implodeFactor = -0.85;
+		thickenHoleFactor = 0.4, 
+		thickenThickness = 0.05; 
+		
 
 	private boolean 
 		active = true;
@@ -442,13 +444,14 @@ public class HalfedgeLayer implements ActionListener {
 		IndexedFaceSet shownGeometry = geometry;
 		if (thickenSurface && geometry != null) {
 			ThickenedSurfaceFactory tsf = new ThickenedSurfaceFactory(geometry);
-			tsf.setThickness(thickness);
-			tsf.setMakeHoles(makeHoles);
+			tsf.setThickness(thickenThickness);
+			tsf.setMakeHoles(thickenMakeHoles);
 			tsf.setKeepFaceColors(false);
-			tsf.setHoleFactor(holeFactor);
-			tsf.setStepsPerEdge(stepsPerEdge);
-			tsf.setProfileCurve(profileCurve);
-			tsf.setLinearHole(linearHoles);
+			tsf.setHoleFactor(thickenHoleFactor);
+			tsf.setStepsPerEdge(thickenStepsPerEdge);
+			tsf.setProfileCurve(thickenProfileCurve);
+			tsf.setLinearHole(thickenLinearHoles);
+			tsf.setCurvedEdges(thickenCurvedEdge);
 			tsf.update();
 			shownGeometry = tsf.getThickenedSurface();
 		}
@@ -782,11 +785,11 @@ public class HalfedgeLayer implements ActionListener {
 		this.implode = implode;
 	}
 
-	public double getThickness() {
-		return thickness;
+	public double getThickenThickness() {
+		return thickenThickness;
 	}
-	public void setThickness(double thickness) {
-		this.thickness = thickness;
+	public void setThickenThickness(double thickness) {
+		this.thickenThickness = thickness;
 	}
 
 	public double getImplodeFactor() {
@@ -796,30 +799,39 @@ public class HalfedgeLayer implements ActionListener {
 		this.implodeFactor = implodeFactor;
 	}
 
-	public boolean isMakeHoles() {
-		return makeHoles;
+	public boolean isThickenLinearHoles() {
+		return thickenLinearHoles;
+	}
+	public void setThickenLinearHoles(boolean linearHoles) {
+		this.thickenLinearHoles = linearHoles;
 	}
 	
-	public void setLinearHoles(boolean linearHoles) {
-		this.linearHoles = linearHoles;
+	public boolean isThickenMakeHoles() {
+		return thickenMakeHoles;
+	}
+	public void setThickenMakeHoles(boolean makeHoles) {
+		this.thickenMakeHoles = makeHoles;
+	}
+
+	public double getThickenHoleFactor() {
+		return thickenHoleFactor;
+	}
+	public void setThickenHoleFactor(double holeFactor) {
+		this.thickenHoleFactor = holeFactor;
+	}
+
+	public int getThickenStepsPerEdge() {
+		return thickenStepsPerEdge;
+	}
+	public void setThickenStepsPerEdge(int stepsPerEdge) {
+		this.thickenStepsPerEdge = stepsPerEdge;
 	}
 	
-	public void setMakeHoles(boolean makeHoles) {
-		this.makeHoles = makeHoles;
+	public boolean isThickenCurvedEdge() {
+		return thickenCurvedEdge;
 	}
-
-	public double getHoleFactor() {
-		return holeFactor;
-	}
-	public void setHoleFactor(double holeFactor) {
-		this.holeFactor = holeFactor;
-	}
-
-	public int getStepsPerEdge() {
-		return stepsPerEdge;
-	}
-	public void setStepsPerEdge(int stepsPerEdge) {
-		this.stepsPerEdge = stepsPerEdge;
+	public void setThickenCurvedEdge(boolean thickenCurvedEdge) {
+		this.thickenCurvedEdge = thickenCurvedEdge;
 	}
 
 	public AdapterSet getAdapters() {
@@ -849,11 +861,11 @@ public class HalfedgeLayer implements ActionListener {
 	}
 
 	public double[][] getProfileCurve() {
-		return profileCurve;
+		return thickenProfileCurve;
 	}
 
 	public void setProfileCurve(double[][] profileCurve) {
-		this.profileCurve = profileCurve;
+		this.thickenProfileCurve = profileCurve;
 	}
 
 	public boolean addAdapter(Adapter<?> a, boolean persistent) {

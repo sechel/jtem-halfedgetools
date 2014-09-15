@@ -46,7 +46,8 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		implodeChecker = new JRadioButton("Implode");
 	private JCheckBox
 		makeHolesChecker = new JCheckBox("Holes"),
-		linearHolesChecker = new JCheckBox("linear");
+		linearHolesChecker = new JCheckBox("Linear"),
+		curvedEdgesChecker = new JCheckBox("Curved Edges");
 	private SpinnerNumberModel
 		jumpSizeModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.1),
 		stepsPerEdgeModel = new SpinnerNumberModel(1, 1, 100, 1),
@@ -93,8 +94,9 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		
 		add(thickenChecker, c1);
 		add(thicknessSpinner, c2);
-		add(linearHolesChecker,c1);
 		add(makeHolesChecker, c2);
+		add(linearHolesChecker, c1);
+		add(curvedEdgesChecker, c2);
 		add(new JLabel("Hole Factor"), c1);
 		add(holeFactorSpinner, c2);
 		add(new JLabel("Steps Per Edge"), c1);
@@ -120,6 +122,8 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		stepsPerEdgeSpinner.addChangeListener(this);
 		noEffectChecker.addActionListener(this);
 		updateButton.addActionListener(this);
+		linearHolesChecker.addActionListener(this);
+		curvedEdgesChecker.addActionListener(this);
 		
 		ButtonGroup modeGroup = new ButtonGroup();
 		modeGroup.add(noEffectChecker);
@@ -147,13 +151,14 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		layer.setRemoveTextureJumps(removeTextureJumpsRadio.isSelected());
 		layer.setTextureJumpSize(jumpSizeModel.getNumber().doubleValue());
 		layer.setImplode(implodeChecker.isSelected());
-		layer.setThickenSurface(thickenChecker.isSelected());
 		layer.setImplodeFactor(implodeFactorModel.getNumber().doubleValue());
-		layer.setThickness(thicknessModel.getNumber().doubleValue());
-		layer.setMakeHoles(makeHolesChecker.isSelected());
-		layer.setLinearHoles(linearHolesChecker.isSelected());
-		layer.setHoleFactor(holeFactorModel.getNumber().doubleValue());
-		layer.setStepsPerEdge(stepsPerEdgeModel.getNumber().intValue());
+		layer.setThickenSurface(thickenChecker.isSelected());
+		layer.setThickenThickness(thicknessModel.getNumber().doubleValue());
+		layer.setThickenMakeHoles(makeHolesChecker.isSelected());
+		layer.setThickenLinearHoles(linearHolesChecker.isSelected());
+		layer.setThickenHoleFactor(holeFactorModel.getNumber().doubleValue());
+		layer.setThickenStepsPerEdge(stepsPerEdgeModel.getNumber().intValue());
+		layer.setThickenCurvedEdge(curvedEdgesChecker.isSelected());
 		
 		String profileCurveTxt = profileCurveArea.getText();
 		StringTokenizer st = new StringTokenizer(profileCurveTxt);
@@ -182,10 +187,12 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		implodeChecker.setSelected(layer.isImplode());
 		thickenChecker.setSelected(layer.isThickenSurface());
 		implodeFactorModel.setValue(layer.getImplodeFactor());
-		thicknessModel.setValue(layer.getThickness());
-		makeHolesChecker.setSelected(layer.isMakeHoles());
-		holeFactorModel.setValue(layer.getHoleFactor());
-		stepsPerEdgeModel.setValue(layer.getStepsPerEdge());
+		thicknessModel.setValue(layer.getThickenThickness());
+		makeHolesChecker.setSelected(layer.isThickenMakeHoles());
+		holeFactorModel.setValue(layer.getThickenHoleFactor());
+		stepsPerEdgeModel.setValue(layer.getThickenStepsPerEdge());
+		linearHolesChecker.setSelected(layer.isThickenLinearHoles());
+		curvedEdgesChecker.setSelected(layer.isThickenCurvedEdge());
 		noEffectChecker.setSelected(
 			!layer.isImplode() && 
 			!layer.isThickenSurface() && 
