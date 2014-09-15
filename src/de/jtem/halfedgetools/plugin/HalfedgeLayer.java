@@ -116,6 +116,8 @@ public class HalfedgeLayer implements ActionListener {
 		thickenSurface = false, 
 		thickenMakeHoles = true, 
 		thickenLinearHoles = true,
+		thickenFaceNormals = false,
+		thickenConstantWidth = false,
 		thickenCurvedEdge = false;
 	private int 
 		thickenStepsPerEdge = 8;
@@ -125,7 +127,8 @@ public class HalfedgeLayer implements ActionListener {
 		implodeFactor = -0.85,
 		textureJumpSize = 1.0,
 		thickenHoleFactor = 0.4, 
-		thickenThickness = 0.05; 
+		thickenThickness = 0.05,
+		thickenNormalShift = 0.5;
 		
 
 	private boolean 
@@ -452,6 +455,9 @@ public class HalfedgeLayer implements ActionListener {
 			tsf.setProfileCurve(thickenProfileCurve);
 			tsf.setLinearHole(thickenLinearHoles);
 			tsf.setCurvedEdges(thickenCurvedEdge);
+			tsf.setShiftAlongNormal(thickenNormalShift);
+			tsf.setConstantWidth(thickenConstantWidth);
+			tsf.setThickenAlongFaceNormals(thickenFaceNormals);
 			tsf.update();
 			shownGeometry = tsf.getThickenedSurface();
 		}
@@ -833,6 +839,34 @@ public class HalfedgeLayer implements ActionListener {
 	public void setThickenCurvedEdge(boolean thickenCurvedEdge) {
 		this.thickenCurvedEdge = thickenCurvedEdge;
 	}
+	
+	public double[][] getThickenProfileCurve() {
+		return thickenProfileCurve;
+	}
+	public void setThickenProfileCurve(double[][] profileCurve) {
+		this.thickenProfileCurve = profileCurve;
+	}
+	
+	public double getThickenNormalShift() {
+		return thickenNormalShift;
+	}
+	public void setThickenNormalShift(double thickenNormalShift) {
+		this.thickenNormalShift = thickenNormalShift;
+	}
+	
+	public boolean isThickenConstantWidth() {
+		return thickenConstantWidth;
+	}
+	public void setThickenConstantWidth(boolean thickenConstantWidth) {
+		this.thickenConstantWidth = thickenConstantWidth;
+	}
+	
+	public boolean isThickenFaceNormals() {
+		return thickenFaceNormals;
+	}
+	public void setThickenFaceNormals(boolean thickenFaceNormals) {
+		this.thickenFaceNormals = thickenFaceNormals;
+	}
 
 	public AdapterSet getAdapters() {
 		AdapterSet adapters = new AdapterSet();
@@ -858,14 +892,6 @@ public class HalfedgeLayer implements ActionListener {
 
 	public AdapterSet getActiveVolatileAdapters() {
 		return activeVolatileAdapters;
-	}
-
-	public double[][] getProfileCurve() {
-		return thickenProfileCurve;
-	}
-
-	public void setProfileCurve(double[][] profileCurve) {
-		this.thickenProfileCurve = profileCurve;
 	}
 
 	public boolean addAdapter(Adapter<?> a, boolean persistent) {

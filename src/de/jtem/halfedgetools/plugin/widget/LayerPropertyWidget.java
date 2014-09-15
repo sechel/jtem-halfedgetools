@@ -47,19 +47,23 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 	private JCheckBox
 		makeHolesChecker = new JCheckBox("Holes"),
 		linearHolesChecker = new JCheckBox("Linear"),
-		curvedEdgesChecker = new JCheckBox("Curved Edges");
+		curvedEdgesChecker = new JCheckBox("Curved Edges"),
+		faceNormalsChecker = new JCheckBox("Face Normals"),
+		constantWidthChecker = new JCheckBox("Constant Width");
 	private SpinnerNumberModel
 		jumpSizeModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.1),
 		stepsPerEdgeModel = new SpinnerNumberModel(1, 1, 100, 1),
 		holeFactorModel = new SpinnerNumberModel(1.0, -100.0, 100.0, 0.01),
 		implodeFactorModel = new SpinnerNumberModel(0.5, -1.0, 1.0, 0.01),
-		thicknessModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.01);
+		thicknessModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.01),
+		normalShiftModel = new SpinnerNumberModel(0.5, -10.0, 10.0, 0.1);
 	private JSpinner
 		jumpSizeSpinner = new JSpinner(jumpSizeModel),
 		stepsPerEdgeSpinner = new JSpinner(stepsPerEdgeModel),
 		holeFactorSpinner = new JSpinner(holeFactorModel),
 		implodeFactorSpinner = new JSpinner(implodeFactorModel), 
-		thicknessSpinner = new JSpinner(thicknessModel); 
+		thicknessSpinner = new JSpinner(thicknessModel),
+		normalShiftSpinner = new JSpinner(normalShiftModel);
 	private JTextArea
 		profileCurveArea = new JTextArea();
 	private JScrollPane
@@ -97,6 +101,10 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		add(makeHolesChecker, c2);
 		add(linearHolesChecker, c1);
 		add(curvedEdgesChecker, c2);
+		add(constantWidthChecker, c1);
+		add(faceNormalsChecker, c2);
+		add(new JLabel("Normal Shift"), c1);
+		add(normalShiftSpinner, c2);
 		add(new JLabel("Hole Factor"), c1);
 		add(holeFactorSpinner, c2);
 		add(new JLabel("Steps Per Edge"), c1);
@@ -124,6 +132,9 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		updateButton.addActionListener(this);
 		linearHolesChecker.addActionListener(this);
 		curvedEdgesChecker.addActionListener(this);
+		normalShiftSpinner.addChangeListener(this);
+		constantWidthChecker.addActionListener(this);
+		faceNormalsChecker.addActionListener(this);
 		
 		ButtonGroup modeGroup = new ButtonGroup();
 		modeGroup.add(noEffectChecker);
@@ -159,6 +170,9 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		layer.setThickenHoleFactor(holeFactorModel.getNumber().doubleValue());
 		layer.setThickenStepsPerEdge(stepsPerEdgeModel.getNumber().intValue());
 		layer.setThickenCurvedEdge(curvedEdgesChecker.isSelected());
+		layer.setThickenNormalShift(normalShiftModel.getNumber().doubleValue());
+		layer.setThickenFaceNormals(faceNormalsChecker.isSelected());
+		layer.setThickenConstantWidth(constantWidthChecker.isSelected());
 		
 		String profileCurveTxt = profileCurveArea.getText();
 		StringTokenizer st = new StringTokenizer(profileCurveTxt);
@@ -171,7 +185,7 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 				pointsList.add(p);
 			}
 			double[][] profileCurve = pointsList.toArray(new double[pointsList.size()][]);
-			layer.setProfileCurve(profileCurve);
+			layer.setThickenProfileCurve(profileCurve);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this, e.getMessage(), "Profile Curve Parsing Error", ERROR_MESSAGE);
 			return;
@@ -193,13 +207,16 @@ public class LayerPropertyWidget extends JPanel implements ActionListener, Chang
 		stepsPerEdgeModel.setValue(layer.getThickenStepsPerEdge());
 		linearHolesChecker.setSelected(layer.isThickenLinearHoles());
 		curvedEdgesChecker.setSelected(layer.isThickenCurvedEdge());
+		normalShiftModel.setValue(layer.getThickenNormalShift());
+		faceNormalsChecker.setSelected(layer.isThickenFaceNormals());
+		constantWidthChecker.setSelected(layer.isThickenConstantWidth());
 		noEffectChecker.setSelected(
 			!layer.isImplode() && 
 			!layer.isThickenSurface() && 
 			!layer.isRemoveTextureJumps()
 		);
 		StringBuffer sb = new StringBuffer();
-		for (double[] p : layer.getProfileCurve()) {
+		for (double[] p : layer.getThickenProfileCurve()) {
 			sb.append(p[0] + "\t" + p[1] + "\n");
 		}
 		profileCurveArea.setText(sb.toString());
