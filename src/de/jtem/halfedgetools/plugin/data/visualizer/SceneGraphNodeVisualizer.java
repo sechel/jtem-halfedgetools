@@ -30,7 +30,7 @@ public class SceneGraphNodeVisualizer extends DataVisualizerPlugin {
 	private SimpleAppearanceInspector 
 		appInspector = new SimpleAppearanceInspector();
 	
-	private class SceneGraphComponentVisualization extends AbstractDataVisualization {
+	public class SceneGraphComponentVisualization extends AbstractDataVisualization {
 
 		private SceneGraphComponent
 			root = new SceneGraphComponent("Scene Graph Visualizer Root");

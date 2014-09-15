@@ -31,6 +31,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.jreality.geometry.IndexedLineSetFactory;
+import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedLineSet;
@@ -455,11 +456,13 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 				if (v == null) {
 					numNullValues++;
 					continue;
+				} else if (v.length == 4) {
+					Pn.dehomogenize(v, v);
 				} else if (v.length != 3) {
 					throw new RuntimeException(
-							"Adapter does not return vectors in 3-space.");
+							"Adapter does not return vectors in 3-space or homogeneous 4-space.");
 				}
-				v = v.clone();
+				v = new double[]{v[0], v[1], v[2]};
 				double[] p = aSet.getD(BaryCenter3d.class, node);
 				if (normalized) {
 					Rn.normalize(v, v);
