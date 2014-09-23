@@ -668,12 +668,16 @@ public class TopologyAlgorithms {
 		if (edge.getRightFace() != null) {
 			graph.removeFace(edge.getRightFace());
 		}
-
-		edge.getPreviousEdge().linkNextEdge(edge.getOppositeEdge().getNextEdge());
-
-		edge.getOppositeEdge().getPreviousEdge().linkNextEdge(edge.getNextEdge());
+		if (edge.getPreviousEdge() != null) {
+			edge.getPreviousEdge().linkNextEdge(edge.getOppositeEdge().getNextEdge());
+		}
+		if (edge.getOppositeEdge() != null) {
+			edge.getOppositeEdge().getPreviousEdge().linkNextEdge(edge.getNextEdge());
+		}
 		// remove the vertex
-		graph.removeEdge(edge.getOppositeEdge());
+		if (edge.getOppositeEdge() != null) {
+			graph.removeEdge(edge.getOppositeEdge());
+		}
 		graph.removeEdge(edge);	
 	}
 	

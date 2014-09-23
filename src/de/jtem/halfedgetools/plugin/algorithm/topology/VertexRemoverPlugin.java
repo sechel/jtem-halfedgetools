@@ -31,6 +31,7 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.topology;
 
+import java.util.LinkedList;
 import java.util.Set;
 
 import de.jtem.halfedge.Edge;
@@ -61,6 +62,12 @@ public class VertexRemoverPlugin extends AlgorithmPlugin {
 			double progress = numVertices++ / (double)vertices.size();
 			getCurrentJob().fireJobProgress(progress);
 			TopologyAlgorithms.removeVertex(v);
+		}
+		// check for orphan edges
+		for (E e : new LinkedList<E>(hds.getEdges())) {
+			if (e.isValid() && (e.getTargetVertex() == null || !e.getTargetVertex().isValid())) {
+				TopologyAlgorithms.removeEdge(e);
+			}
 		}
 		hcp.update();
 	}
