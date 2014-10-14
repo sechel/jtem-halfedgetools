@@ -37,6 +37,7 @@ import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.geometry.ThickenedSurfaceFactory;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.scene.Appearance;
+import de.jreality.scene.ClippingPlane;
 import de.jreality.scene.Geometry;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.IndexedLineSet;
@@ -82,6 +83,7 @@ public class HalfedgeLayer implements ActionListener {
 		activeVolatileAdapters = new AdapterSet(),
 		volatileAdapters = new AdapterSet();
 	private SceneGraphComponent 
+		clippingRoot = new SceneGraphComponent("Clipping"),
 		layerRoot = new SceneGraphComponent("Default Layer"), 
 		displayFacesRoot = new SceneGraphComponent("Display Faces"),
 		geometryRoot = new SceneGraphComponent("Geometry"),
@@ -129,7 +131,11 @@ public class HalfedgeLayer implements ActionListener {
 		thickenHoleFactor = 0.4, 
 		thickenThickness = 0.05,
 		thickenNormalShift = 0.5;
-		
+	
+	private boolean
+		clippingEnabled = false;
+	private double[]
+		clippingScale = new double[]{0.5,0.5,0.5};
 
 	private boolean 
 		active = true;
@@ -148,6 +154,7 @@ public class HalfedgeLayer implements ActionListener {
 		layerRoot.addChild(boundingBoxRoot);
 		layerRoot.addChild(selectionRoot);
 		layerRoot.addChild(temporaryRoot);
+		layerRoot.addChild(clippingRoot);
 		layerRoot.setTransformation(new Transformation("Layer Transform"));
 		layerRoot.setAppearance(new Appearance("Layer Appearance"));
 		actionTool.setDescription("Selection");
@@ -971,5 +978,67 @@ public class HalfedgeLayer implements ActionListener {
 	public HalfedgeInterface getHalfedgeInterface() {
 		return hif;
 	}
+
+	public void setClippingScale(double x, double y, double z) {
+		clippingScale = new double[]{x,y,z};
+		updateClipping();
+	}
+
+	public void setEnableClipping(boolean clip) {
+		clippingEnabled = clip;
+		updateClipping();
+	}
 	
+	private void updateClipping() {
+		Rectangle3D bb = BoundingBoxUtility.calculateBoundingBox(layerRoot);
+		clippingRoot.removeAllChildren();
+		if(clippingEnabled) {
+			clippingRoot.addChild(createClippingBox(bb, clippingScale));
+		}
+	}
+
+	private SceneGraphComponent createClippingBox(Rectangle3D bb, double[] cs) {
+		SceneGraphComponent clipBox =  new SceneGraphComponent("Clipping Box");
+		MatrixBuilder.euclidean().translate(bb.getCenter()).assignTo(clipBox);
+		double[] extent = bb.getExtent();
+		
+		double x = extent[0]/2;
+		double y = extent[1]/2;
+		double z = extent[2]/2;
+		
+		clipBox.addChild(clippingPlane(0, cs[0]*x, false, "Right"));
+		clipBox.addChild(clippingPlane(0, cs[0]*x, true, "Left"));
+		clipBox.addChild(clippingPlane(1, cs[1]*y, false, "Back"));
+		clipBox.addChild(clippingPlane(1, cs[1]*y, true, "Front"));
+		clipBox.addChild(clippingPlane(2, cs[2]*z, false, "Top"));
+		clipBox.addChild(clippingPlane(2, cs[2]*z, true, "Bottom"));
+		return clipBox;
+	}
+
+	public SceneGraphComponent clippingPlane(int dir, double v, boolean flip, String name) {
+		SceneGraphComponent clipPlane =  new SceneGraphComponent(name);
+		double[] t = new double[3];
+		t[dir]=1.1*v;
+		double[] n = new double[3];
+		n[dir] = 1;
+		if(flip) {
+			double[] plane = new double[4];
+			plane[dir]=1;
+			MatrixBuilder.euclidean().reflect(plane).translate(t).rotateFromTo(new double[]{0,0,1},n).assignTo(clipPlane);
+		} else {
+			MatrixBuilder.euclidean().translate(t).rotateFromTo(new double[]{0,0,1},n).assignTo(clipPlane);
+		}
+		ClippingPlane cpTop =  new ClippingPlane();
+		clipPlane.setGeometry(cpTop);
+		return clipPlane;
+	}
+
+	public double[] getClippingScale() {
+		return clippingScale;
+	}
+	
+	public boolean isClippingEnabled() {
+		return clippingEnabled;
+	}
 }
+

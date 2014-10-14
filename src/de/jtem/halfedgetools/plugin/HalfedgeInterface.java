@@ -118,6 +118,7 @@ import de.jtem.halfedgetools.jreality.adapter.JRPositionAdapter;
 import de.jtem.halfedgetools.jreality.adapter.JRTexturePositionAdapter;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.plugin.widget.LayerActionsWidget;
 import de.jtem.halfedgetools.plugin.widget.LayerPropertyWidget;
 import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.halfedgetools.selection.SelectionListener;
@@ -172,11 +173,14 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		redoButton = new JButton(redoAction);
 	private LayerPropertyWidget 
 		layerPropertyPanel = new LayerPropertyWidget();
+	private LayerActionsWidget 
+		layerActionsPanel = new LayerActionsWidget();
 	private JToggleButton 
 		visualizersToggle = new JToggleButton(ImageHook.getIcon("page_white_paint_arrow.png")),
 		layerOptionsToggle = new JToggleButton(ImageHook.getIcon("page_white_gear_arrow.png"));
 	private JPopupMenu 
 		layerOptionsPopup = new JPopupMenu("Layer Options"),
+		layerActionsPopup = new JPopupMenu("Layer Actions"),
 		visualizersPopup = new JPopupMenu("Visualizers");
 	private JToolBar 
 		layerToolbar = new JToolBar();
@@ -474,6 +478,17 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 			layerOptionsPopup.setMinimumSize(new Dimension(300, 430));
 			layerOptionsPopup.setPreferredSize(new Dimension(300, 430));
 		}
+		if (layerActionsPopup == e.getSource()) {
+			layerActionsPanel.setLayer(activeLayer);
+			layerActionsPopup.setLightWeightPopupEnabled(false);
+			layerActionsPopup.setBorderPainted(true);
+			layerActionsPopup.removeAll();
+			layerActionsPopup.setLayout(new GridLayout());
+			layerActionsPopup.add(layerActionsPanel);
+//			layerActionsPopup.setMinimumSize(new Dimension(150, 150));
+			layerActionsPopup.pack();
+//			layerActionsPopup.setPreferredSize(new Dimension(150, 150));
+		}
 	}
 
 	private void makeLayout() {
@@ -492,7 +507,27 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		layersTable.getSelectionModel().setSelectionMode(SINGLE_SELECTION);
 		layersTable.setDefaultEditor(Visibility.class, new VisibilityEditor());
 		layersTable.setDefaultRenderer(Visibility.class, new VisibilityRenderer());
-		layersTable.setComponentPopupMenu(visualizersPopup);
+		layersTable.setComponentPopupMenu(layerActionsPopup);
+//		layersTable.addMouseListener(new MouseAdapter() {
+//			
+//			@Override
+//			public void mousePressed(MouseEvent e) {
+//				 int r = layersTable.rowAtPoint(e.getPoint());
+//			        if (r >= 0 && r < layersTable.getRowCount()) {
+//			            layersTable.setRowSelectionInterval(r, r);
+//			        } else {
+//			            layersTable.clearSelection();
+//			        }
+//
+//			        int rowindex = layersTable.getSelectedRow();
+//			        if (rowindex < 0)
+//			            return;
+//			        if (e.isPopupTrigger() && e.getComponent() instanceof JTable ) {
+//			        	layerActionsPopup.show(layersTable, e.getX(), e.getY());
+//			        }
+//			}
+//			
+//		});
 
 		shrinkPanel.add(hdsLabel, c);
 		c.weighty = 1.0;
@@ -555,6 +590,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		layerOptionsToggle.addActionListener(this);
 		layerOptionsToggle.setToolTipText("Layer Options");
 		layerOptionsPopup.addPopupMenuListener(this);
+		layerActionsPopup.addPopupMenuListener(this);
 	}
 
 	private class NewLayerAction extends AbstractAction {
