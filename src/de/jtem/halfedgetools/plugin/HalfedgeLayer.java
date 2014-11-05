@@ -64,6 +64,7 @@ import de.jtem.halfedgetools.jreality.ConverterHds2Ifs;
 import de.jtem.halfedgetools.jreality.ConverterHeds2JR;
 import de.jtem.halfedgetools.jreality.ConverterJR2Heds;
 import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
+import de.jtem.halfedgetools.plugin.widget.LayerActionsWidget.ClippingMode;
 import de.jtem.halfedgetools.selection.FaceSetSelection;
 import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.halfedgetools.selection.TypedSelection;
@@ -136,7 +137,9 @@ public class HalfedgeLayer implements ActionListener {
 		clippingEnabled = false;
 	private double[]
 		clippingScale = new double[]{0.5,0.5,0.5};
-
+	private ClippingMode
+		clippingMode = ClippingMode.REL;
+	
 	private boolean 
 		active = true;
 
@@ -1001,17 +1004,26 @@ public class HalfedgeLayer implements ActionListener {
 		SceneGraphComponent clipBox =  new SceneGraphComponent("Clipping Box");
 		MatrixBuilder.euclidean().translate(bb.getCenter()).assignTo(clipBox);
 		double[] extent = bb.getExtent();
+		double x = cs[0];
+		double y = cs[1];
+		double z = cs[2];
 		
-		double x = extent[0]/2;
-		double y = extent[1]/2;
-		double z = extent[2]/2;
+		switch (clippingMode) {
+		case REL:
+			x *= extent[0]/2;
+			y *= extent[1]/2;
+			z *= extent[2]/2;
+			break;
+		case ABS:
+			break;
+		}
 		
-		clipBox.addChild(clippingPlane(0, cs[0]*x, false, "Right"));
-		clipBox.addChild(clippingPlane(0, cs[0]*x, true, "Left"));
-		clipBox.addChild(clippingPlane(1, cs[1]*y, false, "Back"));
-		clipBox.addChild(clippingPlane(1, cs[1]*y, true, "Front"));
-		clipBox.addChild(clippingPlane(2, cs[2]*z, false, "Top"));
-		clipBox.addChild(clippingPlane(2, cs[2]*z, true, "Bottom"));
+		clipBox.addChild(clippingPlane(0, x, false, "Right"));
+		clipBox.addChild(clippingPlane(0, x, true, "Left"));
+		clipBox.addChild(clippingPlane(1, y, false, "Back"));
+		clipBox.addChild(clippingPlane(1, y, true, "Front"));
+		clipBox.addChild(clippingPlane(2, z, false, "Top"));
+		clipBox.addChild(clippingPlane(2, z, true, "Bottom"));
 		return clipBox;
 	}
 
@@ -1039,6 +1051,14 @@ public class HalfedgeLayer implements ActionListener {
 	
 	public boolean isClippingEnabled() {
 		return clippingEnabled;
+	}
+
+	public void setClippingMode(ClippingMode clippingMode) {
+		this.clippingMode = clippingMode;
+	}
+	
+	public ClippingMode getClippingMode() {
+		return clippingMode;
 	}
 }
 
