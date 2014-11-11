@@ -15,6 +15,7 @@ import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
 import static javax.swing.JOptionPane.PLAIN_MESSAGE;
 import static javax.swing.JOptionPane.YES_NO_OPTION;
+import static javax.swing.JOptionPane.showMessageDialog;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
@@ -870,19 +871,16 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 						IndexedFaceSetUtility.calculateAndSetNormals(ifs);
 					}
 					set(g);
-				} else if (selectedFile.getName().toLowerCase()
-						.endsWith(".heml")) {
+				} else if (selectedFile.getName().toLowerCase().endsWith(".heml")) {
 					String filePath = selectedFile.getAbsolutePath();
-					HalfEdgeDataStructure<?, ?, ?> hds = HalfedgeIO
-							.readHDS(filePath);
+					HalfEdgeDataStructure<?, ?, ?> hds = HalfedgeIO.readHDS(filePath);
 					set(hds);
 				}
 			} catch (final Exception ex) {
 				Runnable r = new Runnable() {
 					@Override
 					public void run() {
-						JOptionPane.showMessageDialog(w, ex.toString(), ex
-								.getClass().getSimpleName(), ERROR_MESSAGE);
+						showMessageDialog(w, ex.toString(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
 					}
 				};
 				EventQueue.invokeLater(r);

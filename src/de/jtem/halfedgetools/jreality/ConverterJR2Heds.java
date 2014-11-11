@@ -1,7 +1,9 @@
 package de.jtem.halfedgetools.jreality;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import de.jreality.scene.IndexedFaceSet;
@@ -148,19 +150,27 @@ public class ConverterJR2Heds {
 		
 		// edges (from faces)
 		DualHashMap<Integer, Integer, E> vertexEdgeMap = new DualHashMap<Integer, Integer, E>();
+		Set<Integer> skippedFaces = new HashSet<Integer>();
 		for (int i = 0; i < numF; i++){
 			int[] f = indices[2][i];
 			if (f.length < 3) continue;
+			DualHashMap<Integer, Integer, E> vEMap = new DualHashMap<Integer, Integer, E>();
+			Set<E> edges = new HashSet<E>();
+			boolean faceValid = true;
 			for (int j = 0; j < f.length; j++){
 				int s = f[j];
 				int t = f[(j + 1) % f.length];
 				if (s == t) continue;
+				if (vertexEdgeMap.get(s, t) != null) {
+					// remove already generated face edges
+					skippedFaces.add(i);
+					for (E e : edges) heds.removeEdge(e);
+					faceValid = false;
+					break;
+				}
 				E e = heds.addNewEdge();
 				e.setTargetVertex(heds.getVertex(t));
-				E old = vertexEdgeMap.put(s, t, e);
-				if (old != null) {
-					log.warning("there is more than one edge between vertex " + s + " and " + t);
-				}
+				vEMap.put(s, t, e);
 				if (coords[1] != null) eAdapters.set(Position.class, e, coords[1][i]);
 				if (colors[1] != null) eAdapters.set(Color.class, e, colors[1][i]);
 				if (labels[1] != null) eAdapters.set(Label.class, e, labels[1][i]);
@@ -168,7 +178,12 @@ public class ConverterJR2Heds {
 				if (pSize[1] != null) eAdapters.set(Size.class, e, pSize[1][i]);
 				if (radii[1] != null) eAdapters.set(Radius.class, e, radii[1][i]);
 				if (textCoords[1] != null) eAdapters.set(TexturePosition.class, e, textCoords[1][i]);
+				edges.add(e);
 			}
+			if (faceValid) vertexEdgeMap.putAll(vEMap);
+		}
+		if (!skippedFaces.isEmpty()) {
+			log.warning("skipped faces: " + skippedFaces.size());
 		}
 		
 		// additional edges (from edges) create and link
@@ -220,9 +235,10 @@ public class ConverterJR2Heds {
 		
 		// faces, linkage, and boundary edges
 		for (int i = 0; i < numF; i++){
+			if (skippedFaces.contains(i)) continue;
 			int[] face = indices[2][i];
 			if (face.length < 3) continue;
-			F f = heds.addNewFace();
+			F f = null;
 			for (int j = 0; j < face.length; j++){
 				int s = face[j];
 				int t = face[(j + 1) % face.length];
@@ -238,25 +254,30 @@ public class ConverterJR2Heds {
 					oppEdge.setTargetVertex(heds.getVertex(s));
 					E old = vertexEdgeMap.put(t, s, oppEdge);
 					if (old != null) {
-						log.warning("there is more than one edge between vertex " + s + " and " + t);
+						log.warning("more than one edge between vertex " + s + " and " + t);
 					}
 				}
 				E nextEdge = vertexEdgeMap.get(t, next);
 				if (faceEdge == oppEdge) {
-					System.out.println("ConverterJR2Heds.ifs2heds()");
+					log.severe("cannot link edge as opposite to itself");
+					break;
 				}
 				faceEdge.linkOppositeEdge(oppEdge);
 				faceEdge.linkNextEdge(nextEdge);
+				if (f == null) {
+					f = heds.addNewFace();
+				}
 				faceEdge.setLeftFace(f);
 			}	
-			if (coords[2] != null) fAdapters.set(Position.class, f, coords[2][i]);
-			if (colors[2] != null) fAdapters.set(Color.class, f, colors[2][i]);
-			if (labels[2] != null) fAdapters.set(Label.class, f, labels[2][i]);
-			if (normals[2] != null) fAdapters.set(Normal.class, f, normals[2][i]);
-			if (pSize[2] != null) fAdapters.set(Size.class, f, pSize[2][i]);
-			if (radii[2] != null) fAdapters.set(Radius.class, f, radii[2][i]);
-			if (textCoords[2] != null) fAdapters.set(TexturePosition.class, f, textCoords[2][i]);
-			
+			if (f != null) {
+				if (coords[2] != null) fAdapters.set(Position.class, f, coords[2][i]);
+				if (colors[2] != null) fAdapters.set(Color.class, f, colors[2][i]);
+				if (labels[2] != null) fAdapters.set(Label.class, f, labels[2][i]);
+				if (normals[2] != null) fAdapters.set(Normal.class, f, normals[2][i]);
+				if (pSize[2] != null) fAdapters.set(Size.class, f, pSize[2][i]);
+				if (radii[2] != null) fAdapters.set(Radius.class, f, radii[2][i]);
+				if (textCoords[2] != null) fAdapters.set(TexturePosition.class, f, textCoords[2][i]);
+			}
 		}
 		
 		// link boundary
@@ -326,6 +347,16 @@ public class ConverterJR2Heds {
 				return null;
 			else
 				return vMap.get(key2);
+		}
+		
+		public void putAll(DualHashMap<K1, K2, V> map) {
+			for (K1 k1 : map.map.keySet()) {
+				Map<K2, V> mm = map.map.get(k1);
+				for (K2 k2 : mm.keySet()) {
+					V v = mm.get(k2);
+					put(k1, k2, v);
+				}
+			}
 		}
 
 	}

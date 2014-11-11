@@ -35,6 +35,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.jreality.plugin.job.JobMonitorPlugin;
+import de.jtem.halfedgetools.jreality.node.DefaultJREdge;
+import de.jtem.halfedgetools.jreality.node.DefaultJRFace;
+import de.jtem.halfedgetools.jreality.node.DefaultJRHDS;
+import de.jtem.halfedgetools.jreality.node.DefaultJRVertex;
 import de.jtem.halfedgetools.plugin.algorithm.generator.ConvexHullGenerator;
 import de.jtem.halfedgetools.plugin.algorithm.generator.RandomEllipsoidGenerator;
 import de.jtem.halfedgetools.plugin.algorithm.generator.RandomSphereGenerator;
@@ -200,7 +204,6 @@ public class HalfedgePluginFactory {
 	public static Set<Plugin> createDataVisualizationPlugins() {
 		Set<Plugin> s = new HashSet<Plugin>();
 		s.add(new VisualizationInterface());
-		
 		s.add(new LabelVisualizer());
 		s.add(new TableDataVisualizer());
 		s.add(new TextDumpVisualizer());
@@ -208,9 +211,8 @@ public class HalfedgePluginFactory {
 		s.add(new ColoredBeadsVisualizer());
 		s.add(new HistogramVisualizer());	
 		s.add(new VectorFieldVisualizer());
-		s.add(new Immersion3DVisualizer());
+		s.add(new Immersion3DVisualizer<DefaultJRVertex, DefaultJREdge, DefaultJRFace, DefaultJRHDS>());
 		s.add(new SceneGraphNodeVisualizer());
-		
 		s.add(new FacePlanarityDataSource());
 		s.add(new SceneGraphTestSource());
 		return s;

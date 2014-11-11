@@ -1,5 +1,6 @@
 package de.jtem.halfedgetools.plugin;
 
+import static de.jreality.geometry.IndexedFaceSetUtility.makeConsistentOrientation;
 import static de.jreality.geometry.IndexedFaceSetUtility.removeTextureCoordinateJumps;
 import static de.jreality.math.Rn.euclideanNormSquared;
 import static de.jreality.scene.Appearance.INHERITED;
@@ -418,11 +419,9 @@ public class HalfedgeLayer implements ActionListener {
 
 	private void convertFaceSet() {
 		hds.clear();
-		boolean oriented = IndexedFaceSetUtility
-				.makeConsistentOrientation(geometry);
+		boolean oriented = makeConsistentOrientation(geometry);
 		if (!oriented) {
-			System.err.println("Not orientable face set in convertFaceSet()");
-			return;
+			layerLogger.warning("Not orientable face set in convertFaceSet()");
 		}
 		converterToHDS.ifs2heds(geometry, hds, getEffectiveAdapters(), edgeMap);
 		createDisplayGeometry();
