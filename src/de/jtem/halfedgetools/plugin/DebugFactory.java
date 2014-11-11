@@ -373,12 +373,14 @@ public class DebugFactory {
 		DraggablePoint2D dragTool = new DraggablePoint2D(p);
 		dragTool.getViewScene().setPointPaint(Color.green);
 		dragTool.getViewScene().setPointShape(new Ellipse2D.Double(-3,-3,6,6));
+		dragTool.getViewScene().setAnnotated(true);
 		moddeller.getViewer().getRoot().addChild(dragTool.getViewScene());
 		moddeller.getModeller().addTool(dragTool, null);
 		String annText = a.getDefault(Label.class, v, "");
-		Annotation ann = new Annotation(annText, coord[0], coord[1], Annotation.WEST);
+		Annotation ann = new Annotation(annText, coord[0], coord[1], Annotation.SOUTHWEST);
 		DraggableAnnotation dragAnn = new DraggableAnnotation(ann);
-		dragTool.getViewScene().addChild(dragAnn.getViewScene());
+		dragAnn.getViewScene().setPaint(Color.BLACK);
+		dragTool.getViewScene().getAnnotations().add(ann);
 		moddeller.getModeller().addTool(dragAnn, null);
 		return p;
 	}
@@ -440,6 +442,7 @@ public class DebugFactory {
 		dragPolygon.getViewScene().setPaint(new Color(128,0,80,30));
 		dragPolygon.getViewScene().setOutlinePaint(Color.red);
 		dragPolygon.getViewScene().setPointPaint(Color.yellow);
+		dragPolygon.getViewScene().setAnnotated(true);
 		String annText = a.getDefault(Label.class, f, "");
 		Annotation ann = new Annotation(annText, bary.x, bary.y, Annotation.WEST);
 		DraggableAnnotation dragAnn = new DraggableAnnotation(ann);

@@ -65,7 +65,12 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.template.ShrinkPanelPlugin;
 
-public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionListener, ChangeListener {
+public class HalfedgeDebuggerPlugin <
+	V extends Vertex<V, E, F>, 
+	E extends Edge<V, E, F>, 
+	F extends Face<V, E, F>, 
+	HDS extends HalfEdgeDataStructure<V, E, F>
+> extends ShrinkPanelPlugin implements ActionListener, ChangeListener {
 
 	private HalfedgeInterface
 		hcp = null;
@@ -98,7 +103,7 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 		navigationPanel = new JPanel(),
 		debugPanel = new JPanel();
 	
-	private HalfEdgeDataStructure<?, ?, ?>
+	private HDS
 		hds = null;
 	private AdapterSet
 		adapters = new AdapterSet(new IndexLabelAdapter());
@@ -176,11 +181,12 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object s = e.getSource();
 		if (getGeometryButton == s) {
-			hds = hcp.get();
+			hds = (HDS)hcp.get();
 			setData(hds);
 		}
 		if (continueButton == s) {
@@ -338,12 +344,7 @@ public class HalfedgeDebuggerPlugin extends ShrinkPanelPlugin implements ActionL
 	}
 	
 	
-	public <
-		V extends Vertex<V, E, F>,
-		E extends Edge<V, E, F>, 
-		F extends Face<V, E, F>,
-		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void setData(HDS hds) {
+	public void setData(HDS hds) {
 		this.hds = hds;
 		vertexSpinner.removeChangeListener(this);
 		edgeSpinner.removeChangeListener(this);

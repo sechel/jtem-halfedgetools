@@ -156,6 +156,7 @@ public class ConverterJR2Heds {
 			if (f.length < 3) continue;
 			DualHashMap<Integer, Integer, E> vEMap = new DualHashMap<Integer, Integer, E>();
 			Set<E> edges = new HashSet<E>();
+			Map<E, V> edgeTargets = new HashMap<E, V>();
 			boolean faceValid = true;
 			for (int j = 0; j < f.length; j++){
 				int s = f[j];
@@ -169,7 +170,8 @@ public class ConverterJR2Heds {
 					break;
 				}
 				E e = heds.addNewEdge();
-				e.setTargetVertex(heds.getVertex(t));
+				edges.add(e);
+				edgeTargets.put(e, heds.getVertex(t));
 				vEMap.put(s, t, e);
 				if (coords[1] != null) eAdapters.set(Position.class, e, coords[1][i]);
 				if (colors[1] != null) eAdapters.set(Color.class, e, colors[1][i]);
@@ -178,9 +180,14 @@ public class ConverterJR2Heds {
 				if (pSize[1] != null) eAdapters.set(Size.class, e, pSize[1][i]);
 				if (radii[1] != null) eAdapters.set(Radius.class, e, radii[1][i]);
 				if (textCoords[1] != null) eAdapters.set(TexturePosition.class, e, textCoords[1][i]);
-				edges.add(e);
+				
 			}
-			if (faceValid) vertexEdgeMap.putAll(vEMap);
+			if (faceValid) {
+				vertexEdgeMap.putAll(vEMap);
+				for (E e : edgeTargets.keySet()){
+					e.setTargetVertex(edgeTargets.get(e));
+				}
+			}
 		}
 		if (!skippedFaces.isEmpty()) {
 			log.warning("skipped faces: " + skippedFaces.size());

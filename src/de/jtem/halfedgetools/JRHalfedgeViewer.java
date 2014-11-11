@@ -40,6 +40,7 @@ import de.jreality.plugin.JRViewer.ContentType;
 import de.jreality.plugin.basic.ConsolePlugin;
 import de.jreality.ui.JRealitySplashScreen;
 import de.jreality.util.SystemProperties;
+import de.jtem.halfedgetools.plugin.HalfedgeDebuggerPlugin;
 import de.jtem.halfedgetools.plugin.HalfedgePluginFactory;
 import de.jtem.jrworkspace.plugin.lnfswitch.LookAndFeelSwitch;
 import de.jtem.jrworkspace.plugin.lnfswitch.plugin.CrossPlatformLnF;
@@ -126,6 +127,7 @@ public class JRHalfedgeViewer {
 		v.addContentSupport(ContentType.Raw);
 		v.registerPlugins(HalfedgePluginFactory.createPlugins());
 		v.registerPlugin(ConsolePlugin.class);
+		v.registerPlugin(HalfedgeDebuggerPlugin.class);
 		v.getController().setManageLookAndFeel(false);
 		addLnFPlugins(v);
 		v.startup(); 
