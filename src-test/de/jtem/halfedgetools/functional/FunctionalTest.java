@@ -63,7 +63,8 @@ public abstract class FunctionalTest <
 	F extends Face<V, E, F>
 > {
 
-	private static Logger logger = Logger.getLogger(FunctionalTest.class.getSimpleName());
+	private static Logger 
+		log = Logger.getLogger(FunctionalTest.class.getSimpleName());
 	
 	private Double
 		eps = 1E-5,
@@ -139,7 +140,7 @@ public abstract class FunctionalTest <
 			f.evaluate(hds, xGrad, f2, null, null);
 			
 			fdGrad = (f1.get() - f2.get()) / (2 * eps);
-			logger.info("fdGrad["+i+"] = "+fdGrad+ "; G["+i+"] = " + G.get(i));
+			log.info("fdGrad["+i+"] = "+fdGrad+ "; G["+i+"] = " + G.get(i));
 			normDif += (fdGrad - G.get(i)) * (fdGrad - G.get(i));
 			xGrad.set(i, xi);
 		}
@@ -220,6 +221,7 @@ public abstract class FunctionalTest <
 
 					fdHessian = (iPlusjPlus.E/eps - iPlusjMinus.E/eps - iMinusjPlus.E/eps + iMinusjMinus.E/eps) / (4 * eps);
 				}
+				log.info("fdHess["+i+","+j+"] = " +fdHessian+ "; G["+i+","+j+"] = " + H.get(i,j));
 				normDif += (fdHessian - H.get(i,j)) * (fdHessian - H.get(i,j));
 				xHess.set(i, xi);
 				xHess.set(j, xj);
