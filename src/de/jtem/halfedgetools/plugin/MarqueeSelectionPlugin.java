@@ -1,17 +1,19 @@
 package de.jtem.halfedgetools.plugin;
 
+import static java.awt.event.MouseEvent.BUTTON3;
+import static javax.swing.SwingUtilities.isLeftMouseButton;
+
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import javax.swing.SwingUtilities;
 
 import de.jreality.geometry.Primitives;
 import de.jreality.math.Matrix;
@@ -23,12 +25,10 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.SceneGraphPath;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.SceneGraphUtility;
-import de.jtem.halfedge.Edge;
-import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
-import de.jtem.halfedge.Vertex;
+import de.jtem.halfedge.Node;
 import de.jtem.halfedgetools.adapter.AdapterSet;
-import de.jtem.halfedgetools.adapter.type.generic.Position4d;
+import de.jtem.halfedgetools.adapter.type.generic.BaryCenter4d;
 import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.halfedgetools.selection.TypedSelection;
 import de.jtem.jrworkspace.plugin.Controller;
@@ -50,8 +50,6 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 	private Point
 		start = new Point(),
 		active = new Point();
-	private boolean 
-		selectInside = false;
 	private Selection 
 		startSelection = new Selection();
 	private SceneGraphComponent	
@@ -65,11 +63,9 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 	}
 	
 	
-	private Set<Vertex<?,?,?>> getMarqueeVertices() {
-		Set<Vertex<?,?,?>> vSet = new HashSet<Vertex<?,?,?>>();
+	private Set<Node<?,?,?>> getMarqueeNodes(boolean v, boolean e, boolean f) {
+		Set<Node<?,?,?>> result = new HashSet<>();
 		Dimension size = view.getViewer().getViewingComponentSize();
-		int sign = active.x - start.x;
-		selectInside = (sign >=0);
 		int w = Math.abs(active.x - start.x);
 		int h = Math.abs(active.y - start.y);
 		int xMin = Math.min(active.x, start.x) - size.width / 2;  
@@ -79,7 +75,7 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 		SceneGraphComponent root = view.getViewer().getSceneRoot();
 		SceneGraphComponent layerRoot = hif.getActiveLayer().getLayerRoot();
 		List<SceneGraphPath> paths = SceneGraphUtility.getPathsBetween(root, layerRoot);
-		if (paths.isEmpty()) return vSet;
+		if (paths.isEmpty()) return result;
 		SceneGraphPath hifPath = paths.get(0);
 		SceneGraphPath camPath = view.getViewer().getCameraPath();
 		Matrix P = new Matrix(CameraUtility.getCameraToNDC(view.getViewer()));
@@ -90,8 +86,12 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 		AdapterSet a = hif.getAdapters();
 		HalfEdgeDataStructure<?, ?, ?> hds = hif.get();
 		double[] homPos = {0,0,0,1};
-		for (Vertex<?,?,?> v : hds.getVertices()) {
-			double[] pos = a.get(Position4d.class, v, double[].class);
+		List<Node<?,?,?>> nodes = new LinkedList<>();
+		if (v) nodes.addAll(hds.getVertices());
+		if (e) nodes.addAll(hds.getEdges());
+		if (f) nodes.addAll(hds.getFaces());
+		for (Node<?,?,?> n : nodes) {
+			double[] pos = a.get(BaryCenter4d.class, n, double[].class);
 			Pn.dehomogenize(homPos, pos);
 			T.transformVector(homPos);
 			P.transformVector(homPos);
@@ -100,146 +100,11 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 			double yPos = -homPos[1] * size.height / 2;
 			if (xPos > xMin && xPos < xMax &&
 				yPos > yMin && yPos < yMax) {
-				vSet.add(v);
-			}
-		}
-		return vSet;
-	}
-	
-	private 
-	 	Set<Face<?,?,?>> getMarqueeFaces(Set<Vertex<?,?,?>> verts) {
-		Set<Face<?,?,?>> result = new HashSet<Face<?,?,?>>();
-		if (selectInside) {//inside
-			for (Vertex<?,?,?> v : verts){
-				for(Face<?,?,?> f : getFaceStar(v) ){
-					boolean containsAll = true;
-					for(Vertex<?,?,?> vf : boundaryVertices(f)){
-						containsAll &= verts.contains(vf);
-					}
-					if(containsAll) {
-						result.add(f);
-					}
-				}
-			}
-		} else {//touching
-			for (Vertex<?,?,?> v : verts){
-				for(Face<?,?,?> f : getFaceStar(v) ){		
-					result.add(f);
-				}
+				result.add(n);
 			}
 		}
 		return result;
 	}
-	
-	private
-	 	Set<Edge<?,?,?>> getMarqueeEdges(Set<Vertex<?,?,?>> verts) {
-		Set<Edge<?,?,?>> result = new HashSet<Edge<?,?,?>>();
-		if (selectInside){//inside
-			for (Vertex<?,?,?> v : verts){ 
-				for(Edge<?,?,?> e : incomingEdges(v) ){
-					if(verts.contains(e.getStartVertex())) {
-						result.add(e);
-						result.add(e.getOppositeEdge());
-					}
-				}
-			}
-			return result;
-	
-		} else {//touching
-			for (Vertex<?,?,?> v : verts){
-				for(Edge<?,?,?> e : incomingEdges(v) ){
-					result.add(e);
-					result.add(e.getOppositeEdge());
-				}
-			}
-			return result;
-		}
-	}
-	
-
-	
-	private static List<Edge<?,?,?>> incomingEdges(Vertex<?,?,?> vertex){
-		Edge<?,?,?> e0 = vertex.getIncomingEdge();
-		if (e0 == null) {
-			return Collections.emptyList();
-		}
-		LinkedList<Edge<?,?,?>> result = new LinkedList<Edge<?,?,?>>();
-		Edge<?,?,?> e = e0;
-		do {
-			if (vertex != e.getTargetVertex()) {
-				throw new RuntimeException("Edge " + e + " does not have vertex " + vertex + " as target vertex, " +
-				"although it is the opposite of the next edge of an edge which does.");
-			}
-			result.add(e);
-			e = e.getNextEdge();
-			if (e == null) {
-				throw new RuntimeException("Some edge has null as next edge.");
-			}
-			e = e.getOppositeEdge();
-			if (e == null) {
-				throw new RuntimeException("Some edge has null as opposite edge.");
-			}
-		} while (e != e0);
-		return result;
-	}
-	
-	 private static 	
-	    	List<Face<?,?,?>> getFaceStar(Vertex<?,?,?> vertex) {
-	        List<Face<?,?,?>> faceStar = new ArrayList<Face<?,?,?>>();
-	        for (Edge<?,?,?> e : getEdgeStar(vertex)){
-	        	if (e.getLeftFace() != null)
-	        		faceStar.add(e.getLeftFace());
-	        }
-	        return faceStar;
-	    }
-	 
-	 public static 
-	 	List<Vertex<?,?,?>> boundaryVertices(Face<?,?,?> face) {
-		Collection<Edge<?,?,?>> b = boundaryEdges(face);
-		LinkedList<Vertex<?,?,?>> vList = new LinkedList<Vertex<?,?,?>>();
-		for (Edge<?,?,?> e : b) {
-			vList.add(e.getTargetVertex());
-		}
-		return vList;
-	}
-	 
-	 private static  List<Edge<?,?,?>> boundaryEdges(Face<?,?,?> face) {
-			final Edge<?,?,?> e0 = face.getBoundaryEdge();
-			if (e0 == null) {
-				return Collections.emptyList();
-			}
-			LinkedList<Edge<?,?,?>> result = new LinkedList<Edge<?,?,?>>();
-			Edge<?,?,?> e = e0;
-			do {
-				if (face != e.getLeftFace()) {
-					throw new RuntimeException("Edge " + e + " does not have face " + face + " as left face, " +
-							"although it is the next edge of an edge which does.");
-				}
-				result.add(e);
-				e = e.getNextEdge();
-				if (e == null) {
-					throw new RuntimeException("Some edge has null as next edge.");
-				}
-			} while (e != e0);
-			return result;
-		}
-	
-	 private static 
-	 	 List<Edge<?,?,?>> getEdgeStar(Vertex<?,?,?> vertex){
-		 List<Edge<?,?,?>> edgeStar = new LinkedList<Edge<?,?,?>>();
-		 if (vertex.getIncomingEdge() == null || !vertex.getIncomingEdge().isValid())
-			 return Collections.emptyList();
-		 Edge<?,?,?> actEdge = vertex.getIncomingEdge();
-		 do {
-			if (actEdge == null)
-			return Collections.emptyList();
-	     	edgeStar.add(actEdge);
-	     	if (actEdge.getNextEdge() == null)
-	     		return Collections.emptyList();
-	     	actEdge = actEdge.getNextEdge().getOppositeEdge();
-		} while (actEdge != vertex.getIncomingEdge());
-		return edgeStar;
-	 }
 	
 	@Override
 	public void install(Controller c) throws Exception {
@@ -249,91 +114,30 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 		contentTools = c.getPlugin(ContentTools.class);
 		view.getViewer().getViewingComponent().addMouseListener(this);
 		view.getViewer().getViewingComponent().addMouseMotionListener(this);
-//		Scene scene = c.getPlugin(Scene.class);
-//		scene.getSceneRoot().addChild(marqueeRoot);
-//		gui = c.getPlugin(WidgetInterface.class);
-//		gui.getPanel().addMouseListener(this);
-//		gui.getPanel().addMouseMotionListener(this);
 	}
-	
-	private void updateMarquee() {
-//		Component comp = view.getViewer().getViewingComponent();
-//		SceneGraphPath camPath = view.getViewer().getCameraPath();
-//		Camera cam = camPath.getLastComponent().getCamera();
-//		Matrix P = new Matrix(CameraUtility.getCameraToNDC(view.getViewer()));
-//		Matrix C = new Matrix(camPath.getInverseMatrix(null));
-//		Matrix T = new Matrix();
-//		T.multiplyOnLeft(C);
-//		T.multiplyOnLeft(P);
-//		T.invert();
-//		double w = Math.abs(active.x - start.x) / (double)comp.getWidth();
-//		double h = Math.abs(active.y - start.y) / (double)comp.getHeight();
-//		double x = Math.min(active.x, start.x) / (double)comp.getWidth() - 0.5; 
-//		double y = Math.min(active.y, start.y) / (double)comp.getHeight() - 0.5;
-//		MatrixBuilder mb = MatrixBuilder.euclidean();
-//		mb.translate(x, y, 0);
-//		mb.scale(w, h, 1.0);
-//		mb.translate(0,0,cam.getNear());
-//		T.multiplyOnLeft(mb.getMatrix());
-//		T.assignTo(marqueeRoot);
-	}
-	
-	
-//	@Override
-//	public void paint(Graphics2D g, JPanel canvas) {
-//		if (!marqueeEnabled) return;
-//		Stroke sOld = g.getStroke();
-//		int w = Math.abs(active.x - start.x);
-//		int h = Math.abs(active.y - start.y);
-//		int x = Math.min(active.x, start.x);
-//		int y = Math.min(active.y, start.y);
-//
-//		g.setColor(new Color(255, 0, 0, 50));
-//		g.fillRect(x, y, w, h);
-//		
-//		float[] dash = {0f, 1f, 3f, 4f};
-//		BasicStroke s = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, dash, 0);
-//		g.setStroke(s);
-//		g.setColor(Color.RED);
-//		g.drawRect(x, y, w == 0 ? 1 : w, h == 0 ? 1 : h);
-//		
-//		g.setStroke(sOld);
-//	}
-
 	
 	private void cancelMarqee() {
 		marqueeEnabled = false;
 		hif.setSelection(startSelection);
-		updateMarquee();
 		contentTools.setRotationEnabled(rotateWasEnabled);
 		contentTools.setDragEnabled(dragWasEnabled);
 	}
 	
 
-	private void updateMarqueeSelection(MouseEvent e) {
-		Set<Vertex<?,?,?>> marqeeVertices = getMarqueeVertices();
-		if (marqeeVertices.isEmpty()) {
-			hif.setSelection(startSelection);
-			return;
-		}
-		
+	private void updateMarqueeSelection(MouseEvent ev) {
 		HalfedgeLayer layer = hif.getActiveLayer();
-		Selection marqueeSelection = new Selection();
 		Integer channel = TypedSelection.CHANNEL_DEFAULT;
 		if (hif.getSelectionInterface() != null) {
 			channel = hif.getSelectionInterface().getActiveInputChannel(layer);
 		}
-		if(e.isShiftDown()){
-			marqueeSelection.addAll(marqeeVertices, channel);
-		}
-		if(e.isAltDown()){
-			marqueeSelection.addAll(getMarqueeEdges(marqeeVertices), channel);
-		}
-		if(e.isControlDown()){
-			marqueeSelection.addAll(getMarqueeFaces(marqeeVertices), channel);
-		}	
+		boolean v = ev.isShiftDown() && !ev.isAltDown() && !ev.isControlDown();
+		boolean e = ev.isShiftDown() && ev.isAltDown() && !ev.isControlDown();
+		boolean f = ev.isShiftDown() && !ev.isAltDown() && ev.isControlDown();
+		
+		Set<Node<?,?,?>> marqeeNodes = getMarqueeNodes(v, e, f);
+		Selection marqueeSelection = new Selection(marqeeNodes);
 		Selection newSelection = new Selection(startSelection);
-		newSelection.addAll(marqueeSelection);
+		newSelection.addAll(marqueeSelection, channel);
 		hif.setSelection(newSelection);
 	}
 	
@@ -347,7 +151,6 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 			return;
 		}
 		active = e.getPoint();
-		updateMarquee();
 		updateMarqueeSelection(e);
 	}
 
@@ -361,7 +164,7 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if (!activated) return;
-		if (!(e.isControlDown()||e.isAltDown()||e.isShiftDown())) {
+		if (!(e.isControlDown() || e.isAltDown() || e.isShiftDown()) || !isLeftMouseButton(e)) {
 			return;
 		}
 		marqueeEnabled = true;
@@ -384,7 +187,6 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 		contentTools.setRotationEnabled(true);
 		contentTools.setDragEnabled(true);
 		marqueeEnabled = false;
-		updateMarquee();
 		updateMarqueeSelection(e);
 	}
 
