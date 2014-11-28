@@ -1,6 +1,5 @@
 package de.jtem.halfedgetools.plugin;
 
-import static java.awt.event.MouseEvent.BUTTON3;
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 
 import java.awt.Dimension;
@@ -13,8 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.SwingUtilities;
-
 import de.jreality.geometry.Primitives;
 import de.jreality.math.Matrix;
 import de.jreality.math.Pn;
@@ -25,6 +22,7 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.SceneGraphPath;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.SceneGraphUtility;
+import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Node;
 import de.jtem.halfedgetools.adapter.AdapterSet;
@@ -64,7 +62,7 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 	
 	
 	private Set<Node<?,?,?>> getMarqueeNodes(boolean v, boolean e, boolean f) {
-		Set<Node<?,?,?>> result = new HashSet<>();
+		Set<Node<?,?,?>> result = new HashSet<Node<?,?,?>>();
 		Dimension size = view.getViewer().getViewingComponentSize();
 		int w = Math.abs(active.x - start.x);
 		int h = Math.abs(active.y - start.y);
@@ -86,9 +84,13 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 		AdapterSet a = hif.getAdapters();
 		HalfEdgeDataStructure<?, ?, ?> hds = hif.get();
 		double[] homPos = {0,0,0,1};
-		List<Node<?,?,?>> nodes = new LinkedList<>();
+		List<Node<?,?,?>> nodes = new LinkedList<Node<?,?,?>>();
 		if (v) nodes.addAll(hds.getVertices());
-		if (e) nodes.addAll(hds.getEdges());
+		if (e) {
+			for (Node<?,?,?> ee : hds.getPositiveEdges()) {
+				nodes.add(ee);
+			}
+		}
 		if (f) nodes.addAll(hds.getFaces());
 		for (Node<?,?,?> n : nodes) {
 			double[] pos = a.get(BaryCenter4d.class, n, double[].class);
@@ -101,6 +103,10 @@ public class MarqueeSelectionPlugin extends Plugin implements MouseMotionListene
 			if (xPos > xMin && xPos < xMax &&
 				yPos > yMin && yPos < yMax) {
 				result.add(n);
+				if (n instanceof Edge) {
+					Edge<?,?,?> ee = (Edge<?,?,?>)n;
+					result.add(ee.getOppositeEdge());
+				}
 			}
 		}
 		return result;
