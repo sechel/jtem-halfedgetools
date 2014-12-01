@@ -667,7 +667,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 			List<HalfedgeLayer> otherLayers = new LinkedList<HalfedgeLayer>(layers);
 			otherLayers.remove(layer);
 			HalfedgeLayer[] layersArr = otherLayers.toArray(new HalfedgeLayer[otherLayers.size()]);
-			final JList layerList = new JList(layersArr);
+			final JList<HalfedgeLayer> layerList = new JList<>(layersArr);
 			JScrollPane scroller = new JScrollPane(layerList);
 			scroller.setPreferredSize(new Dimension(200, 300));
 			
@@ -684,12 +684,12 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 				@Override
 				protected void executeJob() throws Exception {
 					fireJobProgress(0.0);
-					Object[] selectedLayers = layerList.getSelectedValues();
+					List<HalfedgeLayer> selectedLayers = layerList.getSelectedValuesList();
 					double count = 0;
 					for (Object l : selectedLayers) {
 						HalfedgeLayer hl = (HalfedgeLayer)l;
 						mergeLayers(layer, hl);
-						fireJobProgress(count++ / selectedLayers.length);
+						fireJobProgress(count++ / selectedLayers.size());
 					}
 					updateStates();
 				}

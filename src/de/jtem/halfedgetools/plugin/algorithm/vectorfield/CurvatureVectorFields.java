@@ -45,8 +45,8 @@ public class CurvatureVectorFields extends AlgorithmDialogPlugin {
 		k2Radio = new JCheckBox("K2"),
 		nRadio = new JCheckBox("N"),
 		onBoundaryChecker = new JCheckBox("On Boundary");
-	private JComboBox
-		nodeTypeCombo = new JComboBox(new String[] {"Vertices", "Edges", "Faces"});
+	private JComboBox<String>
+		nodeTypeCombo = new JComboBox<>(new String[] {"Vertices", "Edges", "Faces"});
 	private SpinnerNumberModel
 		radiusModel = new SpinnerNumberModel(6.0, 0.1, 10.0, 0.1);
 	private JSpinner

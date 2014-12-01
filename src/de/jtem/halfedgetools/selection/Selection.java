@@ -18,6 +18,7 @@ public class Selection extends TypedSelection<Node<?,?,?>> {
 	public <N extends Node<?,?,?>> Selection(TypedSelection<N> c) {
 		super(c);
 	}
+	@SafeVarargs
 	public <N extends Node<?,?,?>> Selection(N... nArr) {
 		super(nArr);
 	}

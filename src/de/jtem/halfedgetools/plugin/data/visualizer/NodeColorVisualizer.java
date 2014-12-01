@@ -60,8 +60,8 @@ public class NodeColorVisualizer extends DataVisualizerPlugin implements ActionL
 	private JSpinner 
 		clampLowSpinner = new JSpinner(clampLowModel),
 		clampHighSpinner = new JSpinner(clampHighModel);
-	private JComboBox
-		colorMapCombo = new JComboBox(ColorMap.values());
+	private JComboBox<ColorMap>
+		colorMapCombo = new JComboBox<>(ColorMap.values());
 	private SpinnerNumberModel
 		offsetModel = new SpinnerNumberModel(0.005, 0.001, 1.0, 0.001);
 	private JSpinner

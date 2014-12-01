@@ -7,8 +7,8 @@ import de.jtem.halfedgetools.plugin.WidgetPlugin;
 
 public class ViewSwitchWidget extends WidgetPlugin {
 
-	private JComboBox
-		viewsCombo = new JComboBox(new String[] {"Front", "Back", "Top", "Bottom", "Left", "Right"});
+	private JComboBox<String>
+		viewsCombo = new JComboBox<>(new String[] {"Front", "Back", "Top", "Bottom", "Left", "Right"});
 	
 	@Override
 	public JComponent getWidgetComponent() {

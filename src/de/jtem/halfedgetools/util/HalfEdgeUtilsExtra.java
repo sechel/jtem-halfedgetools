@@ -532,6 +532,7 @@ public class HalfEdgeUtilsExtra {
 		return true;
 	}
 	
+	@SafeVarargs
 	public static < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -561,6 +562,7 @@ public class HalfEdgeUtilsExtra {
 		} else return null;
 	}
 	
+	@SafeVarargs
 	public static < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,
@@ -579,6 +581,7 @@ public class HalfEdgeUtilsExtra {
 		return faces.get(0);
 	}
 	
+	@SafeVarargs
 	public static < 
 		V extends Vertex<V, E, F>,
 		E extends Edge<V, E, F>,

@@ -57,22 +57,33 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		ActionListener, ChangeListener {
 
-	private SpinnerNumberModel scaleModel = new SpinnerNumberModel(1.0, -100.0,
-			100.0, 0.1), thicknessModel = new SpinnerNumberModel(1.0, 0.0, 100.0,
-			0.1);
-	private JSpinner scaleSpinner = new JSpinner(scaleModel),
-			thicknessSpinner = new JSpinner(thicknessModel);
-	private JCheckBox directedChecker = new JCheckBox("Directed"),
-			tubesChecker = new JCheckBox("Tubes"),
-			normalizedChecker = new JCheckBox("Normalized"),
-			centeredChecker = new JCheckBox("Centered");
-	private JPanel optionsPanel = new JPanel();
+	private SpinnerNumberModel 
+		scaleModel = new SpinnerNumberModel(1.0, -100.0, 100.0, 0.1), 
+		thicknessModel = new SpinnerNumberModel(1.0, 0.0, 100.0, 0.1);
+	private JSpinner 
+		scaleSpinner = new JSpinner(scaleModel),
+		thicknessSpinner = new JSpinner(thicknessModel);
+	private JCheckBox 
+		directedChecker = new JCheckBox("Directed"),
+		tubesChecker = new JCheckBox("Tubes"),
+		normalizedChecker = new JCheckBox("Normalized"),
+		centeredChecker = new JCheckBox("Centered");
+	private JPanel 
+		optionsPanel = new JPanel();
 
-	private JComboBox colorChooser;
-	private Color[] colors = { Color.RED, Color.GREEN, Color.BLUE, Color.CYAN,
-			Color.MAGENTA, Color.YELLOW, Color.ORANGE, Color.PINK, Color.BLACK,
-			Color.WHITE };
-
+	private Color[] colors = { 
+		Color.RED, Color.GREEN, Color.BLUE, Color.CYAN,
+		Color.MAGENTA, Color.YELLOW, Color.ORANGE, Color.PINK, 
+		Color.BLACK, Color.WHITE 
+	};
+	private String[] colornames = { 
+		"RED", "GREEN", "BLUE", "CYAN", 
+		"MAGENTA", "YELLOW", "ORANGE", "PINK", 
+		"BLACK", "WHITE" 
+	};
+	private JComboBox<String> 
+		colorChooser = new JComboBox<>(colornames);;
+	
 	private VectorFieldVisualization actVis = null;
 	private boolean listenersDisabled = false;
 
@@ -107,9 +118,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		centeredChecker.setSelected(true);
 		centeredChecker.addActionListener(this);
 
-		String[] colornames = { "RED", "GREEN", "BLUE", "CYAN", "MAGENTA",
-				"YELLOW", "ORANGE", "PINK", "BLACK", "WHITE" };
-		colorChooser = new JComboBox(colornames);
+		
 		colorChooser.setSelectedIndex(8);
 		cl.gridwidth = 2;
 		optionsPanel.add(colorChooser, cl);

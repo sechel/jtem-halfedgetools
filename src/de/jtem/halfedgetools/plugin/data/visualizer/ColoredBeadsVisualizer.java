@@ -56,9 +56,10 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements ActionListener, ChangeListener {
 
-	private JComboBox 
-		beadsPosCombo = new JComboBox(),
-		colorMapCombo = new JComboBox(ColorMap.values());
+	private JComboBox<Adapter<double[]>>
+		beadsPosCombo = new JComboBox<>();
+	private JComboBox<ColorMap>
+		colorMapCombo = new JComboBox<>(ColorMap.values());
 	private ClampSpinnerModel 
 		clampLowModel = new ClampSpinnerModel(),
 		clampHighModel = new ClampSpinnerModel();
@@ -138,7 +139,6 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		hif = c.getPlugin(HalfedgeInterface.class);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (actVis == null || listenersDisabled) {
@@ -147,7 +147,7 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		actVis.colorMap = (ColorMap) colorMapCombo.getSelectedItem();
 		actVis.invert = invertChecker.isSelected();
 		actVis.absolute = absoluteChecker.isSelected();
-		actVis.beadPosAdapter = (Adapter<double[]>) beadsPosCombo.getSelectedItem();
+		actVis.beadPosAdapter = beadsPosCombo.getItemAt(beadsPosCombo.getSelectedIndex());
 		actVis.clamp = clampChecker.isSelected();
 		actVis.update();
 	}
@@ -411,7 +411,6 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public JPanel connectUserInterfaceFor(DataVisualization visualization) {
 		actVis = (ColoredBeadsVisualization) visualization;
@@ -443,10 +442,10 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 
 		AdapterSet aSet = visualization.getLayer().getEffectiveAdapters();
 		aSet.add(simpleBeadsPositionAdapter);
-		List beadPosList = aSet.queryAll(BeadPosition.class);
+		List<Adapter<double[]>> beadPosList = aSet.queryAll(BeadPosition.class, double[].class);
 		Collections.sort(beadPosList);
-		Vector<Adapter<?>> beadPosVec = new Vector<Adapter<?>>(beadPosList);
-		ComboBoxModel beadPosModel = new DefaultComboBoxModel(beadPosVec);
+		Vector<Adapter<double[]>> beadPosVec = new Vector<>(beadPosList);
+		ComboBoxModel<Adapter<double[]>> beadPosModel = new DefaultComboBoxModel<>(beadPosVec);
 		beadsPosCombo.setModel(beadPosModel);
 		beadsPosCombo.setSelectedItem(actVis.beadPosAdapter);
 		return optionsPanel;
@@ -475,7 +474,6 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 		return "Colored Beads";
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public DataVisualization createVisualization(HalfedgeLayer layer, NodeType type, Adapter<?> source) {
 		ColoredBeadsVisualization vis = new ColoredBeadsVisualization(layer, source, this, type);
@@ -489,10 +487,9 @@ public class ColoredBeadsVisualizer extends DataVisualizerPlugin implements Acti
 
 		AdapterSet aSet = layer.getEffectiveAdapters();
 		aSet.add(simpleBeadsPositionAdapter);
-		List beadPosList = aSet.queryAll(BeadPosition.class);
+		List<Adapter<double[]>> beadPosList = aSet.queryAll(BeadPosition.class, double[].class);
 		Collections.sort(beadPosList);
-		vis.beadPosAdapter = (Adapter<double[]>) beadPosList.get(0);
-
+		vis.beadPosAdapter = beadPosList.get(0);
 		return vis;
 	}
 

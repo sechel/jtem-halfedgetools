@@ -34,6 +34,7 @@ public class TypedSelection <N extends Node<?,?,?>> implements Set<N>, Serializa
 	public TypedSelection(TypedSelection<? extends N> c) {
 		M.putAll(c.M);
 	}
+	@SafeVarargs
 	public <NN extends N> TypedSelection(NN... nArr) {
 		addAll(Arrays.asList(nArr));
 	}

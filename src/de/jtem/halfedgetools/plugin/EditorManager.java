@@ -31,8 +31,8 @@ public class EditorManager extends Plugin implements ActionListener {
 		toolBar = null;
 	private ViewMenuBar
 		menuBar = null;
-	private JComboBox
-		modeCombo = new JComboBox();
+	private JComboBox<EditorModePlugin>
+		modeCombo = new JComboBox<>();
 	private List<EditorModePlugin>
 		modePlugins = new LinkedList<EditorModePlugin>();
 	private EditorModePlugin
@@ -75,7 +75,7 @@ public class EditorManager extends Plugin implements ActionListener {
 	
 	private void updateStates() {
 		Vector<EditorModePlugin> pluginsVec = new Vector<EditorModePlugin>(modePlugins);
-		DefaultComboBoxModel model = new DefaultComboBoxModel(pluginsVec);
+		DefaultComboBoxModel<EditorModePlugin> model = new DefaultComboBoxModel<>(pluginsVec);
 		modeCombo.removeActionListener(this);
 		modeCombo.setModel(model);
 		modeCombo.setSelectedItem(activeMode);

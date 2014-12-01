@@ -30,8 +30,8 @@ import de.jtem.jrworkspace.plugin.flavor.ToolBarFlavor;
 
 public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 
-	private Map<String, JComboBox>
-		comboMap = new HashMap<String, JComboBox>();
+	private Map<String, JComboBox<AlgorithmPlugin>>
+		comboMap = new HashMap<>();
 	
 	private Map<String, Set<AlgorithmPlugin>>
 		algoMap = new HashMap<String, Set<AlgorithmPlugin>>();
@@ -44,7 +44,7 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 	}
 
 	private void addComboBox(String cat) {
-		JComboBox catCombo = new JComboBox();
+		JComboBox<AlgorithmPlugin> catCombo = new JComboBox<>();
 		catCombo.setMaximumRowCount(50);
 		AlgorithmComboModel model = new AlgorithmComboModel(cat);
 		catCombo.setModel(model);
@@ -71,7 +71,7 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 		}
 		
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected,cellHasFocus);
 			if (c instanceof JLabel) {
 				JLabel l = (JLabel)c;
@@ -90,7 +90,7 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 		
 	}
 	
-	private class AlgorithmComboModel implements ComboBoxModel {
+	private class AlgorithmComboModel implements ComboBoxModel<AlgorithmPlugin> {
 
 		private String
 			category = AlgorithmCategory.Custom.toString();
@@ -107,7 +107,7 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 		}
 
 		@Override
-		public Object getElementAt(int index) {
+		public AlgorithmPlugin getElementAt(int index) {
 			List<AlgorithmPlugin> algos = getAlgorithms(category);
 			return algos.get(index);
 		}
@@ -155,7 +155,7 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 		Collections.sort(algorithmCategories);
 				
 		for (String cat : algorithmCategories) {
-			JComboBox combo = comboMap.get(cat);
+			JComboBox<AlgorithmPlugin> combo = comboMap.get(cat);
 			Set<AlgorithmPlugin> algos = algoMap.get(cat);
 			if (algos.isEmpty()) continue;
 			comboToolBar.add(combo, c);

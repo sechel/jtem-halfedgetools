@@ -84,8 +84,8 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 		presetRoot = new PresetTreeNode(null);
 	private JTree
 		presetTree = new JTree(new DefaultTreeModel(presetRoot, false));
-	private JList
-		fileList = new JList(new FileModel());
+	private JList<File>
+		fileList = new JList<>(new FileModel());
 	private JScrollPane
 		presetTreeScroller = new JScrollPane(presetTree),
 		fileScroller = new JScrollPane(fileList);
@@ -269,7 +269,7 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component result = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value instanceof File) {
 				File f = (File)value;
@@ -298,13 +298,13 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 		
 	}
 	
-	private class FileModel extends AbstractListModel {
+	private class FileModel extends AbstractListModel<File> {
 
 		private static final long 	
 			serialVersionUID = 1L;
 
 		@Override
-		public Object getElementAt(int index) {
+		public File getElementAt(int index) {
 			return folderFiles.get(index);
 		}
 

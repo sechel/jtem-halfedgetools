@@ -57,8 +57,8 @@ public class HistogramVisualizer extends DataVisualizerPlugin implements ChangeL
 
 	private JPanel
 		panel = new JPanel();
-	private JComboBox
-		colorMapCombo = new JComboBox(ColorMap.values());
+	private JComboBox<ColorMap>
+		colorMapCombo = new JComboBox<>(ColorMap.values());
 	private SpinnerNumberModel
 		numBinsModel = new SpinnerNumberModel(500, 1, 100000, 1),
 		scaleExpModel = new SpinnerNumberModel(0, -20, 20, 1);
