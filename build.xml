@@ -18,8 +18,8 @@
 	<property name = "version" value = "B${time}"/>
 	<property name="vendor" value="jTEM Development Team"/>
 
-	<property name="target" value="1.6"/>
-    <property name="source" value="1.6"/>
+	<property name="target" value="1.7"/>
+    <property name="source" value="1.7"/>
 	<property name="src" value="src"/>
 	<property name="src-test" value="src-test"/>
 	<property name="lib" value="lib"/>
@@ -31,6 +31,9 @@
 	<path id="jre6.libraryclasspath">
 		<pathelement location="${lib}/jre6/rt.jar"/>
 	</path>	
+	<path id="jre7.libraryclasspath">
+		<pathelement location="${lib}/jre7/rt.jar"/>
+	</path>		
 	<path id="jfreechart.libraryclasspath">
 		<pathelement location="${lib}/jfreechart/jcommon-1.0.18.jar"/>
 		<pathelement location="${lib}/jfreechart/jfreechart-1.0.14.jar"/>
@@ -73,7 +76,7 @@
 	</target>
 	
 	<target name="compile" depends="create build folders">
-        <javac debug="yes" destdir="${build}" excludesfile="build.exclude" source="${source}" target="${target}" bootclasspathref="jre6.libraryclasspath" includeantruntime="false" encoding="UTF-8">
+        <javac debug="yes" destdir="${build}" excludesfile="build.exclude" source="${source}" target="${target}" bootclasspathref="jre7.libraryclasspath" includeantruntime="false" encoding="UTF-8">
         	<compilerarg line="-Xlint:deprecation"/>
         	<compilerarg line="-Xlint:unchecked"/>
             <src path="${src}"/>
