@@ -76,7 +76,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		faceAlphaLabel = new JLabel("Face Opacity"),
 		rotationLabel = new JLabel("Rotation °");
 	private SpinnerNumberModel
-		rotationModel = new SpinnerNumberModel(0.0, -360.0, 360.0, 1.0),
+		rotationModel = new SpinnerNumberModel(0.0, -360.0, 360.0, 0.1),
 		edgeWidthModel = new SpinnerNumberModel(1.0, 0.01, 20.0, 0.1),
 		faceAlphaModel = new SpinnerNumberModel(0.2, 0.0, 1.0, 0.1);
 	private JSpinner
@@ -84,6 +84,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		rotationSpinner = new JSpinner(rotationModel),
 		faceAlphaSpinner = new JSpinner(faceAlphaModel);
 	private JCheckBox
+		reflectChecker = new JCheckBox("Reflect", false),
 		antiAliasChecker = new JCheckBox("Anti-Aliasing", true),
 		gridChecker = new JCheckBox("Grid", true),
 		verticesChecker = new JCheckBox("Vertices", false),
@@ -114,14 +115,14 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		leftSlot.setBorder(BorderFactory.createEtchedBorder());
 		rightSlot.setBorder(BorderFactory.createEtchedBorder());
 		try {
-			createInpectors();
+			createInspectors();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		updateAppearances();
 	}
 	
-	private void createInpectors() throws Exception {
+	private void createInspectors() throws Exception {
 		optionsShrinker.setLayout(new GridBagLayout());
 		GridBagConstraints lc = LayoutFactory.createLeftConstraint();
 		GridBagConstraints rc = LayoutFactory.createRightConstraint();
@@ -130,6 +131,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		optionsShrinker.add(antiAliasChecker, rc);
 		optionsShrinker.add(rotationLabel, lc);
 		optionsShrinker.add(rotationSpinner, rc);
+		optionsShrinker.add(reflectChecker, rc);
 		optionsShrinker.add(new JSeparator(JSeparator.HORIZONTAL), rc);
 		optionsShrinker.add(verticesChecker, rc);
 		optionsShrinker.add(vertexIndexChecker, rc);
@@ -151,7 +153,6 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		optionsShrinker.add(faceAlphaSpinner, rc);
 		optionsShrinker.add(new JSeparator(JSeparator.HORIZONTAL), rc);
 		optionsShrinker.add(selectionChecker, lc);
-		leftSlot.addShrinkPanel(optionsShrinker);
 		
 		antiAliasChecker.addActionListener(this);
 		backgroundColorButton.addColorChangedListener(this);
@@ -172,6 +173,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		faceColorButton.addColorChangedListener(this);
 		faceAlphaSpinner.addChangeListener(this);
 		selectionChecker.addActionListener(this);
+		reflectChecker.addActionListener(this);
 	}
 	
 	private void updateAppearances() {
@@ -179,9 +181,10 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		viewer.setBackground(backgroundColorButton.getColor());
 		viewer.setGridEnabled(gridChecker.isSelected());
 		SceneComponent root = viewer.getRoot();
-		AffineTransform R = new AffineTransform();
-		R.rotate(toRadians(rotationModel.getNumber().doubleValue()));
-		root.setTransform(R);
+		AffineTransform T = new AffineTransform();
+		T.rotate(toRadians(rotationModel.getNumber().doubleValue()));
+		if (reflectChecker.isSelected()) T.scale(-1, 1);
+		root.setTransform(T);
 		
 		SceneComponent vertices = layerComponent.getVertexComponent();
 		SceneComponent edges = layerComponent.getEdgeComponent();
@@ -242,6 +245,22 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		updateAppearances();
 	}
 	
+	@Override
+	public void storeStates(Controller c) throws Exception {
+		super.storeStates(c);
+		c.storeProperty(TextureSpaceInterface.class, "uiPosition", shrinkPanel.getParentSlot() == leftSlot);
+	}
+
+	@Override
+	public void restoreStates(Controller c) throws Exception {
+		super.restoreStates(c);
+		boolean uiPos = c.getProperty(TextureSpaceInterface.class, "uiPosition", true);
+		if (uiPos) {
+			leftSlot.addShrinkPanel(optionsShrinker);
+		} else {
+			rightSlot.addShrinkPanel(optionsShrinker);
+		}
+	}
 	
 	@Override
 	public void install(Controller c) throws Exception {
