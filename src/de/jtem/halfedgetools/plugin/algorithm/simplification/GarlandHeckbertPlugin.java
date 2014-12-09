@@ -1,5 +1,7 @@
 package de.jtem.halfedgetools.plugin.algorithm.simplification;
 
+import java.awt.EventQueue;
+
 import javax.swing.JOptionPane;
 
 import de.jtem.halfedge.Edge;
@@ -17,6 +19,7 @@ import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class GarlandHeckbertPlugin extends AlgorithmPlugin {
 
+	private Integer numVertices = null;
 	
 	@Override
 	public < 
@@ -24,11 +27,23 @@ public class GarlandHeckbertPlugin extends AlgorithmPlugin {
 		E extends Edge<V, E, F>,
 		F extends Face<V, E, F>,
 		HDS extends HalfEdgeDataStructure<V, E, F>
-	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) {
-		String numString = JOptionPane.showInputDialog(getOptionParent(), "Retain Vertices", 20);
-		if (numString == null) return;
-		int retainVertices = Integer.parseInt(numString);
-		int numSteps = hds.numVertices() - retainVertices;
+	> void execute(HDS hds, AdapterSet a, HalfedgeInterface hcp) throws Exception {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				String numString = JOptionPane.showInputDialog(getOptionParent(), "Retain Vertices", 20);
+				if (numString == null) {
+					numVertices = null;
+				} else {
+					numVertices = Integer.parseInt(numString);
+				}
+			}
+		};
+		EventQueue.invokeAndWait(r);
+		if (numVertices == null) { // cancel
+			return;
+		}
+		int numSteps = hds.numVertices() - numVertices;
 		if (numSteps <= 0) return;
 		Triangulator.triangulateSingleSource(hds);
 		GarlandHeckbert<V, E, F, HDS> gh = new GarlandHeckbert<V, E, F, HDS>(hds, a);
