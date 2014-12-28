@@ -58,7 +58,10 @@ public class EdgeRemoverPlugin extends AlgorithmPlugin {
 		if (edges.isEmpty()) return;
 		int numEdges = 0;
 		for (E e : edges) {
-			if (e.isPositive()) continue;
+			if (!e.isValid()) { 
+				// may have been removed together with its opposite edge
+				continue;
+			}
 			double progress = numEdges++ / (double)edges.size() * 2.0;
 			getCurrentJob().fireJobProgress(progress);
 			TopologyAlgorithms.removeEdge(e);

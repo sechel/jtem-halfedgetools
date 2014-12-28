@@ -6,8 +6,10 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -147,8 +149,11 @@ public class LayerComponent extends SceneComponent {
 			}
 			vComp.getPoints().add(p2d);
 		}
+		Set<Edge> doneEdges = new HashSet<Edge>();
 		for (Edge e : s.getEdges()) {
-			if (e.isPositive() || !e.isValid()) continue;
+			if (!e.isValid() || doneEdges.contains(e)) {
+				continue;
+			}
 			Shape edgeShape = getEdgeShape(e, a);
 			Integer channel = s.getChannel(e);
 			SceneComponent eComp = eMap.get(channel);
@@ -162,6 +167,8 @@ public class LayerComponent extends SceneComponent {
 			}
 			Path2D path = (Path2D)eComp.getShape();
 			path.append(edgeShape, false);
+			doneEdges.add(e);
+			doneEdges.add(e.getOppositeEdge());
 		}
 		for (Face f : s.getFaces()) {
 			if (!f.isValid()) return;

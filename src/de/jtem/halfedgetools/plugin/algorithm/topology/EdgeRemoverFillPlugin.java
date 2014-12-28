@@ -60,7 +60,10 @@ public class EdgeRemoverFillPlugin extends AlgorithmPlugin {
 		Set<E> edges = hif.getSelection().getEdges(hds);
 		if (edges.isEmpty()) return;
 		for (E e : edges) {
-			if (e.isPositive() || !e.isValid()) continue;
+			if (!e.isValid()) { 
+				// may have been removed together with its opposite edge
+				continue;
+			}
 			TopologyAlgorithms.removeEdgeFill(e);
 		}
 		hif.update();
