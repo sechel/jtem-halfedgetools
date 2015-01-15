@@ -31,6 +31,9 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.plugin.algorithm.subdivision;
 
+import java.util.Map;
+import java.util.Set;
+
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -43,6 +46,7 @@ import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmCategory;
 import de.jtem.halfedgetools.plugin.algorithm.AlgorithmPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.selection.Selection;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class LoopLinearPlugin extends AlgorithmPlugin {
@@ -61,8 +65,17 @@ public class LoopLinearPlugin extends AlgorithmPlugin {
 		HDS hds2 = hcp.createEmpty(hds);
 		Triangulator.triangulateByCuttingCorners(hds, a);
 		TypedAdapterSet<double[]> da = a.querySet(double[].class);
-		subdivider.subdivide(hds, hds2, da);
+		Map<E, Set<E>> eMap = subdivider.subdivide(hds, hds2, da);
+		Selection s = hcp.getSelection();
+		for (E e : s.getEdges(hds)) {
+			if (eMap.containsKey(e)) {
+				s.addAll(eMap.get(e));
+			} else {
+				s.addAll(eMap.get(e.getOppositeEdge()));
+			}
+		}
 		hcp.set(hds2);
+		hcp.setSelection(s);
 	}
 
 	@Override
