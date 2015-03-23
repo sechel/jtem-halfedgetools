@@ -9,10 +9,13 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -25,15 +28,22 @@ import javax.swing.event.ChangeListener;
 
 import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.plugin.JRViewer;
+import de.jreality.plugin.basic.Scene;
 import de.jreality.plugin.basic.ViewShrinkPanelPlugin;
 import de.jreality.reader.ReaderOBJ;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
+import de.jreality.scene.SceneGraphPath;
+import de.jreality.scene.event.AppearanceEvent;
+import de.jreality.scene.event.AppearanceListener;
+import de.jreality.shader.EffectiveAppearance;
+import de.jreality.shader.ImageData;
 import de.jreality.ui.ColorChooseJButton;
 import de.jreality.ui.ColorChooseJButton.ColorChangedEvent;
 import de.jreality.ui.ColorChooseJButton.ColorChangedListener;
 import de.jreality.ui.LayoutFactory;
 import de.jreality.util.Input;
+import de.jreality.util.LoggingSystem;
 import de.jreality.util.SceneGraphUtility;
 import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
@@ -55,10 +65,14 @@ import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkSlot;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkSlotVertical;
 
 public class TextureSpaceInterface extends ViewShrinkPanelPlugin 
-implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListener, AppearanceChangeListener, SelectionListener {
+implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListener, AppearanceChangeListener, SelectionListener, AppearanceListener {
 
+	private static Logger
+		log = LoggingSystem.getLogger(TextureSpaceInterface.class);
 	private HalfedgeInterface
 		hif = null;
+	private Scene
+		scenePlugin = null;
 	
 	private ShrinkSlot
 		leftSlot = new ShrinkSlotVertical(250),
@@ -95,13 +109,17 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		selectionChecker = new JCheckBox("Selection", true),
 		vertexIndexChecker = new JCheckBox("Indices"),
 		edgeIndexChecker = new JCheckBox("Indices"),
-		faceIndexChecker = new JCheckBox("Indices");
+		faceIndexChecker = new JCheckBox("Indices"),
+		showTextureChecker = new JCheckBox("Texture");
 	private ColorChooseJButton
 		backgroundColorButton = new ColorChooseJButton(new Color(232, 232, 232), true),
 		vertexColorButton = new ColorChooseJButton(Color.WHITE, true),
 		vertexOutlineColorButton = new ColorChooseJButton(new Color(153, 0, 0), true),
 		edgeColorButton = new ColorChooseJButton(new Color(102, 102, 102), true),
 		faceColorButton = new ColorChooseJButton(new Color(0, 102, 204), true);
+	
+	private AffineTexturePaint
+		texturePaint = null;
 	
 	public TextureSpaceInterface() {
 		shrinkPanel.setTitle("Texture Space Viewer 2D");
@@ -148,6 +166,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		optionsShrinker.add(new JSeparator(JSeparator.HORIZONTAL), rc);
 		optionsShrinker.add(facesChecker, lc);
 		optionsShrinker.add(faceColorButton, rc);
+		optionsShrinker.add(showTextureChecker, rc);
 		optionsShrinker.add(faceIndexChecker, rc);
 		optionsShrinker.add(faceAlphaLabel, lc);
 		optionsShrinker.add(faceAlphaSpinner, rc);
@@ -174,6 +193,39 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		faceAlphaSpinner.addChangeListener(this);
 		selectionChecker.addActionListener(this);
 		reflectChecker.addActionListener(this);
+		showTextureChecker.addActionListener(this);
+	}
+	
+	@Override
+	public void appearanceChanged(AppearanceEvent ev) {
+		updateTexturePaint();
+		viewer.repaint();
+	}
+	
+	private void updateTexturePaint() {
+		SceneGraphPath path = scenePlugin.getContentPath();
+		scenePlugin.getContentAppearance().removeAppearanceListener(this);
+		scenePlugin.getContentAppearance().addAppearanceListener(this);
+		EffectiveAppearance app = EffectiveAppearance.create(path);
+		Object imageObject = app.getAttribute("polygonShader.texture2d:image", new Object());
+		if (imageObject instanceof ImageData) {
+			ImageData image = (ImageData)imageObject;
+			BufferedImage bi = (BufferedImage)image.getOriginalImage();
+			Rectangle anchor = new Rectangle(1, 1);
+			texturePaint = new AffineTexturePaint(bi, anchor);
+			texturePaint.setTransformationPath(path);
+		} else {
+			if (imageObject != null) {
+				log.warning("cannot load texture of type: " + imageObject.getClass());
+			} else {
+				log.warning("no texture found");
+			}
+		}
+		// workaround, awt otherwise does not notice texture changes
+		if (showTextureChecker.isSelected()) {
+			SceneComponent faces = layerComponent.getFaceComponent();
+			faces.setPaint(texturePaint);
+		}
 	}
 	
 	private void updateAppearances() {
@@ -206,9 +258,14 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		edges.setStroke(new BasicStroke(edgeWidthModel.getNumber().floatValue()));
 		edges.setAnnotated(edgeIndexChecker.isSelected());
 		Color fc = faceColorButton.getColor();
-		int alpha = (int)(faceAlphaModel.getNumber().doubleValue() * 255);
-		Color faceColorAlpha = new Color(fc.getRed(), fc.getGreen(), fc.getBlue(), alpha);
-		faces.setPaint(faceColorAlpha);
+		int faceAlpha = (int)(faceAlphaModel.getNumber().doubleValue() * 255);
+		Color faceColorAlpha = new Color(fc.getRed(), fc.getGreen(), fc.getBlue(), faceAlpha);
+		if (showTextureChecker.isSelected()) {
+			updateTexturePaint();
+			faces.setPaint(texturePaint);
+		} else {
+			faces.setPaint(faceColorAlpha);
+		}
 		faces.setAnnotationPaint(fc.darker());
 		faces.setAnnotated(faceIndexChecker.isSelected());
 		edgeSelection.setStroke(new BasicStroke(edgeWidthModel.getNumber().floatValue() * 2));
@@ -219,9 +276,8 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 		// global appearance
 		root.setStroke(edges.getStroke());
 		root.setOutlinePaint(edges.getOutlinePaint());
-		root.setPaint(faces.getPaint());
+		root.setPaint(faceColorAlpha);
 		root.setPointPaint(vertices.getPointPaint());
-		
 		viewer.repaint();
 	}
 	
@@ -266,6 +322,7 @@ implements HalfedgeListener, ColorChangedListener, ActionListener, ChangeListene
 	public void install(Controller c) throws Exception {
 		super.install(c);
 		hif = c.getPlugin(HalfedgeInterface.class);
+		scenePlugin = c.getPlugin(Scene.class);
 		activeLayerChanged(null, hif.getActiveLayer());
 		hif.addHalfedgeListener(this);
 		for (TextureSpacePlugin tp : c.getPlugins(TextureSpacePlugin.class)) {
