@@ -26,8 +26,11 @@ public class AffineTexturePaint extends TexturePaint {
 	public void setTransformationPath(SceneGraphPath path) {
 		this.transformationPath = path;
 	}
-	public SceneGraphPath getTransform() {
-		return transformationPath;
+	public AffineTransform getTextureTransform() {
+		EffectiveAppearance app = EffectiveAppearance.create(transformationPath);
+		Matrix texMatrix = (Matrix)app.getAttribute("polygonShader.texture2d:textureMatrix", new Matrix());
+		double[] texArr = texMatrix.getArray();
+		return new AffineTransform(texArr[0], texArr[4], texArr[1], texArr[5], texArr[3], texArr[7]);
 	}
 	
 	@Override
@@ -38,10 +41,7 @@ public class AffineTexturePaint extends TexturePaint {
 		AffineTransform xform, 
 		RenderingHints hints
 	) {
-		EffectiveAppearance app = EffectiveAppearance.create(transformationPath);
-		Matrix texMatrix = (Matrix)app.getAttribute("polygonShader.texture2d:textureMatrix", new Matrix());
-		double[] texArr = texMatrix.getArray();
-		AffineTransform T = new AffineTransform(texArr[0], texArr[4], texArr[1], texArr[5], texArr[3], texArr[7]);
+		AffineTransform T = getTextureTransform();
 		try {
 			T.invert();
 		} catch (NoninvertibleTransformException e) { }
