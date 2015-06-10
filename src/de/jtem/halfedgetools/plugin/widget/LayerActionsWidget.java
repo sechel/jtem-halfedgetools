@@ -41,11 +41,18 @@ public class LayerActionsWidget extends JPanel implements ActionListener, Change
 	private SpinnerNumberModel
 		xSizeModel = new SpinnerNumberModel(0.5, 0.0, 1.0, 0.1),
 		ySizeModel = new SpinnerNumberModel(0.5, 0.0, 1.0, 0.1),
-		zSizeModel = new SpinnerNumberModel(0.5, 0.0, 1.0, 0.1);
+		zSizeModel = new SpinnerNumberModel(0.5, 0.0, 1.0, 0.1),
+		xOriginModel = new SpinnerNumberModel(0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1.0),
+		yOriginModel = new SpinnerNumberModel(0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1.0),
+		zOriginModel = new SpinnerNumberModel(0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1.0);
+	
 	private JSpinner
 		xSizeSpinner = new JSpinner(xSizeModel),
 		ySizeSpinner = new JSpinner(ySizeModel),
-		zSizeSpinner = new JSpinner(zSizeModel);
+		zSizeSpinner = new JSpinner(zSizeModel),
+		xOriginSpinner = new JSpinner(xOriginModel),
+		yOriginSpinner = new JSpinner(yOriginModel),
+		zOriginSpinner = new JSpinner(zOriginModel);
 	
 	public LayerActionsWidget() {
 		setLayout(new GridBagLayout());
@@ -68,6 +75,25 @@ public class LayerActionsWidget extends JPanel implements ActionListener, Change
 		xSizeSpinner.addChangeListener(this);
 		ySizeSpinner.addChangeListener(this);
 		zSizeSpinner.addChangeListener(this);
+		
+		add(new JLabel("Origin"),lc);
+		add(new JLabel("x"),lc);
+		add(xOriginSpinner,lc);
+		add(new JLabel("y"),lc);
+		add(yOriginSpinner,lc);
+		add(new JLabel("z"),lc);
+		add(zOriginSpinner,rc);
+		xOriginSpinner.setPreferredSize(new Dimension(50,20));
+		yOriginSpinner.setPreferredSize(new Dimension(50,20));
+		zOriginSpinner.setPreferredSize(new Dimension(50,20));
+		clippingBox.addActionListener(this);
+		xOriginSpinner.addChangeListener(this);
+		yOriginSpinner.addChangeListener(this);
+		zOriginSpinner.addChangeListener(this);
+		xOriginSpinner.setEnabled(false);
+		yOriginSpinner.setEnabled(false);
+		zOriginSpinner.setEnabled(false);
+		
 		scaleGroup.add(relativeButton);
 		scaleGroup.add(absoluteButton);
 		relativeButton.setSelected(true);
@@ -98,6 +124,10 @@ public class LayerActionsWidget extends JPanel implements ActionListener, Change
 			zSizeModel.setMaximum(1.0);
 			zSizeModel.setStepSize(.05);
 		} else if(absoluteButton.isSelected()) {
+			xOriginSpinner.setEnabled(absoluteButton.isSelected());
+			yOriginSpinner.setEnabled(absoluteButton.isSelected());
+			zOriginSpinner.setEnabled(absoluteButton.isSelected());
+			
 			Rectangle3D bb = BoundingBoxUtility.calculateBoundingBox(layer.getGeometryRoot());
 			Rectangle3D bbGeometry = BoundingBoxUtility.calculateBoundingBox(layer.getGeometry());
 			double[] extent = bb.getExtent();
@@ -113,16 +143,25 @@ public class LayerActionsWidget extends JPanel implements ActionListener, Change
 			zSizeModel.setValue(2.0*gExtent[1]);
 			zSizeModel.setMaximum(Double.MAX_VALUE);
 			zSizeModel.setStepSize(extent[1]*0.05);
+			
+			xOriginModel.setStepSize(extent[0]*0.05);
+			yOriginModel.setStepSize(extent[1]*0.05);
+			zOriginModel.setStepSize(extent[1]*0.05);
 		}
 	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		if(e.getSource() == xSizeSpinner || e.getSource() == ySizeSpinner || e.getSource() == zSizeSpinner) {
+		if(e.getSource() == xSizeSpinner || e.getSource() == ySizeSpinner || e.getSource() == zSizeSpinner ||
+		   e.getSource() == xOriginSpinner || e.getSource() == yOriginSpinner || e.getSource() == zOriginSpinner) {
 			double x = xSizeModel.getNumber().doubleValue();
 			double y = ySizeModel.getNumber().doubleValue();
 			double z = zSizeModel.getNumber().doubleValue();
-			layer.setClippingScale(x,y,z);	
+			double ox = xOriginModel.getNumber().doubleValue();
+			double oy = yOriginModel.getNumber().doubleValue();
+			double oz = zOriginModel.getNumber().doubleValue();
+			layer.setClippingScale(x,y,z);
+			layer.setClippingOrigin(ox,oy,oz);
 		}
 	}
 	
@@ -143,6 +182,10 @@ public class LayerActionsWidget extends JPanel implements ActionListener, Change
 		xSizeModel.setValue(scale[0]);
 		ySizeModel.setValue(scale[1]);
 		zSizeModel.setValue(scale[2]);
+		double[] origin = layer.getClippingOrigin();
+		xOriginModel.setValue(origin[0]);
+		yOriginModel.setValue(origin[1]);
+		zOriginModel.setValue(origin[2]);
 	}
 	
 	

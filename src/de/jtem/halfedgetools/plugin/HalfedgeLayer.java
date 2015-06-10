@@ -151,6 +151,9 @@ public class HalfedgeLayer implements ActionListener {
 
 	private ActionTool 
 		actionTool = new ActionTool("PrimaryAction");
+	
+	private double[]
+		clippingOrigin = new double[]{0,0,0};
 
 	private HalfedgeLayer() {
 		layerRoot.addChild(geometryRoot);
@@ -555,22 +558,24 @@ public class HalfedgeLayer implements ActionListener {
 	}
 
 	protected void updateBoundingBox() {
-		boundingBoxRoot.setGeometry(null);
-		if (boundingBoxRoot.getChildNodes().contains(pivotRoot)) {
-			boundingBoxRoot.removeChild(pivotRoot);
+		synchronized(boundingBoxRoot) {
+			boundingBoxRoot.setGeometry(null);
+			if (boundingBoxRoot.getChildNodes().contains(pivotRoot)) {
+				boundingBoxRoot.removeChild(pivotRoot);
+			}
+			Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(layerRoot);
+			if (euclideanNormSquared(bbox.getExtent()) == 0)
+				return;
+			BoundingBoxUtility.removeZeroExtends(bbox);
+			IndexedFaceSet ifs = IndexedFaceSetUtility.representAsSceneGraph(bbox);
+			ifs.setName("Bounding Box");
+			boundingBoxRoot.setGeometry(ifs);
+			MatrixBuilder mb = MatrixBuilder.euclidean();
+			mb.translate(bbox.getMinX(), bbox.getMinY(), bbox.getMaxZ());
+			mb.scale(bbox.getMaxExtent() / 20);
+			mb.assignTo(pivotRoot);
+			boundingBoxRoot.addChild(pivotRoot);
 		}
-		Rectangle3D bbox = BoundingBoxUtility.calculateBoundingBox(layerRoot);
-		if (euclideanNormSquared(bbox.getExtent()) == 0)
-			return;
-		BoundingBoxUtility.removeZeroExtends(bbox);
-		IndexedFaceSet ifs = IndexedFaceSetUtility.representAsSceneGraph(bbox);
-		ifs.setName("Bounding Box");
-		boundingBoxRoot.setGeometry(ifs);
-		MatrixBuilder mb = MatrixBuilder.euclidean();
-		mb.translate(bbox.getMinX(), bbox.getMinY(), bbox.getMaxZ());
-		mb.scale(bbox.getMaxExtent() / 20);
-		mb.assignTo(pivotRoot);
-		boundingBoxRoot.addChild(pivotRoot);
 	}
 
 	@Override
@@ -985,6 +990,10 @@ public class HalfedgeLayer implements ActionListener {
 		clippingScale = new double[]{x,y,z};
 		updateClipping();
 	}
+	
+	public void setClippingOrigin(double x, double y, double z) {
+		clippingOrigin = new double[]{x,y,z};
+	}
 
 	public void setEnableClipping(boolean clip) {
 		clippingEnabled = clip;
@@ -995,13 +1004,13 @@ public class HalfedgeLayer implements ActionListener {
 		Rectangle3D bb = BoundingBoxUtility.calculateBoundingBox(layerRoot);
 		clippingRoot.removeAllChildren();
 		if(clippingEnabled) {
-			clippingRoot.addChild(createClippingBox(bb, clippingScale));
+			clippingRoot.addChild(createClippingBox(bb, clippingScale, clippingOrigin));
 		}
 	}
 
-	private SceneGraphComponent createClippingBox(Rectangle3D bb, double[] cs) {
+	private SceneGraphComponent createClippingBox(Rectangle3D bb, double[] cs, double[] origin) {
 		SceneGraphComponent clipBox =  new SceneGraphComponent("Clipping Box");
-		MatrixBuilder.euclidean().translate(bb.getCenter()).assignTo(clipBox);
+		
 		double[] extent = bb.getExtent();
 		double x = cs[0];
 		double y = cs[1];
@@ -1009,11 +1018,13 @@ public class HalfedgeLayer implements ActionListener {
 		
 		switch (clippingMode) {
 		case REL:
+			MatrixBuilder.euclidean().translate(bb.getCenter()).assignTo(clipBox);
 			x *= extent[0]/2;
 			y *= extent[1]/2;
 			z *= extent[2]/2;
 			break;
 		case ABS:
+			MatrixBuilder.euclidean().translate(origin).assignTo(clipBox);
 			break;
 		}
 		
@@ -1046,6 +1057,10 @@ public class HalfedgeLayer implements ActionListener {
 
 	public double[] getClippingScale() {
 		return clippingScale;
+	}
+
+	public double[] getClippingOrigin() {
+		return clippingOrigin;
 	}
 	
 	public boolean isClippingEnabled() {

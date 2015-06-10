@@ -37,6 +37,7 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin implements ItemLi
 	
 	private JRadioButton
 		triangleButton = new JRadioButton("Triangle"),
+		ngonButton = new JRadioButton("n-gon"),
 		cubeButton = new JRadioButton("Cube"),
 		openCubeButton = new JRadioButton("Open Cube"),
 		cylinderButton = new JRadioButton("Cylinder"),
@@ -47,11 +48,13 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin implements ItemLi
 		cylinderParametersPanel = new ShrinkPanel("Cyclinder parameters");
 	
 	private SpinnerNumberModel
+		ngonSize = new SpinnerNumberModel(5,3,Integer.MAX_VALUE, 1),
 		circlePoints = new SpinnerNumberModel(15, 3, 100, 1),
 		heightPoints = new SpinnerNumberModel(15, 2, 100, 1),
 		aspectRatio = new SpinnerNumberModel(1.0, 0.0001, 10000, 0.1);
 	
 	private JSpinner
+		ngonSpinner = new JSpinner(ngonSize),
 		circleSpinner = new JSpinner(circlePoints),
 		heightSpinner = new JSpinner(heightPoints),
 		ratioSpinner = new JSpinner(aspectRatio);
@@ -74,6 +77,7 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin implements ItemLi
 		
 		triangleButton.setSelected(true);
 		primitivesGroup.add(triangleButton);
+		primitivesGroup.add(ngonButton);
 		primitivesGroup.add(openCubeButton);
 		primitivesGroup.add(cubeButton);
 		primitivesGroup.add(cylinderButton);
@@ -91,6 +95,8 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin implements ItemLi
 		cylinderParametersPanel.setShrinked(false);
 		
 		panel.add(triangleButton,gbc2);
+		panel.add(ngonButton,gbc2);
+		panel.add(ngonSpinner,gbc2);
 		panel.add(cubeButton,gbc2);
 		panel.add(openCubeButton, gbc2);
 		panel.add(cylinderButton,gbc2);
@@ -117,6 +123,9 @@ public class PrimitivesGenerator extends AlgorithmDialogPlugin implements ItemLi
 		IndexedFaceSet ifs = null;
 		if(triangleButton.isSelected()) {
 			ifs = Primitives.regularPolygon(3);
+		}
+		if(ngonButton.isSelected()) {
+			ifs = Primitives.regularPolygon(ngonSize.getNumber().intValue());
 		}
 		if(cubeButton.isSelected()) {
 			ifs = Primitives.cube();

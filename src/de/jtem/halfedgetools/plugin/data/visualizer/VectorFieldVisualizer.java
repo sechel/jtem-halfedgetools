@@ -17,6 +17,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,17 +46,21 @@ import de.jtem.halfedge.Vertex;
 import de.jtem.halfedgetools.adapter.Adapter;
 import de.jtem.halfedgetools.adapter.AdapterSet;
 import de.jtem.halfedgetools.adapter.type.generic.BaryCenter3d;
+import de.jtem.halfedgetools.plugin.HalfedgeInterface;
 import de.jtem.halfedgetools.plugin.HalfedgeLayer;
 import de.jtem.halfedgetools.plugin.data.AbstractDataVisualization;
 import de.jtem.halfedgetools.plugin.data.DataVisualization;
 import de.jtem.halfedgetools.plugin.data.DataVisualizer;
 import de.jtem.halfedgetools.plugin.data.DataVisualizerPlugin;
 import de.jtem.halfedgetools.plugin.image.ImageHook;
+import de.jtem.halfedgetools.selection.Selection;
+import de.jtem.halfedgetools.selection.SelectionListener;
 import de.jtem.halfedgetools.util.GeometryUtility;
+import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.PluginInfo;
 
 public class VectorFieldVisualizer extends DataVisualizerPlugin implements
-		ActionListener, ChangeListener {
+		ActionListener, ChangeListener, SelectionListener {
 
 	private SpinnerNumberModel 
 		scaleModel = new SpinnerNumberModel(1.0, -100.0, 100.0, 0.1), 
@@ -67,7 +72,8 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		directedChecker = new JCheckBox("Directed"),
 		tubesChecker = new JCheckBox("Tubes"),
 		normalizedChecker = new JCheckBox("Normalized"),
-		centeredChecker = new JCheckBox("Centered");
+		centeredChecker = new JCheckBox("Centered"),
+		selectionChecker = new JCheckBox("Selected");
 	private JPanel 
 		optionsPanel = new JPanel();
 
@@ -86,6 +92,9 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 	
 	private VectorFieldVisualization actVis = null;
 	private boolean listenersDisabled = false;
+	
+	private List<VectorFieldVisualization>
+		visualizationList = new ArrayList<>();
 
 	public VectorFieldVisualizer() {
 		initOptionPanel();
@@ -122,6 +131,8 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		colorChooser.setSelectedIndex(8);
 		cl.gridwidth = 2;
 		optionsPanel.add(colorChooser, cl);
+		optionsPanel.add(selectionChecker, cr);
+		selectionChecker.addActionListener(this);
 		colorChooser.addActionListener(this);
 
 		checkTubesEnabled();
@@ -165,8 +176,13 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		vis.normalized = normalizedChecker.isSelected();
 		vis.centered = centeredChecker.isSelected();
 		vis.color = colors[colorChooser.getSelectedIndex()];
+		if(selectionChecker.isSelected()) {
+			vis.selection = layer.getSelection();
+		} else {
+			vis.selection = null;
+		}
 		layer.addTemporaryGeometry(vis.vectorsComponent);
-
+		visualizationList.add(vis);
 		return vis;
 	}
 
@@ -174,6 +190,7 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 	public void disposeVisualization(DataVisualization vis) {
 		VectorFieldVisualization vfVis = (VectorFieldVisualization) vis;
 		vis.getLayer().removeTemporaryGeometry(vfVis.vectorsComponent);
+		visualizationList.remove(vis);
 	}
 
 	@Override
@@ -197,6 +214,11 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		actVis.normalized = normalizedChecker.isSelected();
 		actVis.centered = centeredChecker.isSelected();
 		actVis.color = colors[colorChooser.getSelectedIndex()];
+		if(selectionChecker.isSelected()) {
+			actVis.selection = actVis.getLayer().getSelection();
+		} else {
+			actVis.selection = null;
+		}
 		actVis.update();
 	}
 
@@ -212,6 +234,8 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 				normalized = true, centered = true;
 		private Color color = Color.BLACK;
 
+		private Selection selection = null;
+		
 		public VectorFieldVisualization(HalfedgeLayer layer, Adapter<?> source,
 				DataVisualizer visualizer, NodeType type) {
 			super(layer, source, visualizer, type);
@@ -255,13 +279,25 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 			List<? extends Node> nodes = null;
 			switch (getType()) {
 			case Vertex:
-				nodes = hds.getVertices();
+				if(selection == null) {
+					nodes = hds.getVertices();
+				} else {
+					nodes = new LinkedList<Vertex<?,?,?> >(selection.getVertices());
+				}
 				break;
 			case Edge:
-				nodes = hds.getEdges();
+				if(selection == null) {
+					nodes = hds.getEdges();
+				} else {
+					nodes = new LinkedList<Edge<?,?,?> >(selection.getEdges());
+				}
 				break;
 			default:
-				nodes = hds.getFaces();
+				if(selection == null) {
+					nodes = hds.getFaces();
+				} else {
+					nodes = new LinkedList<Face<?,?,?> >(selection.getFaces());
+				}
 				break;
 			}
 
@@ -619,6 +655,20 @@ public class VectorFieldVisualizer extends DataVisualizerPlugin implements
 		listenersDisabled = false;
 
 		return optionsPanel;
+	}
+
+	@Override
+	public void selectionChanged(Selection s, HalfedgeInterface hif) {
+		if (listenersDisabled) return;
+		for (VectorFieldVisualization v : visualizationList) {
+			v.update();
+		}
+	}
+	
+	@Override
+	public void install(Controller c) throws Exception {
+		super.install(c);
+		c.getPlugin(HalfedgeInterface.class).addSelectionListener(this);
 	}
 
 }
