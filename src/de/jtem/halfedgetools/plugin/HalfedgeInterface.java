@@ -112,6 +112,7 @@ import de.jtem.halfedgetools.adapter.generic.AngleDefectAdapter;
 import de.jtem.halfedgetools.adapter.generic.GaussCurvatureAdapter;
 import de.jtem.halfedgetools.adapter.generic.SelectionAdapter;
 import de.jtem.halfedgetools.adapter.generic.UndirectedEdgeIndex;
+import de.jtem.halfedgetools.io.ExportOptions;
 import de.jtem.halfedgetools.io.HalfedgeIO;
 import de.jtem.halfedgetools.jreality.ConverterHds2Ifs;
 import de.jtem.halfedgetools.jreality.adapter.JRNormalAdapter;
@@ -746,18 +747,20 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	}
 
 	private class ExportAction extends AbstractAction implements Job {
-
+		
 		private static final long serialVersionUID = 1L;
 		private File selectedFile = null;
-
+		private ExportOptions options = ExportOptions.CURRENT;
+		
 		public ExportAction() {
 			putValue(NAME, "Export");
 			putValue(SMALL_ICON, ImageHook.getIcon("disk.png"));
-			putValue(SHORT_DESCRIPTION, "Export");
+			putValue(SHORT_DESCRIPTION, "Export (Shift-Click -> Visible Layers, Alt-Click -> All Layers");
 		}
 
-		private ExportAction(File selectedFile) {
+		private ExportAction(File selectedFile, ExportOptions options) {
 			this.selectedFile = selectedFile;
+			this.options = options;
 		}
 
 		@Override
@@ -767,10 +770,27 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 			try {
 				if (selectedFile.getName().toLowerCase().endsWith(".heml")) {
 					HalfedgeIO.writeHDS(hds, selectedFile.getAbsolutePath());
-				} else if (selectedFile.getName().toLowerCase()
-						.endsWith(".obj")) {
-					HalfedgeIO.writeOBJ(hds, getAdapters(),
-							selectedFile.getAbsolutePath());
+				} else if (selectedFile.getName().toLowerCase().endsWith(".obj")) {
+					if(options == ExportOptions.CURRENT) {
+						HalfedgeIO.writeOBJ(hds, getAdapters(),	selectedFile.getAbsolutePath());
+					} else if(options == ExportOptions.SELECTED) {
+						List<HalfedgeLayer> checkedLayers = getVisibleLayers();
+						List<HalfEdgeDataStructure<?, ?, ?>> hdss = new LinkedList<>();
+						List<String> names = new LinkedList<>();
+						for(HalfedgeLayer l : checkedLayers) {
+							hdss.add(l.get());
+							names.add(l.getName());
+						}
+						HalfedgeIO.writeOBJ(hdss, names, getAdapters(), selectedFile.getAbsolutePath());
+					} else if(options == ExportOptions.ALL) {
+						List<HalfEdgeDataStructure<?, ?, ?>> hdss = new LinkedList<>();
+						List<String> names = new LinkedList<>();
+						for(HalfedgeLayer l : layers) {
+							hdss.add(l.get());
+							names.add(l.getName());
+						}
+						HalfedgeIO.writeOBJ(hdss, names, getAdapters(), selectedFile.getAbsolutePath());
+					}
 				}
 			} catch (final Exception ex) {
 				Runnable r = new Runnable() {
@@ -805,8 +825,16 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 				if (result2 != JOptionPane.YES_OPTION)
 					return;
 			}
-
-			ExportAction exportJob = new ExportAction(file);
+			boolean selected = (e.getModifiers() & ActionEvent.SHIFT_MASK)== ActionEvent.SHIFT_MASK;
+			boolean all = (e.getModifiers() & ActionEvent.ALT_MASK) == ActionEvent.ALT_MASK;
+			ExportAction exportJob = null;
+			if(all) {
+				exportJob = new ExportAction(file, ExportOptions.ALL);
+			} else if(selected) {
+				exportJob = new ExportAction(file, ExportOptions.SELECTED);
+			} else {
+				exportJob = new ExportAction(file, ExportOptions.CURRENT);
+			}
 			jobQueue.queueJob(exportJob);
 		}
 
@@ -863,14 +891,18 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 				if (selectedFile.getName().toLowerCase().endsWith(".obj")) {
 					ReaderOBJ reader = new ReaderOBJ();
 					SceneGraphComponent c = reader.read(selectedFile);
-					Geometry g = SceneGraphUtility.getFirstGeometry(c);
-					if (g == null)
-						return;
-					if (g instanceof IndexedFaceSet) {
-						IndexedFaceSet ifs = (IndexedFaceSet) g;
-						IndexedFaceSetUtility.calculateAndSetNormals(ifs);
+					//	layers.remove(activeLayer);
+					for(SceneGraphComponent s : c.getChildComponents()) {
+						Geometry g = SceneGraphUtility.getFirstGeometry(s);
+						if (g == null)
+							continue;
+						if (g instanceof IndexedFaceSet) {
+							HalfedgeLayer l = createLayer(s.getName());
+							IndexedFaceSet ifs = (IndexedFaceSet) g;
+							IndexedFaceSetUtility.calculateAndSetNormals(ifs);
+							l.set(ifs);
+						}	
 					}
-					set(g);
 				} else if (selectedFile.getName().toLowerCase().endsWith(".heml")) {
 					String filePath = selectedFile.getAbsolutePath();
 					HalfEdgeDataStructure<?, ?, ?> hds = HalfedgeIO.readHDS(filePath);
@@ -1340,6 +1372,16 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 
 	public HalfedgeLayer getActiveLayer() {
 		return activeLayer;
+	}
+	
+	public List<HalfedgeLayer> getVisibleLayers() {
+		List<HalfedgeLayer> checked = new LinkedList<>();
+		for(HalfedgeLayer l : layers) {
+			if(l.isVisible()) {
+				checked.add(l);
+			}
+		}
+		return checked;
 	}
 	
 	public List<HalfedgeLayer> getAllLayers() {

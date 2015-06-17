@@ -35,6 +35,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -88,5 +91,33 @@ public class HalfedgeIO {
 		
 	}
 
+	public static void writeOBJ(List<HalfEdgeDataStructure<?, ?, ?>> hdss, List<String> names, AdapterSet adapters, String file) {
+		try {
+			FileOutputStream fos = new FileOutputStream(file);
+			ConverterHeds2JR converter = new ConverterHeds2JR();
+			Iterator<String> nameIter = names.iterator();
+			HashSet<String> newNames = new HashSet<>(); 
+			Iterator<HalfEdgeDataStructure<?, ?, ?>> hdsIter = hdss.iterator();
+			int count = 0;
+			for (; hdsIter.hasNext() && nameIter.hasNext();) {
+				String name = nameIter.next();
+				name = name.replace(' ','_');
+				while(newNames.contains(name)) {
+					name += "_";
+				}
+				newNames.add(name);
+				HalfEdgeDataStructure<?, ?, ?> hds = hdsIter.next();
+				if(hds.numVertices() == 0) {
+					continue;
+				}
+				count += WriterOBJ.write(converter.heds2ifs(hds, adapters,null), name, count, fos);
+			}
+			fos.close();
+		} catch (Exception e1) {
+			System.err.println("Could not write to file " + file);
+			e1.printStackTrace();
+		}
+	
+}
 }
 
