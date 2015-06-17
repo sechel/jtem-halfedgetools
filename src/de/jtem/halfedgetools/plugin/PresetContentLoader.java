@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -364,6 +365,7 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 		if (folder != null) {
 			File[] filesArray = folder.listFiles(SUPPORTED_FILES_FILTER);
 			List<File> files = Arrays.asList(filesArray);
+			Collections.sort(files);
 			folderFiles.addAll(files);
 		}
 		fileList.setModel(new FileModel());
@@ -423,10 +425,20 @@ public class PresetContentLoader extends ViewShrinkPanelPlugin implements Action
 				try {
 					HalfedgeLayer layer = hif.getActiveLayer();
 					SceneGraphComponent c = objReader.read(selectedFile);
-					IndexedFaceSet g = (IndexedFaceSet)getFirstGeometry(c);
-					IndexedFaceSetUtility.calculateAndSetNormals(g);
-					layer.set(g);
-					if(hif.getActiveLayer() == layer) {
+					if(c.getChildComponentCount() == 1) {
+						IndexedFaceSet g = (IndexedFaceSet)getFirstGeometry(c);
+						IndexedFaceSetUtility.calculateAndSetNormals(g);
+						layer.set(g);
+						if(hif.getActiveLayer() == layer) {
+							hif.encompassContent();
+						}
+					} else {
+						for(SceneGraphComponent s : c.getChildComponents()) {
+							IndexedFaceSet g = (IndexedFaceSet)getFirstGeometry(s);
+							IndexedFaceSetUtility.calculateAndSetNormals(g);
+							HalfedgeLayer newLayer = hif.createLayer(s.getName());
+							newLayer.set(g);
+						}
 						hif.encompassContent();
 					}
 				} catch (IOException e1) {
