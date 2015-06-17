@@ -2,3 +2,4 @@ bin
 *.xml
 /build
 /release
+/dependencies.properties

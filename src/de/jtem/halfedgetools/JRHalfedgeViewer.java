@@ -65,7 +65,7 @@ public class JRHalfedgeViewer {
 			e.printStackTrace();
 		}
 		String JOGL3 = "";
-		if (useGLJPanel) {
+		if (useJOGL3) {
 			JOGL3 = SystemProperties.VIEWER_DEFAULT_JOGL3 + " "; 
 		}
 		if (overlaysSupported) {
