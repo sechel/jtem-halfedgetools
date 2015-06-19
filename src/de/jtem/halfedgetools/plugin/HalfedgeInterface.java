@@ -9,6 +9,8 @@ import static de.jreality.shader.CommonAttributes.TRANSPARENCY_DEFAULT;
 import static de.jreality.shader.CommonAttributes.TUBE_RADIUS;
 import static de.jreality.util.SceneGraphUtility.getPathsBetween;
 import static java.awt.GridBagConstraints.BOTH;
+import static java.awt.event.ActionEvent.CTRL_MASK;
+import static java.awt.event.ActionEvent.SHIFT_MASK;
 import static java.awt.event.InputEvent.CTRL_DOWN_MASK;
 import static javax.swing.JFileChooser.FILES_ONLY;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
@@ -633,18 +635,38 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		public DeleteLayerAction() {
 			putValue(NAME, "Delete Layer");
 			putValue(SMALL_ICON, ImageHook.getIcon("page_white_delete.png"));
-			putValue(SHORT_DESCRIPTION, "Delete Layer");
+			putValue(SHORT_DESCRIPTION, "Delete Layer (Shift-Click -> Visible Layers; Ctrl-Click -> All Layers");
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			HalfedgeLayer layer = getActiveLayer();
-			Window w = getWindowAncestor(shrinkPanel);
-			int result = JOptionPane.showConfirmDialog(w, "Delete Layer "
-					+ layer + "?");
-			if (result != JOptionPane.OK_OPTION)
-				return;
-			removeLayer(layer);
+			if((e.getModifiers() & CTRL_MASK) == CTRL_MASK) {
+				Window w = getWindowAncestor(shrinkPanel);
+				int result = JOptionPane.showConfirmDialog(w, "Delete all layers?");
+				if (result != JOptionPane.OK_OPTION)
+					return;
+				for(HalfedgeLayer l : layers) {
+					removeLayer(l);
+				}
+			} else if((e.getModifiers() & SHIFT_MASK) == SHIFT_MASK) {
+				Window w = getWindowAncestor(shrinkPanel);
+				int result = JOptionPane.showConfirmDialog(w, "Delete visible layers?");
+				if (result != JOptionPane.OK_OPTION)
+					return;
+				for(HalfedgeLayer l : getVisibleLayers()) {
+					removeLayer(l);
+				}
+			} else {
+				HalfedgeLayer layer = getActiveLayer();
+				Window w = getWindowAncestor(shrinkPanel);
+				int result = JOptionPane.showConfirmDialog(w, "Delete all layer " + layer.getName() +" ?");
+				if (result != JOptionPane.OK_OPTION)
+					return;
+				removeLayer(layer);
+			}
+			if(layers.isEmpty()) {
+				createLayer("Default Layer");
+			}
 			updateStates();
 			checkContent();
 		}
@@ -755,7 +777,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		public ExportAction() {
 			putValue(NAME, "Export");
 			putValue(SMALL_ICON, ImageHook.getIcon("disk.png"));
-			putValue(SHORT_DESCRIPTION, "Export (Shift-Click -> Visible Layers, Alt-Click -> All Layers");
+			putValue(SHORT_DESCRIPTION, "Export (Shift-Click -> Visible Layers, Ctrl-Click -> All Layers");
 		}
 
 		private ExportAction(File selectedFile, ExportOptions options) {
@@ -825,8 +847,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 				if (result2 != JOptionPane.YES_OPTION)
 					return;
 			}
-			boolean selected = (e.getModifiers() & ActionEvent.SHIFT_MASK)== ActionEvent.SHIFT_MASK;
-			boolean all = (e.getModifiers() & ActionEvent.ALT_MASK) == ActionEvent.ALT_MASK;
+			boolean selected = (e.getModifiers() & SHIFT_MASK)== SHIFT_MASK;
+			boolean all = (e.getModifiers() & CTRL_MASK) == CTRL_MASK;
 			ExportAction exportJob = null;
 			if(all) {
 				exportJob = new ExportAction(file, ExportOptions.ALL);
@@ -901,8 +923,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 							IndexedFaceSet ifs = (IndexedFaceSet) g;
 							IndexedFaceSetUtility.calculateAndSetNormals(ifs);
 							l.set(ifs);
-						}	
+						}
 					}
+					activateLayer(layers.get(0));
 				} else if (selectedFile.getName().toLowerCase().endsWith(".heml")) {
 					String filePath = selectedFile.getAbsolutePath();
 					HalfEdgeDataStructure<?, ?, ?> hds = HalfedgeIO.readHDS(filePath);
@@ -1305,6 +1328,20 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 		return newLayer;
 	}
 
+	public void addAllLayers(final List<HalfedgeLayer> ls) {
+		for(HalfedgeLayer l : ls) {
+			if (layers.contains(l)) {
+				continue;
+			}
+			layers.add(0, l);
+			root.addChild(l.getLayerRoot());
+			fireLayerAdded(l);
+		}
+		checkContent();
+		updateStates();
+		activateLayer(layers.get(layers.size()-1));
+	}
+	
 	public void addLayer(HalfedgeLayer layer) {
 		if (layers.contains(layer))
 			return;
