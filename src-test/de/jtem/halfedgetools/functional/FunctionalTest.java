@@ -64,7 +64,7 @@ public abstract class FunctionalTest <
 > {
 
 	private static Logger 
-		log = Logger.getLogger(FunctionalTest.class.getSimpleName());
+		log = Logger.getLogger(FunctionalTest.class.getName());
 	
 	private Double
 		eps = 1E-5,
