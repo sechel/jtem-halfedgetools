@@ -914,15 +914,28 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 					ReaderOBJ reader = new ReaderOBJ();
 					SceneGraphComponent c = reader.read(selectedFile);
 					//	layers.remove(activeLayer);
-					for(SceneGraphComponent s : c.getChildComponents()) {
-						Geometry g = SceneGraphUtility.getFirstGeometry(s);
+					List<SceneGraphComponent> childComponents = c.getChildComponents();
+					if(childComponents.size() == 1) {
+						Geometry g = SceneGraphUtility.getFirstGeometry(c);
 						if (g == null)
-							continue;
+							return;
 						if (g instanceof IndexedFaceSet) {
-							HalfedgeLayer l = createLayer(s.getName());
+							HalfedgeLayer l = getActiveLayer();
 							IndexedFaceSet ifs = (IndexedFaceSet) g;
 							IndexedFaceSetUtility.calculateAndSetNormals(ifs);
 							l.set(ifs);
+						}
+					} else {
+						for(SceneGraphComponent s : childComponents) {
+							Geometry g = SceneGraphUtility.getFirstGeometry(s);
+							if (g == null)
+								continue;
+							if (g instanceof IndexedFaceSet) {
+								HalfedgeLayer l = createLayer(s.getName());
+								IndexedFaceSet ifs = (IndexedFaceSet) g;
+								IndexedFaceSetUtility.calculateAndSetNormals(ifs);
+								l.set(ifs);
+							}
 						}
 					}
 					activateLayer(layers.get(0));
