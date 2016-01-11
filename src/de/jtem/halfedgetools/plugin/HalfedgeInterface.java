@@ -913,7 +913,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 				if (selectedFile.getName().toLowerCase().endsWith(".obj")) {
 					ReaderOBJ reader = new ReaderOBJ();
 					SceneGraphComponent c = reader.read(selectedFile);
-					//	layers.remove(activeLayer);
 					List<SceneGraphComponent> childComponents = c.getChildComponents();
 					if(childComponents.size() == 1) {
 						Geometry g = SceneGraphUtility.getFirstGeometry(c);
@@ -938,7 +937,6 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 							}
 						}
 					}
-					activateLayer(layers.get(0));
 				} else if (selectedFile.getName().toLowerCase().endsWith(".heml")) {
 					String filePath = selectedFile.getAbsolutePath();
 					HalfEdgeDataStructure<?, ?, ?> hds = HalfedgeIO.readHDS(filePath);
