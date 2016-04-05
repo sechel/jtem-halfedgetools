@@ -1,17 +1,15 @@
 package de.jtem.halfedgetools.algorithm.simplification;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Set;
 
 import javax.vecmath.Matrix3d;
 import javax.vecmath.Tuple3d;
 import javax.vecmath.Vector3d;
 
-import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
@@ -37,11 +35,11 @@ public class GarlandHeckbert <
 		activeMesh = null;
 	private AdapterSet
 		a = null;
-	private HashMap<E, EdgePQItem> 
+	private Map<E, EdgePQItem>
 		edgeOperationMap = new HashMap<E, EdgePQItem>();
 	private PriorityQueue<EdgePQItem> 
 		pq = new PriorityQueue<EdgePQItem>();
-	private HashMap<V, Quadric> 
+	private Map<V, Quadric> 
 		quadric_map = new HashMap<V, Quadric>();
 	private boolean 
 		forceBoundary = false;
@@ -51,7 +49,6 @@ public class GarlandHeckbert <
 		activeMesh = mesh;
 		this.a = a;
 	}
-	
 	
 	private class Quadric {
 		
@@ -85,7 +82,7 @@ public class GarlandHeckbert <
 			return Double.compare(this.error, item.error);
 		}
 
-		public Set<E> collapse() {
+		public List<E> collapse() {
 			if (!isValidEdgeOperation(edge)) {
 				return null;
 			}
@@ -113,8 +110,8 @@ public class GarlandHeckbert <
 			a.set(Position.class, v, location);
 
 			// get 2 ring (as sets)
-			Set<E> ring2EdgeSet = new HashSet<E>();
-			Set<V> ring2VertexSet = new HashSet<V>();
+			List<E> ring2EdgeSet = new LinkedList<E>();
+			List<V> ring2VertexSet = new LinkedList<V>();
 
 			List<V> ring1List = HalfEdgeUtilsExtra.getVertexStar(v);
 			for (V ring1Vertex : ring1List) {
@@ -204,7 +201,7 @@ public class GarlandHeckbert <
 				System.out.println("ERROR: There is nothing left to simplify!");
 				return;
 			}
-			Set<E> l = p.collapse();
+			List<E> l = p.collapse();
 			if (l != null) {
 				for (E e : l) {
 					EdgePQItem edgePqItem = edgeOperationMap.get(e);
@@ -293,8 +290,6 @@ public class GarlandHeckbert <
 		} else if (A.determinant() < Rn.TOLERANCE || (v1ob && v2ob)) {
 			double[] p1 = a.get(Position3d.class, v1, double[].class);
 			double[] p2 = a.get(Position3d.class, v2, double[].class);
-			Pn.dehomogenize(p1, p1);
-			Pn.dehomogenize(p2, p2);
 			v = Rn.linearCombination(null, 0.5, p1, 0.5, p2);
 		} else {
 			Ainv = new Matrix3d(A);
