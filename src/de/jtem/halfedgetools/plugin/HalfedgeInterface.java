@@ -645,7 +645,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 				int result = JOptionPane.showConfirmDialog(w, "Delete all layers?");
 				if (result != JOptionPane.OK_OPTION)
 					return;
-				for(HalfedgeLayer l : layers) {
+				for(HalfedgeLayer l : new LinkedList<>(layers)) {
 					removeLayer(l);
 				}
 			} else if((e.getModifiers() & SHIFT_MASK) == SHIFT_MASK) {
@@ -659,7 +659,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 			} else {
 				HalfedgeLayer layer = getActiveLayer();
 				Window w = getWindowAncestor(shrinkPanel);
-				int result = JOptionPane.showConfirmDialog(w, "Delete all layer " + layer.getName() +" ?");
+				int result = JOptionPane.showConfirmDialog(w, "Delete layer " + layer.getName() +" ?");
 				if (result != JOptionPane.OK_OPTION)
 					return;
 				removeLayer(layer);
