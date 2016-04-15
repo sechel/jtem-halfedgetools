@@ -42,6 +42,7 @@ import java.util.List;
 import com.thoughtworks.xstream.XStream;
 
 import de.jreality.writer.WriterOBJ;
+import de.jreality.writer.WriterSTL;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
@@ -118,6 +119,45 @@ public class HalfedgeIO {
 			e1.printStackTrace();
 		}
 	
-}
+	}
+
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void writeSTL(HDS offsetLayout, AdapterSet as, String fileName) {
+		writeSTL(offsetLayout, as, fileName, false);
+	}
+	
+	public static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void writeSTLSolid(HDS offsetLayout, AdapterSet as, String fileName) {
+		writeSTL(offsetLayout, as, fileName, true);
+	}
+	
+	private static <
+		V extends Vertex<V, E, F>,
+		E extends Edge<V, E, F>, 
+		F extends Face<V, E, F>,
+		HDS extends HalfEdgeDataStructure<V, E, F>
+	> void writeSTL(HDS offsetLayout, AdapterSet as, String fileName, boolean solid) {
+		try {
+			FileOutputStream fos = new FileOutputStream(fileName);
+			ConverterHeds2JR converter = new ConverterHeds2JR();
+			if(solid) {
+				WriterSTL.writeSolid(converter.heds2ifs(offsetLayout, as ,null), fos);
+			} else {
+				WriterSTL.write(converter.heds2ifs(offsetLayout, as ,null), fos);
+			}
+			fos.close();
+		} catch (Exception e1) {
+			System.err.println("Could not write to file " + fileName);
+			e1.printStackTrace();		}
+
+	}
 }
 
