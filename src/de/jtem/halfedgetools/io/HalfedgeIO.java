@@ -111,7 +111,11 @@ public class HalfedgeIO {
 				if(hds.numVertices() == 0) {
 					continue;
 				}
-				count += WriterOBJ.write(converter.heds2ifs(hds, adapters,null), name, count, fos);
+				if(hds.numFaces() != 0) {
+					count += WriterOBJ.write(converter.heds2ifs(hds, adapters,null), name, count, fos);
+				} else {
+					count += WriterOBJ.write(converter.heds2ifs(hds, adapters, null), name, count, true, fos);
+				}
 			}
 			fos.close();
 		} catch (Exception e1) {
