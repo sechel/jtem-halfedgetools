@@ -225,6 +225,8 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	
 	private boolean
 		normalizeContent = true;
+	private boolean 
+		autoUpdate = true;
 	
 	public HalfedgeInterface() {
 		makeLayout();
@@ -640,6 +642,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			autoUpdate = false;
 			if((e.getModifiers() & CTRL_MASK) == CTRL_MASK) {
 				Window w = getWindowAncestor(shrinkPanel);
 				int result = JOptionPane.showConfirmDialog(w, "Delete all layers?");
@@ -667,6 +670,7 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 			if(layers.isEmpty()) {
 				createLayer("Default Layer");
 			}
+			autoUpdate = true;
 			updateStates();
 			checkContent();
 		}
@@ -1017,6 +1021,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	}
 
 	protected void updateStates() {
+		if(!autoUpdate) {
+			return;
+		}
 		Runnable updateStatesRunner = new Runnable() {
 			@Override
 			public void run() {
@@ -1437,6 +1444,9 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 	}
 
 	public void checkContent() {
+		if(!autoUpdate) {
+			return;
+		}
 		if (scene == null) return;
 		List<SceneGraphPath> paths = getPathsBetween(scene.getSceneRoot(), root);
 		if (paths.isEmpty()) {
@@ -1683,6 +1693,10 @@ public class HalfedgeInterface extends ShrinkPanelPlugin implements
 
 	public void setNormalizeContent(boolean normalizeContent) {
 		this.normalizeContent = normalizeContent;
+	}
+
+	public void setAutoUpdate(boolean b) {
+		autoUpdate = b;
 	}
 	
 }
