@@ -63,6 +63,7 @@ import de.jtem.halfedgetools.plugin.algorithm.simplification.GarlandHeckbertPlug
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkLinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.CatmullClarkPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.DooSabinPlugin;
+import de.jtem.halfedgetools.plugin.algorithm.subdivision.DualGraphSubdivisionPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.LoopLinearPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.LoopPlugin;
 import de.jtem.halfedgetools.plugin.algorithm.subdivision.MedialGraphLinearPlugin;
@@ -161,6 +162,7 @@ public class HalfedgePluginFactory {
 		s.add(new StellarLinearPlugin());
 		s.add(new TriangulatePlugin());
 		s.add(new TriangulateCutCornersPlugin());
+		s.add(new DualGraphSubdivisionPlugin());
 		return s;
 	}
 	
