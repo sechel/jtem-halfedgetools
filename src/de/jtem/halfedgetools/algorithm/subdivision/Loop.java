@@ -31,6 +31,13 @@ OF SUCH DAMAGE.
 
 package de.jtem.halfedgetools.algorithm.subdivision;
 
+import static de.jreality.math.Rn.add;
+import static de.jreality.math.Rn.linearCombination;
+import static de.jreality.math.Rn.times;
+import static de.jtem.halfedge.util.HalfEdgeUtils.incomingEdges;
+import static java.lang.StrictMath.cos;
+import static java.lang.StrictMath.pow;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,12 +45,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.jreality.math.Rn;
 import de.jtem.halfedge.Edge;
 import de.jtem.halfedge.Face;
 import de.jtem.halfedge.HalfEdgeDataStructure;
 import de.jtem.halfedge.Vertex;
-import de.jtem.halfedge.util.HalfEdgeUtils;
 import de.jtem.halfedgetools.adapter.TypedAdapterSet;
 import de.jtem.halfedgetools.adapter.type.BaryCenter;
 import de.jtem.halfedgetools.adapter.type.Position;
@@ -70,11 +75,10 @@ public class Loop {
 		Map<V, double[]> oldVtoPos = new HashMap<V, double[]>();
 		Map<V,E> newVtoOldE = new HashMap<V,E>();
 		Map<E, Set<E>> oldEtoNewEs = new HashMap<E,Set<E>>();
-//		Map<E,Set<E>> oldEtoOldEs = new HashMap<E,Set<E>>();
 		
 		int maxDeg = 0;
 		for(V v : oldHeds.getVertices()) {
-			maxDeg = Math.max(maxDeg, HalfEdgeUtils.incomingEdges(v).size());
+			maxDeg = Math.max(maxDeg, incomingEdges(v).size());
 		}
 		
 		
@@ -84,54 +88,18 @@ public class Loop {
 		HashMap<Integer, Double> alphaMap = new HashMap<Integer, Double>();
 		for(int i = 1; i <= maxDeg; i++) {
 			double alpha = 0.0;
-			if(i == 6)
+			if(i == 6) {
 				alpha = 3.0/8.0;
-			else
-				alpha = 5.0/8.0 - StrictMath.pow(3.0/8.0 + 1.0/4.0 * StrictMath.cos(2*Math.PI/i),2);
+			} else {
+				alpha = 5.0/8.0 - pow(3.0/8.0 + 1.0/4.0 * cos(2*Math.PI/i),2);
+			}
 			alphaMap.put(i, alpha);
 		}
 		
-		//just an idea for a map to locate the n-gon 
-		// (in this case triangle) of the grid
-		//maybe we can use this later to locate the symmetry cycle
-//		for (E e: oldHeds.getEdges()){
-//			Set<E> oldEs = new HashSet<E>();
-//			E tmp = e.getNextEdge();
-//			while (tmp != e){
-//				oldEs.add(tmp);
-//				tmp.getNextEdge();
-//			}			
-//			oldEtoOldEs.put(e, oldEs);
-//		}
-//		Set<E> checkE = new HashSet<E>();
 		
 		for(E e : oldHeds.getPositiveEdges()) {
-
 			double[] pos = new double[3];
-			
-			// calc with edge midpoint
-//			eA.setEdgeAlpha(0.5);
-//			eA.setEdgeIgnore(true);
-//			pos = eA.get(e);
-			
-			// calc with original scheme
-			// Verschiebung der neuen Punkte p_neu = 1/8*(3*a+3*b+1*c+1*d)
-//			eA.setEdgeIgnore(true);
-//			eA.setEdgeAlpha(1.0);
-//			double[] a = eA.get(e.getPreviousEdge());
-//			double[] b = eA.get(e.getOppositeEdge().getPreviousEdge());
-//			eA.setEdgeIgnore(false);
-//			double[] c = eA.get(e.getOppositeEdge().getNextEdge());
-//			double[] d = eA.get(e.getNextEdge().getOppositeEdge());
-//			
-//			Rn.times(a,3.0,a);
-//			Rn.times(b,3.0,b);
-//			Rn.add(pos, b, a);
-//			Rn.add(pos, c, pos);
-//			Rn.add(pos, d, pos);
-//			Rn.times(pos, 1.0/8.0, pos);
-			
-			if (e.getLeftFace() == null || e.getRightFace() == null){
+			if (e.getLeftFace() == null || e.getRightFace() == null) {
 				// boarderhandling edge-midpoints
 				a.setParameter("alpha", 0.5);
 				a.setParameter("ignore", true);
@@ -146,12 +114,12 @@ public class Loop {
 				a.setParameter("ignore", true);
 				double[] m = a.get(BaryCenter.class, e);
 				
-				Rn.times(b1, 3.0/8.0, b1);
-				Rn.times(b2, 3.0/8.0, b2);
-				Rn.times(m, 1.0/4.0, m);
+				times(b1, 3.0/8.0, b1);
+				times(b2, 3.0/8.0, b2);
+				times(m, 1.0/4.0, m);
 				
-				Rn.add(pos, b1, b2);
-				Rn.add(pos, m, pos);
+				add(pos, b1, b2);
+				add(pos, m, pos);
 				
 				oldEtoPos.put(e, pos);
 			}
@@ -162,21 +130,21 @@ public class Loop {
 		//	Falls der Grad d := #Nachbarn =6,
 		//	ist der Punkt regulär.
 		for(V v : oldHeds.getVertices()) {
-			List<E> star = HalfEdgeUtils.incomingEdges(v);
+			List<E> star = incomingEdges(v);
 			int deg = star.size();
 			
 			double[] mid = new double[3];
 			for(E e : star) {
 				a.setParameter("alpha", 0.0);
 				a.setParameter("ignore", false);
-				Rn.add(mid, a.get(BaryCenter3d.class, e), mid);
+				add(mid, a.get(BaryCenter3d.class, e), mid);
 			}
-			Rn.times(mid, 1.0 / deg, mid);	
+			times(mid, 1.0 / deg, mid);	
 			
 			double[] newpos = new double[3];
 			double alpha = alphaMap.get(deg);
 			double[] p = a.get(BaryCenter3d.class, v);
-			Rn.linearCombination(newpos, 1.0 - alpha, p, alpha, mid);
+			linearCombination(newpos, 1.0 - alpha, p, alpha, mid);
 			
 			oldVtoPos.put(v, newpos);			
 		}
