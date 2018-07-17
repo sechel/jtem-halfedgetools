@@ -197,7 +197,7 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		view = c.getPlugin(View.class);
 		hcp = c.getPlugin(HalfedgeInterface.class);
 		viewMenuBar = c.getPlugin(ViewMenuBar.class);
-		String catName = getCategory();
+		String catName = getCategory().toString();
 		viewMenuBar.addMenuItem(getClass(), getPriority(), action, "Halfedge", catName);
 		dropdownToolbar = c.getPlugin(AlgorithmDropdownToolbar.class);
 		dropdownToolbar.addAlgorithm(this);
@@ -219,8 +219,8 @@ public abstract class AlgorithmPlugin extends Plugin implements Comparable<Algor
 		return null;
 	}
 	
-	public String getCategory() {
-		return getAlgorithmCategory().toString();
+	public AlgorithmCategory getCategory() {
+		return getAlgorithmCategory();
 	}
 	
 	public AlgorithmCategory getAlgorithmCategory() {

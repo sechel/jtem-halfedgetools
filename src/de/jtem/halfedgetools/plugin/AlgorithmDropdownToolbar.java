@@ -30,11 +30,11 @@ import de.jtem.jrworkspace.plugin.flavor.ToolBarFlavor;
 
 public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 
-	private Map<String, JComboBox<AlgorithmPlugin>>
+	private Map<AlgorithmCategory, JComboBox<AlgorithmPlugin>>
 		comboMap = new HashMap<>();
 	
-	private Map<String, Set<AlgorithmPlugin>>
-		algoMap = new HashMap<String, Set<AlgorithmPlugin>>();
+	private Map<AlgorithmCategory, Set<AlgorithmPlugin>>
+		algoMap = new HashMap<AlgorithmCategory, Set<AlgorithmPlugin>>();
 	
 	private JToolBar
 		comboToolBar = new JToolBar("Halfedge Algorithms");
@@ -43,15 +43,15 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 
 	}
 
-	private void addComboBox(String cat) {
+	private void addComboBox(AlgorithmCategory cat) {
 		JComboBox<AlgorithmPlugin> catCombo = new JComboBox<>();
 		catCombo.setMaximumRowCount(50);
 		AlgorithmComboModel model = new AlgorithmComboModel(cat);
 		catCombo.setModel(model);
 		AlgorithmCellRenderer renderer = new AlgorithmCellRenderer(cat);
 		catCombo.setRenderer(renderer);
-		comboMap.put(cat.toString(), catCombo);
-		algoMap.put(cat.toString(), new HashSet<AlgorithmPlugin>());
+		comboMap.put(cat, catCombo);
+		algoMap.put(cat, new HashSet<AlgorithmPlugin>());
 		updateComboBoxes();
 	}
 	
@@ -63,10 +63,10 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 		
 		private static final long 
 			serialVersionUID = 1L;
-		private String
-			category = AlgorithmCategory.Custom.toString();
+		private AlgorithmCategory
+			category = AlgorithmCategory.Custom;
 
-		public AlgorithmCellRenderer(String cat) {
+		public AlgorithmCellRenderer(AlgorithmCategory cat) {
 			this.category = cat;
 		}
 		
@@ -92,10 +92,10 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 	
 	private class AlgorithmComboModel implements ComboBoxModel<AlgorithmPlugin> {
 
-		private String
-			category = AlgorithmCategory.Custom.toString();
+		private AlgorithmCategory
+			category = AlgorithmCategory.Custom;
 		
-		public AlgorithmComboModel(String cat) {
+		public AlgorithmComboModel(AlgorithmCategory cat) {
 			this.category = cat;
 		}
 		
@@ -136,7 +136,7 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 	}
 	
 	
-	protected List<AlgorithmPlugin> getAlgorithms(String cat) {
+	protected List<AlgorithmPlugin> getAlgorithms(AlgorithmCategory cat) {
 		List<AlgorithmPlugin> result = new LinkedList<AlgorithmPlugin>();
 		Set<AlgorithmPlugin> algoSet = algoMap.get(cat);
 		result.addAll(algoSet);
@@ -151,10 +151,10 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth = 1;
 		int numCombos = 0;
-		LinkedList<String> algorithmCategories = new LinkedList<String>(comboMap.keySet());
+		LinkedList<AlgorithmCategory> algorithmCategories = new LinkedList<>(comboMap.keySet());
 		Collections.sort(algorithmCategories);
 				
-		for (String cat : algorithmCategories) {
+		for (AlgorithmCategory cat : algorithmCategories) {
 			JComboBox<AlgorithmPlugin> combo = comboMap.get(cat);
 			Set<AlgorithmPlugin> algos = algoMap.get(cat);
 			if (algos.isEmpty()) continue;
@@ -183,7 +183,7 @@ public class AlgorithmDropdownToolbar extends Plugin implements ToolBarFlavor {
 	}
 	
 	public void addAlgorithm(AlgorithmPlugin ap) {
-		String algoName = ap.getCategory();
+		AlgorithmCategory algoName = ap.getCategory();
 		if(!algoMap.containsKey(algoName)) {
 			addComboBox(algoName);
 		}
